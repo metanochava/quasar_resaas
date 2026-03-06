@@ -14,7 +14,7 @@ pushtag:
 	git tag v$$VERSION; \
 	git push origin main; \
 	git push origin v$$VERSION; 
-pushnpm:
+publish:
 	npm version patch --no-git-tag-version; \
 	git add .; \
 	VERSION=$$(node -p "require('./package.json').version"); \
