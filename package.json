@@ -1,15 +1,15 @@
 {
-  "name": "@metano/quasar_resaas",
+  "name": "quasar_resaas",
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.0.478",
-  "description": "Rest em quasar para autenticacao",
+  "version": "0.0.1",
+  "description": "Quasar rest SaaS",
   "keywords": [
+    "quasar",
     "rest",
-    "auth",
-    "api",
-    "quasar"
+    "saas",
+    "framework"
   ],
   "homepage": "https://github.com/metanochava/quasar_resaas#readme",
   "bugs": {
