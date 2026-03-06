@@ -11,15 +11,23 @@ export * from './boot/data.js'
 export * from './boot/storage.js'
 
 
-import MainLayout from './layouts/MainLayout.vue'
-import AuthLayout from './layouts/AuthLayout.vue'
-import AutoForm from './components/auto/AutoForm.vue'
-import AutoTable from './components/auto/AutoTable.vue'
-import AutoCrud from './components/auto/AutoCrud.vue'
-import CrudPage from './components/auto/CrudPage.vue'
-import AllLogo from './components/AllLogo.vue'
+export { default as MainLayout } from './layouts/MainLayout.vue'
+export { default as AuthLayout } from './layouts/AuthLayout.vue'
+
+export { default as AutoForm } from './components/auto/AutoForm.vue'
+export { default as AutoTable } from './components/auto/AutoTable.vue'
+export { default as AutoCrud } from './components/auto/AutoCrud.vue'
+export { default as CrudPage } from './components/auto/CrudPage.vue'
+
+export { default as AllLogo } from './components/AllLogo.vue'
+export { default as TopMenu } from './components/TopMenu.vue'
+
+export { default as HeaderBrand } from './components/header/HeaderBrand.vue'
+export { default as HeaderDarkMode } from './components/header/HeaderDarkMode.vue'
+export { default as HeaderFullScreen } from './components/header/HeaderFullScreen.vue'
+export { default as HeaderLanguage } from './components/header/HeaderLanguage.vue'
 
 
 
-export { MainLayout, AuthLayout, AutoForm, AutoTable, AutoCrud, CrudPage,  AllLogo}
+
 
