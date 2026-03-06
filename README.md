@@ -1,13 +1,12 @@
-# quasar
+# Quasar Rest SaaS
 
-# Fernando 847213584 cell julia
-# Comandos de Compilacao e publicacao
-### npm pack
-##  
-
+Fernando 847213584 cell julia
+Comandos de Compilacao e publicacao
+npm pack
+ 
 💎 Como usar no Wizard
 🔥 simples demais
-import { buildFormFromSchema } from '@metano/quasar_rest_auth'
+import { buildFormFromSchema } from 'quasar_ressas'
 
 const fields = ref([])
 const formModel = ref({})
