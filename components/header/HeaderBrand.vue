@@ -26,7 +26,7 @@
 <script>
 
 import { defineComponent } from 'vue'
-import { AuthStore, UserStore } from '../../stores/AuthStore'
+import { TipoEntidadeStore, UserStore } from '../../stores/TipoEntidadeStore'
 import { tdc } from '../../boot/base';
 
 
@@ -35,7 +35,7 @@ export default defineComponent({
 
   },
   setup () {
-    const Auth = AuthStore()
+    const Auth = TipoEntidadeStore()
     const User = UserStore()
     return {
       Auth,

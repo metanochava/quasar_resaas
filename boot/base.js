@@ -1,6 +1,6 @@
 
 import { getActivePinia } from 'pinia'
-import { LanguageStore, UserStore } from '../stores/AuthStore'
+import { LanguageStore, UserStore } from '../stores/TipoEntidadeStore'
 import figlet from 'figlet'
 
 export const tdc = (texto = '') => {

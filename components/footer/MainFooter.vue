@@ -25,7 +25,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { tdc } from '../../boot/base';
-import { LoadStore, UserStore } from '../../stores/AuthStore';
+import { LoadStore, UserStore } from '../../stores/TipoEntidadeStore';
 import Comments from "./Comments.vue";
 
 

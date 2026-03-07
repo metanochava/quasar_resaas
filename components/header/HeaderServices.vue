@@ -35,7 +35,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { tdc } from '../../boot/base'
-import { AuthStore, UserStore } from '../../stores/AuthStore'
+import { TipoEntidadeStore, UserStore } from '../../stores/TipoEntidadeStore'
 import { setStorage } from '../../boot/storage';
 
 
@@ -43,7 +43,7 @@ export default defineComponent({
 
   setup () {
     const User = UserStore()
-    const Auth = AuthStore()
+    const Auth = TipoEntidadeStore()
     return {
       User,
       Auth
@@ -93,6 +93,7 @@ export default defineComponent({
         } else {
           this.User.TipoEntidade = tipoEnt
           this.Auth.TipoEntidade = tipoEnt
+          this.User.setTipoEntidadeThemeLayoutSettings(tipoEnt)
           setStorage('c', 'tipoEntidade', JSON.stringify(this.User.TipoEntidade))
           return false
         }

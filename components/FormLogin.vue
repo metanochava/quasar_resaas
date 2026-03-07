@@ -75,7 +75,7 @@
 
 import { defineComponent } from 'vue'
 import { tdc } from '../boot/base'
-import { AuthStore, UserStore } from '../stores/AuthStore'
+import { TipoEntidadeStore, UserStore } from '../stores/TipoEntidadeStore'
 import { setStorage, getStorage } from '../boot/storage'
 import AllLogo  from './../components/AllLogo.vue'
 import { useQuasar } from 'quasar'
@@ -93,7 +93,7 @@ export default defineComponent({
     AllLogo
   },
   setup () {
-    const Auth = AuthStore()
+    const Auth = TipoEntidadeStore()
     const  User = UserStore()
     const q = useQuasar()
     const router = useRouter()

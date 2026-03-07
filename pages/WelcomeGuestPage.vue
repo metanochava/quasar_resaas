@@ -29,7 +29,7 @@
 
 <script setup>
   import { tdc } from '../boot/base';
-  import { UserStore } from '../stores/AuthStore';
+  import { UserStore } from '../stores/TipoEntidadeStore';
   import AllLogo from './../components/AllLogo.vue';
   const User = UserStore()
 </script>

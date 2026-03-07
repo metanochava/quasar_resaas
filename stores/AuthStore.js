@@ -43,10 +43,12 @@ export const AlertStore = defineStore('alert', {
 
 
 
-export const AuthStore = defineStore('auth', {
+export const TipoEntidadeStore = defineStore('tipoentidade', {
   state: () => ({
     TipoEntidades: [],
     TipoEntidade: { },
+    LayoutSettings: { },
+    Theme: { },
     Idiomas: [ ]
   }),
 
@@ -134,7 +136,7 @@ export const UserStore = defineStore("user", {
   state: () => ({
     data: null,
     Idioma: {},
-    TipoEntidade: [],
+    TipoEntidade: {},
     Entidades: [],
     Entidade: null,
     EntidadeModelos: [],
@@ -159,6 +161,8 @@ export const UserStore = defineStore("user", {
     redirect: '',
     loginMsg: '',
     loading: false,
+    Theme: {},
+    LayoutSettings: {}
   }),
 
   getters: {
@@ -357,6 +361,7 @@ export const UserStore = defineStore("user", {
 
     selectEntidade_ (entidade, q) {
       this.Entidade = entidade
+      this.setEntidadeThemeLayoutSettings()
       setStorage('c', 'userEntidade', JSON.stringify(entidade), 365)
       this.getSucursals_(q)
     },
@@ -409,6 +414,7 @@ export const UserStore = defineStore("user", {
     selectEntidade (entidade) {
       setStorage('c', 'userEntidade', JSON.stringify(entidade), 365)
       this.Entidade = JSON.parse(getStorage('c', 'userEntidade'))
+      this.setEntidadeThemeLayoutSettings()
       this.getSucursals()
       this.setEntidadeModulos()
     },
@@ -515,9 +521,63 @@ export const UserStore = defineStore("user", {
           }).catch(err => {
             console.log(err)
           })
+
+          
         return rsp 
       }
     },
+    
+
+
+    async setEntidadeThemeLayoutSettings () {
+      if (getStorage('c', 'userEntidade') !== null) {
+        const tipoEntidadeStore = TipoEntidadeStore()
+        const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + this.Entidade?.id + '/themeGet/', params: { } }))
+          .then(res => {
+            setStorage('c', 'entidadeTheme', JSON.stringify(res.data), 365)
+            this.Theme = res.data || tipoEntidadeStore.Theme
+          }).catch(err => {
+            console.log(err)
+          })
+
+          const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + this.Entidade?.id + '/layoutsettingsGet/', params: { } }))
+          .then(res => {
+            setStorage('c', 'entidadeThemeLayoutsettings', JSON.stringify(res.data), 365)
+            this.LayoutSettings = res.data || tipoEntidadeStore.LayoutSettings
+          }).catch(err => {
+            console.log(err)
+          })
+
+          
+        return lay 
+      }
+    },
+
+    async setTipoEntidadeThemeLayoutSettings (TipoEntidade) {
+      const tipoEntidadeStore = TipoEntidadeStore()
+      if (getStorage('c', 'userTipoEntidade') !== null) {
+
+        const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade?.id + '/themeGet/', params: { } }))
+          .then(res => {
+            setStorage('c', 'tipoEntidadeTheme', JSON.stringify(res.data), 365)
+            tipoEntidadeStore.Theme = res.data || {}
+          }).catch(err => {
+            console.log(err)
+          })
+
+          const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + Entidade?.id + '/layoutsettingsGet/', params: { } }))
+          .then(res => {
+            setStorage('c', 'tipoEntidadeThemeLayoutsettings', JSON.stringify(res.data), 365)
+            tipoEntidadeStore.LayoutSettings = res.data || {}
+          }).catch(err => {
+            console.log(err)
+          })
+
+          
+        return lay 
+      }
+    },
+    
     async getPermicoes () {
       if (getStorage('c', 'userSucursal') !== null) {
 
@@ -616,6 +676,10 @@ export const UserStore = defineStore("user", {
         this.Grupo = {id:'1', name:'Hóspede'}
 
         const userEntidade = getStorage('c', 'userEntidade')
+
+
+        deleteStorage('c', 'entidadeTheme')
+        deleteStorage('c', 'entidadeThemeLayoutsettings')
 
         deleteStorage('c', 'access')
         deleteStorage('c', 'refresh')

@@ -27,7 +27,7 @@
 <script>
 /* -------------------- IMPORT STORES -------------------- */
 
-import { AuthStore, UserStore } from '../stores/AuthStore'
+import { TipoEntidadeStore, UserStore } from '../stores/TipoEntidadeStore'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
@@ -50,7 +50,7 @@ export default defineComponent({
     Rodape,
   },
   setup() {
-    const Auth = AuthStore()
+    const Auth = TipoEntidadeStore()
     const User = UserStore()
 
     return {

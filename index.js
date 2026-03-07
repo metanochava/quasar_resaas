@@ -1,4 +1,4 @@
-export * from './stores/AuthStore.js'
+export * from './stores/TipoEntidadeStore.js'
 export * from './stores/SettingsStore.js'
 export * from './router/restRoutes.js'
 export * from './router/authRoutes.js'

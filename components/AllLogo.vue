@@ -52,7 +52,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { HTTPClient, url } from './../boot/api'
-import { UserStore } from './../stores/AuthStore'
+import { UserStore } from './../stores/TipoEntidadeStore'
 import { tdc } from '../boot/base'
 
 
