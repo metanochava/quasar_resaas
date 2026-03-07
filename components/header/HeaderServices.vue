@@ -74,17 +74,22 @@ export default defineComponent({
       return /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.includes(":");
     },
     getHostname (tipoEnt) {
+      console.log(tipoEnt)
       let domain = ''
 
       if (this.isIP(window.location.hostname)){
         const url = new URL(window.location.href);
         const tipoentidade = url.pathname.split("/").filter(Boolean)[0];
         domain = tipoentidade
+        console.log(window.location.hostname, domain)
+
       }else{
         domain = window.location.href.split('/')[2].split('.')[0]
         if (domain === 'www') {
           domain = window.location.href.split('/')[2].split('.')[1]
         }
+        console.log("bom", domain)
+
       }
       console.log(domain, tipoEnt.nome.toLowerCase())
       if(domain){
