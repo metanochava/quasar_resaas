@@ -361,7 +361,7 @@ export const UserStore = defineStore("user", {
 
     selectEntidade_ (entidade, q) {
       this.Entidade = entidade
-      this.setEntidadeThemeLayoutSettings()
+      this.setEntidadeThemeLayoutSettings(entidade)
       setStorage('c', 'userEntidade', JSON.stringify(entidade), 365)
       this.getSucursals_(q)
     },
@@ -414,7 +414,7 @@ export const UserStore = defineStore("user", {
     selectEntidade (entidade) {
       setStorage('c', 'userEntidade', JSON.stringify(entidade), 365)
       this.Entidade = JSON.parse(getStorage('c', 'userEntidade'))
-      this.setEntidadeThemeLayoutSettings()
+      this.setEntidadeThemeLayoutSettings(entidade)
       this.getSucursals()
       this.setEntidadeModulos()
     },
@@ -529,10 +529,10 @@ export const UserStore = defineStore("user", {
     
 
 
-    async setEntidadeThemeLayoutSettings () {
+    async setEntidadeThemeLayoutSettings (Entidade) {
       if (getStorage('c', 'userEntidade') !== null) {
         const tipoEntidadeStore = TipoEntidadeStore()
-        const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + this.Entidade?.id + '/themeGet/', params: { } }))
+        const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade?.id + '/themeGet/', params: { } }))
           .then(res => {
             setStorage('c', 'entidadeTheme', JSON.stringify(res.data), 365)
             this.Theme = res.data || tipoEntidadeStore.Theme
@@ -540,7 +540,7 @@ export const UserStore = defineStore("user", {
             console.log(err)
           })
 
-          const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + this.Entidade?.id + '/layoutsettingsGet/', params: { } }))
+          const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade?.id + '/layoutsettingsGet/', params: { } }))
           .then(res => {
             setStorage('c', 'entidadeThemeLayoutsettings', JSON.stringify(res.data), 365)
             this.LayoutSettings = res.data || tipoEntidadeStore.LayoutSettings
