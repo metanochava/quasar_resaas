@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { getStorage, setStorage, deleteStorage } from '../boot/storage'
 import { HTTPAuth, HTTPClient, url } from '../boot/api'
 import { tdc } from '../boot/base'
+import { setCssVar } from 'quasar'
+
 
 
 
@@ -180,6 +182,24 @@ export const UserStore = defineStore("user", {
   },
 
   actions: {
+    async get_layout_theme() {
+
+      await HTTPClient.get(url({type: "u", url: "api/site", params: {}}) )
+      .then(res => {
+        this.User.Theme = res.data.theme
+        this.User.LayoutSettings = res.data.layoutSettings
+        this.set_layout_theme()
+      })
+      .catch( () => {
+
+      })
+    },
+    async set_layout_theme() {
+      Object.entries(this.User.Theme).forEach(([key, value]) => {
+        setCssVar(key, value)
+      })
+    },
+
     async getMenus () {
       await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + this.data.id + '/menus/', params: {} }))
         .then(res => {
@@ -531,19 +551,22 @@ export const UserStore = defineStore("user", {
       const tipoEntidadeStore = TipoEntidadeStore()
       const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade?.id + '/themeGet/', params: { } }))
         .then(res => {
-          this.Theme = res.data  // || tipoEntidadeStore.Theme
+          this.Theme = res.data   || tipoEntidadeStore.Theme
           setStorage('c', 'entidadeTheme', JSON.stringify(this.Theme), 365)
         }).catch(err => {
           console.log(err)
         })
 
-        const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade?.id + '/layoutsettingsGet/', params: { } }))
+      const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade?.id + '/layoutsettingsGet/', params: { } }))
         .then(res => {
-          this.LayoutSettings = res.data // || tipoEntidadeStore.LayoutSettings
+          this.LayoutSettings = res.data  || tipoEntidadeStore.LayoutSettings
           setStorage('c', 'entidadeThemeLayoutsettings', JSON.stringify(this.LayoutSettings), 365)
         }).catch(err => {
           console.log(err)
         })
+      
+        this.set_layout_theme()
+      
       return lay 
     },
 
@@ -555,19 +578,21 @@ export const UserStore = defineStore("user", {
           .then(res => {
             setStorage('c', 'tipoEntidadeTheme', JSON.stringify(res.data), 365)
             tipoEntidadeStore.Theme = res.data || {}
+            
           }).catch(err => {
             console.log(err)
           })
 
-          const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade?.id + '/layoutsettingsGet/', params: { } }))
+        const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade?.id + '/layoutsettingsGet/', params: { } }))
           .then(res => {
             setStorage('c', 'tipoEntidadeThemeLayoutsettings', JSON.stringify(res.data), 365)
             tipoEntidadeStore.LayoutSettings = res.data || {}
+            
           }).catch(err => {
             console.log(err)
           })
 
-          
+          this.set_layout_theme()
         return lay 
       }
     },
