@@ -2,9 +2,7 @@ import { defineStore } from 'pinia'
 import { getStorage, setStorage, deleteStorage } from '../boot/storage'
 import { HTTPAuth, HTTPClient, url } from '../boot/api'
 import { tdc } from '../boot/base'
-import { setCssVar } from 'quasar'
-
-
+import { setCssVar, Dark } from "quasar"
 
 
 
@@ -51,6 +49,8 @@ export const TipoEntidadeStore = defineStore('tipoentidade', {
     TipoEntidade: { },
     LayoutSettings: { },
     Theme: { },
+    AnimationSettings: { },
+    Typography: { },
     Idiomas: [ ]
   }),
 
@@ -164,7 +164,9 @@ export const UserStore = defineStore("user", {
     loginMsg: '',
     loading: false,
     Theme: {},
-    LayoutSettings: {}
+    LayoutSettings: {},
+    AnimationSettings: { },
+    Typography: { },
   }),
 
   getters: {
@@ -217,18 +219,59 @@ export const UserStore = defineStore("user", {
       .then(res => {
         this.Theme = res.data.theme
         this.LayoutSettings = res.data.layoutSettings
+        this.AnimationSettings = res.data.animation_settings
+        this.Typography = res.data.typography
+
         this.set_layout_theme()
       })
       .catch( () => {
 
       })
     },
-    async set_layout_theme() {
+
+
+    set_layout_theme(){
+
+      /* =========================
+        DARK MODE
+      ========================= */
+
+      Dark.set(this.LayoutSettings.dark_mode)
+
+      /* =========================
+        CORES
+      ========================= */
       const theme = this.normalizeTheme(this.Theme)
       Object.entries(theme).forEach(([key, value]) => {
         setCssVar(key, value)
       })
+      
+
+      /* =========================
+        BACKGROUND GLOBAL
+      ========================= */
+      document.body.style.background =
+        Dark.isActive
+          ? this.Theme.background_dark
+          : this.Theme.background
+
+
+      /* =========================
+        TIPOGRAFIA
+      ========================= */
+      const font = this.Typography.font_family
+
+      const link = document.createElement("link")
+      link.href = `https://fonts.googleapis.com/css2?family=${font.replace(" ","+")}:wght@300;400;500;700&display=swap`
+      link.rel = "stylesheet"
+
+      document.head.appendChild(link)
+
+      document.body.style.fontFamily = font
+
+
     },
+
 
     async getMenus () {
       await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + this.data.id + '/menus/', params: {} }))
@@ -411,7 +454,7 @@ export const UserStore = defineStore("user", {
 
     selectEntidade_ (entidade, q) {
       this.Entidade = entidade
-      this.setEntidadeThemeLayoutSettings(entidade)
+      this.setEntidadeLayoutSettings()
       setStorage('c', 'userEntidade', JSON.stringify(entidade), 365)
       this.getSucursals_(q)
     },
@@ -464,7 +507,7 @@ export const UserStore = defineStore("user", {
     selectEntidade (entidade) {
       setStorage('c', 'userEntidade', JSON.stringify(entidade), 365)
       this.Entidade = JSON.parse(getStorage('c', 'userEntidade'))
-      this.setEntidadeThemeLayoutSettings(entidade)
+      this.setEntidadeLayoutSettings()
       this.getSucursals()
       this.setEntidadeModulos()
     },
@@ -577,9 +620,9 @@ export const UserStore = defineStore("user", {
       }
     },
 
-    async setEntidadeThemeLayoutSettings (Entidade) {
+    async setEntidadeLayoutSettings () {
       const tipoEntidadeStore = TipoEntidadeStore()
-      const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade?.id + '/themeGet/', params: { } }))
+      const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + this.Entidade?.id + '/themeGet/', params: { } }))
         .then(res => {
           this.Theme = res.data   || tipoEntidadeStore.Theme
           setStorage('c', 'entidadeTheme', JSON.stringify(this.Theme), 365)
@@ -587,10 +630,27 @@ export const UserStore = defineStore("user", {
           console.log(err)
         })
 
-      const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade?.id + '/layoutSettingsGet/', params: { } }))
+      const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + this.Entidade?.id + '/layoutSettingsGet/', params: { } }))
         .then(res => {
           this.LayoutSettings = res.data  || tipoEntidadeStore.LayoutSettings
-          setStorage('c', 'entidadeThemeLayoutsettings', JSON.stringify(this.LayoutSettings), 365)
+          setStorage('c', 'entidadeLayoutSettings', JSON.stringify(this.LayoutSettings), 365)
+        }).catch(err => {
+          console.log(err)
+        })
+
+
+      const tp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + this.Entidade?.id + '/typographyGet/', params: { } }))
+        .then(res => {
+          this.Typography = res.data   || tipoEntidadeStore.Typography
+          setStorage('c', 'entidadeTypography', JSON.stringify(this.Typography), 365)
+        }).catch(err => {
+          console.log(err)
+        })
+
+      const as = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + this.Entidade?.id + '/animationSettingsGet/', params: { } }))
+        .then(res => {
+          this.AnimationSettings = res.data  || tipoEntidadeStore.AnimationSettings
+          setStorage('c', 'entidadeAnimationSettings', JSON.stringify(this.AnimationSettings), 365)
         }).catch(err => {
           console.log(err)
         })
@@ -600,11 +660,11 @@ export const UserStore = defineStore("user", {
       return lay
     },
 
-    async setTipoEntidadeThemeLayoutSettings (TipoEntidade) {
+    async setTipoEntidadeLayoutSettings () {
       const tipoEntidadeStore = TipoEntidadeStore()
       if (getStorage('c', 'userTipoEntidade') !== null) {
 
-        const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade?.id + '/themeGet/', params: { } }))
+        const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + this.TipoEntidade?.id + '/themeGet/', params: { } }))
           .then(res => {
             setStorage('c', 'tipoEntidadeTheme', JSON.stringify(res.data), 365)
             tipoEntidadeStore.Theme = res.data || {}
@@ -614,15 +674,34 @@ export const UserStore = defineStore("user", {
             console.log(err)
           })
 
-        const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade?.id + '/layoutSettingsGet/', params: { } }))
+        const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + this.TipoEntidade?.id + '/layoutSettingsGet/', params: { } }))
           .then(res => {
-            setStorage('c', 'tipoEntidadeThemeLayoutsettings', JSON.stringify(res.data), 365)
+            setStorage('c', 'tipoEntidadeLayoutsettings', JSON.stringify(res.data), 365)
             tipoEntidadeStore.LayoutSettings = res.data || {}
             this.LayoutSettings = tipoEntidadeStore.LayoutSettings
 
           }).catch(err => {
             console.log(err)
           })
+
+
+        const tp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + this.Entidade?.id + '/typographyGet/', params: { } }))
+        .then(res => {
+          setStorage('c', 'tipoEntidadeTypography', JSON.stringify(res.data), 365)
+          tipoEntidadeStore.Typography = res.data || {}
+          this.Typography = tipoEntidadeStore.Typography
+        }).catch(err => {
+          console.log(err)
+        })
+
+      const as = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + this.Entidade?.id + '/animationSettingsGet/', params: { } }))
+        .then(res => {
+          setStorage('c', 'tipoEntidadeAnimationSettings', JSON.stringify(res.data), 365)
+          tipoEntidadeStore.AnimationSettings = res.data || {}
+          this.AnimationSettings = tipoEntidadeStore.AnimationSettings
+        }).catch(err => {
+          console.log(err)
+        })
 
           this.set_layout_theme()
         return lay
@@ -730,7 +809,9 @@ export const UserStore = defineStore("user", {
 
 
         deleteStorage('c', 'entidadeTheme')
-        deleteStorage('c', 'entidadeThemeLayoutsettings')
+        deleteStorage('c', 'entidadeLayoutsettings')
+        deleteStorage('c', 'entidadeTypography')
+        deleteStorage('c', 'entidadeAnimationSettings')
 
         deleteStorage('c', 'access')
         deleteStorage('c', 'refresh')
