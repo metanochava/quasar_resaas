@@ -1,0 +1,46 @@
+/* HOVER */
+
+.hover-lift:hover{
+  transform: translateY(-4px);
+  transition: all .2s;
+}
+
+.hover-shadow:hover{
+  box-shadow: 0 10px 25px rgba(0,0,0,.2);
+}
+
+.hover-grow:hover{
+  transform: scale(1.05);
+}
+
+
+/* PAGE TRANSITIONS */
+
+.fade-enter-active,
+.fade-leave-active{
+  transition: opacity .3s;
+}
+
+.fade-enter-from,
+.fade-leave-to{
+  opacity:0;
+}
+
+.slide-left-enter-active{
+  transition: all .3s;
+}
+
+.slide-left-enter-from{
+  transform: translateX(40px);
+  opacity:0;
+}
+
+
+.anim-fade{
+ animation:fadeCard .35s ease;
+}
+
+@keyframes fadeCard{
+ from{opacity:0}
+ to{opacity:1}
+}
