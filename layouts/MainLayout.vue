@@ -14,7 +14,7 @@
     </q-dialog>
 
     <q-dialog v-model="api_retorno_modal" full-width full-height>
-      <q-card>
+      <s-card>
         <q-bar class="bg-primary text-white">
           <q-toolbar-title>
             <span class="text-weight-bold">API</span>
@@ -25,10 +25,10 @@
 
         <q-separator />
 
-        <q-card-section class="scroll">
+        <s-card-section class="scroll">
           <!-- <ApiRetorno /> -->
-        </q-card-section>
-      </q-card>
+        </s-card-section>
+      </s-card>
     </q-dialog>
 
     <!-- -------------------- HEADER -------------------- -->
@@ -67,7 +67,7 @@
     </q-header>
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
-    <q-drawer
+    <s-drawer
       v-model="User.LeftTop"
       show-if-above
       :mini="miniState"
@@ -79,7 +79,7 @@
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <LeftMenu />
       </q-scroll-area>
-    </q-drawer>
+    </s-drawer>
 
     <!-- -------------------- RIGHT DRAWER -------------------- -->
     <q-drawer v-model="User.RightTop" side="right" bordered :width="300">
@@ -90,8 +90,20 @@
 
     <!-- -------------------- PAGE CONTAINER -------------------- -->
 
-    <q-page-container >
-      <router-view />
+    <q-page-container>
+
+      <transition
+        v-if="ps.animation?.enable_animations"
+        :name="ps.animation?.page_transition || 'fade'"
+        mode="out-in"
+      >
+        <router-view/>
+      </transition>
+
+      <router-view v-else/>
+
+
+
     </q-page-container>
 
     <!-- -------------------- RODAPÉ -------------------- -->
@@ -170,7 +182,20 @@ export default defineComponent({
       miniState: false,
     }
   },
-  computed: {},
+  computed:{
+
+    ps(){
+      return this.User.ps || {}
+    }
+
+  },
+
+  async mounted(){
+
+    await this.User.getSettings()
+
+
+  },
 
   mounted() {
     if (['authwelcome','welcome'].includes(this.$route.name)){
