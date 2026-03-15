@@ -222,7 +222,7 @@ export const UserStore = defineStore("user", {
       await HTTPClient.get(url({type: "u", url: "api/site", params: {}}) )
       .then(res => {
         this.Theme = res.data.theme
-        this.LayoutSettings = res.data.layoutSettings
+        this.LayoutSettings = res.data.layout_settings
         this.AnimationSettings = res.data.animation_settings
         this.Typography = res.data.typography
 
@@ -290,6 +290,7 @@ export const UserStore = defineStore("user", {
       if (this.Typography.line_height) {
         document.body.style.lineHeight = this.Typography.line_height
       }
+      console.log('Configurado')
     },
 
 
