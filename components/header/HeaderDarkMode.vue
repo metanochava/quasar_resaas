@@ -26,7 +26,7 @@
       }
     },
     mounted() {
-      const isDark = ( getStorage('l', 'dark')).toLowerCase() === 'true'
+      const isDark = ( getStorage('l', 'dark'))?.toLowerCase() === 'true'
       this.$q.dark.set(isDark) 
     },
     methods: {

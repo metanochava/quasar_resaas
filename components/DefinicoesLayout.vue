@@ -17,6 +17,7 @@
         toggle-color="white"
         :options="[
           { label: 'Desktop', value: 'desktop' },
+          { label: 'Tablet', value: 'Tablet' },
           { label: 'Mobile', value: 'mobile' }
         ]"
       />
