@@ -16,6 +16,15 @@
       attrs.class,
       animation.hover_effect ? 'hover-' + animation.hover_style : ''
     ]"
+
+    :style="{
+      borderRadius: layout.square
+        ? '0px'
+        : layout.rounded
+        ? '16px'
+        : '4px'
+    }"
+
   >
     <slot/>
   </q-btn>

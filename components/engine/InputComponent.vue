@@ -10,6 +10,13 @@
     :standout="attrs.standout ?? layout.input_style === 'standout'"
 
     :class="attrs.class"
+    :style="{
+      borderRadius: layout.square
+        ? '0px'
+        : layout.rounded
+        ? '16px'
+        : '4px'
+    }"
   >
     <slot/>
   </q-input>
