@@ -228,6 +228,8 @@ export const UserStore = defineStore("user", {
         this.AnimationSettings = res.data.animation_settings
         this.Typography = res.data.typography
 
+        this.Entidade =  { id : res.data.entidade }
+
         this.setSettings()
       })
       .catch( () => {
