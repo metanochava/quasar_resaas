@@ -20,7 +20,7 @@
             <span class="text-weight-bold">API</span>
           </q-toolbar-title>
           <q-space />
-          <q-btn dense flat icon="close" v-close-popup />
+          <s-btn dense flat icon="close" v-close-popup />
         </q-bar>
 
         <q-separator />
@@ -35,7 +35,7 @@
     <q-header bordered :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
       <q-toolbar class="no-wrap q-px-md">
         <!-- Menu Esquerdo -->
-        <q-btn dense flat round icon="menu" @click="User.toggleLeftTop()" />
+        <s-btn dense flat round icon="menu" @click="User.toggleLeftTop()" />
 
         <!-- Marca (logo + nome) -->
         <HeaderBrand />
@@ -61,7 +61,7 @@
         <HeaderUser />
 
         <!-- Menu Direito -->
-        <q-btn dense flat round icon="menu" @click="User.toggleRightTop()" />
+        <s-btn dense flat round icon="menu" @click="User.toggleRightTop()" />
       </q-toolbar>
       <TopMenu v-show="!User.LeftTop && !['authwelcome','welcome'].includes($route.name)"></TopMenu>
     </q-header>
@@ -70,7 +70,6 @@
     <s-drawer
       v-model="User.LeftTop"
       show-if-above
-      :mini="miniState"
       side="left"
       bordered
       class="q-pr-0"
@@ -112,7 +111,7 @@
 
     <!-- -------------------- PAGE SCROLLER -------------------- -->
     <q-page-scroller position="bottom-right" :scroll-offset="50" :offset="[18, -10]">
-      <q-btn icon="keyboard_arrow_up" color="primary" round />
+      <s-btn icon="keyboard_arrow_up" color="primary" round />
     </q-page-scroller>
   </q-layout>
 </template>
@@ -193,7 +192,6 @@ export default defineComponent({
   async mounted(){
 
     await this.User.getSettings()
-
 
   },
 

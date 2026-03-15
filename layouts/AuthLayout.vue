@@ -19,7 +19,7 @@
     <Rodape />
 
     <q-page-scroller position="bottom-right" :scroll-offset="50" :offset="[18, -10]">
-      <q-btn icon="keyboard_arrow_up" color="primary" round />
+      <s-btn icon="keyboard_arrow_up" color="primary" round />
     </q-page-scroller>
   </q-layout>
 </template>
@@ -61,9 +61,19 @@ export default defineComponent({
   data() {
     return {}
   },
-  computed: {},
+  computed:{
 
-  mounted() {},
+    ps(){
+      return this.User.ps || {}
+    }
+
+  },
+
+  async mounted(){
+
+    await this.User.getSettings()
+
+  },
 
   methods: {},
 })
