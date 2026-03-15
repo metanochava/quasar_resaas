@@ -311,12 +311,12 @@
 
                 <q-card-section class="q-gutter-md">
                   <q-toggle
-                    v-model="User.AnimationSetting.enable_animations"
+                    v-model="User.AnimationSettings.enable_animations"
                     label="Enable animations"
                   />
 
                   <q-select
-                    v-model="User.AnimationSetting.animation_speed"
+                    v-model="User.AnimationSettings.animation_speed"
                     :options="['slow', 'normal', 'fast']"
                     label="Animation speed"
                     dense
@@ -324,7 +324,7 @@
                   />
 
                   <q-select
-                    v-model="User.AnimationSetting.page_transition"
+                    v-model="User.AnimationSettings.page_transition"
                     :options="['fade', 'slide-left', 'slide-right', 'scale']"
                     label="Page transition"
                     dense
@@ -332,7 +332,7 @@
                   />
 
                   <q-select
-                    v-model="User.AnimationSetting.button_animation"
+                    v-model="User.AnimationSettings.button_animation"
                     :options="['none', 'ripple', 'pulse']"
                     label="Button animation"
                     dense
@@ -340,12 +340,12 @@
                   />
 
                   <q-toggle
-                    v-model="User.AnimationSetting.hover_effect"
+                    v-model="User.AnimationSettings.hover_effect"
                     label="Hover effect"
                   />
 
                   <q-select
-                    v-model="User.AnimationSetting.hover_style"
+                    v-model="User.AnimationSettings.hover_style"
                     :options="['lift', 'shadow', 'grow']"
                     label="Hover style"
                     dense
@@ -353,7 +353,7 @@
                   />
 
                   <q-select
-                    v-model="User.AnimationSetting.card_animation"
+                    v-model="User.AnimationSettings.card_animation"
                     :options="['none', 'fade', 'slide-up']"
                     label="Card animation"
                     dense
@@ -361,7 +361,7 @@
                   />
 
                   <q-select
-                    v-model="User.AnimationSetting.modal_animation"
+                    v-model="User.AnimationSettings.modal_animation"
                     :options="['none', 'scale', 'fade']"
                     label="Modal animation"
                     dense
@@ -616,7 +616,7 @@ export default defineComponent({
 
         return () => {
           const layout = User.LayoutSettings || {}
-          const animation = User.AnimationSetting || {}
+          const animation = User.AnimationSettings || {}
           const enableAnimations = animation.enable_animations !== false
 
           const classList = [attrs.class]
@@ -699,7 +699,7 @@ export default defineComponent({
 
         return () => {
           const layout = User.LayoutSettings || {}
-          const animation = User.AnimationSetting || {}
+          const animation = User.AnimationSettings || {}
           const enableAnimations = animation.enable_animations !== false
 
           const styleObj = {
@@ -799,7 +799,7 @@ export default defineComponent({
         theme: this.User.Theme || {},
         layout: this.User.LayoutSettings || {},
         typography: this.User.Typography || {},
-        animation: this.User.AnimationSetting || {}
+        animation: this.User.AnimationSettings || {}
       }
     },
 
@@ -951,7 +951,7 @@ export default defineComponent({
           type: "u",
           url: `/api/django_resaas/entidades/${this.User.Entidade.id}/animationSettingsPut/`
         }),
-        this.User.AnimationSetting
+        this.User.AnimationSettings
       )
     }
   },
@@ -978,7 +978,7 @@ export default defineComponent({
       }
     },
 
-    "User.AnimationSetting": {
+    "User.AnimationSettings": {
       deep: true,
       handler() {
         this.touchPreview()
