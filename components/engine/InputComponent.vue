@@ -14,8 +14,7 @@
     :outlined="attrs.outlined ?? layout.input_style === 'outlined'"
     :filled="attrs.filled ?? layout.input_style === 'filled'"
     :standout="attrs.standout ?? layout.input_style === 'standout'"
-    :class="attrs.class"
-    :style="radiusStyle"
+    :class="['s-input', attrs.class]"
   >
     <template v-if="isPassword" #append>
       <q-icon
@@ -69,6 +68,43 @@ export default defineComponent({
     const localValue = ref(props.modelValue)
     const showPassword = ref(false)
 
+    // --------------------------
+    // 🎨 THEME ENGINE (🔥 MESMO DO SELECT)
+    // --------------------------
+
+    const applyTheme = (v) => {
+      let radius = "4px"
+
+      if (v?.border_radius) {
+        radius = v.border_radius
+      } else {
+        switch (v?.mode) {
+          case "square":
+            radius = "0px"
+            break
+          case "rounded":
+            radius = "16px"
+            break
+          case "soft":
+            radius = "8px"
+            break
+          case "pill":
+            radius = "999px"
+            break
+          default:
+            radius = "4px"
+        }
+      }
+
+      document.documentElement.style.setProperty("--s-radius", radius)
+    }
+
+    watch(layout, applyTheme, { immediate: true, deep: true })
+
+    // --------------------------
+    // 🔁 MODEL
+    // --------------------------
+
     watch(
       () => props.modelValue,
       v => {
@@ -79,6 +115,10 @@ export default defineComponent({
     watch(localValue, v => {
       emit("update:modelValue", v)
     })
+
+    // --------------------------
+    // 🔐 PASSWORD
+    // --------------------------
 
     const isPassword = computed(() => props.type === "password")
 
@@ -91,12 +131,24 @@ export default defineComponent({
       return props.type || "text"
     })
 
+    const togglePassword = () => {
+      showPassword.value = !showPassword.value
+    }
+
+    // --------------------------
+    // 🎭 MASK
+    // --------------------------
+
     const computedMask = computed(() => {
       if (props.mask) return props.mask
       if (props.type === "phone") return "(##) #####-####"
       if (props.type === "date") return "####-##-##"
       return undefined
     })
+
+    // --------------------------
+    // ✅ VALIDATION
+    // --------------------------
 
     const computedRules = computed(() => {
       const rules = []
@@ -126,6 +178,10 @@ export default defineComponent({
       return rules
     })
 
+    // --------------------------
+    // 🌍 TRANSLATIONS
+    // --------------------------
+
     const translatedLabel = computed(() =>
       props.label ? tdc(props.label) : attrs.label ? tdc(attrs.label) : undefined
     )
@@ -134,28 +190,24 @@ export default defineComponent({
       props.placeholder
         ? tdc(props.placeholder)
         : attrs.placeholder
-          ? tdc(attrs.placeholder)
-          : undefined
+        ? tdc(attrs.placeholder)
+        : undefined
     )
 
     const translatedHint = computed(() =>
       props.hint ? tdc(props.hint) : attrs.hint ? tdc(attrs.hint) : undefined
     )
 
+    // --------------------------
+    // ❌ ERRORS
+    // --------------------------
+
     const hasError = ref(false)
     const firstError = ref("")
 
-    const togglePassword = () => {
-      showPassword.value = !showPassword.value
-    }
-
-    const radiusStyle = computed(() => ({
-      borderRadius: layout.value.square
-        ? "0px"
-        : layout.value.rounded
-          ? "16px"
-          : "4px"
-    }))
+    // --------------------------
+    // 🎛️ ATTRS
+    // --------------------------
 
     const inputAttrs = computed(() => {
       const { class: klass, ...rest } = attrs
@@ -177,9 +229,15 @@ export default defineComponent({
       hasError,
       firstError,
       togglePassword,
-      radiusStyle,
       inputAttrs
     }
   }
 })
 </script>
+
+<style scoped>
+/* 🔥 ESSENCIAL: aplicar no elemento certo do Quasar */
+.s-input :deep(.q-field__control) {
+  border-radius: var(--s-radius, 4px) !important;
+}
+</style>

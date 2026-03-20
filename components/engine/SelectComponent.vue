@@ -26,15 +26,7 @@
     :filled="attrs.filled ?? layout.input_style === 'filled'"
     :standout="attrs.standout ?? layout.input_style === 'standout'"
 
-    :class="attrs.class"
-
-    :style="{
-      borderRadius: layout.square
-        ? '0px'
-        : layout.rounded
-        ? '16px'
-        : '4px'
-    }"
+    :class="['s-select', attrs.class]"
 
     @filter="onFilter"
   >
@@ -91,15 +83,54 @@ export default defineComponent({
     const cache = {}
 
     // --------------------------
+    // 🎨 THEME ENGINE (🔥 FINAL)
+    // --------------------------
+
+    const applyTheme = (v) => {
+
+      let radius = "4px" // fallback
+
+      // prioridade 1 → valor direto do backend
+      if (v?.border_radius) {
+        radius = v.border_radius
+      }
+
+      // prioridade 2 → modo
+      else {
+        switch (v?.mode) {
+
+          case "square":
+            radius = "0px"
+            break
+
+          case "rounded":
+            radius = "16px"
+            break
+
+          case "soft":
+            radius = "8px"
+            break
+
+          case "pill":
+            radius = "999px"
+            break
+
+          default:
+            radius = "4px"
+        }
+      }
+
+      document.documentElement.style.setProperty("--s-radius", radius)
+    }
+
+    watch(layout, applyTheme, { immediate: true, deep: true })
+
+    // --------------------------
     // 🔑 OPTION CONFIG
     // --------------------------
 
     const optionLabelKey = computed(() => attrs["option-label"])
     const optionValueKey = computed(() => attrs["option-value"])
-
-    // --------------------------
-    // 🔧 GET LABEL (SAFE)
-    // --------------------------
 
     const getLabel = (o) => {
       if (!o) return ""
@@ -112,7 +143,6 @@ export default defineComponent({
         return o?.[optionLabelKey.value] ?? ""
       }
 
-      // fallback básico
       if (typeof o === "string") return o
       if (typeof o.label === "string") return o.label
 
@@ -181,16 +211,12 @@ export default defineComponent({
         const search = (val || "").toLowerCase()
 
         if(props.api){
-
           await fetchOptions(val)
-
         }else{
-
           optionsList.value = (props.options || []).filter(o => {
             const label = String(getLabel(o)).toLowerCase()
             return label.includes(search)
           })
-
         }
 
       })
@@ -270,3 +296,10 @@ export default defineComponent({
 
 })
 </script>
+
+<style scoped>
+/* 🔥 aplica no elemento correto do Quasar */
+.s-select :deep(.q-field__control) {
+  border-radius: var(--s-radius, 4px) !important;
+}
+</style>
