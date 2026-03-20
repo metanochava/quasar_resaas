@@ -146,11 +146,7 @@ export default defineComponent({
 
         }else{
 
-          optionsList.value = props.options.filter(o=>
-            (o.label ?? o)
-              .toLowerCase()
-              .includes(val.toLowerCase())
-          )
+          optionsList.value = props.options.filter(o=> (o.label ?? o)?.toLowerCase()?.includes(val.toLowerCase()))
 
         }
 

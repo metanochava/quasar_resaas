@@ -52,8 +52,16 @@ const modules = ref([])
 const models = ref([])
 
 async function loadApps() {
-  const {data} = await HTTPAuth.get(url({type:'u', url:'/api/django_resaas/modulos/', params:{}}))
-  modules.value = data.apps
+  const { data } = await HTTPAuth.get(
+    url({ type: 'u', url: '/api/django_resaas/modulos/', params: {} })
+  )
+
+  modules.value = (data.apps || [])
+    .filter(app => app && (app.nome || app.name))
+    .map(app => ({
+      label: String(app.nome || app.name),
+      value: app.id ?? app.value ?? null
+    }))
 }
 
 async function loadModelsRelation(){
