@@ -194,7 +194,7 @@ async function executeAction() {
         </div>
       </q-card-section>
 
-      <s-card-actions align="right">
+      <q-card-actions align="right">
         <s-btn flat label="Cancelar" v-close-popup />
 
         <s-btn
@@ -202,7 +202,7 @@ async function executeAction() {
           :label="actionType === 'hard_delete' ? 'Eliminar Permanentemente' : 'Eliminar'"
           @click="executeAction"
         />
-      </s-card-actions>
+      </q-card-actions>
 
     </s-card>
   </q-dialog>

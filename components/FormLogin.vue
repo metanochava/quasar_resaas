@@ -20,7 +20,7 @@
           <br>
           <q-form  @submit.prevent="login">
 
-            <s-input outlined dense @keyup.enter="login()" clearable v-model="identifier" :label="tdc('Usuario ou Celular ou Email')">
+            <s-input @keyup.enter="login()" clearable v-model="identifier" label="Usuario ou Celular ou Email">
               <template v-slot:prepend>
                 <q-icon name="email" />
               </template>
@@ -29,7 +29,7 @@
               </template>
             </s-input>
             <br/>
-            <s-input outlined dense @keyup.enter="login()"  :readonly="readonly" clearable v-model="password" :type="isPwd ? 'password': 'text'" :label="tdc('Senha')">
+            <s-input @keyup.enter="login()"  :readonly="readonly" clearable v-model="password" :type="isPwd ? 'password': 'text'" label="Senha">
 
               <template v-slot:prepend>
                 <q-icon
@@ -53,18 +53,18 @@
           </q-form>
         </q-card-section>
 
-        <s-card-actions class="q-px-md" >
+        <q-card-actions class="q-px-md" >
           <s-btn  :readonly="User.loading" :disable="User.loading"
                   :loading="User.loading" size="md" @click="login()"  
                   color="positive" dense class="full-width " 
                   :label="tdc('Entrar')"
           />
           <p></p>
-        </s-card-actions>
-        <s-card-actions align="around" >
+        </q-card-actions>
+        <q-card-actions align="around" >
           <s-btn flat :to="{name:'esquecerpassword'}"  size="md"  color="purple" :label="tdc('Esqueci minha') + ' ' + tdc('Senha')" />
           <s-btn flat :to="{name:'registarUser'}"  size="md" color="primary" class="" :label="tdc('Registar')" />
-        </s-card-actions>
+        </q-card-actions>
       </s-card>
   </q-page>
 </template>

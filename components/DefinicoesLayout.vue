@@ -17,7 +17,6 @@
         toggle-color="white"
         :options="[
           { label: 'Desktop', value: 'desktop' },
-          { label: 'Tablet', value: 'Tablet' },
           { label: 'Mobile', value: 'mobile' }
         ]"
       />
@@ -591,10 +590,10 @@
         />
       </q-card-section>
 
-      <s-card-actions align="right">
+      <q-card-actions align="right">
         <s-btn flat label="Cancelar" v-close-popup />
         <s-btn color="primary" label="Aplicar" @click="applyColor" />
-      </s-card-actions>
+      </q-card-actions>
     </s-card>
   </q-dialog>
 </template>

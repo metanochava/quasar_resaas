@@ -19,17 +19,17 @@
           </q-card-section>
           <q-separator />
 
-          <s-card-actions class="row" >
+          <q-card-actions class="row" >
             <s-btn flat   class="col-12" color="primary"  @click="pergunta = false, User.logout(User.Entidade?.id)" > {{tdc(User.Entidade?.nome)}}</s-btn>
-          </s-card-actions>
+          </q-card-actions>
 
-          <s-card-actions class="row" >
+          <q-card-actions class="row" >
             <s-btn flat   class="col-12" color="primary"  @click="pergunta = false, User.logout('x')" > {{tdc(User?.TipoEntidade?.nome)}}</s-btn>
-          </s-card-actions>
+          </q-card-actions>
           <q-separator/>
-          <s-card-actions class="row" >
+          <q-card-actions class="row" >
             <s-btn  class="col-12" flat v-close-popup>{{tdc('Cancelar')}}</s-btn>
-          </s-card-actions>
+          </q-card-actions>
         </s-card>
 
     </q-dialog>
@@ -37,13 +37,13 @@
     <s-btn round flat>
       <q-avatar class="" size="45px" :class="$q.dark.isActive ? 'bg-white' : 'bg-white'" >
         <img  :src="User?.perfil" >
-        <s-card-actions align="center" v-if="User" flat>
+        <q-card-actions align="center" v-if="User" flat>
           <div class="text-h6 text-gry-8 row text-center">{{User?.username}}</div>
-        </s-card-actions>
+        </q-card-actions>
         <q-separator />
         <q-menu flat  square  fit :offset="[130, 5]"  >
           <s-card class="my-card"  style="width:270px;"  flat bordered square  >
-            <s-card-actions class="text-center row" v-if="User">
+            <q-card-actions class="text-center row" v-if="User">
               <div class=" col-12">
                 <q-avatar class="" size="120px"  >
                   <img   :src="User?.perfil" >
@@ -52,7 +52,7 @@
               <div class=" text-center col-12 text-grey-9 text-h6">
                 {{User?.username}}
               </div>
-            </s-card-actions>
+            </q-card-actions>
             <q-separator  v-if="User" />
             <q-expansion-item
                 v-if="User.data"
@@ -111,15 +111,15 @@
                 </q-list>
               </q-menu>
             </s-btn>
-            <s-card-actions align="around" v-if="User.data">
+            <q-card-actions align="around" v-if="User.data">
               <s-btn  icon="settings" dense size=""  :to="{name:'userDetails', params:{'user_id': User?.id}}" flat color="secondary" class="">{{tdc('Definições')}}</s-btn>
               <s-btn  icon="logout" dense size="" flat color="red" @click="pergunta = !pergunta">{{tdc('Sair')}}</s-btn>
-            </s-card-actions>
+            </q-card-actions>
 
-            <s-card-actions align="around" v-else>
+            <q-card-actions align="around" v-else>
               <s-btn  icon="person_add" dense size="" :to="{name:'registarUser'}" flat color="primary" class="" :label="tdc('Registar')" />
               <s-btn  icon="login" dense size="" :to="{name:'login'}" flat color="secondary" class="" >{{tdc('login')}}</s-btn>
-            </s-card-actions>
+            </q-card-actions>
             <q-separator color="primary" dense size="xs" />
           </s-card>
 

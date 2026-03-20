@@ -222,10 +222,10 @@ async function save() {
       <q-separator />
 
       <!-- ACTIONS -->
-      <s-card-actions align="right">
+      <q-card-actions align="right">
         <s-btn flat label="Cancelar" @click="close" />
         <s-btn color="primary" :loading="saving" label="Salvar" @click="save" />
-      </s-card-actions>
+      </q-card-actions>
 
     </s-card>
   </q-dialog>

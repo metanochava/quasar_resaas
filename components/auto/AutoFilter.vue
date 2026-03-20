@@ -154,11 +154,11 @@ function apply() {
       <q-separator />
 
       <!-- ACTIONS -->
-      <s-card-actions align="right">
+      <q-card-actions align="right">
         <s-btn flat label="Limpar" @click="clear" />
         <s-btn flat label="Cancelar" @click="close" />
         <s-btn color="primary" label="Aplicar" @click="apply" />
-      </s-card-actions>
+      </q-card-actions>
 
     </s-card>
   </q-dialog>

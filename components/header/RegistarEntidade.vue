@@ -11,17 +11,17 @@
           </q-card-section>
           <q-separator />
 
-          <s-card-actions class="row" >
+          <q-card-actions class="row" >
             <s-btn flat   class="col-12" color="primary" type="submit" @click="logout(User?.Entidade?.id)" > {{tdc(User?.Entidade?.nome)}}</s-btn>
-          </s-card-actions>
+          </q-card-actions>
 
-          <s-card-actions class="row" >
+          <q-card-actions class="row" >
             <s-btn flat   class="col-12" color="primary" type="submit" @click="logout('x')" > {{tdc(User?.TipoEntidade?.nome)}}</s-btn>
-          </s-card-actions>
+          </q-card-actions>
           <q-separator/>
-          <s-card-actions class="row" >
+          <q-card-actions class="row" >
             <s-btn  class="col-12" flat v-close-popup>{{tdc('Cancelar')}}</s-btn>
-          </s-card-actions>
+          </q-card-actions>
         </s-card>
 
     </q-dialog>
@@ -30,13 +30,13 @@
       <q-avatar class="" size="45px" :class="$q.dark.isActive ? 'bg-white' : 'bg-white'" >
         <img  v-if="UserPessoa" :src="User?.perfil?.url" >
         <img  v-else src="https://awsacademy.instructure.com/images/messages/avatar-50.png" >
-        <s-card-actions align="center" v-if="User" flat>
+        <q-card-actions align="center" v-if="User" flat>
           <div class="text-h6 text-gry-8 row text-center">{{User?.username}}</div>
-        </s-card-actions>
+        </q-card-actions>
         <q-separator />
         <q-menu flat  square  fit :offset="[130, 5]"  >
           <s-card class="my-card"  style="width:270px;"  flat bordered square  >
-            <s-card-actions class="text-center row" v-if="User">
+            <q-card-actions class="text-center row" v-if="User">
               <div class=" col-12">
                 <q-avatar class="" size="120px"  >
                   <img  v-if="User" :src="User?.perfil?.url" >
@@ -46,7 +46,7 @@
               <div class=" text-center col-12 text-grey-9 text-h6">
                 {{User?.username}}
               </div>
-            </s-card-actions>
+            </q-card-actions>
             <q-separator  v-if="User" />
             <q-expansion-item
                 v-if="User"

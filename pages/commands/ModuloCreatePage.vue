@@ -66,7 +66,7 @@
 
                 <q-separator />
 
-                <s-card-actions align="between">
+                <q-card-actions align="between">
 
                   <!-- abrir scaffold -->
                   <s-btn
@@ -86,7 +86,7 @@
                     @click="confirmDelete(app.name)"
                   />
 
-                </s-card-actions>
+                </q-card-actions>
               </s-card>
             </div>
           </div>

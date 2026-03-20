@@ -26,10 +26,10 @@
           </q-card-section>
           <q-separator />
 
-          <s-card-actions align="right">
+          <q-card-actions align="right">
             <s-btn  v-close-popup   :color="$q.dark.isActive ? '' : 'dark'" >{{tdc('Cancelar')}}</s-btn>
             <s-btn   :color="$q.dark.isActive ? 'primary' : 'primary'" type="submit" @click="comentar" > {{tdc('Enviar')}}</s-btn>
-          </s-card-actions>
+          </q-card-actions>
         </s-card>
     
   </div>

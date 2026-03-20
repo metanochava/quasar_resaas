@@ -18,19 +18,11 @@
     :ripple="animation.button_animation === 'ripple'"
 
     :class="[
+      's-btn',
       attrs.class,
       animation.hover_effect ? 'hover-' + animation.hover_style : '',
       animation.button_animation === 'pulse' ? 'btn-anim-pulse' : ''
     ]"
-
-    :style="{
-      borderRadius: layout.square
-        ? '0px'
-        : layout.rounded
-        ? '16px'
-        : '4px'
-    }"
-
   >
 
     <slot/>
@@ -41,7 +33,7 @@
 
 <script>
 
-import { defineComponent, computed, useAttrs } from "vue"
+import { defineComponent, computed, useAttrs, watch } from "vue"
 import { UserStore } from "./../../stores/AuthStore"
 import { tdc } from "../../boot/base"
 
@@ -58,9 +50,51 @@ export default defineComponent({
     const layout = computed(()=>User.ps?.layout || {})
     const animation = computed(()=>User.ps?.animation || {})
 
+    // --------------------------
+    // 🎨 THEME ENGINE (🔥 IGUAL AOS OUTROS)
+    // --------------------------
+
+    const applyTheme = (v) => {
+
+      let radius = "4px"
+
+      if (v?.border_radius) {
+        radius = v.border_radius
+      } else {
+        switch (v?.mode) {
+          case "square":
+            radius = "0px"
+            break
+          case "rounded":
+            radius = "16px"
+            break
+          case "soft":
+            radius = "8px"
+            break
+          case "pill":
+            radius = "999px"
+            break
+          default:
+            radius = "4px"
+        }
+      }
+
+      document.documentElement.style.setProperty("--s-radius", radius)
+    }
+
+    watch(layout, applyTheme, { immediate: true, deep: true })
+
+    // --------------------------
+    // 🌍 TRANSLATION
+    // --------------------------
+
     const translatedLabel = computed(()=>{
       return attrs.label ? tdc(attrs.label) : undefined
     })
+
+    // --------------------------
+    // 🎛️ ATTRS
+    // --------------------------
 
     const btnAttrs = computed(()=>{
 
@@ -86,3 +120,26 @@ export default defineComponent({
 })
    
 </script>
+
+<style scoped>
+/* 🔥 botão aceita direto */
+.s-btn {
+  border-radius: var(--s-radius, 4px) !important;
+}
+
+/* opcional: garantir também no conteúdo interno */
+.s-btn :deep(.q-btn__content) {
+  border-radius: inherit;
+}
+
+/* animação exemplo */
+.btn-anim-pulse {
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+</style>
