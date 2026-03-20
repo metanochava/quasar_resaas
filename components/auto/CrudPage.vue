@@ -5,13 +5,10 @@
         <s-select
           v-model="module"
           :options="modules"
-          :label="tdc('module')"
-          outlined
-          dense 
-          map-options
-          emit-value
           option-value="name"
           option-label="name"
+          emit-value
+          map-options
           @update:model-value="loadModelsRelation()"
         />
       </div>

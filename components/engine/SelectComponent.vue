@@ -91,30 +91,33 @@ export default defineComponent({
     const cache = {}
 
     // --------------------------
-    // 🔧 HELPERS (CORE FIX)
+    // 🔑 OPTION CONFIG
+    // --------------------------
+
+    const optionLabelKey = computed(() => attrs["option-label"])
+    const optionValueKey = computed(() => attrs["option-value"])
+
+    // --------------------------
+    // 🔧 GET LABEL (SAFE)
     // --------------------------
 
     const getLabel = (o) => {
       if (!o) return ""
 
-      if (typeof o === "string") return o
+      if (typeof optionLabelKey.value === "function") {
+        return optionLabelKey.value(o)
+      }
 
+      if (typeof optionLabelKey.value === "string") {
+        return o?.[optionLabelKey.value] ?? ""
+      }
+
+      // fallback básico
+      if (typeof o === "string") return o
       if (typeof o.label === "string") return o.label
-      if (typeof o.name === "string") return o.name
-      if (typeof o.nome === "string") return o.nome
 
       return ""
     }
-
-    const normalizeOption = (o) => ({
-      label: tdc(getLabel(o)),
-      value: o?.id ?? o?.value ?? o,
-      raw: o
-    })
-
-    const normalizedOptions = computed(() =>
-      (props.options || []).map(normalizeOption)
-    )
 
     // --------------------------
     // 🔁 WATCHERS
@@ -154,7 +157,7 @@ export default defineComponent({
 
         const data = r.data.results ?? r.data
 
-        optionsList.value = (data || []).map(normalizeOption)
+        optionsList.value = data || []
 
         cache[search] = optionsList.value
 
@@ -175,17 +178,18 @@ export default defineComponent({
 
       update(async()=>{
 
+        const search = (val || "").toLowerCase()
+
         if(props.api){
 
           await fetchOptions(val)
 
         }else{
 
-          const search = (val || "").toLowerCase()
-
-          optionsList.value = normalizedOptions.value.filter(o =>
-            o.label.toLowerCase().includes(search)
-          )
+          optionsList.value = (props.options || []).filter(o => {
+            const label = String(getLabel(o)).toLowerCase()
+            return label.includes(search)
+          })
 
         }
 
@@ -202,7 +206,7 @@ export default defineComponent({
       if(props.api){
         fetchOptions("")
       }else{
-        optionsList.value = normalizedOptions.value
+        optionsList.value = props.options
       }
 
     })
