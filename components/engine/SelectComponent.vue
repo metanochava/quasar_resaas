@@ -300,6 +300,6 @@ export default defineComponent({
 <style scoped>
 /* 🔥 aplica no elemento correto do Quasar */
 .s-select :deep(.q-field__control) {
-  border-radius: var(--s-radius, 4px) !important;
+  border-radius: var(--s-radius) !important;
 }
 </style>

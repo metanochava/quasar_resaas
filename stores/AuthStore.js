@@ -234,41 +234,75 @@ export const UserStore = defineStore("user", {
 
       })
     },
-
-
     setSettings(){
 
       /* =========================
-        DARK MODE
+        🌙 DARK MODE
       ========================= */
 
       Dark.set(!!this.LayoutSettings.dark_mode)
 
       /* =========================
-        CORES
+        🎨 CORES (QUASAR)
       ========================= */
+
       const theme = this.normalizeTheme(this.Theme)
+
       Object.entries(theme).forEach(([key, value]) => {
         setCssVar(key, value)
       })
-      
 
       /* =========================
-        BACKGROUND GLOBAL
+        🎨 CSS VARIABLES (GLOBAL SYSTEM)
       ========================= */
+
+      const root = document.documentElement
+
+      // 👉 BORDER RADIUS (🔥 AQUI ESTÁ O QUE FALTAVA)
+      let radius = "4px"
+
+      if (this.LayoutSettings.border_radius) {
+        radius = this.LayoutSettings.border_radius
+      } else if (this.LayoutSettings.square) {
+        radius = "0px"
+      } else if (this.LayoutSettings.rounded) {
+        radius = "16px"
+      }
+
+      root.style.setProperty("--s-radius", radius)
+
+      // 👉 INPUT COLORS
+      root.style.setProperty("--input-bg", this.Theme.input_background || "#fff")
+      root.style.setProperty("--input-border", this.Theme.input_border || "#ccc")
+      root.style.setProperty("--input-focus", this.Theme.input_focus || "#1976D2")
+
+      // 👉 BUTTON COLORS
+      root.style.setProperty("--btn-primary", this.Theme.button_primary)
+      root.style.setProperty("--btn-primary-text", this.Theme.button_primary_text)
+
+      // 👉 TEXT
+      root.style.setProperty("--text-primary", this.Theme.text_primary)
+      root.style.setProperty("--text-secondary", this.Theme.text_secondary)
+
+      /* =========================
+        🧱 BACKGROUND GLOBAL
+      ========================= */
+
       document.body.style.background =
         Dark.isActive
           ? (this.Theme.background_dark || this.Theme.background || '')
           : (this.Theme.background || this.Theme.background_dark || '')
 
-
       /* =========================
-        TIPOGRAFIA
+        🔤 TIPOGRAFIA
       ========================= */
+
       const font = this.Typography.font_family || "Roboto"
 
       let link = document.getElementById("dynamic-theme-font")
-      const fontHref = `https://fonts.googleapis.com/css2?family=${font.replace(/ /g, "+")}:wght@300;400;500;700&display=swap`
+
+      const fontHref =
+        `https://fonts.googleapis.com/css2?family=${font.replace(/ /g, "+")}:wght@300;400;500;700&display=swap`
 
       if (!link) {
         link = document.createElement("link")
@@ -290,9 +324,22 @@ export const UserStore = defineStore("user", {
       if (this.Typography.line_height) {
         document.body.style.lineHeight = this.Typography.line_height
       }
-      console.log('Configurado')
-    },
 
+      /* =========================
+        ⚡ ANIMAÇÃO
+      ========================= */
+
+      const speed =
+        this.AnimationSettings.animation_speed === "fast"
+          ? "0.2s"
+          : this.AnimationSettings.animation_speed === "slow"
+          ? "0.6s"
+          : "0.35s"
+
+      root.style.setProperty("--anim-speed", speed)
+
+      console.log("✅ Theme aplicado (GLOBAL ENGINE)")
+    },
 
     async getMenus () {
       await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + this.data.id + '/menus/', params: {} }))

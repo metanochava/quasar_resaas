@@ -238,6 +238,8 @@ export default defineComponent({
 <style scoped>
 /* 🔥 ESSENCIAL: aplicar no elemento certo do Quasar */
 .s-input :deep(.q-field__control) {
-  border-radius: var(--s-radius, 4px) !important;
+  border-radius: var(--s-radius) !important;
+  background: var(--input-bg);
+  border-color: var(--input-border);
 }
 </style>

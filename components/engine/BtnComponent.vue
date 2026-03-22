@@ -124,7 +124,9 @@ export default defineComponent({
 <style scoped>
 /* 🔥 botão aceita direto */
 .s-btn {
-  border-radius: var(--s-radius, 4px) !important;
+  border-radius: var(--s-radius) !important;
+  background: var(--btn-primary);
+  color: var(--btn-primary-text);
 }
 
 /* opcional: garantir também no conteúdo interno */
