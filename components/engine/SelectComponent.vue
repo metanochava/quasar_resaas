@@ -26,7 +26,7 @@
     :filled="attrs.filled ?? layout.input_style === 'filled'"
     :standout="attrs.standout ?? layout.input_style === 'standout'"
 
-    :class="['s-select', attrs.class]"
+    :class="[ attrs.class]"
 
     @filter="onFilter"
   >
@@ -298,8 +298,5 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* 🔥 aplica no elemento correto do Quasar */
-.s-select :deep(.q-field__control) {
-  border-radius: var(--s-radius) !important;
-}
+
 </style>

@@ -18,7 +18,6 @@
     :ripple="animation.button_animation === 'ripple'"
 
     :class="[
-      's-btn',
       attrs.class,
       animation.hover_effect ? 'hover-' + animation.hover_style : '',
       animation.button_animation === 'pulse' ? 'btn-anim-pulse' : ''
@@ -122,15 +121,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* 🔥 botão aceita direto */
-.s-btn {
-  border-radius: var(--s-radius) !important;
-}
-
-/* opcional: garantir também no conteúdo interno */
-.s-btn :deep(.q-btn__content) {
-  border-radius: inherit;
-}
 
 /* animação exemplo */
 .btn-anim-pulse {
