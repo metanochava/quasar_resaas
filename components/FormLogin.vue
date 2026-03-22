@@ -54,10 +54,15 @@
         </q-card-section>
 
         <q-card-actions class="q-px-md" >
-          <s-btn  :readonly="User.loading" :disable="User.loading"
-                  :loading="User.loading" size="md" @click="login()"  
-                  color="positive" dense class="full-width " 
-                  :label="tdc('Entrar')"
+          <s-btn
+            :readonly="User.loading" 
+            :disable="User.loading"
+            :loading="User.loading"
+            size="md" 
+            @click="login()"  
+            color="positive" dense 
+            class="full-width " 
+            :label="tdc('Entrar')"
           />
           <p></p>
         </q-card-actions>

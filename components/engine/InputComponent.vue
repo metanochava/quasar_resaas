@@ -73,30 +73,7 @@ export default defineComponent({
     // --------------------------
 
     const applyTheme = (v) => {
-      let radius = "4px"
-
-      if (v?.border_radius) {
-        radius = v.border_radius
-      } else {
-        switch (v?.mode) {
-          case "square":
-            radius = "0px"
-            break
-          case "rounded":
-            radius = "16px"
-            break
-          case "soft":
-            radius = "8px"
-            break
-          case "pill":
-            radius = "999px"
-            break
-          default:
-            radius = "4px"
-        }
-      }
-
-      document.documentElement.style.setProperty("--s-radius", radius)
+      document.documentElement.style.setProperty("--s-radius")
     }
 
     watch(layout, applyTheme, { immediate: true, deep: true })
