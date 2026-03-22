@@ -235,6 +235,7 @@ export const UserStore = defineStore("user", {
       })
     },
     setSettings(){
+      console.log('mestura')
 
       /* =========================
         🌙 DARK MODE

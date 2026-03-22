@@ -125,8 +125,6 @@ export default defineComponent({
 /* 🔥 botão aceita direto */
 .s-btn {
   border-radius: var(--s-radius) !important;
-  background: var(--btn-primary);
-  color: var(--btn-primary-text);
 }
 
 /* opcional: garantir também no conteúdo interno */
