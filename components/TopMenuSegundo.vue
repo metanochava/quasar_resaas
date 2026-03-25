@@ -1,19 +1,19 @@
 <template>
-    <div >
-      <s-btn class="q-mr-xs" flat square
-        v-for="App in User.Menus" :key="App"
-        style="padding: 0px;"
-        :icon="App.icon"
-        :label="(tdc(App.menu))"
-      >
-        
-        <q-menu >
-          <q-list  style="min-width: 155px">
-            <SubMenu :Dados="App.submenu" />
-          </q-list>
-        </q-menu>
-      </s-btn>
-      </div>
+  <div >
+    <s-btn class="q-mr-xs" flat squaree
+      v-for="App in User.Menus" :key="App"
+      style="padding: 0px; margin-right:25px;"
+      :icon="App.icon"
+      :label="(tdc(App.menu))"
+    >
+      
+      <q-menu >
+        <q-list  style="min-width: 155px">
+          <SubMenu :Dados="App.submenu" />
+        </q-list>
+      </q-menu>
+    </s-btn>
+  </div>
 </template>
 
 <script >
