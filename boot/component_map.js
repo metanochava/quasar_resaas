@@ -19,16 +19,16 @@ import {
 
 export const componentMap = {
   // 🔤 TEXT / INPUT
-  's-input': QInput,
+  'q-input': QInput,
   'q-field': QField,
 
   // 🔽 SELECT / RELATIONS
-  's-select': QSelect,
+  'q-select': QSelect,
   'q-option-group': QOptionGroup,
 
   // ✅ BOOLEAN
-  's-checkbox': QCheckbox,
-  's-switch': QToggle,
+  'q-checkbox': QCheckbox,
+  'q-switch': QToggle,
   'q-radio': QRadio,
 
   // 📅 DATE / TIME
@@ -36,7 +36,7 @@ export const componentMap = {
   'q-time': QTime,
 
   // 📂 FILES
-  's-upload': QFile,
+  'q-upload': QFile,
   'q-uploader': QUploader,
 
   // ✍️ RICH TEXT

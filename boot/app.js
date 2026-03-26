@@ -5,15 +5,15 @@ export const apiBaseUrl =  process.env.API_BASE_URL
 export const thumbStyle = {
   right: '5px',
   borderRadius: '8px',
-  backgroundColor: '#027be3',
+  backgroundColor: 'var(--q-primary)',
   width: '8px',
   opacity: 0.75
 }
 
 export const barStyle = {
-  right: '2px ',
+  right: '2px',
   borderRadius: '14px',
-  backgroundColor: '#027be3',
+  backgroundColor: 'var(--q-primary)',
   width: '14px',
   opacity: 0.2,
   marginTop: '-3px',
@@ -21,7 +21,6 @@ export const barStyle = {
   paddingTop: '3px',
   paddingBottom: '3px'
 }
-
 
 export const pegaDominio = function () {
   let pagelocalurl = location.href // pega endereço que esta no navegador
