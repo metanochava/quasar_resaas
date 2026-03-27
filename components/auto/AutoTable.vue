@@ -1,11 +1,10 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { exportFile } from 'quasar'
-import { useRouter } from 'vue-router'
 import { tdc } from '../../boot/base'
+import { useRouter } from 'vue-router'
 
-// ---------------- ROUTER ----------------
-const router = useRouter()
+
 
 // ---------------- PROPS ----------------
 const props = defineProps({
@@ -21,14 +20,14 @@ const props = defineProps({
   actions: { type: Array, default: () => [] },
   canDo: { type: Function, default: () => true },
 
-  // 🔥 NOVO
   route: { type: [String, Object], default: null },
-
-  ignoreFields: { type: Array, default: () => ['id','created_at','updated_at','created_by','updated_by'] } 
+  ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
 })
 
+const router = useRouter()
+
 const showConfirm = ref(false)
-const actionType = ref(null)
+const actionType = ref(null) // 'delete' | 'hard_delete'
 const selectedRow = ref(null)
 
 const search = ref('')
@@ -46,34 +45,31 @@ const emit = defineEmits([
   'run-action',
   'update:pagination',
 
-  'objects',
+  'objects', // criado por Metano
   'hard_delete',
   'restore',
   'search',
 ])
 
-// ---------------- LOCAL STATE ----------------
+// ---------------- LOCAL STATE (FIX V-MODEL) ----------------
 const localPagination = ref({ ...props.pagination })
 
 watch(() => props.pagination, (val) => {
   localPagination.value = { ...val }
 })
 
+
 const show_filter = ref(false)
 
 // ---------------- UI STATE ----------------
 const visibleColumns = ref([])
-
 const singularActions = computed(() =>
   (props.actions || []).filter(c => c.details === true || c.details === 'true')
 )
-
 const geralActions = computed(() =>
   (props.actions || []).filter(c => c.details === false || c.details === 'false')
 )
-
 const density = ref('normal')
-
 const objects = ref('Activos')
 const objectsOptions = [
   { label: 'Activos', value: 'alive' },
@@ -87,23 +83,30 @@ const filteredColumns = computed(() =>
 )
 
 const allColumns = computed(() => filteredColumns.value.map(c => c.name))
-
 const effectiveColumns = computed(() =>
   visibleColumns.value.length ? visibleColumns.value : allColumns.value
 )
 
-// ---------------- ZEBRA ROWS ----------------
-function rowClass(props) {
-  return props.rowIndex % 2 === 0 ? 'row-even' : 'row-odd'
+function isDeleted(x) {
+  // isDeleted({ deleted_at: '2026-01-01' }) // true
+  // isDeleted({ deleted_at: null })         // false
+  // isDeleted(null)                         // false
+  return Boolean(x && x.deleted_at)
 }
 
-// ---------------- ROUTE FUNCTION ----------------
 function goToRoute(id) {
   if (!props.route) return
 
+  // caso 1: string
   if (typeof props.route === 'string') {
-    router.push({ name: props.route, params: { id } })
-  } else {
+    router.push({
+      name: props.route,
+      params: { id }
+    })
+  }
+
+  // caso 2: object (mais flexível)
+  else if (typeof props.route === 'object') {
     router.push({
       ...props.route,
       params: {
@@ -114,9 +117,9 @@ function goToRoute(id) {
   }
 }
 
-// ---------------- HELPERS ----------------
-function isDeleted(x) {
-  return Boolean(x && x.deleted_at)
+
+function rowClass(props) {
+  return props.rowIndex % 2 === 0 ? 'row-even' : 'row-odd'
 }
 
 // ---------------- INLINE EDIT ----------------
@@ -128,10 +131,10 @@ function isEditable(name) {
   return true
 }
 
-// ---------------- REQUEST ----------------
+// ---------------- REQUEST HANDLER ----------------
 function onRequest(e) {
   localPagination.value = e.pagination
-  emit('update:pagination', e.pagination)
+  emit('update:pagination', e.pagination) // 🔥 FIX
   emit('request', e)
 }
 
@@ -148,11 +151,15 @@ function exportCSV() {
   exportFile('export.csv', `${header}\n${body}`)
 }
 
-watch(() => props.columns, () => {
-  visibleColumns.value = []
-}, { immediate: true })
+watch(
+  () => props.columns,
+  async (columns) => {
+    if (!columns) return
+    visibleColumns.value = []
+  },
+  { immediate: true }
+)
 
-// ---------------- ACTIONS ----------------
 function confirmAction(type, row) {
   actionType.value = type
   selectedRow.value = row
@@ -174,6 +181,7 @@ const paginationLabel = (start, end, total) => {
   return `${start}-${end} ${tdc('de')} ${total}`
 }
 
+
 function runAction(action, row) {
   emit('run-action', { action, row })
 }
@@ -181,13 +189,19 @@ function runAction(action, row) {
 async function executeAction() {
   if (!selectedRow.value?.id) return
 
-  if (actionType.value === 'delete') emit('delete', selectedRow.value)
-  if (actionType.value === 'hard_delete') emit('hard_delete', selectedRow.value)
+  if (actionType.value === 'delete') {
+    emit('delete', selectedRow.value)
+  }
+
+  if (actionType.value === 'hard_delete') {
+    emit('hard_delete', selectedRow.value)
+  }
 
   showConfirm.value = false
   selectedRow.value = null
   actionType.value = null
 }
+
 </script>
 
 <template>
@@ -245,7 +259,7 @@ async function executeAction() {
     :dense="density === 'dense'"
     row-key="id"
     @request="onRequest"
-    :row-class="rowClass"
+
     :no-data-label="tdc('Sem dados')"
     :rows-per-page-label="tdc('Registos por página')"
     :pagination-label="paginationLabel"
@@ -255,42 +269,181 @@ async function executeAction() {
     <template #top>
       <div class="row col-12 items-center justify-between q-mb-md">
 
+        <!-- LEFT -->
         <div class="text-h4 text-primary">{{ model }}</div>
 
+        <!-- RIGHT -->
         <div class="row q-gutter-sm">
 
-          <s-select v-if="show_filter" v-model="objects" :options="objectsOptions" dense outlined
-            @update:model-value="val => emit('objects', val)" />
+          <s-select
+            v-if="show_filter"
+            v-model="objects"
+            :options="objectsOptions"
+            option-label="label"
+            option-value="value"
+            emit-value
+            map-options
+            dense
+            outlined
+            @update:model-value="val => emit('objects', val)"
+          />
+          
 
-          <s-select v-if="show_filter" v-model="density" :options="['dense','normal']" dense outlined />
+          <s-select v-if="show_filter"
+            v-model="density"
+            :options="['dense','normal']"
+            dense
+            outlined
+            style="width:120px"
+          />
 
-          <s-select v-if="show_filter" v-model="visibleColumns" :options="allColumns" multiple dense outlined />
+          <s-select
+            v-if="show_filter"
+            v-model="visibleColumns"
+            :options="allColumns"
+            multiple
+            dense
+            outlined
+            style="min-width:200px"
+            label="Colunas"
+          />
 
           <s-btn v-if="show_filter" dense flat icon="filter_list" @click="emit('filter')" />
           <s-btn v-if="show_filter" dense flat icon="refresh" @click="emit('refresh')" />
           <s-btn v-if="show_filter" dense flat icon="download" @click="exportCSV" />
 
-          <s-btn flat dense @click="show_filter = !show_filter" />
+          <s-btn  flat dense :icon="show_filter? 'arrow_forward' : 'arrow_back'"  @click=" show_filter = !show_filter" >
+            <q-tooltip>{{tdc('Mostar Filtros')}} </q-tooltip>
+          </s-btn>
 
-          <s-input v-model="search" @keyup.enter="emit('search', search)" />
-
-          <s-btn dense icon="add" color="primary" @click="emit('create')" />
+          <s-input
+            icon="search"
+            v-model="search"
+            style="min-width:200px"
+            :label="tdc('Search')"
+            @keyup.enter="emit('search', search)"
+          />
+          <s-btn
+            dense
+            icon="add"
+            color="primary"
+            @click="emit('create')"
+            v-show="canDo('add_' + model.toLowerCase())"
+          />
         </div>
       </div>
     </template>
 
-    <!-- 🔥 BODY -->
+
+    <!-- 🔥 ACTIONS -->
+    <template #body-cell-__actions="props">
+      <q-td :props="props">
+
+        <!-- BOTÃO 3 PONTOS -->
+        <s-btn
+          dense
+          flat
+          round
+          icon="more_vert"
+        >
+          <q-menu auto-close>
+
+            <q-list dense style="min-width: 180px">
+
+
+              <!-- EDIT -->
+              <q-item
+                v-if="canDo('change_'+model.toLowerCase()) && !isDeleted(props.row)"
+                clickable
+                @click="emit('edit', props.row)"
+              >
+                <q-item-section avatar>
+                  <q-icon name="edit" />
+                </q-item-section>
+                <q-item-section>Editar</q-item-section>
+              </q-item>
+
+
+
+
+
+
+              <!-- DELETE -->
+              <q-item v-if="canDo('delete_'+model.toLowerCase()) && !isDeleted(props.row)" clickable @click="confirmAction('delete', props.row)">
+                <q-item-section avatar>
+                  <q-icon name="delete" color="orange" />
+                </q-item-section>
+                <q-item-section>{{tdc('Eliminar')}}</q-item-section>
+              </q-item>
+
+              <!-- HARD DELETE -->
+              <q-item  v-if="canDo('hard_delete_'+model.toLowerCase()) && isDeleted(props.row)" clickable @click="confirmAction('hard_delete', props.row)">
+                <q-item-section avatar>
+                  <q-icon name="delete_forever" color="red" />
+                </q-item-section>
+                <q-item-section>{{ tdc('Eliminar Permanentemente') }}</q-item-section>
+              </q-item>
+
+              <!-- RESTORE -->
+              <q-item
+                v-if="canDo('restore_'+model.toLowerCase()) && isDeleted(props.row)"
+                clickable
+                 @click="emit('restore', props.row)"
+              >
+                <q-item-section avatar>
+                  <q-icon name="restore" color="green" />
+                </q-item-section>
+                <q-item-section>{{ tdc('Restaurar') }}</q-item-section>
+              </q-item>
+
+              <q-separator v-if="singularActions.length" />
+              
+
+              <!-- ACTIONS DINÂMICAS -->
+              <q-item
+                v-for="a in singularActions"
+                :key="a.url"
+                clickable
+                :disable="a.permission && !canDo(a.method + '_' + a.permission + '_' + a.modelo.toLowerCase())"
+                @click="runAction(a, props.row)"
+              >
+                <q-item-section avatar v-if="a.icon">
+                  <q-icon :name="a.icon" :color="getMethodColor(a.method)" />
+                </q-item-section>
+
+                <q-item-section>
+                  {{ a.method + '_' + a.permission }}
+                </q-item-section>
+              </q-item>
+
+            </q-list>
+
+          </q-menu>
+        </s-btn>
+
+      </q-td>
+    </template>
+
+    <!-- 🔥 INLINE EDIT -->
     <template #body-cell="props">
       <q-td :props="props">
 
-        <!-- ID botão -->
         <template v-if="props.col.name === 'id'">
-          <s-btn dense flat icon="visibility" color="primary"
-            @click="() => goToRoute(props.row.id)" />
-        </template>
+        <s-btn
+          dense
+          flat
+          color="primary"
+          icon="visibility"
+          @click="() => goToRoute(props.row.id)"
+        />
+        
+      </template>
 
         <template v-else-if="props.col.name !== '__actions' && isEditable(props.col.name)">
-          <q-popup-edit :model-value="props.value" auto-save v-slot="scope"
+          <q-popup-edit
+            :model-value="props.value"
+            auto-save
+            v-slot="scope"
             @save="val => emit('inline-patch', {
               id: props.row.id,
               field: props.col.field,
@@ -313,7 +466,14 @@ async function executeAction() {
   </q-table>
 </template>
 
-<style>
-.row-even { background: #fafafa; }
-.row-odd { background: #ffffff; }
+<style scoped>
+
+  .row-even {
+    background-color: #fafafa;
+  }
+
+  .row-odd {
+    background-color: #ffffff;
+  }
+ 
 </style>

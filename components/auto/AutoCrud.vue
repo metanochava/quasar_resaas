@@ -12,6 +12,7 @@
       :loading="loading"
       :pagination="pagination"
       :ignoreFields="ignoreFields"
+      :route="route"
       @request="onRequest"
       @create="openCreate"
       @edit="openEdit"
@@ -61,7 +62,8 @@ const props = defineProps({
   model: { type: String, required: true },
   can: { type: Function, default: null },
   schemaPath: { type: String, default: 'fields' },
-  ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
+  route: { type: [String, Object], default: null },
+  ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] },
 })
 
 // --- state ---
