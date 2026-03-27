@@ -11,6 +11,7 @@
       :can-do="canDo"
       :loading="loading"
       :pagination="pagination"
+      :ignoreFields="ignoreFields"
       @request="onRequest"
       @create="openCreate"
       @edit="openEdit"
@@ -32,12 +33,14 @@
       :model="model"
       :data="selectedRow"
       :can-do="canDo"
+      :ignoreFields="ignoreFields"
       @saved="onSaved"
     />
 
     <AutoFilter
       v-model="showFilter"
       :schema="schema"
+      :ignoreFields="ignoreFields"
       @apply="onApplyFilter"
     />
 
@@ -58,7 +61,7 @@ const props = defineProps({
   model: { type: String, required: true },
   can: { type: Function, default: null },
   schemaPath: { type: String, default: 'fields' },
-  ignoreFields: { type: Array, default: ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
+  ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
 })
 
 // --- state ---
@@ -83,6 +86,7 @@ const filters = ref({})
 
 // --- computed columns ---
 const columns = computed(() => {
+  base.push({ name: '__actions', label: 'Ações', field: '__actions', sortable: false })
   const base = schema.value.map(f => ({
     name: f.name,
     label: f.label,
@@ -109,7 +113,6 @@ async function init() {
     module: props.module,
     model: props.model,
     schemaPath: props.schemaPath,
-    ignoreFields: props.schemaPath,
   })
 
   try {

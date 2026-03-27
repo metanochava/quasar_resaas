@@ -113,7 +113,6 @@ export async function buildFormFromSchema({
   model,
   fetchRelationOptions = null, // opcional: injeta a tua função
   schemaPath = 'fields',        // 'fields' OR 'data.fields' (se o teu ok() embrulhar)
-  ignoreFields = ['created_at','updated_at'],
   moneyMask = '#.##0,00',       // se usares mask monetária custom
 } = {}) {
 
@@ -134,7 +133,6 @@ export async function buildFormFromSchema({
 
   for (const f of fields) {
     if (!f?.name) continue
-    if (ignoreFields.includes(f.name)) continue
 
     let component = 's-input'
     const props = {

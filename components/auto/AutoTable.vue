@@ -16,7 +16,8 @@ const props = defineProps({
   pagination: { type: Object, required: true },
 
   actions: { type: Array, default: () => [] },
-  canDo: { type: Function, default: () => true }
+  canDo: { type: Function, default: () => true },
+  ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
 })
 
 const showConfirm = ref(false)
@@ -24,6 +25,7 @@ const actionType = ref(null) // 'delete' | 'hard_delete'
 const selectedRow = ref(null)
 
 const search = ref('')
+const ignoreSet = computed(() => new Set(props.ignoreFields))
 
 // ---------------- EMITS ----------------
 const emit = defineEmits([
@@ -70,7 +72,11 @@ const objectsOptions = [
 ]
 
 // ---------------- COMPUTED ----------------
-const allColumns = computed(() => props.columns.map(c => c.name))
+const filteredColumns = computed(() =>
+  props.columns.filter(c => !ignoreSet.value.has(c.name))
+)
+
+const allColumns = computed(() => filteredColumns.value.map(c => c.name))
 const effectiveColumns = computed(() =>
   visibleColumns.value.length ? visibleColumns.value : allColumns.value
 )
@@ -85,6 +91,7 @@ function isDeleted(x) {
 
 // ---------------- INLINE EDIT ----------------
 function isEditable(name) {
+  if (ignoreSet.value.has(name)) return false
   const f = props.schema.find(x => x.name === name)
   if (!f) return false
   if (f.ui?.isFile || f.ui?.isImage || f.ui?.isRelation) return false
@@ -100,7 +107,7 @@ function onRequest(e) {
 
 // ---------------- EXPORT CSV ----------------
 function exportCSV() {
-  const cols = props.columns.filter(c => c.name !== '__actions')
+  const cols = filteredColumns.value.filter(c => c.name !== '__actions')
 
   const header = cols.map(c => `"${c.label}"`).join(',')
 
@@ -212,7 +219,7 @@ async function executeAction() {
     flat
     bordered
     :rows="rows"
-    :columns="columns"
+    :columns="filteredColumns"
     :loading="loading"
     :pagination="localPagination"
     :visible-columns="effectiveColumns"
@@ -230,7 +237,7 @@ async function executeAction() {
       <div class="row col-12 items-center justify-between q-mb-md">
 
         <!-- LEFT -->
-        <div class="text-h5 text-primary">{{ model }}</div>
+        <div class="text-h4 text-primary">{{ model }}</div>
 
         <!-- RIGHT -->
         <div class="row q-gutter-sm">
@@ -332,7 +339,7 @@ async function executeAction() {
                 <q-item-section avatar>
                   <q-icon name="delete" color="orange" />
                 </q-item-section>
-                <q-item-section>Eliminar</q-item-section>
+                <q-item-section>{{tdc('Eliminar')}}</q-item-section>
               </q-item>
 
               <!-- HARD DELETE -->
@@ -340,7 +347,7 @@ async function executeAction() {
                 <q-item-section avatar>
                   <q-icon name="delete_forever" color="red" />
                 </q-item-section>
-                <q-item-section>Eliminar Permanentemente</q-item-section>
+                <q-item-section>{{ tdc('Eliminar Permanentemente') }}</q-item-section>
               </q-item>
 
               <!-- RESTORE -->
@@ -352,7 +359,7 @@ async function executeAction() {
                 <q-item-section avatar>
                   <q-icon name="restore" color="green" />
                 </q-item-section>
-                <q-item-section>Restaurar</q-item-section>
+                <q-item-section>{{ tdc('Restaurar') }}</q-item-section>
               </q-item>
 
               <q-separator v-if="singularActions.length" />

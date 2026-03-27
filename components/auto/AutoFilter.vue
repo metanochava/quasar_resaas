@@ -2,11 +2,11 @@
 import { ref, computed, watch } from 'vue'
 import { componentMap } from '../../boot/component_map'
 
-
 // ---------------- PROPS ----------------
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
-  schema: { type: Array, default: () => [] }
+  schema: { type: Array, default: () => [] },
+  ignoreFields: { type: Array, default: () => ['id','created_at','updated_at','created_by','updated_by'] }
 })
 
 // ---------------- EMITS ----------------
@@ -24,29 +24,19 @@ watch(localModel, v => {
 })
 
 // ---------------- STATE ----------------
-const tab = ref('basic')
 const filters = ref({})
+
+const ignoreSet = computed(() => new Set(props.ignoreFields))
+
 const activeCount = computed(() =>
   Object.values(filters.value).filter(v => v !== null && v !== '').length
 )
 
 // ---------------- COMPUTED ----------------
-// const basicFields = computed(() =>
-//   props.schema.filter(f => {
-//     if (f.ui?.isFile || f.ui?.isImage) return false
-//     if (f.ui?.isRelation) return true
-//     if (f.ui?.isChar || f.ui?.isNumeric) return true
-//     return false
-//   }).slice(0, 10)
-// )
-
-// const advancedFields = computed(() =>
-//   props.schema.filter(f => !(f.ui?.isFile || f.ui?.isImage))
-// )
-
 const basicFields = computed(() =>
   props.schema
     .filter(f => {
+      if (ignoreSet.value.has(f.name)) return false // 🔥 AQUI
       if (f.ui?.isFile || f.ui?.isImage) return false
       if (f.ui?.isRelation) return true
       if (f.ui?.isChar || f.ui?.isNumeric) return true
@@ -57,6 +47,7 @@ const basicFields = computed(() =>
 
 const advancedFields = computed(() =>
   props.schema.filter(f =>
+    !ignoreSet.value.has(f.name) && // 🔥 AQUI
     !(f.ui?.isFile || f.ui?.isImage) &&
     !basicFields.value.find(b => b.name === f.name)
   )
@@ -82,21 +73,22 @@ function apply() {
     ...payload,
     __resetPage: true
   })
+
   localModel.value = false
-
-
 }
 </script>
 
 <template>
   <q-dialog v-model="localModel" persistent>
     <s-card style="min-width: 720px; max-width: 92vw;">
+
       <s-btn :label="'Aplicar ' + ( activeCount )" />
+
       <!-- HEADER -->
-      <q-bar class="row items-center justify-between" :class="$q.dark.isActive ? 'bg-primary text-white' : 'bg-primary text-white'">
+      <q-bar class="row items-center justify-between bg-primary text-white">
         <div class="text-h6">Filtros</div>
         <s-btn dense flat icon="close" @click="close" >
-          <q-tooltip>{{('Fechar')}}</q-tooltip>
+          <q-tooltip>Fechar</q-tooltip>
         </s-btn>
       </q-bar>
 
@@ -108,20 +100,8 @@ function apply() {
       </q-card-section>
 
       <q-card-section v-else>
-          <!-- form normal -->
 
-        <q-tabs v-model="tab" dense>
-          <q-tab name="basic" label="Básico" />
-          <q-tab name="advanced" label="Avançado" />
-        </q-tabs>
-
-        <q-separator class="q-my-sm" />
-
-        <q-tab-panels v-model="tab">
-
-          <!-- BASIC -->
-          <q-tab-panel name="basic" class="row q-col-gutter-sm">
-            <div v-for="f in basicFields" :key="f.name" class="col-4">
+        <div v-for="f in basicFields" :key="f.name" class="col-4">
               <component
                 :is="componentMap[f.component] || f.component"
                 v-model="filters[f.name]"
@@ -131,13 +111,10 @@ function apply() {
                 outline
               />
             </div>
-          </q-tab-panel>
 
-          <!-- ADVANCED -->
-          <q-tab-panel name="advanced" class="row q-col-gutter-sm" >
             <div v-for="f in advancedFields" :key="f.name" class="col-4">
               <component
-               :is="componentMap[f.component] || f.component"
+                :is="componentMap[f.component] || f.component"
                 v-model="filters[f.name]"
                 v-bind="f.props"
                 :label="f.label"
@@ -145,9 +122,6 @@ function apply() {
                 outlined
               />
             </div>
-          </q-tab-panel>
-
-        </q-tab-panels>
 
       </q-card-section>
 

@@ -14,7 +14,9 @@ const props = defineProps({
   data: { type: Object, default: null },
   module: { type: String, required: true },
   model: { type: String, required: true },
-  canDo: { type: Function, default: () => true }
+  canDo: { type: Function, default: () => true },
+  ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
+  
 })
 
 // ---------------- EMITS ----------------
@@ -36,19 +38,30 @@ const form = ref({})
 const saving = ref(false)
 const uploadProgress = ref(0)
 
-// ---------------- TABS ----------------
-const tab = ref('general')
+const ignoreSet = computed(() => new Set(props.ignoreFields))
+
 
 const generalFields = computed(() =>
-  props.schema.filter(f => !f.ui?.isRelation && !f.ui?.isFile && !f.ui?.isImage)
+  props.schema.filter(f =>
+    !ignoreSet.value.has(f.name) &&
+    !f.ui?.isRelation &&
+    !f.ui?.isFile &&
+    !f.ui?.isImage
+  )
 )
 
 const relationFields = computed(() =>
-  props.schema.filter(f => f.ui?.isRelation)
+  props.schema.filter(f =>
+    !ignoreSet.value.has(f.name) &&
+    f.ui?.isRelation
+  )
 )
 
 const fileFields = computed(() =>
-  props.schema.filter(f => f.ui?.isFile || f.ui?.isImage)
+  props.schema.filter(f =>
+    !ignoreSet.value.has(f.name) &&
+    (f.ui?.isFile || f.ui?.isImage)
+  )
 )
 
 // ---------------- WATCH DATA ----------------
@@ -151,22 +164,8 @@ async function save() {
       </q-card-section>
 
       <q-card-section v-else>
-          <!-- form normal -->
-
-
-        <q-tabs v-model="tab" dense>
-          <q-tab name="general" label="Geral" />
-          <q-tab name="relations" label="Relações" />
-          <q-tab name="files" label="Ficheiros" />
-        </q-tabs>
-
-        <q-separator class="q-my-sm" />
-
-        <q-tab-panels v-model="tab">
-
-          <!-- GENERAL -->
-          <q-tab-panel name="general" class="row q-col-gutter-sm">
-            <div v-for="f in generalFields" :key="f.name" class="col-6">
+        
+        <div v-for="f in generalFields" :key="f.name" class="col-6">
               <component
                 :is="componentMap[f.component] || f.component"
                 v-model="form[f.name]"
@@ -175,10 +174,6 @@ async function save() {
                 outlined
               />
             </div>
-          </q-tab-panel>
-
-          <!-- RELATIONS -->
-          <q-tab-panel name="relations" class="row q-col-gutter-sm">
             <div v-for="f in relationFields" :key="f.name" class="col-6">
               <component
 
@@ -189,10 +184,6 @@ async function save() {
                 outlined
               />
             </div>
-          </q-tab-panel>
-
-          <!-- FILES -->
-          <q-tab-panel name="files" class="row q-col-gutter-sm">
             <div v-for="f in fileFields" :key="f.name" class="col-6">
 
               <!-- preview -->
@@ -211,14 +202,9 @@ async function save() {
               />
 
             </div>
-
-            <q-linear-progress v-if="uploadProgress > 0" :value="uploadProgress/100" />
-          </q-tab-panel>
-
-        </q-tab-panels>
-
+        <q-linear-progress v-if="uploadProgress > 0" :value="uploadProgress/100" />
+          
       </q-card-section>
-
       <q-separator />
 
       <!-- ACTIONS -->
