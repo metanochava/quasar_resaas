@@ -235,9 +235,10 @@ async function executeAction() {
       </q-card-section>
 
       <q-card-actions align="right">
-        <s-btn flat label="Cancelar" v-close-popup />
+        <s-btn flat dense label="Cancelar" v-close-popup />
 
-        <s-btn
+        <s-btn 
+          dense
           :color="actionType === 'hard_delete' ? 'red' : 'orange'"
           :label="actionType === 'hard_delete' ? 'Eliminar Permanentemente' : 'Eliminar'"
           @click="executeAction"
@@ -469,7 +470,9 @@ async function executeAction() {
 <style scoped>
 
   .row-even {
-    background-color: #fafafa;
+    /* background-color: #fafafa; */
+    background-color: var(--q-primary);
+    opacity: 0.2,
   }
 
   .row-odd {
