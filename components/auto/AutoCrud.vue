@@ -86,7 +86,7 @@ const filters = ref({})
 
 // --- computed columns ---
 const columns = computed(() => {
-  base.push({ name: '__actions', label: 'Ações', field: '__actions', sortable: false })
+
   const base = schema.value.map(f => ({
     name: f.name,
     label: f.label,
@@ -94,8 +94,20 @@ const columns = computed(() => {
     sortable: true,
     align: 'left',
   }))
+
   base.push({ name: '__actions', label: 'Ações', field: '__actions', sortable: false })
-  return base
+
+  const columns = [
+
+    {
+      name: '__actions',
+      label: 'Ações',
+      field: '__actions',
+      sortable: false
+    },
+    ...base
+  ]
+  return columns
 })
 
 // --- permissions ---
