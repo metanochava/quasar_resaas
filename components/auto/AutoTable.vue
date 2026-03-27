@@ -131,6 +131,17 @@ function isEditable(name) {
   return true
 }
 
+// 🔥 TOGGLE ESTADO (NOVO)
+function toggleEstado(row) {
+  const newValue = row.estado == 1 ? 0 : 1
+
+  emit('inline-patch', {
+    id: row.id,
+    field: 'estado',
+    value: newValue
+  })
+}
+
 // ---------------- REQUEST HANDLER ----------------
 function onRequest(e) {
   localPagination.value = e.pagination
@@ -425,15 +436,29 @@ async function executeAction() {
       <q-td :props="props">
 
         <template v-if="props.col.name === 'id'">
-        <s-btn
-          dense
-          flat
-          color="primary"
-          icon="visibility"
-          @click="() => goToRoute(props.row.id)"
-        />
-        
-      </template>
+          <s-btn
+            dense
+            flat
+            color="primary"
+            icon="visibility"
+            @click="() => goToRoute(props.row.id)"
+          >
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.id) }}</q-tooltip>
+          </s-btn>
+          
+        </template>
+
+        <!-- 🔥 ESTADO -->
+        <template v-else-if="props.col.name === 'estado'">
+          <s-btn
+            dense
+            :color="props.row.estado == 1 ? 'primary' : 'secondary'"
+            :label="props.row.estado == 1 ? 'Activo' : 'Inactivo'"
+            @click="() => toggleEstado(props.row)"
+          >
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.estado == 1 ? 'Desativar' : 'Activar') }}</q-tooltip>
+          </s-btn>
+        </template>
 
         <template v-else-if="props.col.name !== '__actions' && isEditable(props.col.name)">
           <q-popup-edit
@@ -474,7 +499,7 @@ async function executeAction() {
 }
 
 .row-odd {
-  background-color: #ddfffd;
+  background-color: #cdcdcd;
 }
 
 </style>
