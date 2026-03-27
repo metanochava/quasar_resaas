@@ -82,8 +82,6 @@ function apply() {
   <q-dialog v-model="localModel" persistent>
     <s-card style="min-width: 720px; max-width: 92vw;">
 
-      <s-btn :label="'Aplicar ' + ( activeCount )" />
-
       <!-- HEADER -->
       <q-bar class="row items-center justify-between bg-primary text-white">
         <div class="text-h6">Filtros</div>
@@ -99,7 +97,7 @@ function apply() {
         <q-spinner />
       </q-card-section>
 
-      <q-card-section v-else>
+      <q-card-section v-else class="row">
 
         <div v-for="f in basicFields" :key="f.name" class="col-4">
               <component
