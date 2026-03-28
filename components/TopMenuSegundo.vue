@@ -20,7 +20,7 @@
 
 import { defineComponent } from 'vue'
 import { tdc, toPlural } from '../boot/base'
-import { UserStore, TipoEntidadeStore } from '../stores/AuthStore'
+import { useUserStore, useTipoEntidadeStore } from '../stores/AuthStore'
 import SubMenu from './SubMenu.vue'
 
 
@@ -33,8 +33,8 @@ export default defineComponent({
   },
   setup () {
 
-    const User = UserStore()
-    const Auth = TipoEntidadeStore()
+    const User = useUserStore()
+    const Auth = useTipoEntidadeStore()
 
     return {
       User,

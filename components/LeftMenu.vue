@@ -55,14 +55,14 @@ import LeftMenuSegundo from './LeftMenuSegundo.vue'
 
 import { defineComponent } from 'vue'
 import { tdc } from '../boot/base'
-import { UserStore } from '../stores/AuthStore'
+import { useUserStore } from '../stores/AuthStore'
 
 export default defineComponent({
   components: {
     LeftMenuSegundo
   },
   setup () {
-    const User = UserStore()
+    const User = useUserStore()
     return {
       User,
     }

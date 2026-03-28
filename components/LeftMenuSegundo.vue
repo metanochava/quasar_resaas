@@ -41,7 +41,7 @@
 
 import { defineComponent } from 'vue'
 import { tdc, toPlural} from '../boot/base'
-import { TipoEntidadeStore, UserStore } from '../stores/AuthStore'
+import { useTipoEntidadeStore, useUserStore } from '../stores/AuthStore'
 import SearchMenu from './SearchMenu.vue'
 import SubMenu from './SubMenu.vue'
 
@@ -54,8 +54,8 @@ export default defineComponent({
     SubMenu
   },
   setup () {
-    const Auth = TipoEntidadeStore()
-    const  User = UserStore()
+    const Auth = useTipoEntidadeStore()
+    const  User = useUserStore()
     return {
       Auth,
       User,

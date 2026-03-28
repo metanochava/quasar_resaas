@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { getStorage } from './storage'
-import { LoadStore, UserStore } from '../stores/AuthStore'
+import { useLoadStore, useUserStore } from '../stores/AuthStore'
 import { Alert } from './alerts'
 
 const apiBaseUrl = process.env.API
@@ -19,7 +19,7 @@ const safeParse = (value) => {
 
 export const url = (payload = { type: 'u', url: '', params: {} }) => {
 
-  const User = UserStore()
+  const User = useUserStore()
   const tipoEntidadeNome = User?.TipoEntidade?.nome
 
   let urlFinal = ''
@@ -61,8 +61,8 @@ const createClient = (auth = false, blob = false) => {
 
   instance.interceptors.request.use((config) => {
 
-    const User = UserStore()
-    const Load = LoadStore()
+    const User = useUserStore()
+    const Load = useLoadStore()
 
     config.headers = config.headers || {}
 
@@ -105,7 +105,7 @@ const createClient = (auth = false, blob = false) => {
 
     (response) => {
 
-      const Load = LoadStore()
+      const Load = useLoadStore()
       Load.dec()
 
       Alert(response)
@@ -115,8 +115,8 @@ const createClient = (auth = false, blob = false) => {
 
     (error) => {
 
-      const User = UserStore()
-      const Load = LoadStore()
+      const User = useUserStore()
+      const Load = useLoadStore()
 
       Load.dec()
 

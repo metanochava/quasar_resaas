@@ -21,7 +21,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import {  UserStore, LanguageStore} from '../../stores/AuthStore'
+import {  useUserStore, useLanguageStore} from '../../stores/AuthStore'
 
 
 export default defineComponent({
@@ -29,8 +29,8 @@ export default defineComponent({
 
   },
   setup () {
-    const User = UserStore()
-    const Language = LanguageStore()
+    const User = useUserStore()
+    const Language = useLanguageStore()
     return {
       User,
       Language

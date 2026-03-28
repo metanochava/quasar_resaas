@@ -34,7 +34,7 @@
 
 <script>
 import { defineComponent, computed, useAttrs, ref, watch } from "vue"
-import { UserStore } from "../../stores/AuthStore"
+import { useUserStore } from "../../stores/AuthStore"
 import { tdc } from "../../boot/base"
 
 export default defineComponent({
@@ -62,7 +62,7 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const attrs = useAttrs()
-    const User = UserStore()
+    const User = useUserStore()
 
     const layout = computed(() => User.ps?.layout || {})
     const localValue = ref(props.modelValue)

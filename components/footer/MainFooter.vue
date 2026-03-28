@@ -25,7 +25,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { tdc } from '../../boot/base';
-import { LoadStore, UserStore } from '../../stores/AuthStore';
+import { useLoadStore, useUserStore } from '../../stores/AuthStore';
 import Comments from "./Comments.vue";
 
 
@@ -36,8 +36,8 @@ export default defineComponent({
   },
 
   setup () {
-    const User = UserStore
-    const Load = LoadStore()
+    const User = useUserStore
+    const Load = useLoadStore()
     return {
       User,
       Load

@@ -1,12 +1,12 @@
 
 import { getActivePinia } from 'pinia'
-import { LanguageStore, UserStore } from '../stores/AuthStore'
+import { useLanguageStore, useUserStore } from '../stores/AuthStore'
 import figlet from 'figlet'
 
 export const tdc = (texto = '') => {
   if (!getActivePinia()) return texto
 
-  const store = LanguageStore()
+  const store = useLanguageStore()
   const chave = texto?.toLowerCase()?.trim()
 
   return store.TraducaoMap[chave] || texto
@@ -123,7 +123,7 @@ export function ascii(text, font = 'Standard') {
 
 
 export function toPlural(word, count = 2) {
-  const User = UserStore()
+  const User = useUserStore()
   const lang = User.Idioma.code
   const w = String(word || '').trim()
   if (!w) return ''

@@ -29,9 +29,9 @@
 
 <script setup>
   import { tdc } from '../boot/base';
-  import { UserStore } from '../stores/AuthStore';
+  import { useUserStore } from '../stores/AuthStore';
   import AllLogo from './../components/AllLogo.vue';
-  const User = UserStore()
+  const User = useUserStore()
 </script>
 
 <style scoped>

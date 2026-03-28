@@ -35,15 +35,15 @@
 <script>
 import { defineComponent } from 'vue'
 import { tdc } from '../../boot/base'
-import { TipoEntidadeStore, UserStore } from '../../stores/AuthStore'
+import { useTipoEntidadeStore, useUserStore } from '../../stores/AuthStore'
 import { setStorage } from '../../boot/storage';
 
 
 export default defineComponent({
 
   setup () {
-    const User = UserStore()
-    const Auth = TipoEntidadeStore()
+    const User = useUserStore()
+    const Auth = useTipoEntidadeStore()
     return {
       User,
       Auth

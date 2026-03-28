@@ -485,7 +485,7 @@
 <script>
 
 import { ref, computed, watch, onMounted } from 'vue'
-import { HTTPAuth, tdc, UserStore , AlertError, buildFormFromSchema, actionsFromSchema} from './../../index'
+import { HTTPAuth, tdc, useUserStore , AlertError, buildFormFromSchema, actionsFromSchema} from './../../index'
 import ModelAction from './ModelAction.vue';
 
 
@@ -498,7 +498,7 @@ export default {
   },
 
   setup () {
-    const User = UserStore()
+    const User = useUserStore()
     return {
       User
     }

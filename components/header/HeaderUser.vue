@@ -134,7 +134,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { tdc } from '../../boot/base'
-import { UserStore } from '../../stores/AuthStore'
+import { useUserStore } from '../../stores/AuthStore'
 import RegistarEntidade from './RegistarEntidade.vue'
 
 export default defineComponent({
@@ -142,7 +142,7 @@ export default defineComponent({
   components: { RegistarEntidade },
 
   setup () {
-    const User = UserStore()
+    const User = useUserStore()
     return { User, tdc }
   },
 

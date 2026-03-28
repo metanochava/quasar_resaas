@@ -7,7 +7,7 @@
 <script>
 import { defineComponent } from 'vue'
 
-import { UserStore } from './../../stores/AuthStore'
+import { useUserStore } from './../../stores/AuthStore'
 import FormLogin from './../../components/FormLogin.vue'
 
 export default defineComponent({
@@ -15,7 +15,7 @@ export default defineComponent({
     FormLogin,
   },
   setup() {
-    const User = UserStore()
+    const User = useUserStore()
     return {
       User,
     }

@@ -15,7 +15,7 @@
 <script>
 
 import { defineComponent, computed, useAttrs } from 'vue'
-import { UserStore } from "./../../stores/AuthStore"
+import { useUserStore } from "./../../stores/AuthStore"
 
 export default defineComponent({
 
@@ -25,7 +25,7 @@ export default defineComponent({
   setup(){
 
     const attrs = useAttrs()
-    const User = UserStore()
+    const User = useUserStore()
 
     const layout = computed(()=>User.ps?.layout || {})
 

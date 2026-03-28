@@ -602,7 +602,7 @@
 import { defineComponent, h } from "vue"
 import { Dark, setCssVar, QBtn, QInput, QCard, QDrawer } from "quasar"
 import { HTTPAuth, url } from "../boot/api"
-import { UserStore } from "../stores/AuthStore"
+import { useUserStore } from "../stores/AuthStore"
 
 export default defineComponent({
   name: "ThemeStudioEngine",
@@ -612,7 +612,7 @@ export default defineComponent({
       name: "TBtn",
       inheritAttrs: false,
       setup(props, { attrs, slots }) {
-        const User = UserStore()
+        const User = useUserStore()
 
         return () => {
           const layout = User.LayoutSettings || {}
@@ -667,7 +667,7 @@ export default defineComponent({
       },
       emits: ["update:modelValue"],
       setup(props, { attrs, emit, slots }) {
-        const User = UserStore()
+        const User = useUserStore()
 
         return () => {
           const layout = User.LayoutSettings || {}
@@ -695,7 +695,7 @@ export default defineComponent({
       name: "TCard",
       inheritAttrs: false,
       setup(props, { attrs, slots }) {
-        const User = UserStore()
+        const User = useUserStore()
 
         return () => {
           const layout = User.LayoutSettings || {}
@@ -743,7 +743,7 @@ export default defineComponent({
       name: "TDrawer",
       inheritAttrs: false,
       setup(props, { attrs, slots }) {
-        const User = UserStore()
+        const User = useUserStore()
 
         return () =>
           h(
@@ -760,7 +760,7 @@ export default defineComponent({
   },
 
   setup() {
-    const User = UserStore()
+    const User = useUserStore()
     return { User }
   },
 

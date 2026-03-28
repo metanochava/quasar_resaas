@@ -27,7 +27,7 @@
 <script>
 
 import { defineComponent, computed, useAttrs, watch } from "vue"
-import { UserStore } from "./../../stores/AuthStore"
+import { useUserStore } from "./../../stores/AuthStore"
 import { tdc } from "../../boot/base"
 
 export default defineComponent({
@@ -38,7 +38,7 @@ export default defineComponent({
   setup(){
 
     const attrs = useAttrs()
-    const User = UserStore()
+    const User = useUserStore()
 
     const layout = computed(()=>User.ps?.layout || {})
     const animation = computed(()=>User.ps?.animation || {})
