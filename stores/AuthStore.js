@@ -3,43 +3,11 @@ import { getStorage, setStorage, deleteStorage } from '../boot/storage'
 import { HTTPAuth, HTTPClient, url } from '../boot/api'
 import { tdc } from '../boot/base'
 import { setCssVar, Dark } from "quasar"
+import { LanguageStore } from  './LanguageStore'
 
 
 
-export const LoadStore = defineStore('load', {
-  state: () => ({
-    count: 0
-  }),
-  getters: {
-    value: (state) => state.count,
-  },
-  actions: {
-    inc() {
-      this.count++
-    },
-    dec() {
-      this.count--
-    },
-  }
-})
 
-
-export const AlertStore = defineStore('alert', {
-  state: () => ({
-    data: []
-  }),
-  actions: {
-    add(alert) {
-      this.data.push(alert)
-    },
-    remove(alert) {
-      this.data = this.data.filter(a => a.id !== alert.id)
-    },
-    clear() {
-      this.data = []
-    },
-  }
-})
 
 
 
@@ -70,69 +38,7 @@ export const TipoEntidadeStore = defineStore('tipoentidade', {
   }
 })
 
-export const LanguageStore = defineStore("lang", {
-  state: () => ({
-    current: {} ,
-    list: [],
-    TraducaoMap: {}
-  }),
 
-  actions: {
-    change(lang) {
-      this.current = lang
-      const User = UserStore()
-      User.setIdioma(this.current)
-      this.setTraducao(this.current)
-    },
-    async setTraducao(idioma) {
-      try {
-        // Reset map
-        this.TraducaoMap = {}
-
-        const res = await HTTPClient.get(
-          url({
-            type: "u",
-            url: `api/django_resaas/idiomas/${idioma?.id}/traducaos`,
-            params: {}
-          })
-        )
-
-        const payload = res.data
-
-        // Função para achatar qualquer JSON
-        const flattenTranslations = (obj, map = {}) => {
-          for (const key in obj) {
-            const value = obj[key]
-
-            if (value && typeof value === "object" && !Array.isArray(value)) {
-              flattenTranslations(value, map)
-            } else {
-              const normalizada = String(key).toLowerCase().trim()
-              map[normalizada] = value
-            }
-          }
-          return map
-        }
-
-        this.TraducaoMap = flattenTranslations(payload)
-
-      } catch (err) {
-
-      }
-    },
-
-    async get() {
-      await HTTPClient.get(url({type: "u", url: "api/django_resaas/idiomas", params: {}}) )
-      .then(res => {
-        this.list = res.data
-        this.current = this.list[0]
-        const User = UserStore()
-        User.setIdioma(this.current)
-      }).catch(err => {
-      })
-    }
-  },
-})
 
 export const UserStore = defineStore("user", {
   state: () => ({

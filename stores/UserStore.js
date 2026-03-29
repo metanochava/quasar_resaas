@@ -1,3 +1,6 @@
+import { createBaseStore } from './../base/base_store'
+import { HTTPAuth, url } from './../boot/api'
+
 export const useUserStore = defineStore('user', {
   state: () => ({
     data: null,
