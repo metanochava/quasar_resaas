@@ -1,4 +1,5 @@
 export * from './stores/AuthStore.js'
+export * from './base/base_store.js'
 export * from './stores/MenuStore.js'
 export * from './stores/SettingsStore.js'
 export * from './router/restRoutes.js'
