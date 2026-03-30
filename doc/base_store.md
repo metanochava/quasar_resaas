@@ -8,11 +8,19 @@ Este documento explica como usar o **BaseStore Enterprise** criado com Pinia par
 
 O `BaseStore` é um gerador de stores que:
 
+<<<<<<< HEAD
 - Evita duplicação de código
 - Padroniza CRUD
 - Integra com `django_resaas`
 - Suporta hooks (antes/depois de ações)
 - Permite extensão por módulo
+=======
+* Evita duplicação de código
+* Padroniza CRUD
+* Integra com `django_resaas`
+* Suporta hooks (antes/depois de ações)
+* Permite extensão por módulo
+>>>>>>> temp-release
 
 ---
 
@@ -205,10 +213,17 @@ src/
 
 # 🚀 13. Próximos passos
 
+<<<<<<< HEAD
 - AutoCrud dinâmico
 - Cache inteligente
 - Permissões automáticas
 - Offline support
+=======
+* AutoCrud dinâmico
+* Cache inteligente
+* Permissões automáticas
+* Offline support
+>>>>>>> temp-release
 
 ---
 
@@ -218,9 +233,17 @@ O BaseStore é o **core do frontend SaaS**.
 
 Com ele você consegue:
 
+<<<<<<< HEAD
 - Criar módulos rapidamente
 - Padronizar sistema inteiro
 - Escalar para múltiplas clínicas
 
 🔥 Isso é arquitetura de produto real.
 
+=======
+* Criar módulos rapidamente
+* Padronizar sistema inteiro
+* Escalar para múltiplas clínicas
+
+🔥 Isso é arquitetura de produto real.
+>>>>>>> temp-release

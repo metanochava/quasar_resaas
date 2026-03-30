@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const useSettingsStore = defineStore('settings', {
+export const SettingsStore = defineStore('settings', {
   state: () => ({
     Settings: { layout: 'main' } 
   }),
@@ -10,3 +10,4 @@ export const useSettingsStore = defineStore('settings', {
     },
   }
 })
+

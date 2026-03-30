@@ -3,9 +3,11 @@ import { getStorage, setStorage, deleteStorage } from '../boot/storage'
 import { HTTPAuth, HTTPClient, url } from '../boot/api'
 import { tdc } from '../boot/base'
 import { setCssVar, Dark } from "quasar"
+import { LanguageStore } from  './LanguageStore'
 
 
 
+<<<<<<< HEAD
 export const useLoadStore = defineStore('load', {
   state: () => ({
     count: 0
@@ -41,6 +43,10 @@ export const useAlertStore = defineStore('alert', {
   }
 })
 
+=======
+
+
+>>>>>>> temp-release
 
 
 export const useTipoEntidadeStore = defineStore('tipoentidade', {
@@ -57,7 +63,7 @@ export const useTipoEntidadeStore = defineStore('tipoentidade', {
   getters: {
 
   },
-
+ 
   actions: {
     async getTipoEntidades(){
       await HTTPClient.get(url({type: "u", url: "api/django_resaas/tipoentidades", params: {}}) )
@@ -70,6 +76,7 @@ export const useTipoEntidadeStore = defineStore('tipoentidade', {
   }
 })
 
+<<<<<<< HEAD
 export const useLanguageStore = defineStore("lang", {
   state: () => ({
     current: {} ,
@@ -133,6 +140,9 @@ export const useLanguageStore = defineStore("lang", {
     }
   },
 })
+=======
+
+>>>>>>> temp-release
 
 export const useUserStore = defineStore("user", {
   state: () => ({
