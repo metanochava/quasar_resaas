@@ -3,7 +3,7 @@ import { getStorage, setStorage, deleteStorage } from '../boot/storage'
 import { HTTPAuth, HTTPClient, url } from '../boot/api'
 import { tdc } from '../boot/base'
 import { setCssVar, Dark } from "quasar"
-import { LanguageStore } from  './LanguageStore'
+import { useLanguageStore } from  './LanguageStore'
 
 
 
