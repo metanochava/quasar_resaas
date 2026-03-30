@@ -25,12 +25,8 @@
 <script>
 import { defineComponent } from 'vue'
 import { tdc } from '../../boot/base';
-<<<<<<< HEAD
-import { useLoadStore, useUserStore } from '../../stores/AuthStore';
-=======
 import { UserStore } from '../../stores/AuthStore';
 import { LoadStore } from '../../stores/LoadStore';
->>>>>>> temp-release
 import Comments from "./Comments.vue";
 
 

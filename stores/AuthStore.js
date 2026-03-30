@@ -7,46 +7,8 @@ import { LanguageStore } from  './LanguageStore'
 
 
 
-<<<<<<< HEAD
-export const useLoadStore = defineStore('load', {
-  state: () => ({
-    count: 0
-  }),
-  getters: {
-    value: (state) => state.count,
-  },
-  actions: {
-    inc() {
-      this.count++
-    },
-    dec() {
-      this.count--
-    },
-  }
-})
 
 
-export const useAlertStore = defineStore('alert', {
-  state: () => ({
-    data: []
-  }),
-  actions: {
-    add(alert) {
-      this.data.push(alert)
-    },
-    remove(alert) {
-      this.data = this.data.filter(a => a.id !== alert.id)
-    },
-    clear() {
-      this.data = []
-    },
-  }
-})
-
-=======
-
-
->>>>>>> temp-release
 
 
 export const useTipoEntidadeStore = defineStore('tipoentidade', {

@@ -1,11 +1,7 @@
 
 import { getActivePinia } from 'pinia'
-<<<<<<< HEAD
-import { useLanguageStore, useUserStore } from '../stores/AuthStore'
-=======
 import { UserStore } from '../stores/AuthStore'
 import { LanguageStore } from '../stores/LanguageStore';
->>>>>>> temp-release
 import figlet from 'figlet'
 
 export const tdc = (texto = '') => {
