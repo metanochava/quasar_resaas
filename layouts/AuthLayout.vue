@@ -13,7 +13,7 @@
 
     <q-page-container class="">
       <router-view />
-      
+
     </q-page-container>
 
     <Rodape />
@@ -27,7 +27,8 @@
 <script>
 /* -------------------- IMPORT STORES -------------------- */
 
-import { useTipoEntidadeStore, useUserStore } from '../stores/AuthStore'
+import { useUserStore } from '../stores/UserStore'
+import { useTipoEntidadeStore } from '../stores/TipoEntidadeStore'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'

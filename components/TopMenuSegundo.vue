@@ -6,7 +6,7 @@
       :icon="App.icon"
       :label="(tdc(App.menu))"
     >
-      
+
       <q-menu >
         <q-list  style="min-width: 155px">
           <SubMenu :Dados="App.submenu" />
@@ -20,7 +20,8 @@
 
 import { defineComponent } from 'vue'
 import { tdc, toPlural } from '../boot/base'
-import { useUserStore, useTipoEntidadeStore } from '../stores/AuthStore'
+import { useUserStore } from '../stores/UserStore'
+import { useTipoEntidadeStore } from '../stores/TipoEntidadeStore'
 import SubMenu from './SubMenu.vue'
 
 
@@ -45,20 +46,20 @@ export default defineComponent({
   },
   data () {
     return {
-     
+
     }
   },
   computed: {
 
   },
   watch: {
-    
+
   },
   mounted () {
 
   },
   methods: {
-    
+
   }
 })
 </script>

@@ -134,7 +134,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { tdc } from '../../boot/base'
-import { useUserStore } from '../../stores/AuthStore'
+import { useUserStore } from '../../stores/UserStore'
 import RegistarEntidade from './RegistarEntidade.vue'
 
 export default defineComponent({
@@ -200,6 +200,6 @@ export default defineComponent({
     this.User.loadFromStorage()
     await this.User.getEntidades()
     this.startSessionWatcher()
-  } 
+  }
 })
 </script>

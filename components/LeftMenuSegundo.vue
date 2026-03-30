@@ -41,7 +41,8 @@
 
 import { defineComponent } from 'vue'
 import { tdc, toPlural} from '../boot/base'
-import { useTipoEntidadeStore, useUserStore } from '../stores/AuthStore'
+import { useUserStore } from '../stores/UserStore'
+import { useTipoEntidadeStore } from '../stores/TipoEntidadeStore'
 import SearchMenu from './SearchMenu.vue'
 import SubMenu from './SubMenu.vue'
 
@@ -65,20 +66,20 @@ export default defineComponent({
   },
   data () {
     return {
-      
+
     }
   },
   computed: {
 
   },
   watch: {
-    
+
   },
   mounted () {
-    
+
   },
   methods: {
-    
+
   }
 })
 </script>

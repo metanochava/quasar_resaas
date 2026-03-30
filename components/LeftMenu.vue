@@ -55,7 +55,7 @@ import LeftMenuSegundo from './LeftMenuSegundo.vue'
 
 import { defineComponent } from 'vue'
 import { tdc } from '../boot/base'
-import { useUserStore } from '../stores/AuthStore'
+import { useUserStore } from '../stores/UserStore'
 
 export default defineComponent({
   components: {
@@ -71,7 +71,7 @@ export default defineComponent({
   data () {
     return {
       tdc: tdc,
-      
+
     }
   },
 
@@ -81,7 +81,7 @@ export default defineComponent({
   },
 
   mounted () {
-    
+
   },
 
   methods: {

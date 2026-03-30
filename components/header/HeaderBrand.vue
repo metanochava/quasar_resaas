@@ -26,7 +26,8 @@
 <script>
 
 import { defineComponent } from 'vue'
-import { useTipoEntidadeStore, useUserStore } from '../../stores/AuthStore'
+import { useUserStore } from '../../stores/UserStore'
+import { useTipoEntidadeStore } from '../../stores/TipoEntidadeStore'
 import { tdc } from '../../boot/base';
 
 
@@ -45,7 +46,7 @@ export default defineComponent({
   },
   data () {
     return {
-      
+
     }
   },
   computed: {
@@ -57,8 +58,8 @@ export default defineComponent({
   },
 
   methods: {
-    
-  
+
+
   }
 })
 </script>

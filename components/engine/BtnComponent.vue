@@ -27,7 +27,7 @@
 <script>
 
 import { defineComponent, computed, useAttrs, watch } from "vue"
-import { useUserStore } from "./../../stores/AuthStore"
+import { useUserStore } from "./../../stores/UserStore"
 import { tdc } from "../../boot/base"
 
 export default defineComponent({
@@ -111,7 +111,7 @@ export default defineComponent({
   }
 
 })
-   
+
 </script>
 
 <style scoped>

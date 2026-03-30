@@ -23,9 +23,9 @@
 
     <TopMenuSegundo ></TopMenuSegundo>
     <q-space />
-    <SearchMenu  :size="'180'" style="margin-right: 30px;"/> 
+    <SearchMenu  :size="'180'" style="margin-right: 30px;"/>
 
-    
+
   </q-bar>
 </template>
 <script >
@@ -33,7 +33,7 @@
 import TopMenuSegundo from './TopMenuSegundo.vue'
 import { defineComponent } from 'vue'
 import { tdc } from '../boot/base'
-import { useUserStore } from '../stores/AuthStore'
+import { useUserStore } from '../stores/UserStore'
 import SearchMenu from './SearchMenu.vue';
 
 export default defineComponent({
@@ -65,7 +65,7 @@ export default defineComponent({
   },
 
   methods: {
-   
+
   }
 })
 </script>

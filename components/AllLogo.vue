@@ -27,7 +27,7 @@
       style="width:60%"
     />
 
-    
+
 
     <!-- NOME -->
     <!-- <br />
@@ -52,7 +52,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { HTTPClient, url } from './../boot/api'
-import { useUserStore } from './../stores/AuthStore'
+import { useUserStore } from './../stores/UserStore'
 import { tdc } from '../boot/base'
 
 

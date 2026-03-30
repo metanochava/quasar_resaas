@@ -21,7 +21,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { useUserStore} from '../../stores/AuthStore'
+import { useUserStore} from '../../stores/UserStore'
 import {useLanguageStore } from '../../stores/LanguageStore';
 
 export default defineComponent({
@@ -38,7 +38,7 @@ export default defineComponent({
   },
   data () {
     return {
-      
+
     }
   },
   computed: {
@@ -50,7 +50,7 @@ export default defineComponent({
   },
 
   methods: {
-    
+
   }
 })
 </script>

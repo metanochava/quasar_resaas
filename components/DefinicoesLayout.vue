@@ -602,7 +602,7 @@
 import { defineComponent, h } from "vue"
 import { Dark, setCssVar, QBtn, QInput, QCard, QDrawer } from "quasar"
 import { HTTPAuth, url } from "../boot/api"
-import { useUserStore } from "../stores/AuthStore"
+import { useUserStore } from "../stores/UserStore"
 
 export default defineComponent({
   name: "ThemeStudioEngine",

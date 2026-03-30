@@ -55,13 +55,13 @@
 
         <q-card-actions class="q-px-md" >
           <s-btn
-            :readonly="User.loading" 
+            :readonly="User.loading"
             :disable="User.loading"
             :loading="User.loading"
-            size="md" 
-            @click="login()"  
-            color="positive" dense 
-            class="full-width " 
+            size="md"
+            @click="login()"
+            color="positive" dense
+            class="full-width "
             :label="tdc('Entrar')"
           />
           <p></p>
@@ -80,7 +80,7 @@
 
 import { defineComponent } from 'vue'
 import { tdc } from '../boot/base'
-import { useTipoEntidadeStore, useUserStore } from '../stores/AuthStore'
+import { useTipoEntidadeStore, useUserStore } from '../stores/UserStore'
 import { setStorage, getStorage } from '../boot/storage'
 import AllLogo  from './../components/AllLogo.vue'
 import { useQuasar } from 'quasar'

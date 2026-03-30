@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { getStorage } from './storage'
-import {useUserStore } from '../stores/AuthStore'
+import {useUserStore } from '../stores/UserStore'
 import { useLoadStore } from '../stores/LoadStore';
 import { Alert } from './alerts'
 

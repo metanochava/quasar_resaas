@@ -28,7 +28,7 @@
 <script>
 
 import { defineComponent, computed, useAttrs } from 'vue'
-import { useUserStore } from "./../../stores/AuthStore"
+import { useUserStore } from "./../../stores/UserStore"
 
 export default defineComponent({
 

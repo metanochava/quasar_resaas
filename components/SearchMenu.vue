@@ -12,7 +12,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { tdc } from '../boot/base'
-import { useUserStore } from '../stores/AuthStore'
+import { useUserStore } from '../stores/UserStore'
 
 export default defineComponent({
   name: 'SearchMenu',
@@ -41,7 +41,7 @@ export default defineComponent({
 
       return menu
         .map(item => {
-          const children = item.submenu 
+          const children = item.submenu
             ? this.filterMenuRecursive(item.submenu, search)
             : []
 

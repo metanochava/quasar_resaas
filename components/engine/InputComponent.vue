@@ -34,7 +34,7 @@
 
 <script>
 import { defineComponent, computed, useAttrs, ref, watch } from "vue"
-import { useUserStore } from "../../stores/AuthStore"
+import { useUserStore } from "../../stores/UserStore"
 import { tdc } from "../../boot/base"
 
 export default defineComponent({
@@ -73,7 +73,7 @@ export default defineComponent({
     // --------------------------
 
     const applyTheme = (v) => {
-      
+
     }
 
     watch(layout, applyTheme, { immediate: true, deep: true })

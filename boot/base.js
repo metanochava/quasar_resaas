@@ -1,6 +1,6 @@
 
 import { getActivePinia } from 'pinia'
-import {useUserStore } from '../stores/AuthStore'
+import {useUserStore } from '../stores/UserStore'
 import {useLanguageStore } from '../stores/LanguageStore';
 import figlet from 'figlet'
 
