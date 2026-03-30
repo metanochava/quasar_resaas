@@ -22,7 +22,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { useUserStore} from '../../stores/AuthStore'
-import { LanguageStore } from '../../stores/LanguageStore';
+import {useLanguageStore } from '../../stores/LanguageStore';
 
 export default defineComponent({
   components: {
