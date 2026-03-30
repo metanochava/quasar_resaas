@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const AlertStore = defineStore('alert', {
+export const AlertStore = defineStore('alert', { 
   state: () => ({
     data: []
   }),

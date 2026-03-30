@@ -25,7 +25,7 @@ export const TipoEntidadeStore = defineStore('tipoentidade', {
   getters: {
 
   },
-
+ 
   actions: {
     async getTipoEntidades(){
       await HTTPClient.get(url({type: "u", url: "api/django_resaas/tipoentidades", params: {}}) )

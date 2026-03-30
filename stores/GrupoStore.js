@@ -24,6 +24,7 @@ export const useGrupoStore = createBaseStore(
           url: `api/django_resaas/users/${userId}/userGrupos/`
         })
       },
+      
 
       async select(grupo) {
         this.linha = grupo

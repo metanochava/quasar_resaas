@@ -10,3 +10,4 @@ export const SettingsStore = defineStore('settings', {
     },
   }
 })
+

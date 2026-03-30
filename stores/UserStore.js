@@ -24,6 +24,7 @@ export const useUserStore = defineStore('user', {
           payload
         )
 
+        
         this.access = data.tokens.access
         this.refresh = data.tokens.refresh
 

@@ -19,6 +19,7 @@ export const LanguageStore = defineStore("lang", {
       try {
         // Reset map
         this.TraducaoMap = {}
+        
 
         const res = await HTTPClient.get(
           url({

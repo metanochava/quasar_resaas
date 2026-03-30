@@ -21,3 +21,4 @@ export const useSucursalStore = createBaseStore(
     }
   }
 )
+
