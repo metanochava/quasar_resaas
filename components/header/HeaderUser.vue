@@ -197,7 +197,7 @@ export default defineComponent({
 
     this.sucursalClosed = false
     /* ---------- LEITURA SEGURA ---------- */
-    this.User.loadFromStorage()
+    // this.User.loadFromStorage()
     await this.User.getEntidades()
     this.startSessionWatcher()
   }
