@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { getStorage } from './storage'
 import {useUserStore } from '../stores/AuthStore'
-import { LoadStore } from '../stores/LoadStore';
+import { useLoadStore } from '../stores/LoadStore';
 import { Alert } from './alerts'
 
 const apiBaseUrl = process.env.API
