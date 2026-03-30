@@ -1,5 +1,6 @@
 import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, url } from './../boot/api'
+import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -24,7 +25,7 @@ export const useUserStore = defineStore('user', {
           payload
         )
 
-        
+
         this.access = data.tokens.access
         this.refresh = data.tokens.refresh
 
