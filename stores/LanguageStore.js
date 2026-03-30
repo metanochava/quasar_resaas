@@ -11,7 +11,7 @@ export const LanguageStore = defineStore("lang", {
   actions: {
     change(lang) {
       this.current = lang
-      const User = UserStore()
+      const User =useUserStore()
       User.setIdioma(this.current)
       this.setTraducao(this.current)
     },
@@ -19,7 +19,7 @@ export const LanguageStore = defineStore("lang", {
       try {
         // Reset map
         this.TraducaoMap = {}
-        
+
 
         const res = await HTTPClient.get(
           url({
@@ -58,7 +58,7 @@ export const LanguageStore = defineStore("lang", {
       .then(res => {
         this.list = res.data
         this.current = this.list[0]
-        const User = UserStore()
+        const User =useUserStore()
         User.setIdioma(this.current)
       }).catch(err => {
       })
