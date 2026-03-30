@@ -1,10 +1,6 @@
 import { Notify } from 'quasar'
 import { tdc } from './base'
-<<<<<<< HEAD
-import { useAlertStore } from '../stores/AuthStore'
-=======
 import { AlertStore } from '../stores/AlertStore'
->>>>>>> temp-release
 
 /* =========================
    Utils
