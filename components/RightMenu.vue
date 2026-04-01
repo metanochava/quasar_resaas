@@ -1,14 +1,14 @@
 <script>
 import { defineComponent, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { MenuStore } from './../stores/MenuStore'
+import { useMenuStore } from './../stores/MenuStore'
 
 export default defineComponent({
   name: 'RightMenu',
 
   setup() {
     const route = useRoute()
-    const menu = MenuStore()
+    const menu = useMenuStore()
 
     // 🔥 AUTO INIT (sem app precisar fazer nada)
     menu.init()
