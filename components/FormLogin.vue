@@ -80,7 +80,8 @@
 
 import { defineComponent } from 'vue'
 import { tdc } from '../boot/base'
-import { useTipoEntidadeStore, useUserStore } from '../stores/UserStore'
+import { useUserStore } from '../stores/UserStore'
+import { useTipoEntidadeStore } from '../stores/TipoEntidadeStore'
 import { setStorage, getStorage } from '../boot/storage'
 import AllLogo  from './../components/AllLogo.vue'
 import { useQuasar } from 'quasar'
