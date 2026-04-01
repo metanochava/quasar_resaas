@@ -2,7 +2,7 @@
 
 import { defineStore } from 'pinia'
 
-export const MenuStore = defineStore('menu', {
+export const useMenuStore = defineStore('menu', {
   state: () => ({
     rightMenus: {},
     initialized: false

@@ -1,14 +1,13 @@
 import { Notify } from 'quasar'
 import { tdc } from './base'
-import { AlertStore } from '../stores/AlertStore'
+import { useAlertStore } from '../stores/AlertStore'
 
 /* =========================
    Utils
 ========================= */
-const getuseAlertStore = () => useAlertStore()
 
 const pushAlert = (sms, type = 'info') => {
-  const Alerta = getuseAlertStore()
+  const Alerta = useAlertStore()
 
   const msg = tdc(String(sms))
 
