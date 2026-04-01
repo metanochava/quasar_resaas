@@ -32,7 +32,7 @@
 
 import { HTTPAuth, url } from '../../boot/api'
 import AutoCrud from './AutoCrud.vue'
-import { useUserStore } from '../stores/UserStore'
+import { useUserStore } from '../../stores/UserStore'
 
 import { ref, watch, onMounted} from 'vue'
 import { useRoute } from 'vue-router'
