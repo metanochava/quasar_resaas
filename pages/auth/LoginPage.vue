@@ -7,7 +7,7 @@
 <script>
 import { defineComponent } from 'vue'
 
-import { useUserStore } from './../../stores/UserStore'
+import { useUserStore } from '../../stores/UserStore'
 import FormLogin from './../../components/FormLogin.vue'
 
 export default defineComponent({

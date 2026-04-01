@@ -51,11 +51,11 @@ export default defineComponent({
     Rodape,
   },
   setup() {
-    const Auth = useTipoEntidadeStore()
+    const TipoEntidade = useTipoEntidadeStore()
     const User = useUserStore()
 
     return {
-      Auth,
+      TipoEntidade,
       User,
     }
   },

@@ -98,12 +98,12 @@ export default defineComponent({
     AllLogo
   },
   setup () {
-    const Auth = useTipoEntidadeStore()
+    const TipoEntidade = useTipoEntidadeStore()
     const  User = useUserStore()
     const q = useQuasar()
     const router = useRouter()
     return {
-      Auth,
+      TipoEntidade,
       tdc,
       User,
       q,
@@ -118,8 +118,8 @@ export default defineComponent({
       readonly: false,
       identifier: '',
       password: '',
-      incorrectAuth: false,
-      correctAuth: false,
+      incorrectTipoEntidade: false,
+      correctTipoEntidade: false,
       latitude: '',
       longitude: '',
       local: '',
@@ -178,15 +178,15 @@ export default defineComponent({
 
       setStorage('l', 'manterlogado', this.User.manterLogado)
 
-      this.correctAuth = false
+      this.correctTipoEntidade = false
 
       await this.User.login({
         identifier: this.identifier,
         password: this.password,
       }, this.q).then(res => {
-        this.correctAuth = true
+        this.correctTipoEntidade = true
       }).catch(err => {
-        this.incorrectAuth = true
+        this.incorrectTipoEntidade = true
       })
     }
   }

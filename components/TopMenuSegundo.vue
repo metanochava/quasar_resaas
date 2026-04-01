@@ -35,11 +35,11 @@ export default defineComponent({
   setup () {
 
     const User = useUserStore()
-    const Auth = useTipoEntidadeStore()
+    const TipoEntidade = useTipoEntidadeStore()
 
     return {
       User,
-      Auth,
+      TipoEntidade,
       tdc,
       toPlural
     }

@@ -12,7 +12,7 @@
                     style="height: 300px"
                   >
                     <div class="row col-xs-12"  >
-                      <div  v-for=" te in Auth?.TipoEntidades" :key="te">
+                      <div  v-for=" te in TipoEntidade?.TipoEntidades" :key="te">
                         <q-item   v-close-popup   flat bordered   class="col-4 " v-if="getHostname(te)"  >
                           <q-item-label  clickable @click="selectteidadeLink(te)"  class="localhover">
                             <q-avatar class="" size="45px" style="border-radius:5px;" >
@@ -35,7 +35,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { tdc } from '../../boot/base'
-import { useUserStore } from '../../stores/UserStore'
+import { useUserStore } from 'django_resaas/stores/UserStore'
 import { useTipoEntidadeStore } from '../../stores/TipoEntidadeStore'
 import { setStorage } from '../../boot/storage';
 
@@ -44,10 +44,10 @@ export default defineComponent({
 
   setup () {
     const User = useUserStore()
-    const Auth = useTipoEntidadeStore()
+    const TipoEntidade = useTipoEntidadeStore()
     return {
       User,
-      Auth
+      TipoEntidade
     }
   },
   props: {
@@ -64,8 +64,8 @@ export default defineComponent({
   computed: {
   },
   async mounted () {
-    await this.Auth.getTipoEntidades()
-    this.Auth?.TipoEntidades?.forEach(entidade => {
+    await this.TipoEntidade.getTipoEntidades()
+    this.TipoEntidade?.TipoEntidades?.forEach(entidade => {
       this.getHostname(entidade)
     })
   },
@@ -94,7 +94,7 @@ export default defineComponent({
           return true
         } else {
           this.User.TipoEntidade = tipoEnt
-          this.Auth.TipoEntidade = tipoEnt
+          this.TipoEntidade.TipoEntidade = tipoEnt
           this.User.TipoEntidadeLayoutSettings()
           setStorage('l', 'tipoEntidade', JSON.stringify(this.User.TipoEntidade))
           return false

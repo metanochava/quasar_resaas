@@ -91,7 +91,7 @@
                 </q-item>
               </q-expansion-item>
 
-            <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(User?.perfilSplint(User.Grupo?.name)) " style="width: 100%; border-color: transparent;">
+            <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(User?.perfilSplint(User?.Grupo?.name)) " style="width: 100%; border-color: transparent;">
               <q-menu fit>
                 <q-list dense   class="rounded-borders" style="min-width: 100px" >
                   <q-item clickable v-close-popup  @click="User.selectGrupo({id:'1', name:'Hóspede'})"  >
@@ -202,7 +202,7 @@ export default defineComponent({
       await this.User?.getEntidades()
       this.startSessionWatcher()
     }
-  
+
   }
 })
 </script>

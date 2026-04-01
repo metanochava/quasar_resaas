@@ -34,7 +34,7 @@
 
 <script>
 import { defineComponent, computed, useAttrs, ref, watch } from "vue"
-import { useUserStore } from "../../stores/UserStore"
+import { useUserStore } from "../stores/UserStore"
 import { tdc } from "../../boot/base"
 
 export default defineComponent({
