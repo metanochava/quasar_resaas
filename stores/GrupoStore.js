@@ -19,6 +19,92 @@ export const useGrupoStore = createBaseStore(
 
     actions: {
 
+      async selectGrupo_ (group) {
+        this.Grupo = group
+        setStorage('l', 'userGrupo', JSON.stringify(group))
+        this.getPermicoes()
+        await this.getMenus()
+        this.redirect = 'authwelcome'
+      },
+
+
+      async selectGrupo (grupo) {
+        setStorage('l', 'userGrupo', JSON.stringify(grupo))
+        this.Grupo = grupo
+        await this.getPermicoes()
+        await this.getMenus()
+      },
+
+      async getGrupos () {
+
+        const res = await HTTPAuth.get(
+          url({ type: 'u', url: `api/django_resaas/users/${this.data?.id}/userGrupos/`, params: {} })
+        )
+
+        setStorage('l', 'userGrupos', JSON.stringify(res.data))
+        this.Grupos = res.data
+
+        if (res.data.length === 1) {
+          this.selectGrupo_(res.data[0])
+        }
+        return res
+      },
+
+      async getGrupos_ (q) {
+
+        const res = await HTTPAuth.get(
+          url({ type: 'u', url: `api/django_resaas/users/${this.data?.id}/userGrupos/`, params: {} })
+        )
+        setStorage('l', 'userGrupos', JSON.stringify(res.data))
+        this.Grupos = res.data
+
+        if (res.data.length === 1) {
+          this.selectGrupo_(res.data[0])
+        }else{
+          if (res.data.length === 0) {
+            this.redirect = 'authwelcome'
+            return
+          }
+          const grupos = []
+          res.data.forEach(element => {
+            grupos.push({ label: this.perfilSplint(element.name), value: element })
+          })
+          q.dialog({
+            title: tdc('Seleccione o Grupo'),
+            options: {
+              type: 'radio',
+              model: 'opt1',
+              isValid: val => true,
+              items: grupos
+            },
+            cancel: true,
+            persistent: true
+          }).onOk(data => {
+            this.selectGrupo_(data)
+          }).onCancel(() => {
+            this.redirect = 'authwelcome'
+          })
+        }
+        return res
+      },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       async getByUser(userId) {
         await this.loadData({
           url: `api/django_resaas/users/${userId}/userGrupos/`

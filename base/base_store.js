@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { buildFormFromSchema, HTTPAuth, url } from './../'
+import { buildFormFromSchema, HTTPAuth, url } from './../utils/autoForm'
 
 export function createBaseStore(name, config, extend = {}) {
   return defineStore(name, {
@@ -12,8 +12,8 @@ export function createBaseStore(name, config, extend = {}) {
       loading: false,
 
       campos: [],
-      linhas: [],
-      linha: null,
+      rows: [],
+      row: null,
       form: {},
 
       search: '',
@@ -29,8 +29,8 @@ export function createBaseStore(name, config, extend = {}) {
     }),
 
     getters: {
-      itemAtual: (state) => state.linha,
-      lista: (state) => state.linhas,
+      item: (state) => state.row,
+      list: (state) => state.rows,
 
       ...(extend.getters || {})
     },
@@ -94,10 +94,10 @@ export function createBaseStore(name, config, extend = {}) {
             })
           )
 
-          this.linhas = data.results || data
-          this.pagination.rowsNumber = data.count || this.linhas.length
+          this.rows = data.results || data
+          this.pagination.rowsNumber = data.count || this.rows.length
 
-          await this.runHook('afterLoad', this.linhas)
+          await this.runHook('afterLoad', this.rows)
 
         } finally {
           this.loading = false
@@ -117,7 +117,7 @@ export function createBaseStore(name, config, extend = {}) {
             url({ type: 'u', url: `${this.url}/${id}/` })
           )
 
-          this.linha = data
+          this.row = data
           this.form = { ...data }
 
           await this.runHook('afterGet', data)
@@ -143,7 +143,7 @@ export function createBaseStore(name, config, extend = {}) {
             this.form
           )
 
-          this.linhas.unshift(data)
+          this.rows.unshift(data)
 
           await this.runHook('afterCreate', data)
 
@@ -160,20 +160,20 @@ export function createBaseStore(name, config, extend = {}) {
       async update() {
         await this.runHook('beforeUpdate', this.form)
 
-        if (!this.linha?.id) return
+        if (!this.row?.id) return
 
         this.loading = true
 
         try {
           const { data } = await HTTPAuth.put(
-            url({ type: 'u', url: `${this.url}/${this.linha.id}/` }),
+            url({ type: 'u', url: `${this.url}/${this.row.id}/` }),
             this.form
           )
 
-          this.linha = data
+          this.row = data
 
-          const index = this.linhas.findIndex(i => i.id === data.id)
-          if (index !== -1) this.linhas[index] = data
+          const index = this.rows.findIndex(i => i.id === data.id)
+          if (index !== -1) this.rows[index] = data
 
           await this.runHook('afterUpdate', data)
 
@@ -194,7 +194,7 @@ export function createBaseStore(name, config, extend = {}) {
           url({ type: 'u', url: `${this.url}/${id}/` })
         )
 
-        this.linhas = this.linhas.filter(i => i.id !== id)
+        this.rows = this.rows.filter(i => i.id !== id)
 
         await this.runHook('afterDelete', id)
       },
@@ -216,7 +216,7 @@ export function createBaseStore(name, config, extend = {}) {
 
       reset() {
         this.form = {}
-        this.linha = null
+        this.row = null
       },
 
       ...(extend.actions || {})

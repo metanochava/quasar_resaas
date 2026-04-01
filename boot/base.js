@@ -48,6 +48,14 @@ export const IsTipoEntidade = {
   }
 }
 
+export const JSONSafeParse = function (value) {
+  try {
+    return value ? JSON.parse(value) : null
+  } catch {
+    return null
+  }
+}
+
 export const isTipoEntidadeMe = function (x) {
   const ite = decrypt(localStorage.getItem(('tipo_entidade_nome')) + '')
   if (x === ite) { return true } else { return false }
