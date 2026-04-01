@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { buildFormFromSchema, HTTPAuth, url } from 'quasar_resaas'
+import { buildFormFromSchema, HTTPAuth, url } from './../'
 
 export function createBaseStore(name, config, extend = {}) {
   return defineStore(name, {

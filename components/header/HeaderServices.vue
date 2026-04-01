@@ -35,7 +35,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { tdc } from '../../boot/base'
-import { useUserStore } from 'django_resaas/stores/UserStore'
+import { useUserStore } from '../../stores/UserStore'
 import { useTipoEntidadeStore } from '../../stores/TipoEntidadeStore'
 import { setStorage } from '../../boot/storage';
 
