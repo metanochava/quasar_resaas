@@ -5,7 +5,7 @@ import { HTTPAuth, HTTPClient, url } from '../boot/api'
 import { useLanguageStore } from  './LanguageStore'
 import { useEntidadeStore } from './EntidadeStore'
 
-import { JSONSafeParse } from './../boot/base'
+
 
 
 
@@ -118,9 +118,8 @@ export const useUserStore = defineStore("user", {
           deleteStorage('l', 'password')
         }
         this.loginMsg = 'good'
+        this.isLogin = true
         await this.me()
-
-        await Entidade.getUserEntidades_(q)
       }).catch(err => {
         this.loading = false
         this.loginMsg = 'error'

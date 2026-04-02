@@ -1,29 +1,39 @@
-export default boot(async () => {
-  const user = useUserStore()
-  const entidade = useEntidadeStore()
-  const grupo = useGrupoStore()
-  const sucursal = useSucursalStore()
+import { useEntidadeStore } from "../stores/EntidadeStore"
+import { useGrupoStore } from "../stores/GrupoStore"
+import { useSucursalStore } from "../stores/SucursalStore"
+import { useUserStore } from "../stores/UserStore"
 
-  await user.me()
 
-  const userId = user.data?.id
-  if (!userId) return
+export default async function loadUserSaas () {
 
-  // ENTIDADE
-  await entidade.getByUser(userId)
-  if (entidade.linhas.length) {
-    await entidade.select(entidade.linhas[0])
+  const User = useUserStore()
+  const Entidade = useEntidadeStore()
+  const Grupo = useGrupoStore()
+  const Sucursal = useSucursalStore()
+
+  console.log(User.data?.id)
+  await User.me()
+  console.log(User.data?.id)
+
+  const UserId = User.data?.id
+
+  if (!UserId) return
+
+  // Entidade
+  await Entidade.getByUser(UserId)
+  if (Entidade.linhas.length) {
+    await Entidade.select(Entidade.linhas[0])
   }
 
-  // GRUPO
-  await grupo.getByUser(userId)
-  if (grupo.linhas.length) {
-    await grupo.select(grupo.linhas[0])
+  // Grupo
+  await Grupo.getByUser(UserId)
+  if (Grupo.linhas.length) {
+    await Grupo.select(Grupo.linhas[0])
   }
 
-  // SUCURSAL
-  await sucursal.getByUser(userId)
-  if (sucursal.linhas.length) {
-    sucursal.select(sucursal.linhas[0])
+  // Sucursal
+  await Sucursal.getByUser(UserId)
+  if (Sucursal.linhas.length) {
+    Sucursal.select(Sucursal.linhas[0])
   }
-})
+}
