@@ -67,14 +67,6 @@ export const useSucursalStore = createBaseStore(
         Grupo.getGrupos_(q)
       },
 
-      select (entidade) {
-        setStorage('l', 'userEntidade', JSON.stringify(entidade))
-        this.Entidade = JSON.parse(getStorage('l', 'userEntidade'))
-        this.setEntidadeLayoutSettings()
-        this.getSucursals()
-        this.setEntidadeModulos()
-      },
-
       select (sucursal) {
         this.Loged = sucursal
         setStorage('l', 'userSucursal', JSON.stringify(sucursal))
