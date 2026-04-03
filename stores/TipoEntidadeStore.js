@@ -6,7 +6,7 @@ import { HTTPAuth, HTTPClient, url } from './../boot/api'
 
 import { useUserStore } from '../stores/UserStore'
 
-export const useTipoEntidadeSore = createBaseStore(
+export const useTipoEntidadeStore = createBaseStore(
   'tipoentidade', 
   {
     url: 'ipa/clinica/tipoentidades',
