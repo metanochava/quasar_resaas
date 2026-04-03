@@ -192,7 +192,7 @@ export default defineComponent({
 
   async mounted(){
 
-    await this.User.getSettings()
+    User.getSettings()
 
   },
 
