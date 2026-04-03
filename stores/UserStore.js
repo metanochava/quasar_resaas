@@ -171,18 +171,18 @@ export const useUserStore = defineStore("user", {
     },
 
     loadFromStorage () {
-      this.Entidade = this.JSONSafeParse(getStorage('l', 'userEntidade'))
-      this.Sucursals = this.JSONSafeParse(getStorage('l', 'userSucursals'))
-      this.Entidades = this.JSONSafeParse(getStorage('l', 'userEntidades'))
-      this.Sucursal = this.JSONSafeParse(getStorage('l', 'userSucursal'))
-      this.Grupo   = this.JSONSafeParse(getStorage('l', 'userGrupo'))
-      this.Grupos   = this.JSONSafeParse(getStorage('l', 'userGrupos'))
-      this.data   = this.JSONSafeParse(getStorage('l', 'user'))
+      this.Entidade = JSONSafeParse(getStorage('l', 'userEntidade'))
+      this.Sucursals = JSONSafeParse(getStorage('l', 'userSucursals'))
+      this.Entidades = JSONSafeParse(getStorage('l', 'userEntidades'))
+      this.Sucursal = JSONSafeParse(getStorage('l', 'userSucursal'))
+      this.Grupo   = JSONSafeParse(getStorage('l', 'userGrupo'))
+      this.Grupos   = JSONSafeParse(getStorage('l', 'userGrupos'))
+      this.data   = JSONSafeParse(getStorage('l', 'user'))
       this.access   = getStorage('l', 'access')
       this.refresh   = getStorage('l', 'refresh')
       this.RightTop   = ('' + getStorage('l', 'right_top')).toLowerCase() === 'true'
       this.LeftTop   = ('' + getStorage('l', 'left_top')).toLowerCase() === 'true'
-      const perms = this.JSONSafeParse(getStorage('l', 'userPermicoes'))
+      const perms = JSONSafeParse(getStorage('l', 'userPermicoes'))
       this.Permicoes = new Set(Array.isArray(perms) ? perms : [])
     },
 
