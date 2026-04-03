@@ -204,13 +204,16 @@ export const useEntidadeStore = createBaseStore(
         console.log("✅ Theme aplicado (GLOBAL ENGINE)")
       },
 
-      async setEntidadeModelos () {
-        await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + this.Entidade?.id + '/modelos', params: {} }))
+      async setEntidadeModelos (EntidadeId) {
+        const Entidade = EntidadeId || this.Entidade?.id
+        const res = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/modelos', params: {} }))
           .then(res => {
             this.EntidadeModelos = res.data
           }).catch(err => {
             console.log(err)
           })
+
+          return res
       },
 
       async setEntidadeModulos () {
@@ -337,14 +340,6 @@ export const useEntidadeStore = createBaseStore(
       // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-      async getEntidadesByUser(userId) {
-        const res = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/users/${userId}/userEntidades/` })
-        )
-
-        this.Entidades = res.data
-        return res.data
-      },
 
       async selectEntidade(entidade) {
         this.Entidade = entidade

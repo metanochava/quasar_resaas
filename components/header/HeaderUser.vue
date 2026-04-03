@@ -135,6 +135,7 @@
 import { defineComponent } from 'vue'
 import { tdc } from '../../boot/base'
 import { useUserStore } from '../../stores/UserStore'
+import { useEntidadeStore } from '../../stores/EntidadeStore'
 import RegistarEntidade from './RegistarEntidade.vue'
 
 export default defineComponent({
@@ -143,7 +144,8 @@ export default defineComponent({
 
   setup () {
     const User = useUserStore()
-    return { User, tdc }
+    const Entidade = useEntidadeStore()
+    return { User, tdc, Entidade }
   },
 
   data () {
@@ -199,7 +201,8 @@ export default defineComponent({
     /* ---------- LEITURA SEGURA ---------- */
     if(this.User){
       this.User?.loadFromStorage()
-      await this.User?.getEntidades()
+      // const res = await this.Entidade?.getUserEntidades(this.User?.id)
+      // this.User?.Entidades = res.data
       this.startSessionWatcher()
     }
 
