@@ -2,6 +2,7 @@ import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, url } from './../boot/api'
 import { setCssVar, Dark } from "quasar"
 import { useSucursalStore} from './SucursalStore'
+import { useUserStore} from './UserStore'
 import { tdc } from '../boot/base'
 import { getStorage, setStorage } from './../boot/storage'
 

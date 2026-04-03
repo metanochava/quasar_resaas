@@ -1,24 +1,28 @@
 import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, url } from './../boot/api'
 import { getStorage, setStorage } from './../boot/storage'
+import { useUserStore} from './UserStore'
 
 
 export const useSucursalStore = createBaseStore(
   'sucursal',
   {
-    url: 'api/django_resaas/sucursais'
+    url: 'api/django_resaas/sucursais',
+    app: 'django_resaas',
+    model: 'Entidade'
   },
 
   {
     state: () => ({
-      LogedSucursals: [],
-      LogedSucursal: null,
+      Logeds: [],
+      Loged: null,
     }),
 
     actions: {
 
       async getUserSucursals_ (q) {
-        await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + this.data?.id + '/userSucursals/', params: { } }))
+        const User = useUserStore()
+        await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + User.data?.id + '/userSucursals/', params: { } }))
           .then(async res => {
             setStorage('l', 'userSucursals', JSON.stringify(res.data))
 
@@ -57,7 +61,7 @@ export const useSucursalStore = createBaseStore(
       },
 
       select_ (sucursal, q) {
-        this.Sucursal = sucursal
+        this.Loged = sucursal
         setStorage('l', 'userSucursal', JSON.stringify(sucursal))
         this.getGrupos_(q)
       },
@@ -71,21 +75,22 @@ export const useSucursalStore = createBaseStore(
       },
 
       select (sucursal) {
-        this.Sucursal = sucursal
+        this.Loged = sucursal
         setStorage('l', 'userSucursal', JSON.stringify(sucursal))
         this.getGrupos()
       },
 
       async getUserSucursals() {
+        const User = useUserStore()
         this.spiner = true
         if (getStorage('l', 'userEntidade') !== null) {
 
-          const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + this.data?.id + '/userSucursals/', params: { } }))
+          const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + User.data?.id + '/userSucursals/', params: { } }))
             .then(res => {
-              this.Sucursal = {}
+              this.Loged = {}
               setStorage('l', 'userSucursal', JSON.stringify({}))
               setStorage('l', 'userSucursals', JSON.stringify(res.data))
-              this.Sucursals = res.data
+              this.Logeds = res.data
             }).catch(err => {
               console.log(err)
             })
