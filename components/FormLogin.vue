@@ -142,8 +142,7 @@ export default defineComponent({
     'User.isLogin'(val) {
       console.log(val)
       if (val) {
-        loadUserSaas()
-        console.log("Caregado...")
+        loadUserSaas(q)
       }
     }
   },
