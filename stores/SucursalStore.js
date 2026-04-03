@@ -2,7 +2,7 @@ import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, url } from './../boot/api'
 import { getStorage, setStorage } from './../boot/storage'
 import { useUserStore} from './UserStore'
-
+import { useGrupoStore} from './GrupoStore'
 
 export const useSucursalStore = createBaseStore(
   'sucursal',
@@ -61,9 +61,10 @@ export const useSucursalStore = createBaseStore(
       },
 
       select_ (sucursal, q) {
+        let Grupo = useGrupoStore()
         this.Loged = sucursal
         setStorage('l', 'userSucursal', JSON.stringify(sucursal))
-        this.getGrupos_(q)
+        Grupo.getGrupos_(q)
       },
 
       select (entidade) {

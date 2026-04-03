@@ -30,7 +30,7 @@ export function createBaseStore(name, config, extend = {}) {
 
     getters: {
       item: (state) => state.row,
-      list: (state) => state.rows,
+      items: (state) => state.rows,
 
       ...(extend.getters || {})
     },

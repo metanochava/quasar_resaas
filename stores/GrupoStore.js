@@ -1,14 +1,21 @@
 import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, url } from './../boot/api'
+import { useUserStore} from './UserStore'
+
+
 
 export const useGrupoStore = createBaseStore(
   'grupo',
   {
-    url: 'api/django_resaas/grupos'
+    url: 'api/django_resaas/grupos',
+    app: 'django_resaas',
+    model: 'Grupo'
   },
 
   {
     state: () => ({
+      Logeds: [],
+      Loged: null,
       Permicoes: new Set()
     }),
 
@@ -19,8 +26,9 @@ export const useGrupoStore = createBaseStore(
 
     actions: {
 
-      async selectGrupo_ (group) {
-        this.Grupo = group
+      async select_ (group) {
+        alert()
+        this.Loged = group
         setStorage('l', 'userGrupo', JSON.stringify(group))
         this.getPermicoes()
         await this.getMenus()
@@ -30,7 +38,7 @@ export const useGrupoStore = createBaseStore(
 
       async selectGrupo (grupo) {
         setStorage('l', 'userGrupo', JSON.stringify(grupo))
-        this.Grupo = grupo
+        this.Loged = grupo
         await this.getPermicoes()
         await this.getMenus()
       },
@@ -42,24 +50,25 @@ export const useGrupoStore = createBaseStore(
         )
 
         setStorage('l', 'userGrupos', JSON.stringify(res.data))
-        this.Grupos = res.data
+        this.Logeds = res.data
 
         if (res.data.length === 1) {
-          this.selectGrupo_(res.data[0])
+          this.select(res.data[0])
         }
         return res
       },
 
       async getGrupos_ (q) {
+        const User = useUserStore()
 
         const res = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/users/${this.data?.id}/userGrupos/`, params: {} })
+          url({ type: 'u', url: `api/django_resaas/users/${User.data?.id}/userGrupos/`, params: {} })
         )
         setStorage('l', 'userGrupos', JSON.stringify(res.data))
-        this.Grupos = res.data
+        this.Logeds = res.data
 
         if (res.data.length === 1) {
-          this.selectGrupo_(res.data[0])
+          this.select_(res.data[0])
         }else{
           if (res.data.length === 0) {
             this.redirect = 'authwelcome'
@@ -80,7 +89,7 @@ export const useGrupoStore = createBaseStore(
             cancel: true,
             persistent: true
           }).onOk(data => {
-            this.selectGrupo_(data)
+            this.select_(data)
           }).onCancel(() => {
             this.redirect = 'authwelcome'
           })
