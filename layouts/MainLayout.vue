@@ -192,11 +192,8 @@ export default defineComponent({
 
   async mounted(){
 
-    User.getSettings()
+    this.TipoEntidade.getSettings()
 
-  },
-
-  mounted() {
     if (['authwelcome','welcome'].includes(this.$route.name)){
       this.User.LeftTop = false
     }

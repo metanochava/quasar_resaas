@@ -72,7 +72,7 @@ export default defineComponent({
 
   async mounted(){
 
-    User.getSettings()
+    this.TipoEntidade.getSettings()
 
   },
 
