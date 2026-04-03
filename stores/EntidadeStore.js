@@ -2,7 +2,6 @@ import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, url } from './../boot/api'
 import { setCssVar, Dark } from "quasar"
 import { useSucursalStore} from './SucursalStore'
-import { useEntidadeStore } from  './EntidadeStore'
 import { tdc } from '../boot/base'
 
 
