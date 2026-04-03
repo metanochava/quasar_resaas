@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { getStorage, setStorage, deleteStorage } from '../boot/storage'
 import { HTTPAuth, HTTPClient, url } from '../boot/api'
 import { useLanguageStore } from  './LanguageStore'
+import { JSONSafeParse } from '../boot/base'
+
 
 
 export const useUserStore = defineStore("user", {
