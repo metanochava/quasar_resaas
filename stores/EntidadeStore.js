@@ -95,8 +95,8 @@ export const useEntidadeStore = createBaseStore(
       },
 
 
-      async setLayoutSettings (Entidade) {
-        let Entidade = Entidade || this.row.id
+      async setLayoutSettings (entidade) {
+        let Entidade = entidade || this.row.id
         if (getStorage('l', 'userEntidade') !== null) {
 
           const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/themeGet/', params: { } }))
@@ -124,7 +124,7 @@ export const useEntidadeStore = createBaseStore(
               this.AnimationSettings = res.data || {}
             })
 
-          if( Entidade) {
+          if( entidade ) {
             const User = useUserStore()
 
             User.Theme = this.LogedTheme
