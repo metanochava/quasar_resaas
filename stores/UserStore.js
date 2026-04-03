@@ -139,7 +139,7 @@ export const useUserStore = defineStore("user", {
       console.log(rsp.data)
       this.data = rsp.data
       const Language = useLanguageStore()
-      Language.change(res.data.language)
+      Language.change(rsp.data.language)
       setStorage('l', 'user', JSON.stringify(rsp.data),  365)
       return rsp
     },
