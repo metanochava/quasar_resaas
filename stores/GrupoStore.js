@@ -1,6 +1,7 @@
 import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, url } from './../boot/api'
 import { useUserStore} from './UserStore'
+import { getStorage, setStorage } from './../boot/storage'
 
 
 
