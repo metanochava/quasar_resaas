@@ -192,7 +192,7 @@ export default defineComponent({
 
   async mounted(){
 
-    this.TipoEntidade.getSettings()
+    this.TipoEntidade.getLayoutSettings()
 
     if (['authwelcome','welcome'].includes(this.$route.name)){
       this.User.LeftTop = false

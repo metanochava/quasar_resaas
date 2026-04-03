@@ -95,7 +95,7 @@ export const useEntidadeStore = createBaseStore(
       },
 
 
-      async setLayoutSettings (entidade) {
+      async getLayoutSettings (entidade) {
         let Entidade = entidade || this.row.id
         if (getStorage('l', 'userEntidade') !== null) {
 

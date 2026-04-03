@@ -34,7 +34,7 @@ export const useTipoEntidadeStore = createBaseStore(
 
     actions: {
 
-      async setLayoutSettings (tipoEntidade) {
+      async getLayoutSettings (tipoEntidade) {
         let TipoEntidade = tipoEntidade || this.row.id
         if (getStorage('l', 'userTipoEntidade') !== null) {
 
