@@ -8,8 +8,11 @@ import { tdc } from '../boot/base'
 
 export const useEntidadeStore = createBaseStore(
   'entidade',
-  { url: 'api/django_resaas/entidades' },
-
+  {
+    url: 'ipa/clinica/entidades',
+    app: 'django_resaas',
+    model: 'Entidade'
+  },
   {
 
     getters: {

@@ -30,6 +30,8 @@ export const usePacienteStore = createBaseStore('paciente', {
 })
 ```
 
+
+
 ---
 
 # 🧩 3. Usando no Vue
