@@ -2,9 +2,9 @@
 import { createBaseStore } from './../base/base_store'
 // import { defineStore } from 'pinia'
 import { HTTPAuth, HTTPClient, url } from './../boot/api'
-
-
 import { useUserStore } from '../stores/UserStore'
+import { getStorage, setStorage } from './../boot/storage'
+
 
 export const useTipoEntidadeStore = createBaseStore(
   'tipoentidade', 
@@ -35,7 +35,7 @@ export const useTipoEntidadeStore = createBaseStore(
     actions: {
 
       async getLayoutSettings (tipoEntidade) {
-        let TipoEntidade = tipoEntidade || this.row.id
+        let TipoEntidade = tipoEntidade || this.row?.id
         if (getStorage('l', 'userTipoEntidade') !== null) {
 
           const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/themeGet/', params: { } }))

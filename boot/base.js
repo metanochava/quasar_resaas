@@ -4,6 +4,7 @@ import {useUserStore } from '../stores/UserStore'
 import {useLanguageStore } from '../stores/LanguageStore';
 import figlet from 'figlet'
 
+
 export const tdc = (texto = '') => {
   if (!getActivePinia()) return texto
 

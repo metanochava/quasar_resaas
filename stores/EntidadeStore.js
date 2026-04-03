@@ -3,6 +3,7 @@ import { HTTPAuth, url } from './../boot/api'
 import { setCssVar, Dark } from "quasar"
 import { useSucursalStore} from './SucursalStore'
 import { tdc } from '../boot/base'
+import { getStorage, setStorage } from './../boot/storage'
 
 
 export const useEntidadeStore = createBaseStore(
@@ -96,7 +97,7 @@ export const useEntidadeStore = createBaseStore(
 
 
       async getLayoutSettings (entidade) {
-        let Entidade = entidade || this.row.id
+        let Entidade = entidade || this.row?.id
         if (getStorage('l', 'userEntidade') !== null) {
 
           const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/themeGet/', params: { } }))
