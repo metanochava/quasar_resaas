@@ -4,7 +4,7 @@ import { useSucursalStore } from "../stores/SucursalStore"
 import { useUserStore } from "../stores/UserStore"
 
 
-export default async function loadUserSaas () {
+export async function loadUserSaas () {
 
   const User = useUserStore()
   const Entidade = useEntidadeStore()
