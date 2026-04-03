@@ -3,7 +3,7 @@ import { getActivePinia } from 'pinia'
 import {useUserStore } from '../stores/UserStore'
 import {useLanguageStore } from '../stores/LanguageStore';
 import figlet from 'figlet'
-
+import { Dark, setCssVar } from "quasar"
 
 export const tdc = (texto = '') => {
   if (!getActivePinia()) return texto
