@@ -12,8 +12,6 @@ export const useLanguageStore = defineStore("lang", {
   actions: {
     change(lang) {
       this.current = lang
-      const User =useUserStore()
-      User.setIdioma(this.current)
       this.setTraducao(this.current)
     },
     async setTraducao(idioma) {
@@ -59,8 +57,6 @@ export const useLanguageStore = defineStore("lang", {
       .then(res => {
         this.list = res.data
         this.current = this.list[0]
-        const User =useUserStore()
-        User.setIdioma(this.current)
       }).catch(err => {
       })
     }
