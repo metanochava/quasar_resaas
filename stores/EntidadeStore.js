@@ -8,7 +8,7 @@ import { tdc } from '../boot/base'
 
 
 
-const Sucursal = useSucursalStore()
+
 
 export const useEntidadeStore = createBaseStore(
   'entidade',
@@ -325,6 +325,7 @@ export const useEntidadeStore = createBaseStore(
       },
 
       selectEntidade_ (entidade, q) {
+        const Sucursal = useSucursalStore()
         this.Entidade = entidade
         this.setEntidadeLayoutSettings()
         setStorage('l', 'userEntidade', JSON.stringify(entidade))
