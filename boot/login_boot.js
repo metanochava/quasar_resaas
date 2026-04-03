@@ -18,9 +18,9 @@ export async function loadUserSaas (q) {
 
   // Entidade
   await Entidade.getUserEntidades_(User.data?.id)
-  if (Entidade.Logeds.length) {
-    await Entidade.select(Entidade.linhas[0])
-  }
+  // if (Entidade.Logeds.length) {
+  //   await Entidade.select(Entidade.Logeds[0])
+  // }
 
   // // Sucursal
   // await Sucursal.getByUser(User.data?.id)

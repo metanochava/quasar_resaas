@@ -194,7 +194,7 @@ export const useEntidadeStore = createBaseStore(
       select_ (entidade, q) {
         const Sucursal = useSucursalStore()
         this.Loged = entidade
-        this.getLayoutSettings(entidade)
+        this.getLayoutSettings(entidade.id)
         setStorage('l', 'userEntidade', JSON.stringify(entidade))
         Sucursal.getUserSucursals_(q)
       },
