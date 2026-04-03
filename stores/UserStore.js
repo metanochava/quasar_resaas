@@ -46,7 +46,6 @@ export const useUserStore = defineStore("user", {
 
   getters: {
     username: (state) => state.data?.username || "Guest",
-
     perfil: (state) =>
       state.data?.perfil?.url ||
       "https://cdn-icons-png.flaticon.com/512/149/149071.png",
@@ -55,6 +54,12 @@ export const useUserStore = defineStore("user", {
 
     can: (state) => (perm) =>
       state.Permicoes.has(String(perm).toLowerCase()),
+    ps: (state) => ({
+      'theme': state.Theme,
+      'layout': state.LayoutSettings,
+      'animation': state.AnimationSettings,
+      'typography': state.Typography,
+    }),
   },
 
   actions: {

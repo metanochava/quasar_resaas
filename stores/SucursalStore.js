@@ -1,5 +1,6 @@
 import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, url } from './../boot/api'
+import { getStorage, setStorage } from './../boot/storage'
 
 
 export const useSucursalStore = createBaseStore(
@@ -22,7 +23,7 @@ export const useSucursalStore = createBaseStore(
             setStorage('l', 'userSucursals', JSON.stringify(res.data))
 
             if (res.data.length === 1) {
-              this.selectSucursal_(res.data[0], q)
+              this.select_(res.data[0], q)
             } else {
               if (res.data.length === 0) {
 
@@ -44,7 +45,7 @@ export const useSucursalStore = createBaseStore(
                 cancel: true,
                 persistent: true
               }).onOk(data => {
-                this.selectSucursal_(data, q)
+                this.select_(data, q)
               }).onCancel(() => {
 
                 this.redirect = 'authwelcome'
@@ -55,13 +56,13 @@ export const useSucursalStore = createBaseStore(
           })
       },
 
-      selectSucursal_ (sucursal, q) {
+      select_ (sucursal, q) {
         this.Sucursal = sucursal
         setStorage('l', 'userSucursal', JSON.stringify(sucursal))
         this.getGrupos_(q)
       },
 
-      selectEntidade (entidade) {
+      select (entidade) {
         setStorage('l', 'userEntidade', JSON.stringify(entidade))
         this.Entidade = JSON.parse(getStorage('l', 'userEntidade'))
         this.setEntidadeLayoutSettings()
@@ -69,7 +70,7 @@ export const useSucursalStore = createBaseStore(
         this.setEntidadeModulos()
       },
 
-      selectSucursal (sucursal) {
+      select (sucursal) {
         this.Sucursal = sucursal
         setStorage('l', 'userSucursal', JSON.stringify(sucursal))
         this.getGrupos()

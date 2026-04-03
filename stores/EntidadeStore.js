@@ -17,12 +17,6 @@ export const useEntidadeStore = createBaseStore(
 
     getters: {
   
-      ps: (state) => ({
-        'theme': state.Theme,
-        'layout': state.LayoutSettings,
-        'animation': state.AnimationSettings,
-        'typography': state.Typography,
-      }),
     },
 
 
@@ -141,31 +135,31 @@ export const useEntidadeStore = createBaseStore(
       
       
 
-      async getUserEntidades () {
-        if (!this.data?.id) return
-        const rsp = await HTTPAuth.get( url({ type: 'u', url: `api/django_resaas/users/${this.data.id}/userEntidades/`,params: {}}))
+      async getUserEntidades (UserId) {
+        if (!UserId) return
+        const rsp = await HTTPAuth.get( url({ type: 'u', url: `api/django_resaas/users/${UserId}/userEntidades/`,params: {}}))
         setStorage('l', 'userEntidades', JSON.stringify(rsp.data))
-        this.Entidades = rsp.data
+        this.Logeds = rsp.data
         return rsp
       },
 
-      async getUserEntidades_ (q) {
-        if (!this.data?.id) return
+      async getUserEntidades_ (UserId, q) {
+        if (!UserId) return
 
         try {
           const res = await HTTPAuth.get(
             url({
               type: 'u',
-              url: `api/django_resaas/users/${this.data.id}/userEntidades/`,
+              url: `api/django_resaas/users/${UserId}/userEntidades/`,
               params: {}
             })
           )
 
           setStorage('l', 'userEntidades', JSON.stringify(res.data))
-          this.Entidades = res.data
+          this.Logeds = res.data
 
           if (res.data.length === 1) {
-            this.selectEntidade_(res.data[0], q)
+            this.select_(res.data[0], q)
           } else {
             if (res.data.length === 0) {
 
@@ -186,7 +180,7 @@ export const useEntidadeStore = createBaseStore(
               },
               cancel: true,
               persistent: true
-            }).onOk(data => this.selectEntidade_(data, q))
+            }).onOk(data => this.select_(data, q))
             .onCancel(() => {
 
               this.redirect = 'welcome'
@@ -197,10 +191,10 @@ export const useEntidadeStore = createBaseStore(
         }
       },
 
-      selectEntidade_ (entidade, q) {
+      select_ (entidade, q) {
         const Sucursal = useSucursalStore()
-        this.Entidade = entidade
-        this.setEntidadeLayoutSettings()
+        this.Loged = entidade
+        this.getLayoutSettings(entidade)
         setStorage('l', 'userEntidade', JSON.stringify(entidade))
         Sucursal.getUserSucursals_(q)
       },
@@ -211,44 +205,7 @@ export const useEntidadeStore = createBaseStore(
       // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-      async selectEntidade(entidade) {
-        this.Entidade = entidade
 
-        await Promise.all([
-          this.loadTheme(),
-          this.loadLayout(),
-          this.loadTypography(),
-          this.loadAnimation()
-        ])
-      },
-
-      async loadTheme() {
-        const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entidades/${this.Entidade?.id}/themeGet/` })
-        )
-        this.Theme = data || {}
-      },
-
-      async loadLayout() {
-        const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entidades/${this.Entidade?.id}/layoutSettingsGet/` })
-        )
-        this.LayoutSettings = data || {}
-      },
-
-      async loadTypography() {
-        const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entidades/${this.Entidade?.id}/typographyGet/` })
-        )
-        this.Typography = data || {}
-      },
-
-      async loadAnimation() {
-        const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entidades/${this.Entidade?.id}/animationSettingsGet/` })
-        )
-        this.AnimationSettings = data || {}
-      },
 
       async getModulos() {
         const { data } = await HTTPAuth.get(
