@@ -1,15 +1,8 @@
 import { defineStore } from 'pinia'
 import { getStorage, setStorage, deleteStorage } from '../boot/storage'
 import { HTTPAuth, HTTPClient, url } from '../boot/api'
-
 import { useLanguageStore } from  './LanguageStore'
-import { useEntidadeStore } from './EntidadeStore'
 
-
-
-
-
-const Entidade = useEntidadeStore()
 
 export const useUserStore = defineStore("user", {
   state: () => ({
