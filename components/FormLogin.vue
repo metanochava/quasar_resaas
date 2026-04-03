@@ -142,7 +142,7 @@ export default defineComponent({
     'User.isLogin'(val) {
       console.log(val)
       if (val) {
-        loadUserSaas(q)
+        loadUserSaas(this.q)
       }
     }
   },
