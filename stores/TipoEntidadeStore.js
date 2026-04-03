@@ -1,12 +1,12 @@
 
 import { createBaseStore } from './../base/base_store'
-import { defineStore } from 'pinia'
+// import { defineStore } from 'pinia'
 import { HTTPAuth, HTTPClient, url } from './../boot/api'
 
 
 import { useUserStore } from '../stores/UserStore'
 
-export const useUserSore = createBaseStore(
+export const useTipoEntidadeSore = createBaseStore(
   'tipoentidade', 
   {
     url: 'ipa/clinica/tipoentidades',
