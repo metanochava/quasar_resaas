@@ -2,7 +2,14 @@ import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, HTTPClient, url } from './../boot/api'
 import { defineStore } from 'pinia'
 
-export const useLanguageStore = defineStore("lang", {
+export const useLanguageStore = createBaseStore(
+  "lang", 
+  {
+    url: 'ipa/clinica/idiomas',
+    app: 'django_resaas',
+    model: 'Idioma'
+  },
+  {
   state: () => ({
     current: {} ,
     list: [],
