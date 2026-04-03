@@ -35,7 +35,7 @@ export const useTipoEntidadeStore = createBaseStore(
     actions: {
 
       async setLayoutSettings (tipoEntidade) {
-        TipoEntidade = tipoEntidade || this.row.id
+        let TipoEntidade = tipoEntidade || this.row.id
         if (getStorage('l', 'userTipoEntidade') !== null) {
 
           const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/themeGet/', params: { } }))

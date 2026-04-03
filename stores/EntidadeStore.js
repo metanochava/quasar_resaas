@@ -96,7 +96,7 @@ export const useEntidadeStore = createBaseStore(
 
 
       async setLayoutSettings (Entidade) {
-        Entidade = Entidade || this.row.id
+        let Entidade = Entidade || this.row.id
         if (getStorage('l', 'userEntidade') !== null) {
 
           const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/themeGet/', params: { } }))
