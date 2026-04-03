@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 import { getStorage, setStorage, deleteStorage } from '../boot/storage'
 import { HTTPAuth, HTTPClient, url } from '../boot/api'
 import { useLanguageStore } from  './LanguageStore'
-import { JSONSafeParse } from '../boot/base'
+import { JSONSafeParse, setSettings } from '../boot/base'
+
 
 
 
@@ -35,6 +36,11 @@ export const useUserStore = defineStore("user", {
     redirect: '',
     loginMsg: '',
     loading: false,
+
+    Theme: {},
+    AnimationSettings: {},
+    Typography: {},
+    LayoutSettings: {}
   }),
 
   getters: {
@@ -60,6 +66,10 @@ export const useUserStore = defineStore("user", {
         }).catch(err => {
           console.log(err)
         })
+    },
+
+    setSettings(){
+      setSettings(this.Theme, this.LayoutSettings, this.Typography, this.AnimationSettings)
     },
    
     isTokenExpired (token) {

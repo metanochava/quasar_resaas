@@ -3,15 +3,25 @@ import { createBaseStore } from './../base/base_store'
 import { defineStore } from 'pinia'
 import { HTTPAuth, HTTPClient, url } from './../boot/api'
 
-export const useTipoEntidadeStore = defineStore('tipoentidade', {
+
+import { useUserStore } from '../stores/UserStore'
+
+export const useUserSore = createBaseStore(
+  'tipoentidade', 
+  {url: 'api/django_resaas/tipoentidades'},
+  {
+
   state: () => ({
-    TipoEntidades: [],
-    TipoEntidade: { },
-    LayoutSettings: { },
-    Theme: { },
-    AnimationSettings: { },
-    Typography: { },
-    Idiomas: [ ]
+    Logeds: [],
+    Loged: null,
+    LogedModelos: [],
+    LogedModulos: [],
+    LogedTheme: {},
+    LogedLayoutSettings: {},
+    LogedAnimationSettings: {},
+    LogedTypography: {},
+    LogedModulos: [],
+    LogedModelos: [],
   }),
 
   getters: {
@@ -20,50 +30,45 @@ export const useTipoEntidadeStore = defineStore('tipoentidade', {
 
   actions: {
 
-    async TipoEntidadeLayoutSettings () {
-      const TipoEntidadeStore = useTipoEntidadeStore()
+    async setLayoutSettings (tipoEntidade) {
+      TipoEntidade = tipoEntidade || this.row.id
       if (getStorage('l', 'userTipoEntidade') !== null) {
 
-        const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + this.TipoEntidade?.id + '/themeGet/', params: { } }))
+        const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/themeGet/', params: { } }))
           .then(res => {
             setStorage('l', 'tipoEntidadeTheme', JSON.stringify(res.data))
-            TipoEntidadeStore.Theme = res.data || {}
-            this.Theme = TipoEntidadeStore.Theme
-
-          }).catch(err => {
-            console.log(err)
+            this.Theme = res.data || {}
           })
 
-        const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + this.TipoEntidade?.id + '/layoutSettingsGet/', params: { } }))
+        const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/layoutSettingsGet/', params: { } }))
           .then(res => {
             setStorage('l', 'tipoEntidadeLayoutsettings', JSON.stringify(res.data))
-            TipoEntidadeStore.LayoutSettings = res.data || {}
-            this.LayoutSettings = TipoEntidadeStore.LayoutSettings
+            this.LayoutSettings = res.data || {}
 
-          }).catch(err => {
-            console.log(err)
           })
 
+        const tp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/typographyGet/', params: { } }))
+          .then(res => {
+            setStorage('l', 'tipoEntidadeTypography', JSON.stringify(res.data))
+            this.Typography = res.data || {}
+          })
 
-        const tp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + this.Entidade?.id + '/typographyGet/', params: { } }))
-        .then(res => {
-          setStorage('l', 'tipoEntidadeTypography', JSON.stringify(res.data))
-          TipoEntidadeStore.Typography = res.data || {}
-          this.Typography = TipoEntidadeStore.Typography
-        }).catch(err => {
-          console.log(err)
-        })
+        const as = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/animationSettingsGet/', params: { } }))
+          .then(res => {
+            setStorage('l', 'tipoEntidadeAnimationSettings', JSON.stringify(res.data))
+            this.AnimationSettings = res.data || {}
+          })
 
-      const as = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + this.Entidade?.id + '/animationSettingsGet/', params: { } }))
-        .then(res => {
-          setStorage('l', 'tipoEntidadeAnimationSettings', JSON.stringify(res.data))
-          TipoEntidadeStore.AnimationSettings = res.data || {}
-          this.AnimationSettings = TipoEntidadeStore.AnimationSettings
-        }).catch(err => {
-          console.log(err)
-        })
+        if( tipoEntidade) {
+          const User = useUserStore()
+          
+          User.Theme = this.LogedTheme
+          User.AnimationSettings = this.LogedAnimationSettings
+          User.Typography = this.LogedTypography
+          User.LayoutSettings = this.LogedLayoutSettings
 
-          this.setSettings()
+          User.setSettings()
+        }
         return lay
       }
     },
