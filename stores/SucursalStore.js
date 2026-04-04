@@ -3,7 +3,7 @@ import { HTTPAuth, url } from './../boot/api'
 import { getStorage, setStorage } from './../boot/storage'
 import { useUserStore} from './UserStore'
 import { useGrupoStore} from './GrupoStore'
-import { perfilSplint } from '../boot/base'
+import { perfilSplint, tdc } from '../boot/base'
 
 
 export const useSucursalStore = createBaseStore(

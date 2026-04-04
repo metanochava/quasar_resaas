@@ -17,6 +17,7 @@ export const useGrupoStore = createBaseStore(
     state: () => ({
       Logeds: [],
       Loged: null,
+      LogedPermicoes: new Set(),
       Permicoes: new Set()
     }),
 
@@ -28,30 +29,33 @@ export const useGrupoStore = createBaseStore(
     actions: {
 
       async select_ (group) {
-        alert()
+        const User = useUserStore()
         this.Loged = group
+        User.Grupo = this.Loged
         setStorage('l', 'userGrupo', JSON.stringify(group))
         this.getPermicoes()
-        await this.getMenus()
+        await User.getMenus()
         this.redirect = 'authwelcome'
       },
 
 
       async selectGrupo (grupo) {
+        const User = useUserStore()
         setStorage('l', 'userGrupo', JSON.stringify(grupo))
         this.Loged = grupo
         await this.getPermicoes()
-        await this.getMenus()
+        await User.getMenus()
       },
 
       async getGrupos () {
-
+        const User = useUserStore()
         const res = await HTTPAuth.get(
           url({ type: 'u', url: `api/django_resaas/users/${this.data?.id}/userGrupos/`, params: {} })
         )
 
         setStorage('l', 'userGrupos', JSON.stringify(res.data))
         this.Logeds = res.data
+        User = this.Logeds
 
         if (res.data.length === 1) {
           this.select(res.data[0])
@@ -67,6 +71,7 @@ export const useGrupoStore = createBaseStore(
         )
         setStorage('l', 'userGrupos', JSON.stringify(res.data))
         this.Logeds = res.data
+        User.Grupos = this.Logeds
 
         if (res.data.length === 1) {
           this.select_(res.data[0])
@@ -115,26 +120,24 @@ export const useGrupoStore = createBaseStore(
 
 
 
-      async getByUser(userId) {
-        await this.loadData({
-          url: `api/django_resaas/users/${userId}/userGrupos/`
-        })
-      },
-      
-
       async select(grupo) {
-        this.linha = grupo
+        const User = useUserStore()
+        this.Loged = grupo
+        User.Grupo = this.Loged
         await this.getPermicoes()
       },
 
       async getPermicoes() {
+        const User = useUserStore()
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/users/${this.linha?.id}/userPermicoes/` })
+          url({ type: 'u', url: `api/django_resaas/users/${this.Loged?.id}/userPermicoes/` })
         )
 
-        this.Permicoes = new Set(
+        this.LogedPermicoes = new Set(
           (data || []).map(p => p.codename?.toLowerCase())
         )
+        User.Permicoes = this.LogedPermicoes
+
       }
     }
   }
