@@ -22,16 +22,14 @@ export const useEntidadeStore = createBaseStore(
 
 
     state: () => ({
-      Logeds: [],
-      Loged: null,
-      LogedModelos: [],
-      LogedModulos: [],
-      LogedTheme: {},
-      LogedLayoutSettings: {},
-      LogedAnimationSettings: {},
-      LogedTypography: {},
-      LogedModulos: [],
-      LogedModelos: [],
+      Modelos: [],
+      Modulos: [],
+      Theme: {},
+      LayoutSettings: {},
+      AnimationSettings: {},
+      Typography: {},
+      Modulos: [],
+      Modelos: [],
 
     }),
 
@@ -41,19 +39,19 @@ export const useEntidadeStore = createBaseStore(
 
         await HTTPClient.get(url({type: "u", url: "api/site", params: {}}) )
         .then(res => {
-          this.LogedTheme = res.data.theme
-          this.LogedLayoutSettings = res.data.layout_settings
-          this.LogedAnimationSettings = res.data.animation_settings
-          this.LogedTypography = res.data.typography
+          this.Theme = res.data.theme
+          this.LayoutSettings = res.data.layout_settings
+          this.AnimationSettings = res.data.animation_settings
+          this.Typography = res.data.typography
 
-          this.Loged =  { id : res.data.entidade }
+          this.row =  { id : res.data.entidade }
 
           const User = useUserStore()
 
-          User.Theme = this.LogedTheme
-          User.AnimationSettings = this.LogedAnimationSettings
-          User.Typography = this.LogedTypography
-          User.LayoutSettings = this.LogedLayoutSettings
+          User.Theme = this.Theme
+          User.AnimationSettings = this.AnimationSettings
+          User.Typography = this.Typography
+          User.LayoutSettings = this.LayoutSettings
 
           User.setSettings()
         })
@@ -61,39 +59,42 @@ export const useEntidadeStore = createBaseStore(
 
         })
       },
-      
+       
 
       async setEntidadeModelos (EntidadeId) {
-        const Entidade = EntidadeId || this.Entidade?.id
+        const User = useUserStore()
+        const Entidade = EntidadeId || this.row?.id
         const res = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/modelos', params: {} }))
           .then(res => {
-            this.EntidadeModelos = res.data
-          }).catch(err => {
-            console.log(err)
+            this.Modelos = res.data
           })
-
+        if ( EntidadeId) {
+          User.EntidadeModelos = this.Modelos
+        }
           return res
       },
 
-      async setEntidadeModulos () {
-        if (getStorage('l', 'userEntidade') !== null) {
+      async setEntidadeModulos (EntidadeId) {
+        const User = useUserStore()
+        const Entidade = EntidadeId || this.row?.id
+        if (Entidade !== null) {
 
-          const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + this.Entidade?.id + '/modulos/', params: { } }))
+          const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/modulos/', params: { } }))
             .then(res => {
-              setStorage('l', 'entidadeModulos', JSON.stringify(res.data))
-              this.EntidadeModulos = res.data
-            }).catch(err => {
-              console.log(err)
+              this.Modulos = res.data
             })
-
+          if ( EntidadeId) {
+            User.Modulos = this.Modulos
+            setStorage('l', 'entidadeModulos', JSON.stringify(res.data))
+          }
           return rsp
         }
       },
 
 
-      async getLayoutSettings (entidade) {
-        let Entidade = entidade || this.row?.id
-        if (getStorage('l', 'userEntidade') !== null) {
+      async getLayoutSettings (entidadeId) {
+        let Entidade = entidadeId || this.row?.id
+        if (Entidade !== null) {
 
           const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/themeGet/', params: { } }))
             .then(res => {
@@ -120,14 +121,13 @@ export const useEntidadeStore = createBaseStore(
               this.AnimationSettings = res.data || {}
             })
 
-          if( entidade ) {
+          if( entidadeId ) {
             const User = useUserStore()
 
-            User.Theme = this.LogedTheme
-            User.AnimationSettings = this.LogedAnimationSettings
-            User.Typography = this.LogedTypography
-            User.LayoutSettings = this.LogedLayoutSettings
-
+            User.Theme = this.Theme
+            User.AnimationSettings = this.AnimationSettings
+            User.Typography = this.Typography
+            User.LayoutSettings = this.LayoutSettings
             User.setSettings()
           }
           return lay
@@ -140,7 +140,7 @@ export const useEntidadeStore = createBaseStore(
         if (!UserId) return
         const rsp = await HTTPAuth.get( url({ type: 'u', url: `api/django_resaas/users/${UserId}/userEntidades/`,params: {}}))
         setStorage('l', 'userEntidades', JSON.stringify(rsp.data))
-        this.Logeds = rsp.data
+        this.s = rsp.data
         return rsp
       },
 
@@ -158,7 +158,7 @@ export const useEntidadeStore = createBaseStore(
           )
 
           setStorage('l', 'userEntidades', JSON.stringify(res.data))
-          this.Logeds = res.data
+          this.s = res.data
 
           if (res.data.length === 1) {
             this.select_(res.data[0], q)
@@ -195,7 +195,7 @@ export const useEntidadeStore = createBaseStore(
 
       select_ (entidade, q) {
         const Sucursal = useSucursalStore()
-        this.Loged = entidade
+        this.row = entidade
         this.getLayoutSettings(entidade.id)
         setStorage('l', 'userEntidade', JSON.stringify(entidade))
         Sucursal.getUserSucursals_(q)

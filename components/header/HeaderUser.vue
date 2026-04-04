@@ -174,8 +174,7 @@ export default defineComponent({
     'User.Entidade' (val) {
       if (!val) return
       this.User.getMenus()
-      this.User.setEntidadeModelos()
-
+      this.Entidade.setEntidadeModelos(this.User.Entidade.id)
     },
 
     'User.isLogout' (val) {
