@@ -5,43 +5,36 @@ import { tdc } from '../../boot/base'
 import { useRouter } from 'vue-router'
 
 
+const preview = ref({
+  show: false,
+  url: ''
+})
 
-
-const showPreview = ref(false)
-
-// 🔍 detectar imagem (JSON string ou object)
-const parsedValue = computed(() => {
+// detectar imagem
+function isImage(val) {
   try {
-    return typeof props.value === 'string'
-      ? JSON.parse(props.value)
-      : props.value
+    const parsed = typeof val === 'string' ? JSON.parse(val) : val
+    return parsed && parsed.url
   } catch {
-    return null
+    return false
   }
-})
-
-const isImage = computed(() => {
-  return parsedValue.value?.url
-})
-
-const imageUrl = computed(() => {
-  return parsedValue.value?.url || ''
-})
-
-// 🔘 boolean
-const isBoolean = computed(() => {
-  return typeof props.value === 'boolean'
-})
-
-// abrir modal
-function openPreview() {
-  showPreview.value = true
 }
 
+// obter URL
+function getImageUrl(val) {
+  try {
+    const parsed = typeof val === 'string' ? JSON.parse(val) : val
+    return parsed?.url || ''
+  } catch {
+    return ''
+  }
+}
 
-
-
-
+// abrir preview
+function openPreview(url) {
+  preview.value.url = url
+  preview.value.show = true
+}
 
 // ---------------- PROPS ----------------
 const props = defineProps({
@@ -58,9 +51,7 @@ const props = defineProps({
   canDo: { type: Function, default: () => true },
 
   route: { type: [String, Object], default: null },
-  ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] },
-
-  value: [String, Boolean, Object]
+  ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
 })
 
 const router = useRouter()
@@ -518,41 +509,39 @@ async function executeAction() {
           <span class="cursor-pointer">{{ props.value }}</span>
         </template>
 
-        <!-- <template v-else>
-          {{ props.value }}
-        </template> -->
-
         <template v-else>
-          <!-- 🖼️ IMAGEM -->
-          <template v-if="isImage">
-            <img
-              :src="imageUrl"
-              style="width:50px;height:50px;object-fit:cover;cursor:pointer;border-radius:6px"
-              @click="openPreview"
-            />
 
-            <q-dialog v-model="showPreview">
-              <q-card>
-                <img :src="imageUrl" style="max-width:100%;max-height:80vh" />
-              </q-card>
-            </q-dialog>
-          </template>
+  <!-- 🖼️ IMAGEM -->
+  <template v-if="isImage(props.value)">
+    <img
+      :src="getImageUrl(props.value)"
+      style="width:50px;height:50px;object-fit:cover;border-radius:6px;cursor:pointer"
+      @click="openPreview(getImageUrl(props.value))"
+    />
 
-          <!-- 🔘 BOOLEAN -->
-          <template v-else-if="isBoolean">
-            <q-btn
-              dense
-              size="sm"
-              :color="props.value ? 'positive' : 'negative'"
-              :label="props.value ? 'Sim' : 'Não'"
-            />
-          </template>
+    <q-dialog v-model="preview.show">
+      <q-card>
+        <img :src="preview.url" style="max-width:100%;max-height:80vh" />
+      </q-card>
+    </q-dialog>
+  </template>
 
-          <!-- 🔤 DEFAULT -->
-          <template v-else>
-            {{ props.value }}
-          </template>
-        </template>
+  <!-- 🔘 BOOLEAN -->
+  <template v-else-if="typeof props.value === 'boolean'">
+    <s-btn
+      dense
+      size="sm"
+      :color="props.value ? 'positive' : 'negative'"
+      :label="props.value ? 'Sim' : 'Não'"
+    />
+  </template>
+
+  <!-- 🔤 DEFAULT -->
+  <template v-else>
+    {{ props.value }}
+  </template>
+
+</template>
 
       </q-td>
     </template>
