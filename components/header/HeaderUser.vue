@@ -193,7 +193,7 @@ export default defineComponent({
 
   methods: {
     startSessionWatcher () {
-      this._sessionInterval = setInterval(this.User.checkSession, 1 * 60 * 1000)
+      this._sessionInterval = setInterval( this.User.checkSession(), 1 * 60 * 1000)
     }
   },
   beforeUnmount () {
