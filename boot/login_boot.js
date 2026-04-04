@@ -17,7 +17,7 @@ export async function loadUserSaas (q) {
   if (!User.data?.id) return
 
   // Entidade
-  await Entidade.getUserEntidades_(User.data?.id)
+  await Entidade.getUserEntidades_(User.data?.id, q)
   // if (Entidade.Logeds.length) {
   //   await Entidade.select(Entidade.Logeds[0])
   // }
