@@ -6,6 +6,43 @@ import { useRouter } from 'vue-router'
 
 
 
+
+const showPreview = ref(false)
+
+// 🔍 detectar imagem (JSON string ou object)
+const parsedValue = computed(() => {
+  try {
+    return typeof props.value === 'string'
+      ? JSON.parse(props.value)
+      : props.value
+  } catch {
+    return null
+  }
+})
+
+const isImage = computed(() => {
+  return parsedValue.value?.url
+})
+
+const imageUrl = computed(() => {
+  return parsedValue.value?.url || ''
+})
+
+// 🔘 boolean
+const isBoolean = computed(() => {
+  return typeof props.value === 'boolean'
+})
+
+// abrir modal
+function openPreview() {
+  showPreview.value = true
+}
+
+
+
+
+
+
 // ---------------- PROPS ----------------
 const props = defineProps({
   module: { type: String, default:'' },
@@ -21,7 +58,9 @@ const props = defineProps({
   canDo: { type: Function, default: () => true },
 
   route: { type: [String, Object], default: null },
-  ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
+  ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] },
+
+  value: [String, Boolean, Object]
 })
 
 const router = useRouter()
@@ -479,9 +518,41 @@ async function executeAction() {
           <span class="cursor-pointer">{{ props.value }}</span>
         </template>
 
-        <template v-else>
+        <!-- <template v-else>
           {{ props.value }}
-        </template>
+        </template> -->
+
+        <!-- <template v-else> -->
+          <!-- 🖼️ IMAGEM -->
+          <template v-else-if="isImage">
+            <img
+              :src="imageUrl"
+              style="width:50px;height:50px;object-fit:cover;cursor:pointer;border-radius:6px"
+              @click="openPreview"
+            />
+
+            <q-dialog v-model="showPreview">
+              <q-card>
+                <img :src="imageUrl" style="max-width:100%;max-height:80vh" />
+              </q-card>
+            </q-dialog>
+          </template>
+
+          <!-- 🔘 BOOLEAN -->
+          <template v-else-if="isBoolean">
+            <q-btn
+              dense
+              size="sm"
+              :color="props.value ? 'positive' : 'negative'"
+              :label="props.value ? 'Sim' : 'Não'"
+            />
+          </template>
+
+          <!-- 🔤 DEFAULT -->
+          <template v-else>
+            {{ props.value }}
+          </template>
+        <!-- </template> -->
 
       </q-td>
     </template>
