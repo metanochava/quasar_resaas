@@ -206,7 +206,7 @@ export default defineComponent({
     if(this.User){
       // const res = await this.Entidade?.getUserEntidades(this.User?.id)
       // this.User?.Entidades = res.data
-      this.User?.getSettings()
+      this.User?.setSettings()
       this.startSessionWatcher()
     }
   }
