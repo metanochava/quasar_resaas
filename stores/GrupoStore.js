@@ -2,8 +2,7 @@ import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, url } from './../boot/api'
 import { useUserStore} from './UserStore'
 import { getStorage, setStorage } from './../boot/storage'
-import { perfilSplint } from '../boot/base'
-
+import { perfilSplint, tdc } from '../boot/base'
 
 
 export const useGrupoStore = createBaseStore(
