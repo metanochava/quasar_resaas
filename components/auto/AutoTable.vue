@@ -180,6 +180,16 @@ function toggleEstado(row) {
   })
 }
 
+function toggleBoolean(row, name) {
+  const newValue = row.value == true ? false : true
+
+  emit('inline-patch', {
+    id: row.id,
+    field: name,
+    value: newValue
+  })
+}
+
 // ---------------- REQUEST HANDLER ----------------
 function onRequest(e) {
   localPagination.value = e.pagination
@@ -505,9 +515,10 @@ async function executeAction() {
           <template v-else-if="isBoolean(props.value)">
             <s-btn
               dense
-              size="md"
+              size="sm"
               :color="toBoolean(props.value) ? 'positive' : 'negative'"
               :label="toBoolean(props.value) ? 'Sim' : 'Não'"
+              @click="() => toggleBoolean(props.row, props.col.name)"
             /> 
           </template>
 
