@@ -132,7 +132,7 @@ export default defineComponent({
   watch: {
     async 'User.isLogin'(val) {
       if (val) {
-        await loadUserSaas()
+        await loadUserSaas(this.q)
       }
     },
 
