@@ -522,9 +522,9 @@ async function executeAction() {
           {{ props.value }}
         </template> -->
 
-        <!-- <template v-else> -->
+        <template v-else>
           <!-- 🖼️ IMAGEM -->
-          <template v-else-if="isImage">
+          <template v-if="isImage">
             <img
               :src="imageUrl"
               style="width:50px;height:50px;object-fit:cover;cursor:pointer;border-radius:6px"
@@ -552,7 +552,7 @@ async function executeAction() {
           <template v-else>
             {{ props.value }}
           </template>
-        <!-- </template> -->
+        </template>
 
       </q-td>
     </template>
