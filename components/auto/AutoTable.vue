@@ -512,36 +512,37 @@ async function executeAction() {
         <template v-else>
 
   <!-- 🖼️ IMAGEM -->
-  <template v-if="isImage(props.value)">
-    <img
-      :src="getImageUrl(props.value)"
-      style="width:50px;height:50px;object-fit:cover;border-radius:6px;cursor:pointer"
-      @click="openPreview(getImageUrl(props.value))"
-    />
+          <template v-if="isImage(props.value)">
+            <img
+              :src="getImageUrl(props.value)"
+              style="width:40px;height:40px;object-fit:cover;border-radius:2px; cursor:pointer"
+              @click="openPreview(getImageUrl(props.value))"
+            />
 
-    <q-dialog v-model="preview.show">
-      <q-card>
-        <img :src="preview.url" style="max-width:100%;max-height:80vh" />
-      </q-card>
-    </q-dialog>
-  </template>
+            <q-dialog v-model="preview.show">
+              <q-card>
+                <img :src="preview.url" style="max-width:100%;max-height:80vh" />
+              </q-card>
+            </q-dialog>
+          </template>
 
-  <!-- 🔘 BOOLEAN -->
-  <template v-else-if="typeof props.value === 'boolean'">
-    <s-btn
-      dense
-      size="sm"
-      :color="props.value ? 'positive' : 'negative'"
-      :label="props.value ? 'Sim' : 'Não'"
-    />
-  </template>
+          <!-- 🔘 BOOLEAN -->
+          <template v-else-if="typeof props.value === 'boolean'">
+            <s-btn
+              dense
+              size="md"
+              :color="props.value ? 'positive' : 'negative'"
+              :label="props.value ? 'Sim' : 'Não'"
+            />
+          </template>
 
-  <!-- 🔤 DEFAULT -->
-  <template v-else>
-    {{ props.value }}
-  </template>
+          <!-- 🔤 DEFAULT -->
+          <template v-else>
+            {{ props.value }} | 
+            {{typeof props.value}}
+          </template>
 
-</template>
+        </template>
 
       </q-td>
     </template>
