@@ -63,7 +63,7 @@ const props = defineProps({
   can: { type: Function, default: null },
   schemaPath: { type: String, default: 'fields' },
   route: { type: [String, Object], default: null },
-  ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] },
+  ignoreFields: { type: Array, default: () =>  ['created_at','updated_at', 'created_by', 'updated_by'] },
 })
 
 // --- state ---
