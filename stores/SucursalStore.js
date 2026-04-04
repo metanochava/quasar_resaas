@@ -33,7 +33,7 @@ export const useSucursalStore = createBaseStore(
             } else {
               if (res.data.length === 0) {
 
-                this.redirect = 'authwelcome'
+                User.redirect = 'authwelcome'
                 return
               }
               const sucursals = []
@@ -54,7 +54,7 @@ export const useSucursalStore = createBaseStore(
                 this.select_(data, q)
               }).onCancel(() => {
 
-                this.redirect = 'authwelcome'
+                User.redirect = 'authwelcome'
               })
             }
           }).catch(err => {

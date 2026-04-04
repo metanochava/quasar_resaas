@@ -139,7 +139,7 @@ export const useUserStore = defineStore("user", {
 
     async me() {
       const rsp = await HTTPAuth.get(url({type: "u", url: "api/me", params: {}}) )
-      console.log(rsp.data)
+
       this.data = rsp.data
       const Language = useLanguageStore()
       Language.change(rsp.data.language)

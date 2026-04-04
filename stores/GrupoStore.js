@@ -35,7 +35,7 @@ export const useGrupoStore = createBaseStore(
         setStorage('l', 'userGrupo', JSON.stringify(group))
         this.getPermicoes()
         await User.getMenus()
-        this.redirect = 'authwelcome'
+        User.redirect = 'authwelcome'
       },
 
 
@@ -77,7 +77,7 @@ export const useGrupoStore = createBaseStore(
           this.select_(res.data[0])
         }else{
           if (res.data.length === 0) {
-            this.redirect = 'authwelcome'
+            User.redirect = 'authwelcome'
             return
           }
           const grupos = []
@@ -97,7 +97,7 @@ export const useGrupoStore = createBaseStore(
           }).onOk(data => {
             this.select_(data)
           }).onCancel(() => {
-            this.redirect = 'authwelcome'
+            User.redirect = 'authwelcome'
           })
         }
         return res

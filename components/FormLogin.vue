@@ -130,9 +130,24 @@ export default defineComponent({
 
   },
   watch: {
+    'User.redirect'(val) {
+      console.log(val)
+      if (val) {
+        this.router.push({ name: val })   // ✅ agora funciona
+        this.User.redirect = '' // reset
+      }
+    },
     async 'User.isLogin'(val) {
       if (val) {
         await loadUserSaas(this.q)
+      }
+    }
+  },
+
+  watch: {
+    async 'User.isLogin'(val) {
+      if (val) {
+        await loadUserSaas()
       }
     },
 

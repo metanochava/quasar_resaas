@@ -145,6 +145,7 @@ export const useEntidadeStore = createBaseStore(
       },
 
       async getUserEntidades_ (UserId, q) {
+        const User = useUserStore()
         if (!UserId) return
 
         try {
@@ -164,7 +165,7 @@ export const useEntidadeStore = createBaseStore(
           } else {
             if (res.data.length === 0) {
 
-              this.redirect = 'welcome'
+              User.redirect = 'welcome'
               return
             }
             const entidades = res.data.map(e => ({
@@ -184,7 +185,7 @@ export const useEntidadeStore = createBaseStore(
             }).onOk(data => this.select_(data, q))
             .onCancel(() => {
 
-              this.redirect = 'welcome'
+              User.redirect = 'welcome'
             })
           }
         } catch (err) {
