@@ -72,7 +72,7 @@ export default defineComponent({
 
   async mounted(){
 
-    this.TipoEntidade.getLayoutSettings()
+    await this.TipoEntidade.getLayoutSettings(this.TipoEntidade?.id)
 
   },
 

@@ -164,9 +164,11 @@ export default defineComponent({
   },
   setup() {
     const TipoEntidade = useTipoEntidadeStore()
+    const Entidade = useEntidadeStore()
     const User = useUserStore()
     return {
       TipoEntidade,
+      Entidade,
       User,
       barStyle,
       thumbStyle
@@ -191,8 +193,11 @@ export default defineComponent({
   },
 
   async mounted(){
+    if(this.User){
+      this.User?.loadFromStorage()
+    }
 
-    this.TipoEntidade.getLayoutSettings()
+    this.Entidade.getLayoutSettings(this.User?.Entidade?.id)
 
     if (['authwelcome','welcome'].includes(this.$route.name)){
       this.User.LeftTop = false
