@@ -16,8 +16,7 @@ export const useSucursalStore = createBaseStore(
 
   {
     state: () => ({
-      Logeds: [],
-      Loged: null,
+
     }),
 
     actions: {
@@ -53,41 +52,40 @@ export const useSucursalStore = createBaseStore(
               }).onOk(data => {
                 this.select_(data, q)
               }).onCancel(() => {
-
                 User.redirect = 'authwelcome'
               })
             }
-          }).catch(err => {
-            console.log(err)
           })
       },
 
       select_ (sucursal, q) {
+        const User = useUserStore()
         let Grupo = useGrupoStore()
-        this.Loged = sucursal
+        this.row = sucursal
+        User.Sucursal = this.row
         setStorage('l', 'userSucursal', JSON.stringify(sucursal))
         Grupo.getGrupos_(q)
       },
 
       select (sucursal) {
-        this.Loged = sucursal
+        const User = useUserStore()
+        let Grupo = useGrupoStore()
+        this.row = sucursal
+        User.Sucursal = this.row
         setStorage('l', 'userSucursal', JSON.stringify(sucursal))
-        this.getGrupos()
+        Grupo.getGrupos()
       },
 
       async getUserSucursals() {
         const User = useUserStore()
-        this.spiner = true
         if (getStorage('l', 'userEntidade') !== null) {
-
           const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + User.data?.id + '/userSucursals/', params: { } }))
             .then(res => {
-              this.Loged = {}
+              this.row = {}
               setStorage('l', 'userSucursal', JSON.stringify({}))
               setStorage('l', 'userSucursals', JSON.stringify(res.data))
-              this.Logeds = res.data
-            }).catch(err => {
-              console.log(err)
+              this.rows = res.data
+              User.Sucursals = this.rows
             })
           return rsp
         }

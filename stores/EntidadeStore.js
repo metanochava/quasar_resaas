@@ -194,11 +194,23 @@ export const useEntidadeStore = createBaseStore(
       },
 
       select_ (entidade, q) {
+        const User = useUserStore()
         const Sucursal = useSucursalStore()
         this.row = entidade
+        User.Entidade = this.row
         this.getLayoutSettings(entidade.id)
         setStorage('l', 'userEntidade', JSON.stringify(entidade))
         Sucursal.getUserSucursals_(q)
+      },
+
+      select (entidade) {
+        const User = useUserStore()
+        const Sucursal = useSucursalStore()
+        this.row = entidade
+        User.Entidade = this.row
+        this.getLayoutSettings(entidade.id)
+        setStorage('l', 'userEntidade', JSON.stringify(entidade))
+        Sucursal.getUserSucursals()
       },
 
       // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
