@@ -29,6 +29,7 @@
 
 import { useUserStore } from '../stores/UserStore'
 import { useTipoEntidadeStore } from '../stores/TipoEntidadeStore'
+import { useEntidadeStore } from '../stores/EntidadeStore'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
@@ -52,10 +53,12 @@ export default defineComponent({
   },
   setup() {
     const TipoEntidade = useTipoEntidadeStore()
+    const Entidade = useEntidadeStore()
     const User = useUserStore()
 
     return {
       TipoEntidade,
+      Entidade,
       User,
     }
   },
@@ -71,6 +74,13 @@ export default defineComponent({
   },
 
   async mounted(){
+    if(this.User){
+      this.User?.loadFromStorage()
+      await this.Entidade.getLayoutSettings(this.User?.Entidade?.id)
+    }
+    await this.TipoEntidade.getLayoutSettings(this.TipoEntidade?.id)
+    this.User.setSettings()
+
 
     await this.TipoEntidade.getLayoutSettings(this.TipoEntidade?.id)
 
