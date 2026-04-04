@@ -130,7 +130,7 @@ export const useGrupoStore = createBaseStore(
       async getPermicoes() {
         const User = useUserStore()
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/users/${this.Loged?.id}/userPermicoes/` })
+          url({ type: 'u', url: `api/django_resaas/users/${User.data?.id}/userPermicoes/` })
         )
 
         this.LogedPermicoes = new Set(
