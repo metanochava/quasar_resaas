@@ -121,6 +121,7 @@
 
 import { useUserStore } from '../stores/UserStore'
 import { useTipoEntidadeStore } from '../stores/TipoEntidadeStore'
+import { useEntidadeStore } from '../stores/EntidadeStore'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
