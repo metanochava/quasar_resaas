@@ -537,13 +537,15 @@ async function executeAction() {
               size="md"
               :color="toBoolean(props.value) ? 'positive' : 'negative'"
               :label="toBoolean(props.value) ? 'Sim' : 'Não'"
-            /> {{isBoolean(props.value)}}
+            /> 
+            {{ props.value }} | 
+            {{typeof props.value}} | {{isBoolean(props.value)}}
           </template>
 
           <!-- 🔤 DEFAULT -->
           <template v-else>
             {{ props.value }} | 
-            {{typeof props.value}} | isBoolean(props.value)
+            {{typeof props.value}} | {{isBoolean(props.value)}}
           </template>
 
 
