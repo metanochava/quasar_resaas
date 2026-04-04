@@ -5,6 +5,23 @@ import { tdc } from '../../boot/base'
 import { useRouter } from 'vue-router'
 
 
+
+function isBoolean(val) {
+  return (
+    typeof val === 'boolean' ||
+    val === 'true' ||
+    val === 'false' ||
+    val === 1 ||
+    val === 0 ||
+    val === '1' ||
+    val === '0'
+  )
+}
+
+function toBoolean(val) {
+  return val === true || val === 'true' || val === 1 || val === '1'
+}
+
 const preview = ref({
   show: false,
   url: ''
@@ -523,15 +540,13 @@ async function executeAction() {
             </q-dialog>
           </template>
 
-          <template v-else-if="typeof props.value === 'boolean'">
+          <template v-else-if="isBoolean(props.value)">
             <s-btn
               dense
               size="md"
-              :color="props.value ? 'positive' : 'negative'"
-              :label="props.value ? 'Sim' : 'Não'"
+              :color="toBoolean(props.value) ? 'positive' : 'negative'"
+              :label="toBoolean(props.value) ? 'Sim' : 'Não'"
             />
-            {{ props.value }} | 
-            {{typeof props.value}}
           </template>
 
           <!-- 🔤 DEFAULT -->
