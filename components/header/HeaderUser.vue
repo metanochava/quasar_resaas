@@ -163,12 +163,12 @@ export default defineComponent({
     'User.Grupo' (val) {
 
       if (!val) return
+      
       if (this.$route.name !== 'welcome' && this.$route.name !== 'authwelcome') {
         this.$router.push({ name: 'home' })
       }
 
       this.User.getMenus()
-
     },
 
     'User.Entidade' (val) {

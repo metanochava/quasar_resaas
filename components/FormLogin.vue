@@ -86,17 +86,14 @@ import { setStorage, getStorage } from '../boot/storage'
 import AllLogo  from './../components/AllLogo.vue'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
-
 import { loadUserSaas } from './../boot/login_boot'
 
 
 export default defineComponent({
   name: 'FormLogin',
-
   props: {
 
   },
-
   components: {
     AllLogo
   },
@@ -134,13 +131,13 @@ export default defineComponent({
   },
   watch: {
     'User.redirect'(val) {
+      console.log(val)
       if (val) {
         this.router.push({ name: val })   // ✅ agora funciona
         this.User.redirect = '' // reset
       }
     },
     'User.isLogin'(val) {
-      console.log(val)
       if (val) {
         loadUserSaas(this.q)
       }
