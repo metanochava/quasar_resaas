@@ -195,9 +195,10 @@ export default defineComponent({
   async mounted(){
     if(this.User){
       this.User?.loadFromStorage()
+      this.Entidade.getLayoutSettings(this.User?.Entidade?.id)
     }
-
-    this.Entidade.getLayoutSettings(this.User?.Entidade?.id)
+    this.TipoEntidade.getLayoutSettings(this.TipoEntidade?.id)
+    
 
     if (['authwelcome','welcome'].includes(this.$route.name)){
       this.User.LeftTop = false
