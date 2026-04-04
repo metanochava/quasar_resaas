@@ -103,31 +103,7 @@ export const useGrupoStore = createBaseStore(
         }
         return res
       },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      async select(grupo) {
-        const User = useUserStore()
-        this.Loged = grupo
-        User.Grupo = this.Loged
-        await this.getPermicoes()
-      },
-
+      
       async getPermicoes() {
         const User = useUserStore()
         const { data } = await HTTPAuth.get(
