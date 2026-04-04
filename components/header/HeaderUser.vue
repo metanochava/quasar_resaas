@@ -68,7 +68,7 @@
                     <center><q-item-label overline class="text-blue"> {{ tdc('Registar Entidade')}}</q-item-label> </center>
                   </q-item-section>
                 </q-item>
-                <q-item dense clickable v-for="entidade in User?.Entidades" :key="entidade?.id" @click=" entidadeClosed = false, sucursalClosed = true, User.selectEntidade(entidade)">
+                <q-item dense clickable v-for="entidade in User?.Entidades" :key="entidade?.id" @click=" entidadeClosed = false, sucursalClosed = true, Entidade.select(entidade)">
                   <q-item-section>
                     <center><q-item-label overline> {{ tdc((entidade?.nome))}}</q-item-label> </center>
                   </q-item-section>
@@ -84,7 +84,7 @@
                 v-model="sucursalClosed"
               >
                 <q-separator />
-                <q-item dense clickable v-for="sucursal in User?.Sucursals" :key="sucursal?.id"   @click=" sucursalClosed = false, User.selectSucursal(sucursal)">
+                <q-item dense clickable v-for="sucursal in User?.Sucursals" :key="sucursal?.id"   @click=" sucursalClosed = false, Sucursal.select(sucursal)">
                   <q-item-section>
                     <center><q-item-label overline> {{ tdc(sucursal?.nome)}}</q-item-label> </center>
                   </q-item-section>
@@ -94,13 +94,13 @@
             <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(perfilSplint(User?.Grupo?.name)) " style="width: 100%; border-color: transparent;">
               <q-menu fit>
                 <q-list dense   class="rounded-borders" style="min-width: 100px" >
-                  <q-item clickable v-close-popup  @click="User.selectGrupo({id:'1', name:'Hóspede'})"  >
+                  <q-item clickable v-close-popup  @click="Grupo.select({id:'1', name:'Hóspede'})"  >
                     <q-item-section>
                       <q-item-label overline> {{tdc('Hóspede')}}</q-item-label>
                     </q-item-section>
                   </q-item>
 
-                  <q-item clickable v-close-popup @click="User.selectGrupo(grupo)" v-ripple v-for=" grupo in User.Grupos" :key="grupo.id">
+                  <q-item clickable v-close-popup @click="Grupo.select(grupo)" v-ripple v-for=" grupo in User.Grupos" :key="grupo.id">
                     <q-item-section>
                       <q-item-label overline> {{ tdc(perfilSplint(grupo.name))}}</q-item-label>
 
@@ -135,7 +135,9 @@
 import { defineComponent } from 'vue'
 import { perfilSplint, tdc } from '../../boot/base'
 import { useUserStore } from '../../stores/UserStore'
+import { useGrupoStore } from '../../stores/GrupoStore'
 import { useEntidadeStore } from '../../stores/EntidadeStore'
+import { useSucursalStore } from '../../stores/SucursalStore'
 import RegistarEntidade from './RegistarEntidade.vue'
 
 
@@ -146,7 +148,9 @@ export default defineComponent({
   setup () {
     const User = useUserStore()
     const Entidade = useEntidadeStore()
-    return { User, tdc, Entidade }
+    const Grupo = useGrupoStore()
+    const Sucursal = useSucursalStore()
+    return { User, tdc, Entidade, Grupo, Sucursal}
   },
 
   data () {
