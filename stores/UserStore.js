@@ -204,13 +204,6 @@ export const useUserStore = defineStore("user", {
       this.Permicoes = new Set(Array.isArray(perms) ? perms : [])
     },
 
-
-    perfilSplint (txt) {
-      if (!txt) return null
-      const p = txt.split('_')
-      return p[1] ?? p[0]
-    },
-
     async checkSession () {
       console.log('checkSession')
       if (!this.isTokenExpired(this.access)) {

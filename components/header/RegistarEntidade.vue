@@ -131,7 +131,7 @@
 
 import { defineComponent } from 'vue'
 import { HTTPAuth, url } from '../../boot/api'
-import { tdc } from '../../boot/base'
+import { tdc, perfilSplint } from '../../boot/base'
 import { deleteStorage, getStorage, setStorage } from '../../boot/storage'
 import { useUserStore } from '../../stores/UserStore'
 
@@ -152,24 +152,11 @@ export default defineComponent({
       sucursalClosed: true,
       pergunta: false,
       selectSucursalModal: false,
+      perfilSplint: perfilSplint,
     }
   },
 
   methods: {
-
-    perfilSplint (datax) {
-      try {
-        const vare = datax.split('_')
-        if (vare[1] != null) {
-          return vare[1]
-        } else {
-          return vare[0]
-        }
-      } catch (err) {
-        return null
-      }
-    },
-
     /* --------------------- SELECT ENTIDADE --------------------- */
     selectEntidade (entidade) {
       setStorage('l', 'userEntidade', JSON.stringify(entidade))

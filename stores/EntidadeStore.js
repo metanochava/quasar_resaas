@@ -3,7 +3,7 @@ import { HTTPAuth, url } from './../boot/api'
 import { setCssVar, Dark } from "quasar"
 import { useSucursalStore} from './SucursalStore'
 import { useUserStore} from './UserStore'
-import { tdc } from '../boot/base'
+import { perfilSplint, tdc } from '../boot/base'
 import { getStorage, setStorage } from './../boot/storage'
 
 
@@ -168,7 +168,7 @@ export const useEntidadeStore = createBaseStore(
               return
             }
             const entidades = res.data.map(e => ({
-              label: this.perfilSplint(e.nome),
+              label: perfilSplint(e.nome),
               value: e
             }))
 

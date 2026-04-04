@@ -3,6 +3,8 @@ import { HTTPAuth, url } from './../boot/api'
 import { getStorage, setStorage } from './../boot/storage'
 import { useUserStore} from './UserStore'
 import { useGrupoStore} from './GrupoStore'
+import { perfilSplint } from '../boot/base'
+
 
 export const useSucursalStore = createBaseStore(
   'sucursal',
@@ -36,7 +38,7 @@ export const useSucursalStore = createBaseStore(
               }
               const sucursals = []
               res.data.forEach(element => {
-                sucursals.push({ label: this.perfilSplint(element.nome), value: element })
+                sucursals.push({ label: perfilSplint(element.nome), value: element })
               })
               q.dialog({
                 title: tdc('Seleccione a Sucursal'),

@@ -91,7 +91,7 @@
                 </q-item>
               </q-expansion-item>
 
-            <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(User?.perfilSplint(User?.Grupo?.name)) " style="width: 100%; border-color: transparent;">
+            <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(perfilSplint(User?.Grupo?.name)) " style="width: 100%; border-color: transparent;">
               <q-menu fit>
                 <q-list dense   class="rounded-borders" style="min-width: 100px" >
                   <q-item clickable v-close-popup  @click="User.selectGrupo({id:'1', name:'Hóspede'})"  >
@@ -102,7 +102,7 @@
 
                   <q-item clickable v-close-popup @click="User.selectGrupo(grupo)" v-ripple v-for=" grupo in User.Grupos" :key="grupo.id">
                     <q-item-section>
-                      <q-item-label overline> {{ tdc(User?.perfilSplint(grupo.name))}}</q-item-label>
+                      <q-item-label overline> {{ tdc(perfilSplint(grupo.name))}}</q-item-label>
 
                     </q-item-section>
 
@@ -133,10 +133,11 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { tdc } from '../../boot/base'
+import { perfilSplint, tdc } from '../../boot/base'
 import { useUserStore } from '../../stores/UserStore'
 import { useEntidadeStore } from '../../stores/EntidadeStore'
 import RegistarEntidade from './RegistarEntidade.vue'
+
 
 export default defineComponent({
   name: 'HeaderUser',
@@ -154,6 +155,7 @@ export default defineComponent({
       entidadeClosed: false,
       pergunta: false,
       showRegistarEntidade: false,
+      perfilSplint: perfilSplint,
     }
   },
 

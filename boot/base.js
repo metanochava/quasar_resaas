@@ -62,6 +62,12 @@ export const isTipoEntidadeMe = function (x) {
   if (x === ite) { return true } else { return false }
 }
 
+
+export const perfilSplint = (txt) => {
+  if (!txt) return null
+  const p = txt.split('_')
+  return p[1] ?? p[0]
+}
 export const urlBase = (url = '') => {
   if (url === '') {
     return process.env.API
