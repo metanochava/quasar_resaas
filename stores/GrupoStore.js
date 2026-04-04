@@ -51,7 +51,7 @@ export const useGrupoStore = createBaseStore(
       async getGrupos () {
         const User = useUserStore()
         const res = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/users/${this.data?.id}/userGrupos/`, params: {} })
+          url({ type: 'u', url: `api/django_resaas/users/${User.data?.id}/userGrupos/`, params: {} })
         )
 
         setStorage('l', 'userGrupos', JSON.stringify(res.data))
