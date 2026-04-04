@@ -487,6 +487,32 @@ async function executeAction() {
           
         </template>
 
+
+          <template v-else-if="isImage(props.value)">
+            <img
+              :src="getImageUrl(props.value)"
+              style="width:40px;height:40px;object-fit:cover;border-radius:2px; cursor:pointer"
+              @click="openPreview(getImageUrl(props.value))"
+            />
+
+            <q-dialog v-model="preview.show">
+              <q-card>
+                <img :src="preview.url" style="max-width:100%;max-height:80vh" />
+              </q-card>
+            </q-dialog>
+          </template>
+
+          <template v-else-if="isBoolean(props.value)">
+            <s-btn
+              dense
+              size="md"
+              :color="toBoolean(props.value) ? 'positive' : 'negative'"
+              :label="toBoolean(props.value) ? 'Sim' : 'Não'"
+            /> 
+            {{ props.value }} | 
+            {{typeof props.value}} | {{isBoolean(props.value)}}
+          </template>
+
         <!-- 🔥 ESTADO -->
         <template v-else-if="props.col.name === 'estado'">
           <s-btn
@@ -517,36 +543,12 @@ async function executeAction() {
           <span class="cursor-pointer">{{ props.value }}</span>
         </template>
 
-          <template v-else-if="isImage(props.value)">
-            <img
-              :src="getImageUrl(props.value)"
-              style="width:40px;height:40px;object-fit:cover;border-radius:2px; cursor:pointer"
-              @click="openPreview(getImageUrl(props.value))"
-            />
 
-            <q-dialog v-model="preview.show">
-              <q-card>
-                <img :src="preview.url" style="max-width:100%;max-height:80vh" />
-              </q-card>
-            </q-dialog>
-          </template>
-
-          <template v-else-if="isBoolean(props.value)">
-            <s-btn
-              dense
-              size="md"
-              :color="toBoolean(props.value) ? 'positive' : 'negative'"
-              :label="toBoolean(props.value) ? 'Sim' : 'Não'"
-            /> 
-            {{ props.value }} | 
-            {{typeof props.value}} | {{isBoolean(props.value)}}
-          </template>
-
-          <!-- 🔤 DEFAULT -->
-          <template v-else>
-            {{ props.value }} | 
-            {{typeof props.value}} | {{isBoolean(props.value)}}
-          </template>
+        <!-- 🔤 DEFAULT -->
+        <template v-else>
+          {{ props.value }} | 
+          {{typeof props.value}} | {{isBoolean(props.value)}}
+        </template>
 
 
       </q-td>
