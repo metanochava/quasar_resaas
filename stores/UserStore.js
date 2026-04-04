@@ -69,8 +69,6 @@ export const useUserStore = defineStore("user", {
         .then(res => {
           this.AllMenus = res.data
           this.Menus = this.AllMenus
-        }).catch(err => {
-          console.log(err)
         })
     },
 
