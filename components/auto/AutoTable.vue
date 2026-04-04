@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router'
 
 
 function isBoolean(val) {
-  return (
+  return 
     typeof val === 'boolean' ||
     val === 'true' ||
     val === 'false' ||
@@ -15,7 +15,7 @@ function isBoolean(val) {
     val === 0 ||
     val === '1' ||
     val === '0'
-  )
+  
 }
 
 function toBoolean(val) {
