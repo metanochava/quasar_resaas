@@ -546,8 +546,6 @@ async function executeAction() {
         <template v-else>
           {{ props.value }}
         </template>
-
-
       </q-td>
     </template>
 
