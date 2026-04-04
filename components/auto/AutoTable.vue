@@ -509,10 +509,9 @@ async function executeAction() {
           <span class="cursor-pointer">{{ props.value }}</span>
         </template>
 
-        <template v-else>
 
-  <!-- 🖼️ IMAGEM -->
-          <template v-if="isImage(props.value)">
+
+          <template v-else-if="isImage(props.value)">
             <img
               :src="getImageUrl(props.value)"
               style="width:40px;height:40px;object-fit:cover;border-radius:2px; cursor:pointer"
@@ -542,7 +541,6 @@ async function executeAction() {
             {{typeof props.value}}
           </template>
 
-        </template>
 
       </q-td>
     </template>
