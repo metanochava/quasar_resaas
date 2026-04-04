@@ -1,7 +1,7 @@
 <template>
-  <div class="q-pa-md text-center" >
+  <s-card class="q-pa-md text-center" >
     <FormLogin />
-  </div>
+  </s-card>
 </template>
 
 <script>

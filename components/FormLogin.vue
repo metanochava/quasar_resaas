@@ -1,6 +1,6 @@
 
 <template>
-  <s-card class=" row items-center justify-evenly" >
+  <q-page class=" row items-center justify-evenly" >
       <s-card square  flat class="text-center" style="max-width: 300px">
         <AllLogo />
         <q-card-section class="text-left justify-evenly">
@@ -71,7 +71,7 @@
           <s-btn flat :to="{name:'registarUser'}"  size="md" color="primary" class="" :label="tdc('Registar')" />
         </q-card-actions>
       </s-card>
-    </s-card>
+  </q-page>
 </template>
 <style scoped>
 
