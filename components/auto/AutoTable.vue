@@ -509,8 +509,6 @@ async function executeAction() {
           <span class="cursor-pointer">{{ props.value }}</span>
         </template>
 
-
-
           <template v-else-if="isImage(props.value)">
             <img
               :src="getImageUrl(props.value)"
@@ -525,7 +523,6 @@ async function executeAction() {
             </q-dialog>
           </template>
 
-          <!-- 🔘 BOOLEAN -->
           <template v-else-if="typeof props.value === 'boolean'">
             <s-btn
               dense
@@ -533,6 +530,8 @@ async function executeAction() {
               :color="props.value ? 'positive' : 'negative'"
               :label="props.value ? 'Sim' : 'Não'"
             />
+            {{ props.value }} | 
+            {{typeof props.value}}
           </template>
 
           <!-- 🔤 DEFAULT -->
