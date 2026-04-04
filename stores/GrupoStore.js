@@ -33,16 +33,17 @@ export const useGrupoStore = createBaseStore(
         this.Loged = group
         User.Grupo = this.Loged
         setStorage('l', 'userGrupo', JSON.stringify(group))
-        this.getPermicoes()
+        await this.getPermicoes()
         await User.getMenus()
         User.redirect = 'authwelcome'
       },
 
 
-      async selectGrupo (grupo) {
+      async select (grupo) {
         const User = useUserStore()
         setStorage('l', 'userGrupo', JSON.stringify(grupo))
         this.Loged = grupo
+        User.Grupo = this.Loged
         await this.getPermicoes()
         await User.getMenus()
       },
