@@ -7,21 +7,12 @@ import { useRouter } from 'vue-router'
 
 
 function isBoolean(val) {
-  return 
-    typeof val === 'boolean' ||
-    val === 'true' ||
-    val === 'false' ||
-    val === 1 ||
-    val === 0 ||
-    val === '1' ||
-    val === '0'
-  
+  return ['true','false', true, false, 1, 0, '1', '0'].includes(val)
 }
 
 function toBoolean(val) {
-  return val === true || val === 'true' || val === 1 || val === '1'
+  return ['true', true, 1, '1'].includes(val)
 }
-
 const preview = ref({
   show: false,
   url: ''
@@ -546,13 +537,13 @@ async function executeAction() {
               size="md"
               :color="toBoolean(props.value) ? 'positive' : 'negative'"
               :label="toBoolean(props.value) ? 'Sim' : 'Não'"
-            />
+            /> {{isBoolean(props.value)}}
           </template>
 
           <!-- 🔤 DEFAULT -->
           <template v-else>
             {{ props.value }} | 
-            {{typeof props.value}}
+            {{typeof props.value}} | isBoolean(props.value)
           </template>
 
 
