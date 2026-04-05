@@ -204,13 +204,10 @@ export default defineComponent({
     if (['authwelcome','welcome'].includes(this.$route.name)){
       this.User.LeftTop = false
     }
-    this.startSessionWatcher()
   },
 
   methods: {
-    startSessionWatcher () {
-      this._sessionInterval = setInterval( this.User.checkSession(), 1 * 60 * 1000)
-    }
+    
   },
 })
 </script>

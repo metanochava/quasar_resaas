@@ -192,7 +192,11 @@ export default defineComponent({
   },
 
   methods: {
-    
+    startSessionWatcher () {
+      setInterval(async () => {
+        await this.User.checkSession()
+      }, 1 * 60 * 1000)
+    }
   },
   beforeUnmount () {
 
@@ -200,8 +204,10 @@ export default defineComponent({
 
   async mounted () {
     this.sucursalClosed = false
+
     if(this.User){
       this.User?.setSettings()
+      this.startSessionWatcher()
     }
   }
 })
