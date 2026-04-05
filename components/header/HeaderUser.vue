@@ -192,9 +192,7 @@ export default defineComponent({
   },
 
   methods: {
-    startSessionWatcher () {
-      this._sessionInterval = setInterval( this.User.checkSession(), 1 * 60 * 1000)
-    }
+    
   },
   beforeUnmount () {
 
@@ -202,12 +200,8 @@ export default defineComponent({
 
   async mounted () {
     this.sucursalClosed = false
-    /* ---------- LEITURA SEGURA ---------- */
     if(this.User){
-      // const res = await this.Entidade?.getUserEntidades(this.User?.id)
-      // this.User?.Entidades = res.data
       this.User?.setSettings()
-      this.startSessionWatcher()
     }
   }
 })
