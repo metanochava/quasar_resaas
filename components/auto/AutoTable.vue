@@ -181,7 +181,8 @@ function toggleEstado(row) {
 }
 
 function toggleBoolean(row, name) {
-  const newValue = row.value == 'true' ? false : true
+  const current = row.value === true || row.value === 'true'
+  const newValue = !current
   emit('inline-patch', {
     id: row.id,
     field: name,
