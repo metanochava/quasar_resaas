@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="modelValue" maximized>
+  <q-dialog v-model="dialog" maximized>
     <s-card class="bg-black">
 
       <!-- HEADER -->
@@ -22,7 +22,7 @@
         </q-btn>
 
         <!-- CLOSE -->
-        <q-btn dense flat icon="close" v-close-popup />
+        <q-btn dense flat icon="close" @click="dialog = false" />
       </q-bar>
 
       <!-- BODY -->
@@ -39,29 +39,32 @@
 </template>
 
 <script setup>
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 
 // props
 const props = defineProps({
   modelValue: Boolean,
-  src: String, // URL ou Blob URL
+  src: String, // URL ou Blob
   title: String
 })
 
 // emit
 const emit = defineEmits(['update:modelValue'])
 
-// computed url
-const pdfUrl = props.src
+// ✅ v-model proxy (CORRETO)
+const dialog = computed({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val)
+})
 
-// fechar
-function close() {
-  emit('update:modelValue', false)
-}
+// URL do PDF
+const pdfUrl = computed(() => props.src)
 
 // download
 function downloadPdf() {
-  window.open(pdfUrl, '_blank')
+  if (pdfUrl.value) {
+    window.open(pdfUrl.value, '_blank')
+  }
 }
 
 // limpar memória (blob)
@@ -71,3 +74,10 @@ watch(() => props.modelValue, (val) => {
   }
 })
 </script>
+
+<style scoped>
+/* opcional: scroll suave */
+iframe {
+  background: #1e1e1e;
+}
+</style>

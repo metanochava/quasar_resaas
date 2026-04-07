@@ -4,7 +4,7 @@
     <PdfRender
       v-model="showPdf"
       :src="pdfUrl"
-      title="Documento PDF"
+      title="Documento"
     />
 
     <AutoTable
