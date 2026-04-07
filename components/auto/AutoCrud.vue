@@ -12,7 +12,7 @@
       :loading="loading"
       :pagination="pagination"
       :ignoreFields="ignoreFields"
-      :route="route"
+
       @request="onRequest"
       @create="openCreate"
       @edit="openEdit"
@@ -27,6 +27,9 @@
       @restore="onRestore"
       @search="onSearch"
     />
+
+
+
     <AutoForm
       v-model="showForm"
       :schema="schema"
@@ -35,13 +38,17 @@
       :data="selectedRow"
       :can-do="canDo"
       :ignoreFields="ignoreFields"
+
       @saved="onSaved"
     />
+
+
 
     <AutoFilter
       v-model="showFilter"
       :schema="schema"
       :ignoreFields="ignoreFields"
+
       @apply="onApplyFilter"
     />
 

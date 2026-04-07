@@ -307,6 +307,10 @@ async function executeAction() {
     </s-card>
   </q-dialog>
 
+  {{columns}} || 
+
+  {{schema}}
+
   <q-table
     square
     flat
@@ -517,7 +521,7 @@ async function executeAction() {
               dense
               size="sm"
               :color="toBoolean(props.value) ? 'positive' : 'negative'"
-              :label="toBoolean(props.value) ? 'Sim' : 'Não'"
+              :label="toBoolean(props.value) ? tdc('Sim') : tdc('Não')"
               @click="() => toggleBoolean(props.row, props.col.name)"
             /> 
           </template>
@@ -528,7 +532,7 @@ async function executeAction() {
             dense
             size="sm"
             :color="props.row.estado == 1 ? 'positive' : 'negative'"
-            :label="props.row.estado == 1 ? 'Activo' : 'Inactivo'"
+            :label="props.row.estado == 1 ? tdc('Activo') : tdc('Inactivo')"
             @click="() => toggleEstado(props.row)"
           >
             <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.estado == 1 ? 'Desativar' : 'Activar') }}</q-tooltip>
