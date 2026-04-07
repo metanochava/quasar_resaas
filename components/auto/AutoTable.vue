@@ -312,6 +312,8 @@ async function executeAction() {
     :visible-columns="effectiveColumns"
     :dense="density === 'normal'"
     row-key="id"
+    :row-class="rowClass"
+
     @request="onRequest"
 
     :no-data-label="tdc('Sem dados')"
@@ -570,6 +572,12 @@ async function executeAction() {
 
 .row-odd {
   background-color: #cdcdcd;
+}
+
+.row-even:hover,
+.row-odd:hover {
+  background-color: var(--q-primary);
+  opacity: 0.1;
 }
 
 </style>
