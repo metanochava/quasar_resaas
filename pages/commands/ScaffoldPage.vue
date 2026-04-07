@@ -868,17 +868,17 @@ export default {
     },
 
     async loadApps() {
-      const {data} = await HTTPAuth.get('/api/django_resaas/modulos/')
+      const {data} = await HTTPAuth.get('/api/django_resaas/resaas_modulos/')
       this.modules = data.apps
     },
 
     async loadModelsRelation(f){
-      const {data} = await HTTPAuth.get('/api/django_resaas/modulos/'+ f.relModule)
+      const {data} = await HTTPAuth.get('/api/django_resaas/resaas_modulos/'+ f.relModule)
       f.models = data.models
     },
 
     async loadModelsSchema(f){
-      const {data} = await HTTPAuth.get('/api/django_resaas/modulos/'+ f)
+      const {data} = await HTTPAuth.get('/api/django_resaas/resaas_modulos/'+ f)
       this.models = data.models
       this.accaoTeste = false
     },

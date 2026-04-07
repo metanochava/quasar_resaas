@@ -225,7 +225,7 @@ export const useEntidadeStore = createBaseStore(
 
       async getModulos() {
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entidades/${this.Entidade?.id}/modulos/` })
+          url({ type: 'u', url: `api/django_resaas/entidades/${this.Entidade?.id}/resaas_modulos/` })
         )
         this.Modulos = data
       },

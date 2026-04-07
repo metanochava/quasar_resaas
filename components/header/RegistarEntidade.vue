@@ -246,7 +246,7 @@ export default defineComponent({
     async getEntidadeModulos () {
       if (getStorage('l', 'userEntidade') !== null) {
         try {
-          await HTTPAuth.get(url({ type: 'u', url: 'saas/entidades/' + this.User?.Entidade.id + '/modulos/', params: {} }))
+          await HTTPAuth.get(url({ type: 'u', url: 'saas/entidades/' + this.User?.Entidade.id + '/resaas_modulos/', params: {} }))
             .then(res => {
               setStorage('l', 'entidadeModulos', JSON.stringify(res.data))
 
