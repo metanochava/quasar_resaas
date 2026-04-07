@@ -4,6 +4,10 @@ import { exportFile } from 'quasar'
 import { tdc } from '../../boot/base'
 import { useRouter } from 'vue-router'
 
+import { useActionStore } from 'src/stores/actionStore'
+
+const actionStore = useActionStore()
+
 
 
 function isBoolean(val) {
@@ -75,6 +79,7 @@ const ignoreSet = computed(() => new Set(props.ignoreFields))
 const emit = defineEmits([
   'request',
   'create',
+  'pdf',
   'edit',
   'delete',
   'filter',
@@ -407,6 +412,27 @@ async function executeAction() {
 
             <q-list dense style="min-width: 180px">
 
+              <!-- PDF -->
+              <q-item
+                v-if="canDo('pdf_'+model.toLowerCase()) && !isDeleted(props.row)"
+                clickable
+                @click="emit('pdf', props.row)"
+              >
+                <q-item-section avatar>
+                  <q-icon 
+                    :name="actionStore.getAction('pdf').icon"
+                    :color="actionStore.getAction('pdf').color"
+                  />
+                </q-item-section>
+
+                <q-item-section>
+                  {{ tdc(actionStore.getAction('pdf').label) }}
+                </q-item-section>
+
+                <q-tooltip>
+                  {{ tdc(actionStore.getAction('pdf').label) }}
+                </q-tooltip>
+              </q-item>
 
               <!-- EDIT -->
               <q-item
@@ -415,17 +441,37 @@ async function executeAction() {
                 @click="emit('edit', props.row)"
               >
                 <q-item-section avatar>
-                  <q-icon name="edit" />
+                  <q-icon 
+                    :name="actionStore.getAction('edit').icon"
+                    :color="actionStore.getAction('edit').color"
+                  />
                 </q-item-section>
-                <q-item-section>Editar</q-item-section>
+
+                <q-item-section>
+                  {{ tdc(actionStore.getAction('edit').label) }}
+                </q-item-section>
+
+                <q-tooltip>
+                  {{ tdc(actionStore.getAction('edit').label) }}
+                </q-tooltip>
               </q-item>
 
               <!-- DELETE -->
               <q-item v-if="canDo('delete_'+model.toLowerCase()) && !isDeleted(props.row)" clickable @click="confirmAction('delete', props.row)">
                 <q-item-section avatar>
-                  <q-icon name="delete" color="orange" />
+                  <q-icon 
+                    :name="actionStore.getAction('delete').icon"
+                    :color="actionStore.getAction('delete').color"
+                  />
                 </q-item-section>
-                <q-item-section>{{tdc('Eliminar')}}</q-item-section>
+
+                <q-item-section>
+                  {{ tdc(actionStore.getAction('delete').label) }}
+                </q-item-section>
+
+                <q-tooltip>
+                  {{ tdc(actionStore.getAction('delete').label) }}
+                </q-tooltip>
               </q-item>
 
               <!-- HARD DELETE -->
@@ -434,6 +480,9 @@ async function executeAction() {
                   <q-icon name="delete_forever" color="red" />
                 </q-item-section>
                 <q-item-section>{{ tdc('Eliminar Permanentemente') }}</q-item-section>
+                <q-tooltip>
+                  {{ tdc('Eliminar Permanentemente') }}
+                </q-tooltip>
               </q-item>
 
               <!-- RESTORE -->
@@ -446,6 +495,9 @@ async function executeAction() {
                   <q-icon name="restore" color="green" />
                 </q-item-section>
                 <q-item-section>{{ tdc('Restaurar') }}</q-item-section>
+                <q-tooltip>
+                  {{ tdc('Restaurar') }}
+                </q-tooltip>
               </q-item>
 
               <q-separator v-if="singularActions.length" />

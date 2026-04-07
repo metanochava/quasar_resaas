@@ -1,6 +1,12 @@
 
 <template>
 
+    <PdfRender
+      v-model="showPdf"
+      :src="pdfUrl"
+      title="Documento PDF"
+    />
+
     <AutoTable
       :module="module"
       :model="model"
@@ -16,6 +22,7 @@
 
       @request="onRequest"
       @create="openCreate"
+      @pdf="openPdf"
       @edit="openEdit"
       @delete="onDelete"
       @filter="showFilter = true"
@@ -61,7 +68,7 @@ import AutoTable from './AutoTable.vue'
 import AutoForm from './AutoForm.vue'
 import AutoFilter from './AutoFilter.vue'
 
-import { HTTPAuth, url } from '../../boot/api'
+import { HTTPAuth, HTTPAuthBlob, url } from '../../boot/api'
 import { buildFormFromSchema } from '../../utils/autoForm'
 
 // --- props ---
@@ -84,6 +91,9 @@ const loading = ref(false)
 const showForm = ref(false)
 const showFilter = ref(false)
 const selectedRow = ref(null)
+
+const showPdf = ref(false)
+const pdfUrl = ref(null)
 
 const pagination = ref({
   page: 1,
@@ -191,6 +201,19 @@ function openEdit(row) {
   selectedRow.value = row
   showForm.value = true
 }
+
+async function openPdf(row) {
+  const res = await HTTPAuthBlob.get(url({
+    type: 'u',
+    url: `/api/${props.module}/${props.model.toLowerCase()}s/${row.id}/pdf/`
+  }))
+
+  const blob = new Blob([res.data], { type: 'application/pdf' })
+  pdfUrl.value = URL.createObjectURL(blob)
+
+  showPdf.value = true
+}
+
 
 async function onDelete(row) {
   await HTTPAuth.delete(url({
