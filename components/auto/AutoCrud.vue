@@ -62,7 +62,7 @@ import AutoForm from './AutoForm.vue'
 import AutoFilter from './AutoFilter.vue'
 
 import { HTTPAuth, url } from '../../boot/api'
-import { buildFormFromSchema, actionsFromSchema } from '../../utils/autoForm'
+import { buildFormFromSchema } from '../../utils/autoForm'
 
 // --- props ---
 const props = defineProps({

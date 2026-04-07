@@ -1,20 +1,5 @@
 import { tdc, HTTPAuth, url, guessLabelKey } from './../index'
 
-
-
-// PRO+ — buildFormFromSchema
-// ✅ masks (telefone, NIF, money)
-// ✅ relations lazy-load + cache + debounce
-// ✅ file/image preview (thumb)
-// ✅ JSON editor (textarea + validate JSON)
-// ✅ rules automáticas (required, min/max, max_length, min_length)
-// ✅ choices -> select
-// ✅ Date/DateTime -> input types corretos
-// ⚠️ Ajusta 1 linha: SCHEMA_PATH se o teu backend retornar data.fields vs data.data.fields
-
-
-
-// cache global simples p/ relations (por módulo/modelo + query)
 const __relationCache = new Map()
 
 function debounceAsync(fn, wait = 350) {
