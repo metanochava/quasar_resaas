@@ -4,7 +4,7 @@ import { exportFile } from 'quasar'
 import { tdc } from '../../boot/base'
 import { useRouter } from 'vue-router'
 
-import { useActionStore } from 'src/stores/actionStore'
+import { useActionStore } from '../../stores/ActionStore'
 
 const actionStore = useActionStore()
 
