@@ -133,14 +133,13 @@ function isDeleted(x) {
 }
 
 function goToRoute(id) {
+  console.log(props.config)
   if (!props.config?.route) return
-  
-  if (typeof props.route === 'string') {
-    router.push({
-      name: props?.config.route,
-      params: { id }
-    })
-  }
+  router.push({
+    name: props?.config.route,
+    params: { id }
+  })
+
 }
 
 
