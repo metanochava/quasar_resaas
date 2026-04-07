@@ -12,6 +12,7 @@
       :loading="loading"
       :pagination="pagination"
       :ignoreFields="ignoreFields"
+      :config = "config"
 
       @request="onRequest"
       @create="openCreate"
@@ -76,6 +77,7 @@ const props = defineProps({
 // --- state ---
 const schema = ref([])
 const actions = ref([])
+const config = ref({})
 const rows = ref([])
 const loading = ref(false)
 
@@ -122,17 +124,17 @@ function canDo(perm) {
 async function init() {
   if (!props.module || !props.model) return
 
-  schema.value = await buildFormFromSchema({
+  const data = await buildFormFromSchema({
     module: props.module,
     model: props.model,
     schemaPath: props.schemaPath,
   })
 
-  try {
-    actions.value = await actionsFromSchema(props.module, props.model)
-  } catch {
-    actions.value = []
-  }
+  schema.value = data.schema
+  actions.value = data.actions
+  config.value = data.config
+
+
 
   await loadData()
 }

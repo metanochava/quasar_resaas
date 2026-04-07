@@ -118,10 +118,12 @@ export async function buildFormFromSchema({
 
   if (!module || !model) throw new Error('module/model required')
 
-  const { data } = await HTTPAuth.get(url({type:'u', url:`api/django_resaas/modulos/${module}/${model}/schema/`, params:{}}))
+  const { data } = await HTTPAuth.get(url({type:'u', url:`/api/django_resaas/modulos/${module}/${model}/schema/`, params:{}}))
 
   // ✅ resolve schemaPath
   const fields = schemaPath === 'data.fields' ? (data?.data?.fields || []) : (data?.fields || [])
+  const actions =  data?.actions || []
+  const config =  data?.config || {} 
 
   const out = []
 
@@ -342,11 +344,5 @@ export async function buildFormFromSchema({
     })
   }
 
-  return out
-}
-
-
-export async function actionsFromSchema(module, model) {
-  const { data } = await HTTPAuth.get(url({type:'u', url:`/api/django_resaas/modulos/${module}/${model}/schema/`, params:{}}))
-  return data.actions 
+  return {'schema': out, 'actions': actions, 'config': config }
 }

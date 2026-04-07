@@ -58,7 +58,7 @@ const props = defineProps({
   actions: { type: Array, default: () => [] },
   canDo: { type: Function, default: () => true },
 
-  route: { type: [String, Object], default: null },
+  config: { type: [Object], default: {} },
   ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
 })
 
@@ -133,24 +133,12 @@ function isDeleted(x) {
 }
 
 function goToRoute(id) {
-  if (!props.route) return
-
-  // caso 1: string
+  if (!props.config?.route) return
+  
   if (typeof props.route === 'string') {
     router.push({
-      name: props.route,
+      name: props?.config.route,
       params: { id }
-    })
-  }
-
-  // caso 2: object (mais flexível)
-  else if (typeof props.route === 'object') {
-    router.push({
-      ...props.route,
-      params: {
-        ...(props.route.params || {}),
-        id
-      }
     })
   }
 }
@@ -306,10 +294,6 @@ async function executeAction() {
 
     </s-card>
   </q-dialog>
-
-  {{columns}} || 
-
-  {{schema}}
 
   <q-table
     square
