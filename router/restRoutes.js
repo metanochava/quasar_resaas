@@ -24,7 +24,7 @@ export let restRoutes = [
     } 
   },
   { 
-    path: '/rota/:rota', 
+    path: '/rota/:rota/:id', 
     name: 'rota_inexistente', 
     component: () => import('../pages/RotaEnexistente.vue'), 
     meta: { 

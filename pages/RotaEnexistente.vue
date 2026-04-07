@@ -8,6 +8,8 @@
 
         <div class="text-subtitle1 text-grey-7 q-mt-sm">
           {{ tdc('Rota solicitada') }}: <b>{{ rota }}</b>
+          <br>
+           {{ tdc('Parametro') }}: <b>{{ id }}</b>
         </div>
 
         <div class="text-subtitle2 text-grey-6 q-mt-sm">
@@ -23,6 +25,7 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const rota = route.params.rota
+const id = route.params.id
 </script>>
 
 <style scoped>

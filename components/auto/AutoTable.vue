@@ -143,7 +143,7 @@ function goToRoute(id) {
   } else {
     router.push({
       name: 'rota_inexistente',
-      params: { 'rota': props?.config.route }
+      params: { 'rota': props?.config.route, 'id': id }
     })
   }
 
