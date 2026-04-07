@@ -22,6 +22,14 @@ export let restRoutes = [
       icon: 'inventory_2',
       requiredRole: 'add_modulo'
     } 
+  },
+  { 
+    path: '/rota/:rota', 
+    name: 'rota_inexistente', 
+    component: () => import('../pages/RotaEnexistente.vue'), 
+    meta: { 
+      title: tdc('Rota ') + ' ' + tdc(' inexistente'), 
+    } 
   }
 ]
 

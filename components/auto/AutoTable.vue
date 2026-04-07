@@ -133,12 +133,19 @@ function isDeleted(x) {
 }
 
 function goToRoute(id) {
-  console.log(props.config)
   if (!props.config?.route) return
-  router.push({
-    name: props?.config.route,
-    params: { id }
-  })
+  
+  if (router.hasRoute(props.config?.route)) {
+    router.push({
+      name: props?.config.route,
+      params: { id }
+    })
+  } else {
+    router.push({
+      name: 'rota_inexistente',
+      params: { 'rota': props?.config.route }
+    })
+  }
 
 }
 
