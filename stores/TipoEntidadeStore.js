@@ -16,16 +16,15 @@ export const useTipoEntidadeStore = createBaseStore(
   {
 
     state: () => ({
-      Logeds: [],
-      Loged: null,
-      LogedModelos: [],
-      LogedModulos: [],
-      LogedTheme: {},
-      LogedLayoutSettings: {},
-      LogedAnimationSettings: {},
-      LogedTypography: {},
-      LogedModulos: [],
-      LogedModelos: [],
+
+      Modelos: [],
+      Modulos: [],
+      Theme: {},
+      LayoutSettings: {},
+      AnimationSettings: {},
+      Typography: {},
+      Modulos: [],
+      Modelos: [],
     }),
 
     getters: {
@@ -66,10 +65,10 @@ export const useTipoEntidadeStore = createBaseStore(
           if( tipoEntidade) {
             const User = useUserStore()
             
-            User.Theme = this.LogedTheme
-            User.AnimationSettings = this.LogedAnimationSettings
-            User.Typography = this.LogedTypography
-            User.LayoutSettings = this.LogedLayoutSettings
+            User.Theme = this.Theme
+            User.AnimationSettings = this.AnimationSettings
+            User.Typography = this.Typography
+            User.LayoutSettings = this.LayoutSettings
 
             User.setSettings()
           }

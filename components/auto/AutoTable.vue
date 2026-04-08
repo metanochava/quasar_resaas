@@ -540,35 +540,35 @@ async function executeAction() {
             icon="visibility"
             @click="() => goToRoute(props.row.id)"
           >
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.id) }}</q-tooltip>
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ props.row.id }}</q-tooltip>
           </s-btn>
           
         </template>
 
 
-          <template v-else-if="isImage(props.value)">
-            <img
-              :src="getImageUrl(props.value)"
-              style="width:40px;height:40px;object-fit:cover;border-radius:2px; cursor:pointer"
-              @click="openPreview(getImageUrl(props.value))"
-            />
+        <template v-else-if="isImage(props.value)">
+          <img
+            :src="getImageUrl(props.value)"
+            style="width:40px;height:40px;object-fit:cover;border-radius:2px; cursor:pointer"
+            @click="openPreview(getImageUrl(props.value))"
+          />
 
-            <q-dialog v-model="preview.show">
-              <q-card>
-                <img :src="preview.url" style="max-width:100%;max-height:80vh" />
-              </q-card>
-            </q-dialog>
-          </template>
+          <q-dialog v-model="preview.show">
+            <q-card>
+              <img :src="preview.url" style="max-width:100%;max-height:80vh" />
+            </q-card>
+          </q-dialog>
+        </template>
 
-          <template v-else-if="isBoolean(props.value)">
-            <s-btn
-              dense
-              size="sm"
-              :color="toBoolean(props.value) ? 'positive' : 'negative'"
-              :label="toBoolean(props.value) ? tdc('Sim') : tdc('Não')"
-              @click="() => toggleBoolean(props.row, props.col.name)"
-            /> 
-          </template>
+        <template v-else-if="isBoolean(props.value)">
+          <s-btn
+            dense
+            size="sm"
+            :color="toBoolean(props.value) ? 'positive' : 'negative'"
+            :label="toBoolean(props.value) ? tdc('Sim') : tdc('Não')"
+            @click="() => toggleBoolean(props.row, props.col.name)"
+          /> 
+        </template>
 
         <!-- 🔥 ESTADO -->
         <template v-else-if="props.col.name === 'estado'">

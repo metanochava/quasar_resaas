@@ -65,7 +65,7 @@ export default defineComponent({
   },
   async mounted () {
     await this.TipoEntidade.getTipoEntidades()
-    this.TipoEntidade?.TipoEntidades?.forEach(entidade => {
+    this.TipoEntidade?.rows?.forEach(entidade => {
       this.getHostname(entidade)
     })
   },
@@ -74,7 +74,7 @@ export default defineComponent({
     isIP(host) {
       return /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.includes(":");
     },
-    getHostname (tipoEnt) {
+    async getHostname (tipoEnt) {
       let domain = ''
 
       if (this.isIP(window.location.hostname)){
@@ -94,8 +94,8 @@ export default defineComponent({
           return true
         } else {
           this.User.TipoEntidade = tipoEnt
-          this.TipoEntidade.TipoEntidade = tipoEnt
-          this.TipoEntidade.getLayoutSettings(tipoEnt?.id)
+          this.row = tipoEnt
+          await this.TipoEntidade.getLayoutSettings(tipoEnt?.id)
           setStorage('l', 'tipoEntidade', JSON.stringify(this.User.TipoEntidade))
           return false
         }

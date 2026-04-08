@@ -194,11 +194,12 @@ export default defineComponent({
   },
 
   async mounted(){
+
     if(this.User){
       this.User?.loadFromStorage()
       await this.Entidade.getLayoutSettings(this.User?.Entidade?.id)
     }
-    await this.TipoEntidade.getLayoutSettings(this.TipoEntidade?.id)
+    
     this.User.setSettings()
 
     if (['authwelcome','welcome'].includes(this.$route.name)){
