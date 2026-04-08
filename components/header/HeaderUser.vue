@@ -206,7 +206,6 @@ export default defineComponent({
     this.sucursalClosed = false
 
     if(this.User){
-      this.User?.setSettings()
       this.startSessionWatcher()
     }
   }

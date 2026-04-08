@@ -199,7 +199,6 @@ export const useEntidadeStore = createBaseStore(
         this.row = entidade
         User.Entidade = this.row
         await this.getLayoutSettings(entidade.id)
-        // User.setSettings()
         setStorage('l', 'userEntidade', JSON.stringify(entidade))
         Sucursal.getUserSucursals_(q)
       },
@@ -210,18 +209,9 @@ export const useEntidadeStore = createBaseStore(
         this.row = entidade
         User.Entidade = this.row
         await this.getLayoutSettings(entidade.id)
-        // User.setSettings()
         setStorage('l', 'userEntidade', JSON.stringify(entidade))
         Sucursal.getUserSucursals()
       },
-
-      // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-
 
       async getModulos() {
         const { data } = await HTTPAuth.get(
