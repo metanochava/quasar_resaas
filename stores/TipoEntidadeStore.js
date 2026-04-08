@@ -37,26 +37,26 @@ export const useTipoEntidadeStore = createBaseStore(
         let TipoEntidade = tipoEntidade || this.row?.id
         if (getStorage('l', 'userTipoEntidade') !== null) {
 
-          const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/themeGet/', params: { } }))
+          const rsp = await HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/themeGet/', params: { } }))
             .then(res => {
               setStorage('l', 'tipoEntidadeTheme', JSON.stringify(res.data))
               this.Theme = res.data || {}
             })
 
-          const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/layoutSettingsGet/', params: { } }))
+          const lay = await HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/layoutSettingsGet/', params: { } }))
             .then(res => {
               setStorage('l', 'tipoEntidadeLayoutsettings', JSON.stringify(res.data))
               this.LayoutSettings = res.data || {}
 
             })
 
-          const tp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/typographyGet/', params: { } }))
+          const tp = await HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/typographyGet/', params: { } }))
             .then(res => {
               setStorage('l', 'tipoEntidadeTypography', JSON.stringify(res.data))
               this.Typography = res.data || {}
             })
 
-          const as = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/animationSettingsGet/', params: { } }))
+          const as = await HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/animationSettingsGet/', params: { } }))
             .then(res => {
               setStorage('l', 'tipoEntidadeAnimationSettings', JSON.stringify(res.data))
               this.AnimationSettings = res.data || {}

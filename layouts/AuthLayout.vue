@@ -77,13 +77,9 @@ export default defineComponent({
     if(this.User){
       this.User?.loadFromStorage()
       await this.Entidade.getLayoutSettings(this.User?.Entidade?.id)
+    
+      this.User.setSettings()
     }
-    await this.TipoEntidade.getLayoutSettings(this.TipoEntidade?.id)
-    this.User.setSettings()
-
-
-    await this.TipoEntidade.getLayoutSettings(this.TipoEntidade?.id)
-
   },
 
   methods: {},
