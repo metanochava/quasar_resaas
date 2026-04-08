@@ -68,6 +68,8 @@ import AutoTable from './AutoTable.vue'
 import AutoForm from './AutoForm.vue'
 import AutoFilter from './AutoFilter.vue'
 
+import PdfRender from './../PdfRender.vue'
+
 import { HTTPAuth, HTTPAuthBlob, url } from '../../boot/api'
 import { buildFormFromSchema } from '../../utils/autoForm'
 
@@ -201,6 +203,7 @@ function openEdit(row) {
   selectedRow.value = row
   showForm.value = true
 }
+
 
 async function openPdf(row) {
   const res = await HTTPAuthBlob.get(url({

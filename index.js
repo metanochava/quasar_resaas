@@ -28,6 +28,7 @@ export { default as CrudPage } from './components/auto/CrudPage.vue'
 export { default as AllLogo } from './components/AllLogo.vue'
 export { default as TopMenu } from './components/TopMenu.vue'
 export { default as PdfRender } from './components/PdfRender.vue'
+export { default as PdfRenderPro } from './components/PdfRenderPro.vue'
 
 export { default as HeaderBrand } from './components/header/HeaderBrand.vue'
 export { default as HeaderDarkMode } from './components/header/HeaderDarkMode.vue'
