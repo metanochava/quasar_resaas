@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { api } from 'boot/axios'
 import { Notify } from 'quasar'
+import { HTTPAuth, url } from '../../boot/api'
 
 const router = useRouter()
 
@@ -21,10 +21,7 @@ async function submit() {
   try {
     loading.value = true
 
-    const { data } = await api.post(
-      '/api/entidade/?selfRegist=self',
-      form.value
-    )
+    const { data } = await HTTPAuth.post(url({type:"u", url:'/api/django_resaas/entidade/?selfRegist=self'}), form.value)
 
     Notify.create({
       type: 'positive',
