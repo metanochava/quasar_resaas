@@ -15,9 +15,6 @@ export const useGrupoStore = createBaseStore(
 
   {
     state: () => ({
-      Logeds: [],
-      Loged: null,
-      LogedPermicoes: new Set(),
       Permicoes: new Set()
     }),
 
@@ -30,8 +27,8 @@ export const useGrupoStore = createBaseStore(
 
       async select_ (group) {
         const User = useUserStore()
-        this.Loged = group
-        User.Grupo = this.Loged
+        this.row = group
+        User.Grupo = this.row
         setStorage('l', 'userGrupo', JSON.stringify(group))
         await this.getPermicoes()
         await User.getMenus()
@@ -42,8 +39,8 @@ export const useGrupoStore = createBaseStore(
       async select (grupo) {
         const User = useUserStore()
         setStorage('l', 'userGrupo', JSON.stringify(grupo))
-        this.Loged = grupo
-        User.Grupo = this.Loged
+        this.row = grupo
+        User.Grupo = this.row
         await this.getPermicoes()
         await User.getMenus()
       },
@@ -55,8 +52,8 @@ export const useGrupoStore = createBaseStore(
         )
 
         setStorage('l', 'userGrupos', JSON.stringify(res.data))
-        this.Logeds = res.data
-        User = this.Logeds
+        this.rows = res.data
+        User = this.rows
 
         if (res.data.length === 1) {
           this.select(res.data[0])
@@ -71,8 +68,8 @@ export const useGrupoStore = createBaseStore(
           url({ type: 'u', url: `api/django_resaas/users/${User.data?.id}/userGrupos/`, params: {} })
         )
         setStorage('l', 'userGrupos', JSON.stringify(res.data))
-        this.Logeds = res.data
-        User.Grupos = this.Logeds
+        this.rows = res.data
+        User.Grupos = this.rows
 
         if (res.data.length === 1) {
           this.select_(res.data[0])
@@ -110,10 +107,10 @@ export const useGrupoStore = createBaseStore(
           url({ type: 'u', url: `api/django_resaas/users/${User.data?.id}/userPermicoes/` })
         )
 
-        this.LogedPermicoes = new Set(
+        this.rowPermicoes = new Set(
           (data || []).map(p => p.codename?.toLowerCase())
         )
-        User.Permicoes = this.LogedPermicoes
+        User.Permicoes = this.rowPermicoes
 
       }
     }

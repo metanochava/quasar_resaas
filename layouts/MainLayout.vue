@@ -200,8 +200,6 @@ export default defineComponent({
       await this.Entidade.getLayoutSettings(this.User?.Entidade?.id)
     }
     
-
-
     if (['authwelcome','welcome'].includes(this.$route.name)){
       this.User.LeftTop = false
     }

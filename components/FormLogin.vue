@@ -131,7 +131,6 @@ export default defineComponent({
   },
   watch: {
     'User.redirect'(val) {
-      console.log(val)
       if (val) {
         this.router.push({ name: val })   // ✅ agora funciona
         this.User.redirect = '' // reset
@@ -144,20 +143,6 @@ export default defineComponent({
     }
   },
 
-  watch: {
-    async 'User.isLogin'(val) {
-      if (val) {
-        await loadUserSaas(this.q)
-      }
-    },
-
-    'User.redirect'(val) {
-      if (val) {
-        this.$router.push({ name: val })
-        this.User.redirect = ''
-      }
-    }
-  },
   mounted () {
 
    if (getStorage('l', 'manterlogado') === 'true') {
@@ -165,7 +150,7 @@ export default defineComponent({
     } else {
       this.User.manterLogado = false
     }
-    this.getGeolocation()
+    // this.getGeolocation()
   },
   methods: {
     check () {

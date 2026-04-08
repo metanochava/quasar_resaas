@@ -187,6 +187,11 @@ export const useUserStore = defineStore("user", {
     },
 
     loadFromStorage () {
+
+      this.Theme = JSONSafeParse(getStorage('l', 'entidadeTheme'))
+      this.LayoutSettings = JSONSafeParse(getStorage('l', 'entidadeLayoutsettings'))
+      this.Typography = JSONSafeParse(getStorage('l', 'entidadeTypography'))
+      this.AnimationSettings = JSONSafeParse(getStorage('l', 'entidadeAnimationSettings'))
       this.Entidade = JSONSafeParse(getStorage('l', 'userEntidade'))
       this.Sucursals = JSONSafeParse(getStorage('l', 'userSucursals'))
       this.Entidades = JSONSafeParse(getStorage('l', 'userEntidades'))

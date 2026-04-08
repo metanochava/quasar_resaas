@@ -76,7 +76,7 @@ export default defineComponent({
   async mounted(){
     if(this.User){
       this.User?.loadFromStorage()
-      await this.Entidade.getLayoutSettings(this.User?.Entidade?.id)
+      await this.TipoEntidade.getLayoutSettings(this.User?.TipoEntidade?.id)
     }
   },
 
