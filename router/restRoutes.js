@@ -1,4 +1,5 @@
 import { tdc } from '../boot/base'
+import { entidadeRoutes } from './../pages/entidade/entidadeRoute'
 
 export let restRoutes = [
 
@@ -30,6 +31,7 @@ export let restRoutes = [
     meta: { 
       title: tdc('Rota ') + ' ' + tdc(' inexistente'), 
     } 
-  }
+  },
+  ...entidadeRoutes,
 ]
 
