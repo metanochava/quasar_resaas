@@ -1,29 +1,36 @@
 <template>
-  <q-dialog v-model="modelValue" maximized>
+  <q-dialog v-model="dialog" maximized>
     <q-card class="bg-grey-10 text-white">
 
       <!-- TOOLBAR -->
       <q-bar class="bg-dark">
 
+        <!-- ZOOM -->
         <q-btn flat icon="zoom_out" @click="zoomOut" />
-        <span>{{ Math.round(scale * 100) }}%</span>
+        <span class="q-mx-sm">{{ Math.round(scale * 100) }}%</span>
         <q-btn flat icon="zoom_in" @click="zoomIn" />
 
-        <q-separator vertical />
+        <q-separator vertical class="q-mx-sm" />
 
+        <!-- PAGINA -->
         <q-btn flat icon="chevron_left" @click="prevPage" />
-        <span>{{ page }} / {{ totalPages }}</span>
+        <span class="q-mx-sm">{{ page }} / {{ totalPages }}</span>
         <q-btn flat icon="chevron_right" @click="nextPage" />
 
         <q-space />
 
+        <!-- DOWNLOAD -->
         <q-btn flat icon="download" @click="downloadPdf" />
-        <q-btn flat icon="close" v-close-popup />
+
+        <!-- CLOSE -->
+        <q-btn flat icon="close" @click="dialog = false" />
       </q-bar>
 
       <!-- VIEW -->
       <q-card-section class="q-pa-none scroll" style="height: 100vh;">
-        <canvas ref="canvasRef"></canvas>
+        <div class="flex flex-center">
+          <canvas ref="canvasRef"></canvas>
+        </div>
       </q-card-section>
 
     </q-card>
@@ -31,19 +38,29 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed } from 'vue'
 import * as pdfjsLib from 'pdfjs-dist'
 
+// worker
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
 
+// props
 const props = defineProps({
   modelValue: Boolean,
   src: String
 })
 
+// emit
 const emit = defineEmits(['update:modelValue'])
 
+// ✅ v-model proxy (CORRETO)
+const dialog = computed({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val)
+})
+
+// refs
 const canvasRef = ref(null)
 const pdfDoc = ref(null)
 const page = ref(1)
@@ -60,7 +77,7 @@ async function loadPdf() {
   totalPages.value = pdfDoc.value.numPages
   page.value = 1
 
-  renderPage()
+  await renderPage()
 }
 
 // render page
@@ -110,8 +127,11 @@ function zoomOut() {
   }
 }
 
+// download
 function downloadPdf() {
-  window.open(props.src, '_blank')
+  if (props.src) {
+    window.open(props.src, '_blank')
+  }
 }
 
 // watch abrir modal
@@ -122,3 +142,9 @@ watch(() => props.modelValue, async (val) => {
   }
 })
 </script>
+
+<style scoped>
+canvas {
+  max-width: 100%;
+}
+</style>
