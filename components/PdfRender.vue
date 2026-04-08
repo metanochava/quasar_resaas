@@ -1,6 +1,7 @@
 <template>
-  <q-dialog v-model="dialog" maximized>
+  <q-dialog v-model="dialog" full-width full-height>
     <s-card class="bg-black">
+    
 
       <!-- HEADER -->
       <q-bar class="bg-primary text-white">
