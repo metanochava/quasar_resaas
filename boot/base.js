@@ -296,7 +296,7 @@ function normalizeTheme(theme = {}) {
 }
 
 export function setSettings(Theme, LayoutSettings, Typography, AnimationSettings){
-  console.log(Theme, LayoutSettings, Typography, AnimationSettings, "hdjh")
+  console.log( Typography, "hdjh")
 
   /* =========================
     🌙 DARK MODE

@@ -9,6 +9,26 @@ import { useActionStore } from '../../stores/ActionStore'
 const actionStore = useActionStore()
 
 
+function resolveValue(val) {
+  try {
+    const parsed = typeof val === 'string' ? JSON.parse(val) : val
+
+    // 🔥 ARRAY (M2M)
+    if (Array.isArray(parsed)) {
+      return parsed.map(x => x?.label || x).join(', ')
+    }
+
+    // 🔥 OBJETO (FK)
+    if (parsed && typeof parsed === 'object') {
+      if ('label' in parsed) return parsed.label
+      if ('url' in parsed) return parsed.url
+    }
+
+    return val
+  } catch {
+    return val
+  }
+}
 
 function isBoolean(val) {
   return ['true','false', true, false].includes(val)
@@ -170,7 +190,7 @@ function isEditable(name) {
 
 // 🔥 TOGGLE ESTADO (NOVO)
 function toggleEstado(row) {
-  const newValue = row.estado == 1 ? 0 : 1
+  const newValue = row.estado.value == 1 ? 0 : 1
 
   emit('inline-patch', {
     id: row.id,
@@ -575,8 +595,8 @@ async function executeAction() {
           <s-btn
             dense
             size="sm"
-            :color="props.row.estado == 1 ? 'positive' : 'negative'"
-            :label="props.row.estado == 1 ? tdc('Activo') : tdc('Inactivo')"
+            :color="props.row.estado.value == 1 ? 'positive' : 'negative'"
+            :label="props.row.estado.value == 1 ? tdc('Activo') : tdc('Inactivo')"
             @click="() => toggleEstado(props.row)"
           >
             <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.estado == 1 ? 'Desativar' : 'Activar') }}</q-tooltip>
@@ -603,7 +623,7 @@ async function executeAction() {
 
         <!-- 🔤 DEFAULT -->
         <template v-else>
-          {{ props.value }}
+          {{ resolveValue(props.value) }}
         </template>
       </q-td>
     </template>
