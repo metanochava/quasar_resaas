@@ -296,7 +296,7 @@ function normalizeTheme(theme = {}) {
 }
 
 export function setSettings(Theme, LayoutSettings, Typography, AnimationSettings){
-  console.log(Theme, LayoutSettings, Typography, AnimationSettings)
+  console.log(Theme, LayoutSettings, Typography, AnimationSettings, "hdjh")
 
   /* =========================
     🌙 DARK MODE
@@ -368,8 +368,8 @@ export function setSettings(Theme, LayoutSettings, Typography, AnimationSettings
 
   let link = document.getElementById("dynamic-theme-font")
 
-  const fontHref =
-    `https://fonts.googleapis.com/css2?family=${font?.replace(/ /g, "+")}:wght@300;400;500;700&display=swap`
+  // const fontHref = `https://fonts.googleapis.com/css2?family=${font?.replace(/ /g, "+")}:wght@300;400;500;700&display=swap`
+  const fontHref =`https://fonts.googleapis.com/css2?family=${font}:wght@300;400;500;700&display=swap`
 
   if (!link) {
     link = document.createElement("link")
