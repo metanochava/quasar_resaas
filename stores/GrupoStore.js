@@ -108,7 +108,7 @@ export const useGrupoStore = createBaseStore(
         )
 
         const rowPermicoes = new Set(
-          (data || []).map(p => p.codename?.toLowerCase().filter(Boolean))
+          (data || []).map(p => {console.log(p) })
         )
         User.Permicoes = rowPermicoes
 
