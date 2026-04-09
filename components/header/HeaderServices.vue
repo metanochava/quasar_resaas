@@ -65,8 +65,8 @@ export default defineComponent({
   },
   async mounted () {
     await this.TipoEntidade.getTipoEntidades()
-    this.TipoEntidade?.rows?.forEach(entidade => {
-      this.getHostname(entidade)
+    this.TipoEntidade?.rows?.forEach(tipoEntidade => {
+      this.getHostname(tipoEntidade)
     })
   },
 
@@ -88,7 +88,7 @@ export default defineComponent({
           domain = window.location.href.split('/')[2].split('.')[1]
         }
       }
-
+      console.log(domain.toLocaleLowerCase(), tipoEnt.nome.toLowerCase(),  tipoEnt)
       if(domain){
         if (domain.toLocaleLowerCase() !== tipoEnt.nome.toLowerCase()) {
           return true

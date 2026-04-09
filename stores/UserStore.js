@@ -188,6 +188,8 @@ export const useUserStore = defineStore("user", {
       const perms = JSONSafeParse(getStorage('l', 'userPermicoes'))
       this.Permicoes = new Set(perms)
 
+      console.log("User Loaded")
+
     },
 
     async checkSession () {
