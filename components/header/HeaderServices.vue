@@ -66,8 +66,11 @@ export default defineComponent({
   async mounted () {
     await this.TipoEntidade.getTipoEntidades()
     this.TipoEntidade?.rows?.forEach(async tipoEntidade => {
+      console.log("no loop")
       await this.getHostname(tipoEntidade)
     })
+
+    console.log("montado o header Service")
   },
 
   methods: {
