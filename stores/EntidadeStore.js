@@ -22,8 +22,6 @@ export const useEntidadeStore = createBaseStore(
 
 
     state: () => ({
-      Modelos: [],
-      Modulos: [],
       Theme: {},
       LayoutSettings: {},
       AnimationSettings: {},
@@ -44,7 +42,7 @@ export const useEntidadeStore = createBaseStore(
           this.AnimationSettings = res.data.animation_settings
           this.Typography = res.data.typography
 
-          this.row =  { id : res.data.entidade }
+          this.row =  res.data.entidade
 
           const User = useUserStore()
 
