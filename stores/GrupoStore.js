@@ -102,22 +102,25 @@ export const useGrupoStore = createBaseStore(
       },
       
       async getPermicoes() {
-        
+
         const User = useUserStore()
 
         const { data } = await HTTPAuth.get(
           url({ type: 'u', url: `api/django_resaas/users/${User.data?.id}/userPermicoes/` })
         )
 
-        const rowPermicoes = new Set(
-          (data || []).map(p => p.codename)
-        )
+        // 🔥 criar Set para uso interno
+        const rowPermicoes = new Set((data || []).map(p => p.codename))
 
+        // 🔥 guardar no store (rápido para lookup)
         User.Permicoes = rowPermicoes
 
-        console.log(JSON.stringify(User.Permicoes))
+        // 🔥 converter para array para storage
+        const permArray = Array.from(rowPermicoes)
 
-        setStorage('l', 'userPermicoes', User.Permicoes)
+        console.log(permArray)
+
+        setStorage('l', 'userPermicoes', permArray)
       }
 
       
