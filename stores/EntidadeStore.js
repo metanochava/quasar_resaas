@@ -50,7 +50,6 @@ export const useEntidadeStore = createBaseStore(
           User.AnimationSettings = this.AnimationSettings
           User.Typography = this.Typography
           User.LayoutSettings = this.LayoutSettings
-
           User.setSettings()
         })
         .catch( () => {

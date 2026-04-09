@@ -74,7 +74,9 @@ export default defineComponent({
     isIP(host) {
       return /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.includes(":");
     },
+
     async getHostname (tipoEnt) {
+      console.log("semmmmmm")
       let domain = ''
 
       if (this.isIP(window.location.hostname)){
@@ -94,12 +96,11 @@ export default defineComponent({
           console.log(domain.toLocaleLowerCase(), tipoEnt.nome.toLowerCase(),  "diferente")
           return true
         } else {
+          console.log(domain.toLocaleLowerCase(), tipoEnt.nome.toLowerCase(),  "igual")
           this.User.TipoEntidade = tipoEnt
-          this.row = tipoEnt
+          this.TipoEntidade.row = tipoEnt
           await this.TipoEntidade.getLayoutSettings(tipoEnt?.id)
           setStorage('l', 'tipoEntidade', JSON.stringify(this.User.TipoEntidade))
-          console.log(domain.toLocaleLowerCase(), tipoEnt.nome.toLowerCase(),  "igual")
-
           return false
         }
       }
