@@ -53,7 +53,7 @@ export const useGrupoStore = createBaseStore(
 
         setStorage('l', 'userGrupos', JSON.stringify(res.data))
         this.rows = res.data
-        User = this.rows
+        User.Grupos = this.rows
 
         if (res.data.length === 1) {
           this.select(res.data[0])
