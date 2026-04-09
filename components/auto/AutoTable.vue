@@ -434,7 +434,7 @@ async function executeAction() {
 
               <!-- PDF -->
               <q-item
-                v-if="canDo('pdf_'+model.toLowerCase()) && !isDeleted(props.row) || true"
+                v-if="canDo('pdf_'+model.toLowerCase()) && !isDeleted(props.row)"
                 clickable
                 @click="emit('pdf', props.row)"
               >

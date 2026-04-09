@@ -168,24 +168,6 @@ export const useUserStore = defineStore("user", {
       return rsp
     },
 
-    async getPermicoes () {
-      if (getStorage('l', 'userSucursal') !== null) {
-
-        const res = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/users/${this.data?.id}/userPermicoes/`, params: {} })
-        )
-
-        const perms = (res.data || [])
-          .map(p => p?.codename?.toLowerCase())
-          .filter(Boolean)
-
-        this.Permicoes = new Set(perms)
-        setStorage('l', 'userPermicoes', JSON.stringify(perms))
-
-        return res
-      }
-    },
-
     loadFromStorage () {
 
       this.Theme = JSONSafeParse(getStorage('l', 'entidadeTheme'))

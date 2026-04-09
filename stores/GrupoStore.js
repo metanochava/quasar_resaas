@@ -107,12 +107,31 @@ export const useGrupoStore = createBaseStore(
           url({ type: 'u', url: `api/django_resaas/users/${User.data?.id}/userPermicoes/` })
         )
 
-        this.rowPermicoes = new Set(
+        const rowPermicoes = new Set(
           (data || []).map(p => p.codename?.toLowerCase())
         )
-        User.Permicoes = this.rowPermicoes
+        User.Permicoes = rowPermicoes
 
+        setStorage('l', 'userPermicoes', JSON.stringify(User.Permicoes))
       }
+
+      // async getPermicoes () {
+      //   if (getStorage('l', 'userSucursal') !== null) {
+
+      //     const res = await HTTPAuth.get(
+      //       url({ type: 'u', url: `api/django_resaas/users/${this.data?.id}/userPermicoes/`, params: {} })
+      //     )
+
+      //     const perms = (res.data || [])
+      //       .map(p => p?.codename?.toLowerCase())
+      //       .filter(Boolean)
+
+      //     this.Permicoes = new Set(perms)
+      //     setStorage('l', 'userPermicoes', JSON.stringify(perms))
+
+      //     return res
+      //   }
+      // },
     }
   }
 )
