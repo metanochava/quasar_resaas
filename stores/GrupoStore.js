@@ -120,8 +120,8 @@ export const useGrupoStore = createBaseStore(
         const permArray = Array.from(rowPermicoes)
 
         console.log(permArray)
+        setStorage('l', 'userPermicoes', JSON.stringify(permArray))
 
-        setStorage('l', 'userPermicoes', permArray)
       }
 
       
