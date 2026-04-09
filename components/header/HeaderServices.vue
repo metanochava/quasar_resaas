@@ -12,7 +12,7 @@
                     style="height: 300px"
                   >
                     <div class="row col-xs-12"  >
-                      <div  v-for=" te in TipoEntidade?.TipoEntidades" :key="te">
+                      <div  v-for=" te in User.TipoEntidades" :key="te">
                         <q-item   v-close-popup   flat bordered   class="col-4 " v-if="getHostname(te)"  >
                           <q-item-label  clickable @click="selectteidadeLink(te)"  class="localhover">
                             <q-avatar class="" size="45px" style="border-radius:5px;" >
@@ -65,13 +65,9 @@ export default defineComponent({
   },
   async mounted () {
     await this.TipoEntidade.getTipoEntidades()
-          console.log("antes do loop")
-    this.TipoEntidade?.rows?.forEach(async tipoEntidade => {
-      console.log("no loop")
+    this.User.TipoEntidades?.forEach(async tipoEntidade => {
       await this.getHostname(tipoEntidade)
     })
-
-    console.log("montado o header Service")
   },
 
   methods: {
@@ -80,7 +76,6 @@ export default defineComponent({
     },
 
     async getHostname (tipoEnt) {
-      console.log("semmmmmm")
       let domain = ''
 
       if (this.isIP(window.location.hostname)){
@@ -97,10 +92,8 @@ export default defineComponent({
      
       if(domain){
         if (domain.toLocaleLowerCase() !== tipoEnt.nome.toLowerCase()) {
-          console.log(domain.toLocaleLowerCase(), tipoEnt.nome.toLowerCase(),  "diferente")
           return true
         } else {
-          console.log(domain.toLocaleLowerCase(), tipoEnt.nome.toLowerCase(),  "igual")
           this.User.TipoEntidade = tipoEnt
           this.TipoEntidade.row = tipoEnt
           await this.TipoEntidade.getLayoutSettings(tipoEnt?.id)
