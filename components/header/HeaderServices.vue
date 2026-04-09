@@ -65,7 +65,7 @@ export default defineComponent({
   },
   async mounted () {
     await this.TipoEntidade.getTipoEntidades()
-    this.TipoEntidade?.rows?.forEach(tipoEntidade => {
+    this.TipoEntidade?.rows?.forEach(async tipoEntidade => {
       await this.getHostname(tipoEntidade)
     })
   },
