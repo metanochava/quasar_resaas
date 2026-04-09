@@ -65,12 +65,11 @@ export default defineComponent({
   data() {
     return {}
   },
+  
   computed:{
-
     ps(){
       return this.User.ps || {}
     }
-
   },
 
   async mounted(){

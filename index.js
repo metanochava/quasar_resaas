@@ -1,4 +1,6 @@
 export * from './stores/UserStore.js'
+export * from './stores/useEntidadeStore.js'
+export * from './stores/useEntidadeStore.js'
 export * from './base/base_store.js'
 export * from './stores/MenuStore.js'
 export * from './stores/SettingsStore.js'
