@@ -364,7 +364,7 @@ export function setSettings(Theme, LayoutSettings, Typography, AnimationSettings
     🔤 TIPOGRAFIA
   ========================= */
 
-  const font = Typography.font_family.label || "Roboto"
+  const font = Typography?.font_family?.label || "Roboto"
 
   let link = document.getElementById("dynamic-theme-font")
 
