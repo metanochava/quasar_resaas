@@ -74,11 +74,11 @@ export const useTipoEntidadeStore = createBaseStore(
       },
 
       async getTipoEntidades(){
+        const User = useUserStore()
         await HTTPClient.get(url({type: "u", url: "api/django_resaas/tipoentidades", params: {}}) )
         .then(res => {
           this.rows = res.data
-        }).catch(err => {
-
+          User.TipoEntidades =  this.rows
         })
       },
     }

@@ -12,6 +12,7 @@ export const useUserStore = defineStore("user", {
   state: () => ({
     data: null,
     Idioma: {},
+    TipoEntidades: [],
     TipoEntidade: {},
     Entidades: [],
     Entidade: null,
