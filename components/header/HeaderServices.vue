@@ -66,7 +66,7 @@ export default defineComponent({
   async mounted () {
     await this.TipoEntidade.getTipoEntidades()
     this.TipoEntidade?.rows?.forEach(tipoEntidade => {
-      this.getHostname(tipoEntidade)
+      await this.getHostname(tipoEntidade)
     })
   },
 
@@ -88,15 +88,18 @@ export default defineComponent({
           domain = window.location.href.split('/')[2].split('.')[1]
         }
       }
-      console.log(domain.toLocaleLowerCase(), tipoEnt.nome.toLowerCase(),  tipoEnt)
+     
       if(domain){
         if (domain.toLocaleLowerCase() !== tipoEnt.nome.toLowerCase()) {
+          console.log(domain.toLocaleLowerCase(), tipoEnt.nome.toLowerCase(),  "diferente")
           return true
         } else {
           this.User.TipoEntidade = tipoEnt
           this.row = tipoEnt
           await this.TipoEntidade.getLayoutSettings(tipoEnt?.id)
           setStorage('l', 'tipoEntidade', JSON.stringify(this.User.TipoEntidade))
+          console.log(domain.toLocaleLowerCase(), tipoEnt.nome.toLowerCase(),  "igual")
+
           return false
         }
       }
