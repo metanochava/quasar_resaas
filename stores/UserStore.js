@@ -186,9 +186,8 @@ export const useUserStore = defineStore("user", {
       this.RightTop   = ('' + getStorage('l', 'right_top')).toLowerCase() === 'true'
       this.LeftTop   = ('' + getStorage('l', 'left_top')).toLowerCase() === 'true'
       const perms = JSONSafeParse(getStorage('l', 'userPermicoes'))
-      this.Permicoes = new Set(Array.isArray(perms) ? perms : [])
-
-
+      this.Permicoes = new Set(perms)
+      
     },
 
     async checkSession () {

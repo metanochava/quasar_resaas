@@ -115,6 +115,7 @@ export const useGrupoStore = createBaseStore(
         // 🔥 guardar no store (rápido para lookup)
         User.Permicoes = rowPermicoes
 
+        console.log(rowPermicoes)
         // 🔥 converter para array para storage
         const permArray = Array.from(rowPermicoes)
 
