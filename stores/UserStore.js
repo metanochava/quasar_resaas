@@ -188,8 +188,6 @@ export const useUserStore = defineStore("user", {
       const perms = JSONSafeParse(getStorage('l', 'userPermicoes'))
       this.Permicoes = new Set(perms)
 
-
-
     },
 
     async checkSession () {
