@@ -16,9 +16,6 @@ export const useTipoEntidadeStore = createBaseStore(
   {
 
     state: () => ({
-
-      Modelos: [],
-      Modulos: [],
       Theme: {},
       LayoutSettings: {},
       AnimationSettings: {},
@@ -76,23 +73,10 @@ export const useTipoEntidadeStore = createBaseStore(
         }
       },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
       async getTipoEntidades(){
         await HTTPClient.get(url({type: "u", url: "api/django_resaas/tipoentidades", params: {}}) )
         .then(res => {
-          this.TipoEntidades = res.data
+          this.rows = res.data
         }).catch(err => {
 
         })
