@@ -65,6 +65,7 @@ export default defineComponent({
   },
   async mounted () {
     await this.TipoEntidade.getTipoEntidades()
+          console.log("antes do loop")
     this.TipoEntidade?.rows?.forEach(async tipoEntidade => {
       console.log("no loop")
       await this.getHostname(tipoEntidade)
