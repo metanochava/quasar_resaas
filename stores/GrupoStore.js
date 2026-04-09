@@ -109,18 +109,14 @@ export const useGrupoStore = createBaseStore(
           url({ type: 'u', url: `api/django_resaas/users/${User.data?.id}/userPermicoes/` })
         )
 
-        // 🔥 criar Set para uso interno
-        const rowPermicoes = new Set((data || []).map(p => p.codename))
+        const Permicoes = (data || []).map(p => p.codename)
+  
+        User.Permicoes = new Set(Permicoes)
 
-        // 🔥 guardar no store (rápido para lookup)
-        User.Permicoes = rowPermicoes
+        console.log(User.Permicoes)
 
-        console.log(rowPermicoes)
-        // 🔥 converter para array para storage
-        const permArray = Array.from(rowPermicoes)
-
-        console.log(permArray)
-        setStorage('l', 'userPermicoes', JSON.stringify(permArray))
+        console.log(Permicoes)
+        setStorage('l', 'userPermicoes', JSON.stringify(Permicoes))
 
       }
 
