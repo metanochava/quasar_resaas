@@ -2,13 +2,14 @@
 <template>
 
     <FormSE
-      v-model="showForm"
       :schema="schema"
       :module="module"
       :model="model"
-      :data="selectedRow"
+
       :can-do="canDo"
       :ignoreFields="ignoreFields"
+      :data="selectedRow"
+      
       @saved="onSaved"
     />
     <!-- <FormPage :schema="schema" :module="module" :model="model" /> -->
@@ -35,7 +36,6 @@ const config = ref({})
 
 ignoreFields - ref(['created_at','updated_at', 'created_by', 'updated_by'])
 
-const showForm = ref(true)
 
 const selectedRow = ref(null)
 
@@ -58,7 +58,7 @@ async function init() {
 }
 
 async function onSaved() {
-  showForm.value = true
+
 }
 
 
