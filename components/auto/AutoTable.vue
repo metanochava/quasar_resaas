@@ -431,8 +431,8 @@ async function executeAction() {
 
 
     <!-- 🔥 ACTIONS -->
-    <template #body-cell-__actions="props">
-      <q-td :props="props">
+    <template #body-cell-__actions="slotProps">
+      <q-td :props="slotProps">
 
         <!-- BOTÃO 3 PONTOS -->
         <s-btn
@@ -447,9 +447,9 @@ async function executeAction() {
 
               <!-- PDF -->
               <q-item
-                v-if="canDo('pdf_'+model.toLowerCase()) && !isDeleted(props.row)"
+                v-if="canDo('pdf_'+model.toLowerCase()) && !isDeleted(slotProps.row)"
                 clickable
-                @click="emit('pdf', props.row)"
+                @click="emit('pdf', slotProps.row)"
               >
                 <q-item-section avatar>
                   <q-icon 
@@ -469,18 +469,18 @@ async function executeAction() {
 
               <!-- EDIT -->
               <q-item
-                v-if="canDo('change_'+model.toLowerCase()) && !isDeleted(props.row)"
+                v-if="canDo('change_'+model.toLowerCase()) && !isDeleted(slotProps.row)"
                 clickable
                 
               >
-                <q-item-section avatar @click="emit('edit', props.row)">
+                <q-item-section avatar @click="emit('edit', slotProps.row)">
                   <q-icon 
                     :name="actionStore.getAction('edit').icon"
                     :color="actionStore.getAction('edit').color"
                   />
                 </q-item-section>
 
-                <q-item-section>
+                <q-item-section @click="emit('edit', slotProps.row)">
                   {{ tdc(actionStore.getAction('edit').label) }}
                 </q-item-section>
 
@@ -490,7 +490,7 @@ async function executeAction() {
                     icon="open_in_new"
                     :to="{
                       name: props.config.routes.change,
-                      params: { id: props.row?.id }
+                      params: { id: slotProps.row?.id }
                     }"
                     @click.stop
                   />
@@ -505,7 +505,7 @@ async function executeAction() {
               
 
               <!-- DELETE -->
-              <q-item v-if="canDo('delete_'+model.toLowerCase()) && !isDeleted(props.row)" clickable @click="confirmAction('delete', props.row)">
+              <q-item v-if="canDo('delete_'+model.toLowerCase()) && !isDeleted(slotProps.row)" clickable @click="confirmAction('delete', slotProps.row)">
                 <q-item-section avatar>
                   <q-icon 
                     :name="actionStore.getAction('delete').icon"
@@ -523,7 +523,7 @@ async function executeAction() {
               </q-item>
 
               <!-- HARD DELETE -->
-              <q-item  v-if="canDo('hard_delete_'+model.toLowerCase()) && isDeleted(props.row)" clickable @click="confirmAction('hard_delete', props.row)">
+              <q-item  v-if="canDo('hard_delete_'+model.toLowerCase()) && isDeleted(slotProps.row)" clickable @click="confirmAction('hard_delete', slotProps.row)">
                 <q-item-section avatar>
                   <q-icon name="delete_forever" color="red" />
                 </q-item-section>
@@ -535,9 +535,9 @@ async function executeAction() {
 
               <!-- RESTORE -->
               <q-item
-                v-if="canDo('restore_'+model.toLowerCase()) && isDeleted(props.row)"
+                v-if="canDo('restore_'+model.toLowerCase()) && isDeleted(slotProps.row)"
                 clickable
-                 @click="emit('restore', props.row)"
+                 @click="emit('restore', slotProps.row)"
               >
                 <q-item-section avatar>
                   <q-icon name="restore" color="green" />
