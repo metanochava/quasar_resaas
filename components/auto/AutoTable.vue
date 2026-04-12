@@ -471,9 +471,9 @@ async function executeAction() {
               <q-item
                 v-if="canDo('change_'+model.toLowerCase()) && !isDeleted(props.row)"
                 clickable
-                @click="emit('edit', props.row)"
+                
               >
-                <q-item-section avatar>
+                <q-item-section avatar @click="emit('edit', props.row)">
                   <q-icon 
                     :name="actionStore.getAction('edit').icon"
                     :color="actionStore.getAction('edit').color"
@@ -484,8 +484,16 @@ async function executeAction() {
                   {{ tdc(actionStore.getAction('edit').label) }}
                 </q-item-section>
 
-                <q-item-section side v-show="props.config?.routes?.change || true">
-                  <s-btn icon="add" :to="{name:'props.config?.routes?.change', params: {id: props.row?.id} }"></s-btn>
+                <q-item-section side v-if="props.config?.routes?.change">
+                  <s-btn
+                    size="sm"
+                    icon="open_in_new"
+                    :to="{
+                      name: props.config.routes.change,
+                      params: { id: props.row?.id }
+                    }"
+                    @click.stop
+                  />
                 </q-item-section>
 
                 
