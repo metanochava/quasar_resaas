@@ -38,7 +38,6 @@ export default defineComponent({
 
     const User = useUserStore()
     return {
-      TipoEntidade,
       User,
       tdc
     }
