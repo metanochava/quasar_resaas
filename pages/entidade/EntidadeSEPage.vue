@@ -5,13 +5,19 @@
       :schema="schema"
       :module="module"
       :model="model"
+    />
+
+    <!-- <FormSE
+      :schema="schema"
+      :module="module"
+      :model="model"
 
       :can-do="canDo"
       :ignoreFields="ignoreFields"
       :data="selectedRow"
       
       @saved="onSaved"
-    />
+    /> -->
     <!-- <FormPage :schema="schema" :module="module" :model="model" /> -->
 
 </template>
