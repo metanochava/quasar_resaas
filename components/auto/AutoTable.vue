@@ -484,10 +484,17 @@ async function executeAction() {
                   {{ tdc(actionStore.getAction('edit').label) }}
                 </q-item-section>
 
+                <q-item-section side v-show="props.config?.routes?.change">
+                  <s-btn :to="{name:'props.config?.routes?.change', params: {id: props.row?.id} }"></s-btn>
+                </q-item-section>
+
+                
+
                 <q-tooltip>
                   {{ tdc(actionStore.getAction('edit').label) }}
                 </q-tooltip>
               </q-item>
+              
 
               <!-- DELETE -->
               <q-item v-if="canDo('delete_'+model.toLowerCase()) && !isDeleted(props.row)" clickable @click="confirmAction('delete', props.row)">
