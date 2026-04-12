@@ -1,74 +1,73 @@
-
 <template>
+  <div class="q-pa-md">
 
     <FormSE
       :schema="schema"
       :module="module"
       :model="model"
+      :can-do="canDo"
+      :ignore-fields="ignoreFields"
+      :data="selectedRow"
+      @saved="onSaved"
     />
 
-    <!-- <FormSE
-      :schema="schema"
-      :module="module"
-      :model="model"
-
-      :can-do="canDo"
-      :ignoreFields="ignoreFields"
-      :data="selectedRow"
-      
-      @saved="onSaved"
-    /> -->
-    <!-- <FormPage :schema="schema" :module="module" :model="model" /> -->
-
+  </div>
 </template>
+
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-
+import { ref, onMounted } from 'vue'
 import FormSE from './../../components/auto/FormSE.vue'
-
-// import { HTTPAuth, HTTPAuthBlob, url } from '../../boot/api'
 import { buildFormFromSchema } from '../../utils/autoForm'
 
-
-// --- state ---
-const module= ref("djnago_resaas")
-const model= ref("Entidade")
-can=""
-schemaPath= ref('fields')
+// ---------------- STATE ----------------
+const module = "django_resaas"
+const model = "entidade"
+const schemaPath = "fields"
 
 const schema = ref([])
 const actions = ref([])
 const config = ref({})
-
-ignoreFields - ref(['created_at','updated_at', 'created_by', 'updated_by'])
-
-
 const selectedRow = ref(null)
 
+const ignoreFields = ref([
+  'id',
+  'created_at',
+  'updated_at',
+  'created_by',
+  'updated_by'
+])
+
+// ---------------- PERMISSIONS ----------------
 function canDo(perm) {
   if (!perm) return true
-  // if (typeof props.can === 'function') return !!props.can(perm)
   return true
 }
 
+// ---------------- INIT ----------------
 async function init() {
-  const data = await buildFormFromSchema({
-    module: module,
-    model: model,
-    schemaPath: schemaPath,
-  })
-  schema.value = data.schema
-  actions.value = data.actions
-  config.value = data.config
+  try {
+    const data = await buildFormFromSchema({
+      module,
+      model,
+      schemaPath
+    })
 
+    schema.value = data.schema || []
+    actions.value = data.actions || []
+    config.value = data.config || {}
+
+  } catch (err) {
+    console.error('Erro ao carregar schema:', err)
+  }
 }
 
-async function onSaved() {
-
+// ---------------- EVENTS ----------------
+function onSaved() {
+  console.log('Salvo com sucesso')
 }
 
-
-onMounted(
+// ---------------- LIFECYCLE ----------------
+onMounted(async () => {
   await init()
-)
+})
 </script>
