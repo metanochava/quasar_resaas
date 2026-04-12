@@ -1,7 +1,7 @@
 
 <template>
 
-    <AutoForm
+    <FormSE
       v-model="showForm"
       :schema="schema"
       :module="module"
@@ -11,14 +11,15 @@
       :ignoreFields="ignoreFields"
       @saved="onSaved"
     />
+    <!-- <FormPage :schema="schema" :module="module" :model="model" /> -->
 
 </template>
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 
-import AutoForm from './../../components/auto/AutoForm.vue'
+import FormSE from './../../components/auto/FormSE.vue'
 
-import { HTTPAuth, HTTPAuthBlob, url } from '../../boot/api'
+// import { HTTPAuth, HTTPAuthBlob, url } from '../../boot/api'
 import { buildFormFromSchema } from '../../utils/autoForm'
 
 
