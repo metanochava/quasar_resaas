@@ -6,8 +6,6 @@ import { JSONSafeParse, setSettings } from '../boot/base'
 
 
 
-
-
 export const useUserStore = defineStore("user", {
   state: () => ({
     data: null,

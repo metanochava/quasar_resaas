@@ -168,7 +168,7 @@ function goToRoute(id) {
   } else {
     router.push({
       name: 'rota_inexistente',
-      params: { 'rota': props?.config.route, 'id': id }
+      params: { 'rota': props?.config.routes?.view, 'id': id }
     })
   }
 
@@ -415,6 +415,7 @@ async function executeAction() {
               v-show="canDo('add_' + model.toLowerCase())"
             />
 
+
             <s-btn 
               dense
               icon="add"
@@ -426,6 +427,7 @@ async function executeAction() {
         </div>
       </div>
     </template>
+
 
 
     <!-- 🔥 ACTIONS -->
