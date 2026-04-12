@@ -1,5 +1,5 @@
 <script setup>
-import FormEngine from 'components/FormEngine.vue'
+import FormEngine from './FormEngine.vue'
 
 const props = defineProps({
   schema: Array,
