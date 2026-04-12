@@ -390,11 +390,11 @@ async function executeAction() {
             label="Colunas"
           />
 
-          <s-btn v-if="show_filter" dense flat icon="filter_list" @click="emit('filter')" />
-          <s-btn v-if="show_filter" dense flat icon="refresh" @click="emit('refresh')" />
-          <s-btn v-if="show_filter" dense flat icon="download" @click="exportCSV" />
+          <s-btn v-if="show_filter" size="sm" dense flat icon="filter_list" @click="emit('filter')" />
+          <s-btn v-if="show_filter" size="sm" dense flat icon="refresh" @click="emit('refresh')" />
+          <s-btn v-if="show_filter" size="sm" dense flat icon="download" @click="exportCSV" />
 
-          <s-btn  flat dense :icon="show_filter? 'arrow_forward' : 'arrow_back'"  @click=" show_filter = !show_filter" >
+          <s-btn size="sm" flat dense :icon="show_filter? 'arrow_forward' : 'arrow_back'"  @click=" show_filter = !show_filter" >
             <q-tooltip>{{tdc('Mostar Filtros')}} </q-tooltip>
           </s-btn>
 
@@ -408,6 +408,7 @@ async function executeAction() {
 
           <q-btn-group >
             <s-btn
+              size="sm" 
               dense
               icon="add"
               color="primary"
@@ -417,6 +418,7 @@ async function executeAction() {
 
 
             <s-btn 
+             size="sm" 
               dense
               icon="open_in_new"
               color="secondary"
@@ -436,6 +438,7 @@ async function executeAction() {
 
         <!-- BOTÃO 3 PONTOS -->
         <s-btn
+          size="sm" 
           dense
           flat
           round
@@ -486,9 +489,10 @@ async function executeAction() {
 
                 <q-item-section side v-if="props.config?.routes?.change">
                   <s-btn
+                    
                     flat
                     size="sm"
-                    icon=""
+                    icon="open_in_new"
                     :to="{
                       name: props.config.routes.change,
                       params: { id: slotRow.row?.id }
