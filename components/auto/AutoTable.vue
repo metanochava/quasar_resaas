@@ -418,7 +418,7 @@ async function executeAction() {
 
             <s-btn 
               dense
-              icon="add"
+              icon="open_in_new"
               color="secondary"
               :to="{ name: props.config?.routes?.add }"
               v-show="canDo('add_' + model.toLowerCase()) && props.config?.routes?.add"
@@ -431,8 +431,8 @@ async function executeAction() {
 
 
     <!-- 🔥 ACTIONS -->
-    <template #body-cell-__actions="slotProps">
-      <q-td :props="slotProps">
+    <template #body-cell-__actions="slotRow">
+      <q-td :props="slotRow">
 
         <!-- BOTÃO 3 PONTOS -->
         <s-btn
@@ -447,9 +447,9 @@ async function executeAction() {
 
               <!-- PDF -->
               <q-item
-                v-if="canDo('pdf_'+model.toLowerCase()) && !isDeleted(slotProps.row)"
+                v-if="canDo('pdf_'+model.toLowerCase()) && !isDeleted(slotRow.row)"
                 clickable
-                @click="emit('pdf', slotProps.row)"
+                @click="emit('pdf', slotRow.row)"
               >
                 <q-item-section avatar>
                   <q-icon 
@@ -469,28 +469,29 @@ async function executeAction() {
 
               <!-- EDIT -->
               <q-item
-                v-if="canDo('change_'+model.toLowerCase()) && !isDeleted(slotProps.row)"
+                v-if="canDo('change_'+model.toLowerCase()) && !isDeleted(slotRow.row)"
                 clickable
                 
               >
-                <q-item-section avatar @click="emit('edit', slotProps.row)">
+                <q-item-section avatar @click="emit('edit', slotRow.row)">
                   <q-icon 
                     :name="actionStore.getAction('edit').icon"
                     :color="actionStore.getAction('edit').color"
                   />
                 </q-item-section>
 
-                <q-item-section @click="emit('edit', slotProps.row)">
+                <q-item-section @click="emit('edit', slotRow.row)">
                   {{ tdc(actionStore.getAction('edit').label) }}
                 </q-item-section>
 
                 <q-item-section side v-if="props.config?.routes?.change">
                   <s-btn
+                    flat
                     size="sm"
-                    icon="open_in_new"
+                    icon=""
                     :to="{
                       name: props.config.routes.change,
-                      params: { id: slotProps.row?.id }
+                      params: { id: slotRow.row?.id }
                     }"
                     @click.stop
                   />
@@ -505,7 +506,7 @@ async function executeAction() {
               
 
               <!-- DELETE -->
-              <q-item v-if="canDo('delete_'+model.toLowerCase()) && !isDeleted(slotProps.row)" clickable @click="confirmAction('delete', slotProps.row)">
+              <q-item v-if="canDo('delete_'+model.toLowerCase()) && !isDeleted(slotRow.row)" clickable @click="confirmAction('delete', slotRow.row)">
                 <q-item-section avatar>
                   <q-icon 
                     :name="actionStore.getAction('delete').icon"
@@ -523,7 +524,7 @@ async function executeAction() {
               </q-item>
 
               <!-- HARD DELETE -->
-              <q-item  v-if="canDo('hard_delete_'+model.toLowerCase()) && isDeleted(slotProps.row)" clickable @click="confirmAction('hard_delete', slotProps.row)">
+              <q-item  v-if="canDo('hard_delete_'+model.toLowerCase()) && isDeleted(slotRow.row)" clickable @click="confirmAction('hard_delete', slotRow.row)">
                 <q-item-section avatar>
                   <q-icon name="delete_forever" color="red" />
                 </q-item-section>
@@ -535,9 +536,9 @@ async function executeAction() {
 
               <!-- RESTORE -->
               <q-item
-                v-if="canDo('restore_'+model.toLowerCase()) && isDeleted(slotProps.row)"
+                v-if="canDo('restore_'+model.toLowerCase()) && isDeleted(slotRow.row)"
                 clickable
-                 @click="emit('restore', slotProps.row)"
+                 @click="emit('restore', slotRow.row)"
               >
                 <q-item-section avatar>
                   <q-icon name="restore" color="green" />
