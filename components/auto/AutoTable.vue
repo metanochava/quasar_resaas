@@ -158,11 +158,11 @@ function isDeleted(x) {
 }
 
 function goToRoute(id) {
-  if (!props.config?.route) return
+  if (!props.config?.routes?.view) return
   
-  if (router.hasRoute(props.config?.route)) {
+  if (router.hasRoute(props.config?.routes?.view)) {
     router.push({
-      name: props?.config.route,
+      name: props?.config.routes.view,
       params: { id }
     })
   } else {
@@ -405,13 +405,24 @@ async function executeAction() {
             :label="tdc('Search')"
             @keyup.enter="emit('search', search)"
           />
-          <s-btn
-            dense
-            icon="add"
-            color="primary"
-            @click="emit('create')"
-            v-show="canDo('add_' + model.toLowerCase())"
-          />
+
+          <q-btn-group >
+            <s-btn
+              dense
+              icon="add"
+              color="primary"
+              @click="emit('create')"
+              v-show="canDo('add_' + model.toLowerCase())"
+            />
+
+            <s-btn 
+              dense
+              icon="add"
+              color="secondary"
+              :to="{ name: props.config?.routes?.add }"
+              v-show="canDo('add_' + model.toLowerCase()) && props.config?.routes?.add"
+            />
+          </q-btn-group>
         </div>
       </div>
     </template>
