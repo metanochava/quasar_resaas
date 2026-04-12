@@ -484,8 +484,8 @@ async function executeAction() {
                   {{ tdc(actionStore.getAction('edit').label) }}
                 </q-item-section>
 
-                <q-item-section side v-show="props.config?.routes?.change">
-                  <s-btn :to="{name:'props.config?.routes?.change', params: {id: props.row?.id} }"></s-btn>
+                <q-item-section side v-show="props.config?.routes?.change || true">
+                  <s-btn icon="add" :to="{name:'props.config?.routes?.change', params: {id: props.row?.id} }"></s-btn>
                 </q-item-section>
 
                 
