@@ -37,8 +37,21 @@
     />
 
 
-
+<!-- 
     <AutoForm
+      v-model="showForm"
+      :schema="schema"
+      :module="module"
+      :model="model"
+      :data="selectedRow"
+      :can-do="canDo"
+      :ignoreFields="ignoreFields"
+
+      @saved="onSaved"
+    /> -->
+
+
+    <FormModal
       v-model="showForm"
       :schema="schema"
       :module="module"
@@ -66,6 +79,7 @@ import { ref, computed, watch } from 'vue'
 import { debounce } from 'quasar'
 import AutoTable from './AutoTable.vue'
 import AutoForm from './AutoForm.vue'
+import FormModal from './FormModal.vue'
 import AutoFilter from './AutoFilter.vue'
 
 import PdfRender from './../PdfRender.vue'

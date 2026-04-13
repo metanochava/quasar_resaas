@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import FormEngine from '../engine/FormEngine.vue'
+import Form from '../engine/FormComponent.vue'
 
 const formRef = ref(null)
 
@@ -16,7 +16,7 @@ function save() {
       {{ data?.id ? 'Editar' : 'Novo' }}
     </div>
 
-    <FormEngine
+    <Form
       ref="formRef"
       v-bind="props"
       @saved="$router.back()"

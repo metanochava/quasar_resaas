@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import FormEngine from '../engine/FormEngine.vue'
+import Form from '../engine/FormComponent.vue'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -21,7 +21,7 @@ function close() {
 
 <template>
   <q-dialog v-model="open">
-    <FormEngine
+    <Form
       v-bind="props"
       @saved="() => { emit('saved'); close() }"
     />
