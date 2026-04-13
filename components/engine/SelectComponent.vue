@@ -8,6 +8,11 @@
     use-input
     input-debounce="300"
 
+    option-label="label"
+    option-value="id"
+    emit-value
+    map-options
+
     :options="optionsList"
     :loading="loading"
 
@@ -27,6 +32,7 @@
     @filter="onFilter"
 
     @virtual-scroll="onScroll"
+    
   >
     <slot/>
   </q-select>
