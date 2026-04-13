@@ -1,12 +1,12 @@
 <script setup>
-import FormEngine from './FormEngine.vue'
+import { ref } from 'vue'
+import FormEngine from '../engine/FormEngine.vue'
 
-const props = defineProps({
-  schema: Array,
-  data: Object,
-  module: String,
-  model: String
-})
+const formRef = ref(null)
+
+function save() {
+  formRef.value?.save()
+}
 </script>
 
 <template>
@@ -17,8 +17,15 @@ const props = defineProps({
     </div>
 
     <FormEngine
+      ref="formRef"
       v-bind="props"
       @saved="$router.back()"
+    />
+
+    <q-btn
+      color="primary"
+      label="Salvar"
+      @click="save"
     />
 
   </div>

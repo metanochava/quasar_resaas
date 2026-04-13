@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import FormEngine from './FormEngine.vue'
+import FormEngine from '../engine/FormEngine.vue'
 
 const props = defineProps({
   modelValue: Boolean,
