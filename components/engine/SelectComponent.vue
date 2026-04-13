@@ -8,10 +8,7 @@
     use-input
     input-debounce="300"
 
-    option-label="label"
-    option-value="id"
-    emit-value
-    map-options
+ 
 
     :options="optionsList"
     :loading="loading"
@@ -103,7 +100,7 @@ export default defineComponent({
     })
 
     watch(()=>props.modelValue,(v)=>{
-      localValue.value=v
+      localValue.value = v
     })
 
     // --------------------------

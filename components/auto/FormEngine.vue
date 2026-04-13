@@ -37,14 +37,53 @@ watch(() => props.data, v => {
   form.value = v ? { ...v } : {}
 }, { immediate: true })
 
+function normalizeValue(v) {
+  // 🔥 FILE
+  if (v instanceof File) return v
+
+  // 🔥 RELAÇÃO {id,label,value}
+  if (v && typeof v === 'object') {
+    // FK
+    if ('id' in v) return v.id
+
+    // CHOICE
+    if ('value' in v) return v.value
+  }
+
+  // 🔥 ARRAY (M2M)
+  if (Array.isArray(v)) {
+    return v.map(x => {
+      if (x && typeof x === 'object') {
+        if ('id' in x) return x.id
+        if ('value' in x) return x.value
+      }
+      return x
+    })
+  }
+
+  return v
+}
+
 function buildPayload() {
   const fd = new FormData()
 
   for (const [k, v] of Object.entries(form.value)) {
     if (v == null) continue
-    if (v instanceof File) fd.append(k, v)
-    else if (typeof v === 'object') fd.append(k, JSON.stringify(v))
-    else fd.append(k, v)
+
+    const val = normalizeValue(v)
+
+    // FILE
+    if (val instanceof File) {
+      fd.append(k, val)
+
+    // ARRAY (M2M)
+    } else if (Array.isArray(val)) {
+      val.forEach(x => fd.append(k, x))
+
+    // PRIMITIVO
+    } else {
+      fd.append(k, val)
+    }
   }
 
   return fd
@@ -86,7 +125,7 @@ async function save() {
       </div>
 
       <div v-for="f in relationFields" :key="f.name" class="col-6">
-        <component :is="componentMap[f.component] || f.component" v-model="form[f.name]" v-bind="f.props" />
+        <component :is="componentMap[f.component] || f.component" v-model="form[f.name]" v-bind="f.props"  />
       </div>
 
       <div v-for="f in fileFields" :key="f.name" class="col-6">
