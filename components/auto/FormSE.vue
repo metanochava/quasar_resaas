@@ -2,6 +2,16 @@
 import { ref } from 'vue'
 import Form from '../engine/FormComponent.vue'
 
+const props = defineProps({
+  schema: { type: Array, default: () => [] },
+  module: { type: String, required: true },
+  model: { type: String, required: true },
+  data: { type: Object, default: null },
+
+  canDo: { type: Function, default: null },
+  ignoreFields: { type: Array, default: () => [] }
+})
+
 const formRef = ref(null)
 
 function save() {
@@ -18,7 +28,13 @@ function save() {
 
     <Form
       ref="formRef"
-      v-bind="props"
+      :schema="schema"
+      :module="module"
+      :model="model"
+      :data="data"
+      :can-do="canDo"
+      :ignore-fields="ignoreFields"
+
       @saved="$router.back()"
     />
 
