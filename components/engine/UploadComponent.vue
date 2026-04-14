@@ -1,5 +1,5 @@
 <template>
-  <s-file
+  <q-file
     v-model="localValue"
     v-bind="attrs"
     :label="translatedLabel"
