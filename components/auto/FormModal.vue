@@ -37,7 +37,7 @@ function save() {
     <s-card style="min-width: 760px; max-width: 92vw;">
       {{ formRef }} || 
 
-      {{ formRef.value.form }}
+      {{ formRef }}
       
       <q-bar class="row items-center justify-between bg-primary text-white">
         <div class="text-h6">
