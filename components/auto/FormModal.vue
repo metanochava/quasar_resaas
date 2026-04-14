@@ -35,8 +35,6 @@ function save() {
 <template>
   <q-dialog v-model="open">
     <s-card style="min-width: 760px; max-width: 92vw;">
-      {{ formRef?.form }}
-      
       <q-bar class="row items-center justify-between bg-primary text-white">
         <div class="text-h6">
           {{ data?.id ? 'Editar' : 'Novo' }}
@@ -52,7 +50,7 @@ function save() {
         <q-spinner />
       </q-card-section>
 
-      <q-card-section v-else class="row q-col-gutter-sm">
+      <q-card-section v-else class=" q-col-gutter-sm">
         <Form
           ref="formRef"
           :schema="schema"

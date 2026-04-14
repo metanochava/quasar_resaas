@@ -45,17 +45,91 @@ const fileFields = computed(() =>
   )
 )
 
-// ---------------- WATCH DATA ----------------
+// ---------------- WATCH ----------------
 watch(() => props.data, v => {
   form.value = v ? { ...v } : {}
 }, { immediate: true })
 
+// ---------------- RULES ----------------
+function resolveRules(rules = []) {
+  return rules.map(r => {
+    switch (r.type) {
+      case 'required':
+        return val => !!val || r.message
+      case 'min_length':
+        return val => !val || val.length >= r.value || r.message
+      case 'max_length':
+        return val => !val || val.length <= r.value || r.message
+      case 'min':
+        return val => val == null || val >= r.value || r.message
+      case 'max':
+        return val => val == null || val <= r.value || r.message
+      case 'email':
+        return val =>
+          !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || r.message
+      default:
+        return () => true
+    }
+  })
+}
+
+// ---------------- PREVIEW ENGINE ----------------
+function getPreview(f, value) {
+  if (!value) return null
+
+  let src = value
+  let name = ''
+
+  if (value instanceof File) {
+    src = URL.createObjectURL(value)
+    name = value.name
+  } else if (typeof value === 'string') {
+    src = value
+    name = value
+  }
+
+  const lower = name.toLowerCase()
+
+  if (f.ui?.isImage || /\.(png|jpg|jpeg|gif|svg|webp)$/.test(lower)) {
+    return { type: 'image', src }
+  }
+
+  if (/\.pdf$/.test(lower)) {
+    return { type: 'pdf', src }
+  }
+
+  if (/\.(mp4|webm|ogg)$/.test(lower)) {
+    return { type: 'video', src }
+  }
+
+  if (/\.(mp3|wav|ogg)$/.test(lower)) {
+    return { type: 'audio', src }
+  }
+
+  if (/\.json$/.test(lower)) {
+    return { type: 'json', src }
+  }
+
+  if (/\.(txt|log|md)$/.test(lower)) {
+    return { type: 'text', src }
+  }
+
+  if (f.ui?.isRichText) {
+    return { type: 'html', content: value }
+  }
+
+  return { type: 'file', name }
+}
+
+// 🔥 helper correto (resolve erro do "as p")
+function previewOf(f) {
+  return getPreview(f, form.value[f.name])
+}
+
 // ---------------- NORMALIZE ----------------
 function normalizeValue(v) {
-  // FILE
   if (v instanceof File) return v
 
-  // ARRAY (M2M)
   if (Array.isArray(v)) {
     return v.map(x => {
       if (x && typeof x === 'object') {
@@ -66,7 +140,6 @@ function normalizeValue(v) {
     })
   }
 
-  // RELAÇÃO / CHOICE
   if (v && typeof v === 'object') {
     if ('value' in v) return v.value
     if ('id' in v) return v.id
@@ -75,41 +148,34 @@ function normalizeValue(v) {
   return v
 }
 
-// ---------------- DETECT FILE ----------------
+// ---------------- FILE DETECT ----------------
 function hasFiles() {
   return Object.values(form.value).some(v => v instanceof File)
 }
 
-// ---------------- BUILD PAYLOAD ----------------
+// ---------------- PAYLOAD ----------------
 function buildPayload() {
   const useFormData = hasFiles()
 
-  // JSON
   if (!useFormData) {
     const data = {}
-
     for (const [k, v] of Object.entries(form.value)) {
       if (v == null) continue
       data[k] = normalizeValue(v)
     }
-
     return { data, config: {} }
   }
 
-  // FORM DATA
   const fd = new FormData()
 
   for (const [k, v] of Object.entries(form.value)) {
     if (v == null) continue
-
     const val = normalizeValue(v)
 
     if (val instanceof File) {
       fd.append(k, val)
-
     } else if (Array.isArray(val)) {
       val.forEach(x => fd.append(k, x))
-
     } else {
       fd.append(k, val)
     }
@@ -128,7 +194,7 @@ function buildPayload() {
   }
 }
 
-// ---------------- SAVE (EXPOSTO) ----------------
+// ---------------- SAVE ----------------
 async function save() {
   saving.value = true
   uploadProgress.value = 0
@@ -158,7 +224,7 @@ async function save() {
   }
 }
 
-// 🔥 EXPOR PARA O PAI CONTROLAR
+// ---------------- EXPOSE ----------------
 defineExpose({
   save,
   form,
@@ -168,35 +234,85 @@ defineExpose({
 
 <template>
   <q-card flat bordered>
-
-    <!-- BODY -->
     <q-card-section class="row q-col-gutter-sm">
 
-      <!-- NORMAL -->
-      <div v-for="f in generalFields" :key="f.name" class="col-6">
-        <component
-          :is="componentMap[f.component] || f.component"
-          v-model="form[f.name]"
-          v-bind="f.props"
-        />
-      </div>
+      <!-- NORMAL + RELATION -->
+      <div
+        v-for="f in [...generalFields, ...relationFields]"
+        :key="f.name"
+        class="col-6"
+      >
 
-      <!-- RELAÇÕES -->
-      <div v-for="f in relationFields" :key="f.name" class="col-6">
+        <!-- PREVIEW -->
+        <template v-if="previewOf(f)">
+          <q-img
+            v-if="previewOf(f).type === 'image'"
+            :src="previewOf(f).src"
+            style="max-width:120px; margin-bottom:8px"
+          />
+
+          <iframe
+            v-else-if="previewOf(f).type === 'pdf'"
+            :src="previewOf(f).src"
+            style="width:100%; height:200px"
+          />
+
+          <video
+            v-else-if="previewOf(f).type === 'video'"
+            :src="previewOf(f).src"
+            controls
+          />
+
+          <audio
+            v-else-if="previewOf(f).type === 'audio'"
+            :src="previewOf(f).src"
+            controls
+          />
+
+          <div
+            v-else-if="previewOf(f).type === 'html'"
+            v-html="previewOf(f).content"
+          />
+
+          <pre v-else-if="previewOf(f).type === 'json'">
+            {{ previewOf(f).src }}
+          </pre>
+
+          <pre v-else-if="previewOf(f).type === 'text'">
+            {{ previewOf(f).src }}
+          </pre>
+
+          <div v-else>
+            📁 {{ previewOf(f).name }}
+          </div>
+        </template>
+
+        <!-- INPUT -->
         <component
-          :is="componentMap[f.component] || f.component"
+          :is="componentMap[f.component] || f.component || 'q-input'"
           v-model="form[f.name]"
           v-bind="f.props"
+          :rules="resolveRules(f.rules)"
         />
+
       </div>
 
       <!-- FILE -->
       <div v-for="f in fileFields" :key="f.name" class="col-6">
+
+        <template v-if="previewOf(f)">
+          <q-img v-if="previewOf(f).type === 'image'" :src="previewOf(f).src" style="max-width:120px" />
+          <iframe v-else-if="previewOf(f).type === 'pdf'" :src="previewOf(f).src" style="width:100%; height:200px" />
+          <div v-else>📁 {{ previewOf(f).name }}</div>
+        </template>
+
         <component
-          :is="componentMap[f.component] || f.component"
+          :is="componentMap[f.component] || f.component || 'q-input'"
           v-model="form[f.name]"
           v-bind="f.props"
+          :rules="resolveRules(f.rules)"
         />
+
       </div>
 
       <!-- PROGRESS -->
@@ -206,6 +322,5 @@ defineExpose({
       />
 
     </q-card-section>
-
   </q-card>
 </template>
