@@ -35,6 +35,9 @@ function save() {
 <template>
   <q-dialog v-model="open">
     <s-card style="min-width: 760px; max-width: 92vw;">
+      {{ formRef.form }} || 
+
+      {{ formRef.value.form }}
       
       <q-bar class="row items-center justify-between bg-primary text-white">
         <div class="text-h6">
