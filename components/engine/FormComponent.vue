@@ -249,10 +249,28 @@ defineExpose({
   <q-card flat>
     <q-card-section class="row ">
 
-      <!-- NORMAL + RELATION -->
+      <!-- NORMAL  -->
       <div class="row col-12 q-col-gutter-sm">
         <div
-          v-for="f in [...generalFields, ...relationFields]"
+          v-for="f in [...generalFields]"
+          :key="f.name"
+          class="col-md-4 col-sm-6 col-xs-12"
+        >
+          <component
+            :is="f.component"
+            v-model="form[f.name]"
+            v-bind="f.props"
+            :rules="resolveRules(f.rules)"
+          />
+        </div>
+      </div>
+
+      <q-separator class="q-my-md"  color="primary" />
+
+            <!-- RELATION -->
+      <div class="row col-12 q-col-gutter-sm">
+        <div
+          v-for="f in [...relationFields]"
           :key="f.name"
           class="col-md-4 col-sm-6 col-xs-12"
         >
@@ -265,7 +283,8 @@ defineExpose({
         </div>
       </div>
       
-
+      <q-separator class="q-my-md"  color="primary" />
+      
       <!-- FILE -->
       <div class="row col-12 q-col-gutter-sm">
         <div v-for="f in fileFields" :key="f.name" class="col-md-4 col-sm-6 col-xs-12">
