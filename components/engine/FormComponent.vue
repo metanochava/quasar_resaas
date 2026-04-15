@@ -258,7 +258,7 @@ defineExpose({
       >
       {{ f.component }} ||  {{ componentMap[f.component] }}
         <component
-          :is="componentMap[f.component] || f.component"
+          :is="f.component"
           v-model="form[f.name]"
           v-bind="f.props"
           :rules="resolveRules(f.rules)"
@@ -289,7 +289,7 @@ defineExpose({
 
         <!-- INPUT -->
         <component
-          :is="componentMap[f.component] || f.component"
+          :is=" f.component"
           v-model="form[f.name]"
           v-bind="f.props"
           :rules="resolveRules(f.rules)"
