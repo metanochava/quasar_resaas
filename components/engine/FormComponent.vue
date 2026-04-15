@@ -247,10 +247,10 @@ defineExpose({
 
 <template>
   <q-card flat>
-    <q-card-section class="row q-col-gutter-sm">
+    <q-card-section class="row ">
 
       <!-- NORMAL + RELATION -->
-      <div class="row col-12">
+      <div class="row col-12 q-col-gutter-sm">
         <div
           v-for="f in [...generalFields, ...relationFields]"
           :key="f.name"
@@ -267,7 +267,7 @@ defineExpose({
       
 
       <!-- FILE -->
-      <div class="row col-12">
+      <div class="row col-12 q-col-gutter-sm">
         <div v-for="f in fileFields" :key="f.name" class="col-md-4 col-sm-6 col-xs-12">
 
           <!-- PREVIEW -->
