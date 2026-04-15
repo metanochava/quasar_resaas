@@ -256,10 +256,10 @@ defineExpose({
       <div
         v-for="f in [...generalFields, ...relationFields]"
         :key="f.name"
-        class="col-6"
+        class="col-md-4 col-sm-6 col-xs-12"
       >
         <component
-          :is="componentMap[f.component] || f.component || 'q-input'"
+          :is="componentMap[f.component] || f.component "
           v-model="form[f.name]"
           v-bind="f.props"
           :rules="resolveRules(f.rules)"
@@ -267,7 +267,7 @@ defineExpose({
       </div>
 
       <!-- FILE -->
-      <div v-for="f in fileFields" :key="f.name" class="col-6">
+      <div v-for="f in fileFields" :key="f.name" class="col-md-4 col-sm-6 col-xs-12">
 
         <!-- PREVIEW -->
         <template v-if="previewOf(f)">
@@ -290,7 +290,7 @@ defineExpose({
 
         <!-- INPUT -->
         <component
-          :is="componentMap[f.component] || f.component || 'q-input'"
+          :is="componentMap[f.component] || f.component "
           v-model="form[f.name]"
           v-bind="f.props"
           :rules="resolveRules(f.rules)"
