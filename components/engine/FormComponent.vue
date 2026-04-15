@@ -267,7 +267,7 @@ defineExpose({
 
       <q-separator class="q-my-md"  color="primary" />
 
-            <!-- RELATION -->
+      <!-- RELATION -->
       <div class="row col-12 q-col-gutter-sm">
         <div
           v-for="f in [...relationFields]"
@@ -302,10 +302,6 @@ defineExpose({
               :src="previewOf(f).src"
               style="width:100%; height:200px; margin-bottom:8px"
             />
-
-            <div v-else>
-              📁 {{ previewOf(f).name }}
-            </div>
           </template> 
 
           <!-- INPUT -->
