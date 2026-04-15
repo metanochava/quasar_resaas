@@ -96,13 +96,27 @@ function getPreview(f, value) {
 
   // 🔥 Objeto vindo do backend
   if (typeof value === 'object' && value.url) {
+
+    let safeUrl = value.url.replace('http://', 'https://')
+
     if (value.mime_type?.startsWith('image')) {
-      return { type: 'image', src: value.url }
+      return {
+        type: 'image',
+        src: safeUrl
+      }
     }
+
     if (value.mime_type === 'application/pdf') {
-      return { type: 'pdf', src: value.url }
+      return {
+        type: 'pdf',
+        src: safeUrl
+      }
     }
-    return { type: 'file', name: value.name }
+
+    return {
+      type: 'file',
+      name: value.name
+    }
   }
 
   return null
