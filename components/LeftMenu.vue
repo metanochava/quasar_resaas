@@ -13,11 +13,6 @@
       >
         <q-menu fit>
           <q-list dense>
-            <q-item clickable v-close-popup  @click="User.selectGrupo({id:'1', name:'Hóspede'})"  >
-              <q-item-section>
-                <q-item-label overline> {{tdc('Hóspede')}}</q-item-label>
-              </q-item-section>
-            </q-item>
             <q-item v-for="grupo in User.Grupos" :key="grupo.id" clickable @click="User.selectGroup(grupo)">
               <q-item-section>{{ grupo.name }}</q-item-section>
             </q-item>

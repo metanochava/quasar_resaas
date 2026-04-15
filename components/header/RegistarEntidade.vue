@@ -90,17 +90,6 @@
             <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(perfilSplint(User?.Grupo?.name)) " style="width: 100%; border-color: transparent;">
               <q-menu fit>
                 <q-list dense   class="rounded-borders" style="min-width: 100px" >
-                  <q-item clickable v-close-popup v-if="'domain'=='domain'" @click="selectGroup({id:'1', name:'Hóspede'})"  >
-                    <q-item-section>
-                      <q-item-label overline> {{tdc('Hóspede')}}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item clickable v-close-popup v-else @click="selectGroup({id:'1', name:'Hóspede'})"  >
-                    <q-item-section>
-                      <q-item-label overline> {{tdc('Hóspede')}}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-
                   <q-item clickable v-close-popup @click="selectGroup(grupo)" v-ripple v-for=" grupo in User.Grupos" :key="grupo.id">
                     <q-item-section>
                       <q-item-label overline> {{ tdc(perfilSplint(grupo.name))}}</q-item-label>
@@ -122,7 +111,7 @@
         </q-menu>
       </q-avatar>
       <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'" v-if="User">{{User?.username }} </q-tooltip>
-      <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'" v-else>{{tdc('Hóspede')}}</q-tooltip>
+      <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'" v-else>{{tdc(User?.Grupo?.name)}}</q-tooltip>
     </s-btn>
   </div>
 </template>
