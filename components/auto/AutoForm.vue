@@ -4,7 +4,7 @@
 import { ref, watch, computed } from 'vue'
 import { tdc } from '../../boot/base'
 import { HTTPAuth, url } from '../../boot/api'
-import { componentMap } from '../../boot/component_map'
+
 
 
 // ---------------- PROPS ----------------
@@ -167,7 +167,7 @@ async function save() {
         
         <div v-for="f in generalFields" :key="f.name" class="col-6">
               <component
-                :is="componentMap[f.component] || f.component"
+                :is=" f.component"
                 v-model="form[f.name]"
                 v-bind="f.props"
                 dense
@@ -177,7 +177,7 @@ async function save() {
             <div v-for="f in relationFields" :key="f.name" class="col-6">
               <component
 
-                :is="componentMap[f.component] || f.component"
+                :is=" f.component"
                 v-model="form[f.name]"
                 v-bind="f.props"
                 dense
@@ -194,7 +194,7 @@ async function save() {
               />
 
               <component
-                :is="componentMap[f.component] || f.component"
+                :is=" f.component"
                 v-model="form[f.name]"
                 v-bind="f.props"
                 dense

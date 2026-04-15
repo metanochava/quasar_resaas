@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { HTTPAuth, url } from '../../boot/api'
-import { componentMap } from '../../boot/component_map'
+
 
 // ---------------- PROPS ----------------
 const props = defineProps({
@@ -247,7 +247,6 @@ defineExpose({
 
 <template>
   <q-card flat>
-    {{ componentMap }}
     <q-card-section class="row q-col-gutter-sm">
 
       <!-- NORMAL + RELATION -->
@@ -256,7 +255,6 @@ defineExpose({
         :key="f.name"
         class="col-md-4 col-sm-6 col-xs-12"
       >
-      {{ f.component }} ||  {{ componentMap[f.component] }}
         <component
           :is="f.component"
           v-model="form[f.name]"
@@ -285,7 +283,7 @@ defineExpose({
           <div v-else>
             📁 {{ previewOf(f).name }}
           </div>
-        </template>
+        </template> 
 
         <!-- INPUT -->
         <component

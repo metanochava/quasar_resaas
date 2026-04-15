@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { componentMap } from '../../boot/component_map'
 
 // ---------------- PROPS ----------------
 const props = defineProps({
@@ -101,7 +100,7 @@ function apply() {
 
         <div v-for="f in basicFields" :key="f.name" class="col-4">
               <component
-                :is="componentMap[f.component] || f.component"
+                :is="f.component"
                 v-model="filters[f.name]"
                 v-bind="f.props"
                 :label="f.label"
@@ -112,7 +111,7 @@ function apply() {
 
             <div v-for="f in advancedFields" :key="f.name" class="col-4">
               <component
-                :is="componentMap[f.component] || f.component"
+                :is=" f.component"
                 v-model="filters[f.name]"
                 v-bind="f.props"
                 :label="f.label"
