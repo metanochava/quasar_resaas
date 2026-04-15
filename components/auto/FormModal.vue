@@ -33,12 +33,17 @@ function save() {
 </script>
 
 <template>
-  <q-dialog v-model="open">
-    <s-card style="min-width: 760px; max-width: 92vw;">
-      <q-bar class="row items-center justify-between bg-primary text-white">
+  <q-dialog v-model="open" persistent>
+    <s-card style="min-width: 760px; max-width: 92vw; max-height: 90vh;" class="column no-wrap">
+
+      <!-- 🔥 HEADER FIXO -->
+      <q-bar class="bg-primary text-white">
         <div class="text-h6">
           {{ data?.id ? 'Editar' : 'Novo' }}
         </div>
+
+        <q-space />
+
         <s-btn dense flat icon="close" @click="close">
           <q-tooltip>Fechar</q-tooltip>
         </s-btn>
@@ -46,27 +51,34 @@ function save() {
 
       <q-separator />
 
-      <q-card-section v-if="!schema || !schema.length">
-        <q-spinner />
-      </q-card-section>
+      <!-- 🔥 BODY COM SCROLL -->
+      <q-card-section class="scroll col">
+        <div v-if="!schema || !schema.length">
+          <q-spinner />
+        </div>
 
-      <q-card-section v-else class=" q-col-gutter-sm">
-        <Form
-          ref="formRef"
-          :schema="schema"
-          :module="module"
-          :model="model"
-          :data="data"
-          :can-do="canDo"
-          :ignore-fields="ignoreFields"
-          @saved="() => { emit('saved'); close() }"
-        />
+        <div v-else>
+          <Form
+            ref="formRef"
+            :schema="schema"
+            :module="module"
+            :model="model"
+            :data="data"
+            :can-do="canDo"
+            :ignore-fields="ignoreFields"
+            @saved="() => { emit('saved'); close() }"
+          />
 
-        <q-linear-progress v-if="uploadProgress > 0" :value="uploadProgress/100" />
+          <q-linear-progress
+            v-if="uploadProgress > 0"
+            :value="uploadProgress / 100"
+          />
+        </div>
       </q-card-section>
 
       <q-separator />
 
+      <!-- 🔥 FOOTER FIXO -->
       <q-card-actions align="right">
         <s-btn flat label="Cancelar" @click="close" />
         <s-btn color="primary" :loading="saving" label="Salvar" @click="save" />
