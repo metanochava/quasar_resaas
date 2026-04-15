@@ -249,8 +249,8 @@ defineExpose({
 </script>
 
 <template>
-  <q-card flat bordered>
-    <q-card-section class="row q-col-gutter-sm">
+  <q-card flat >
+    <q-card-section class="row q-col-gutter-sm q-gutter-sm">
 
       <!-- NORMAL + RELATION -->
       <div
