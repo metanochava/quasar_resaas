@@ -247,6 +247,7 @@ defineExpose({
 
 <template>
   <q-card flat>
+    {{ componentMap }}
     <q-card-section class="row q-col-gutter-sm">
 
       <!-- NORMAL + RELATION -->
@@ -255,8 +256,9 @@ defineExpose({
         :key="f.name"
         class="col-md-4 col-sm-6 col-xs-12"
       >
+      {{ f.component }} ||  {{ componentMap[f.component] }}
         <component
-          :is="componentMap[f.component]"
+          :is="componentMap[f.component] || f.component"
           v-model="form[f.name]"
           v-bind="f.props"
           :rules="resolveRules(f.rules)"
@@ -287,7 +289,7 @@ defineExpose({
 
         <!-- INPUT -->
         <component
-          :is="componentMap[f.component] "
+          :is="componentMap[f.component] || f.component"
           v-model="form[f.name]"
           v-bind="f.props"
           :rules="resolveRules(f.rules)"
