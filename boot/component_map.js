@@ -16,31 +16,19 @@ import {
   QField
 } from 'quasar'
 
-import InputComponent from '../components/engine/InputComponent.vue'
-import SelectComponent from '../components/engine/SelectComponent.vue'
-import BtnComponent from '../components/engine/BtnComponent.vue'
 
 export const componentMap = {
-
-  // BTN
-
-  "q-btn": BtnComponent,
-
   // 🔤 TEXT / INPUT
-  // 'q-input': QInput,
-  'q-input': InputComponent,
+  'q-input': QInput,
   'q-field': QField,
 
   // 🔽 SELECT / RELATIONS
-  // 'q-select': QSelect,
-  'q-select': SelectComponent,
-  'q-multiselect': QSelect,     // 🔥 backend ManyToMany
+  'q-select': QSelect,
   'q-option-group': QOptionGroup,
 
   // ✅ BOOLEAN
   'q-checkbox': QCheckbox,
   'q-switch': QToggle,
-  'q-toggle': QToggle,        // 🔥 backend BooleanField
   'q-radio': QRadio,
 
   // 📅 DATE / TIME
@@ -50,10 +38,6 @@ export const componentMap = {
   // 📂 FILES
   'q-upload': QFile,
   'q-uploader': QUploader,
-
-  // 🔥 CRÍTICO (faltava)
-  'q-file': QFile,
-  'q-image': QFile,
 
   // ✍️ RICH TEXT
   'q-editor': QEditor,
