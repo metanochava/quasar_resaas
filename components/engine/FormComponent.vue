@@ -250,49 +250,54 @@ defineExpose({
     <q-card-section class="row q-col-gutter-sm">
 
       <!-- NORMAL + RELATION -->
-      <div
-        v-for="f in [...generalFields, ...relationFields]"
-        :key="f.name"
-        class="col-md-4 col-sm-6 col-xs-12"
-      >
-        <component
-          :is="f.component"
-          v-model="form[f.name]"
-          v-bind="f.props"
-          :rules="resolveRules(f.rules)"
-        />
+      <div class="row col-12">
+        <div
+          v-for="f in [...generalFields, ...relationFields]"
+          :key="f.name"
+          class="col-md-4 col-sm-6 col-xs-12"
+        >
+          <component
+            :is="f.component"
+            v-model="form[f.name]"
+            v-bind="f.props"
+            :rules="resolveRules(f.rules)"
+          />
+        </div>
       </div>
+      
 
       <!-- FILE -->
-      <div v-for="f in fileFields" :key="f.name" class="col-md-4 col-sm-6 col-xs-12">
+      <div class="row col-12">
+        <div v-for="f in fileFields" :key="f.name" class="col-md-4 col-sm-6 col-xs-12">
 
-        <!-- PREVIEW -->
-        <template v-if="previewOf(f)">
-          <q-img
-            v-if="previewOf(f).type === 'image'"
-            :src="previewOf(f).src"
-            style="max-width:120px; margin-bottom:8px"
+          <!-- PREVIEW -->
+          <template v-if="previewOf(f)">
+            <q-img
+              v-if="previewOf(f).type === 'image'"
+              :src="previewOf(f).src"
+              style="max-width:120px; margin-bottom:8px"
+            />
+
+            <iframe
+              v-else-if="previewOf(f).type === 'pdf'"
+              :src="previewOf(f).src"
+              style="width:100%; height:200px; margin-bottom:8px"
+            />
+
+            <div v-else>
+              📁 {{ previewOf(f).name }}
+            </div>
+          </template> 
+
+          <!-- INPUT -->
+          <component
+            :is=" f.component"
+            v-model="form[f.name]"
+            v-bind="f.props"
+            :rules="resolveRules(f.rules)"
           />
 
-          <iframe
-            v-else-if="previewOf(f).type === 'pdf'"
-            :src="previewOf(f).src"
-            style="width:100%; height:200px; margin-bottom:8px"
-          />
-
-          <div v-else>
-            📁 {{ previewOf(f).name }}
-          </div>
-        </template> 
-
-        <!-- INPUT -->
-        <component
-          :is=" f.component"
-          v-model="form[f.name]"
-          v-bind="f.props"
-          :rules="resolveRules(f.rules)"
-        />
-
+        </div>
       </div>
 
       <!-- PROGRESS -->
