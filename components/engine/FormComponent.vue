@@ -73,60 +73,36 @@ function resolveRules(rules = []) {
   })
 }
 
+// ---------------- HELPERS ----------------
+function isRealFile(v) {
+  return v instanceof File
+}
+
 // ---------------- PREVIEW ----------------
 function getPreview(f, value) {
   if (!value) return null
-
   if (!f.ui?.isFile && !f.ui?.isImage) return null
 
-  // 🔥 FILE NOVO
+  // 🔥 File novo
   if (value instanceof File) {
-
-    // 🖼️ IMAGE
     if (value.type.startsWith('image')) {
-      return {
-        type: 'image',
-        src: URL.createObjectURL(value)
-      }
+      return { type: 'image', src: URL.createObjectURL(value) }
     }
-
-    // 📄 PDF
     if (value.type === 'application/pdf') {
-      return {
-        type: 'pdf',
-        src: URL.createObjectURL(value)
-      }
+      return { type: 'pdf', src: URL.createObjectURL(value) }
     }
-
-    return {
-      type: 'file',
-      name: value.name
-    }
+    return { type: 'file', name: value.name }
   }
 
-  // 🔥 STRING (backend)
-  if (typeof value === 'string') {
-
-    // 🖼️ IMAGE
-    if (/\.(png|jpg|jpeg|gif|svg|webp)$/i.test(value)) {
-      return {
-        type: 'image',
-        src: value
-      }
+  // 🔥 Objeto vindo do backend
+  if (typeof value === 'object' && value.url) {
+    if (value.mime_type?.startsWith('image')) {
+      return { type: 'image', src: value.url }
     }
-
-    // 📄 PDF
-    if (/\.pdf$/i.test(value)) {
-      return {
-        type: 'pdf',
-        src: value
-      }
+    if (value.mime_type === 'application/pdf') {
+      return { type: 'pdf', src: value.url }
     }
-
-    return {
-      type: 'file',
-      name: value
-    }
+    return { type: 'file', name: value.name }
   }
 
   return null
@@ -167,17 +143,16 @@ function hasFiles() {
 function buildPayload() {
   const useFormData = hasFiles()
 
-  // JSON
   if (!useFormData) {
     const data = {}
 
     for (const [k, v] of Object.entries(form.value)) {
       if (v == null) continue
 
-      // 🔥 não enviar string em file/image
-      if ((typeof v === 'string') && fileFields.value.some(f => f.name === k)) {
-        continue
-      }
+      const isFileField = fileFields.value.some(f => f.name === k)
+
+      // 🔥 IGNORAR tudo que não for File
+      if (isFileField && !isRealFile(v)) continue
 
       data[k] = normalizeValue(v)
     }
@@ -185,16 +160,15 @@ function buildPayload() {
     return { data, config: {} }
   }
 
-  // FORM DATA
   const fd = new FormData()
 
   for (const [k, v] of Object.entries(form.value)) {
     if (v == null) continue
 
-    // 🔥 não enviar string em file/image
-    if ((typeof v === 'string') && fileFields.value.some(f => f.name === k)) {
-      continue
-    }
+    const isFileField = fileFields.value.some(f => f.name === k)
+
+    // 🔥 IGNORAR objeto/string backend
+    if (isFileField && !isRealFile(v)) continue
 
     const val = normalizeValue(v)
 
@@ -283,26 +257,21 @@ defineExpose({
 
         <!-- PREVIEW -->
         <template v-if="previewOf(f)">
-
-          <!-- IMAGE -->
           <q-img
             v-if="previewOf(f).type === 'image'"
             :src="previewOf(f).src"
             style="max-width:120px; margin-bottom:8px"
           />
 
-          <!-- PDF -->
           <iframe
             v-else-if="previewOf(f).type === 'pdf'"
             :src="previewOf(f).src"
             style="width:100%; height:200px; margin-bottom:8px"
           />
 
-          <!-- FILE -->
           <div v-else>
             📁 {{ previewOf(f).name }}
           </div>
-
         </template>
 
         <!-- INPUT -->
