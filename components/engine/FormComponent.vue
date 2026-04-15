@@ -73,34 +73,56 @@ function resolveRules(rules = []) {
   })
 }
 
-// ---------------- PREVIEW (SÓ FILE / IMAGE) ----------------
+// ---------------- PREVIEW ----------------
 function getPreview(f, value) {
   if (!value) return null
 
   if (!f.ui?.isFile && !f.ui?.isImage) return null
 
-  // File novo
+  // 🔥 FILE NOVO
   if (value instanceof File) {
+
+    // 🖼️ IMAGE
     if (value.type.startsWith('image')) {
       return {
         type: 'image',
         src: URL.createObjectURL(value)
       }
     }
+
+    // 📄 PDF
+    if (value.type === 'application/pdf') {
+      return {
+        type: 'pdf',
+        src: URL.createObjectURL(value)
+      }
+    }
+
     return {
       type: 'file',
       name: value.name
     }
   }
 
-  // String (backend)
+  // 🔥 STRING (backend)
   if (typeof value === 'string') {
+
+    // 🖼️ IMAGE
     if (/\.(png|jpg|jpeg|gif|svg|webp)$/i.test(value)) {
       return {
         type: 'image',
         src: value
       }
     }
+
+    // 📄 PDF
+    if (/\.pdf$/i.test(value)) {
+      return {
+        type: 'pdf',
+        src: value
+      }
+    }
+
     return {
       type: 'file',
       name: value
@@ -152,7 +174,7 @@ function buildPayload() {
     for (const [k, v] of Object.entries(form.value)) {
       if (v == null) continue
 
-      // 🔥 NÃO enviar string em file/image
+      // 🔥 não enviar string em file/image
       if ((typeof v === 'string') && fileFields.value.some(f => f.name === k)) {
         continue
       }
@@ -169,7 +191,7 @@ function buildPayload() {
   for (const [k, v] of Object.entries(form.value)) {
     if (v == null) continue
 
-    // 🔥 NÃO enviar string em file/image
+    // 🔥 não enviar string em file/image
     if ((typeof v === 'string') && fileFields.value.some(f => f.name === k)) {
       continue
     }
@@ -261,15 +283,26 @@ defineExpose({
 
         <!-- PREVIEW -->
         <template v-if="previewOf(f)">
+
+          <!-- IMAGE -->
           <q-img
             v-if="previewOf(f).type === 'image'"
             :src="previewOf(f).src"
             style="max-width:120px; margin-bottom:8px"
           />
 
+          <!-- PDF -->
+          <iframe
+            v-else-if="previewOf(f).type === 'pdf'"
+            :src="previewOf(f).src"
+            style="width:100%; height:200px; margin-bottom:8px"
+          />
+
+          <!-- FILE -->
           <div v-else>
             📁 {{ previewOf(f).name }}
           </div>
+
         </template>
 
         <!-- INPUT -->
