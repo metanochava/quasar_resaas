@@ -21,10 +21,16 @@ const uploadProgress = ref(0)
 
 const ignoreSet = computed(() => new Set(props.ignoreFields || []))
 
+// 🔥 ocultar campos tipo id
+function isHiddenField(f) {
+  return ['id'].includes(f.name)
+}
+
 // ---------------- FIELD GROUPS ----------------
 const generalFields = computed(() =>
   props.schema.filter(f =>
     !ignoreSet.value.has(f.name) &&
+    !isHiddenField(f) &&
     !f.ui?.isRelation &&
     !f.ui?.isFile &&
     !f.ui?.isImage
@@ -34,6 +40,7 @@ const generalFields = computed(() =>
 const relationFields = computed(() =>
   props.schema.filter(f =>
     !ignoreSet.value.has(f.name) &&
+    !isHiddenField(f) &&
     f.ui?.isRelation
   )
 )
@@ -41,6 +48,7 @@ const relationFields = computed(() =>
 const fileFields = computed(() =>
   props.schema.filter(f =>
     !ignoreSet.value.has(f.name) &&
+    !isHiddenField(f) &&
     (f.ui?.isFile || f.ui?.isImage)
   )
 )
@@ -83,7 +91,7 @@ function getPreview(f, value) {
   if (!value) return null
   if (!f.ui?.isFile && !f.ui?.isImage) return null
 
-  // 🔥 File novo
+  // File novo
   if (value instanceof File) {
     if (value.type.startsWith('image')) {
       return { type: 'image', src: URL.createObjectURL(value) }
@@ -94,29 +102,20 @@ function getPreview(f, value) {
     return { type: 'file', name: value.name }
   }
 
-  // 🔥 Objeto vindo do backend
+  // Objeto backend
   if (typeof value === 'object' && value.url) {
 
     let safeUrl = value.url.replace('http://', 'https://')
 
     if (value.mime_type?.startsWith('image')) {
-      return {
-        type: 'image',
-        src: safeUrl
-      }
+      return { type: 'image', src: safeUrl }
     }
 
     if (value.mime_type === 'application/pdf') {
-      return {
-        type: 'pdf',
-        src: safeUrl
-      }
+      return { type: 'pdf', src: safeUrl }
     }
 
-    return {
-      type: 'file',
-      name: value.name
-    }
+    return { type: 'file', name: value.name }
   }
 
   return null
@@ -150,7 +149,7 @@ function normalizeValue(v) {
 
 // ---------------- FILE DETECT ----------------
 function hasFiles() {
-  return Object.values(form.value).some(v => v instanceof File)
+  return fileFields.value.some(f => form.value[f.name] instanceof File)
 }
 
 // ---------------- PAYLOAD ----------------
@@ -165,8 +164,7 @@ function buildPayload() {
 
       const isFileField = fileFields.value.some(f => f.name === k)
 
-      // 🔥 IGNORAR tudo que não for File
-      if (isFileField && !isRealFile(v)) continue
+      if (isFileField && !(v instanceof File)) continue
 
       data[k] = normalizeValue(v)
     }
@@ -181,17 +179,16 @@ function buildPayload() {
 
     const isFileField = fileFields.value.some(f => f.name === k)
 
-    // 🔥 IGNORAR objeto/string backend
-    if (isFileField && !isRealFile(v)) continue
+    if (isFileField) {
+      if (!(v instanceof File)) continue
+      fd.append(k, v)
+      continue
+    }
 
     const val = normalizeValue(v)
 
-    if (val instanceof File) {
-      fd.append(k, val)
-
-    } else if (Array.isArray(val)) {
+    if (Array.isArray(val)) {
       val.forEach(x => fd.append(k, x))
-
     } else {
       fd.append(k, val)
     }
@@ -249,8 +246,8 @@ defineExpose({
 </script>
 
 <template>
-  <q-card flat >
-    <q-card-section class="row q-col-gutter-sm ">
+  <q-card flat>
+    <q-card-section class="row q-col-gutter-sm">
 
       <!-- NORMAL + RELATION -->
       <div
@@ -259,7 +256,7 @@ defineExpose({
         class="col-md-4 col-sm-6 col-xs-12"
       >
         <component
-          :is="componentMap[f.component] || f.component "
+          :is="componentMap[f.component] || f.component"
           v-model="form[f.name]"
           v-bind="f.props"
           :rules="resolveRules(f.rules)"
@@ -290,7 +287,7 @@ defineExpose({
 
         <!-- INPUT -->
         <component
-          :is="componentMap[f.component] || f.component "
+          :is="componentMap[f.component] || f.component"
           v-model="form[f.name]"
           v-bind="f.props"
           :rules="resolveRules(f.rules)"
