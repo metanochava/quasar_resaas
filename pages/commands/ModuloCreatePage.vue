@@ -1,22 +1,21 @@
 <template>
-  <q-page class=" q-pa-sm">
+  <q-page class="q-pa-sm">
+
     <div class="text-h5 q-mb-lg">
       📦 Módulos
     </div>
 
     <div class="row q-col-gutter-lg">
 
-      <!-- ================================= -->
-      <!-- LEFT: CARDS DE MÓDULOS -->
-      <!-- ================================= -->
-      <div class="col-12 col-md-12">
+      <!-- LEFT -->
+      <div class="col-12">
 
         <div class="row q-col-gutter-md">
-          <!-- ================================= -->
-          <!-- RIGHT: CRIAR -->
-          <!-- ================================= -->
+
+          <!-- CREATE -->
           <div class="col-12 col-md-3">
             <s-card bordered flat class="q-pa-lg">
+
               <div class="text-h6 q-mb-md">
                 ➕ Criar Módulo
               </div>
@@ -36,13 +35,16 @@
                 :loading="loading"
                 @click="createModule"
               />
+
             </s-card>
           </div>
 
+          <!-- LIST -->
           <div class="col-12 col-md-9 row q-col-gutter-sm">
+
             <div
-              v-for="app in apps"
-              :key="app.name"
+              v-for="(app, index) in apps"
+              :key="app.name + '_' + index"
               class="col-12 col-sm-3"
             >
               <s-card bordered flat class="module-card">
@@ -57,9 +59,8 @@
 
                   <q-space />
 
-                  <!-- badge models -->
                   <q-badge color="primary">
-                    {{ app.models }}
+                    {{ app.models || 0 }}
                   </q-badge>
 
                 </q-card-section>
@@ -68,7 +69,7 @@
 
                 <q-card-actions align="between">
 
-                  <!-- abrir scaffold -->
+                  <!-- OPEN -->
                   <s-btn
                     flat
                     color="primary"
@@ -77,7 +78,7 @@
                     @click="openScaffold(app.name)"
                   />
 
-                  <!-- apagar -->
+                  <!-- DELETE -->
                   <s-btn
                     flat
                     round
@@ -87,12 +88,16 @@
                   />
 
                 </q-card-actions>
+
               </s-card>
             </div>
+
           </div>
-          
+
         </div>
+
       </div>
+
     </div>
 
   </q-page>
@@ -105,58 +110,63 @@ import { useRouter } from 'vue-router'
 import { HTTPAuth } from '../../boot/api'
 import { useUserStore } from '../../stores/UserStore'
 
-// ----------------------------------
-
+// ---------------- STATE ----------------
 const router = useRouter()
+const User = useUserStore()
 
 const name = ref('')
 const loading = ref(false)
 const apps = ref([])
 
-const User = useUserStore()
-
-// ----------------------------------
-// LOAD
-// ----------------------------------
-
+// ---------------- LOAD ----------------
 async function loadApps () {
-  const { data } = await HTTPAuth.get('api/django_resaas/resaas_modulos/')
-  apps.value = data.apps
+  try {
+    const { data } = await HTTPAuth.get('/api/django_resaas/resaas_modulos/')
+    apps.value = data?.apps || []
+  } catch (e) {
+    Notify.create({
+      type: 'negative',
+      message: 'Erro ao carregar módulos'
+    })
+    console.error(e)
+  }
 }
 
-// ----------------------------------
-// CREATE
-// ----------------------------------
-
+// ---------------- CREATE ----------------
 async function createModule () {
   if (!name.value?.trim()) return
 
   loading.value = true
   const moduleName = name.value.trim()
 
-  apps.value.push({name: moduleName, models: 0})
-  name.value = ''
-
   try {
-    await HTTPAuth.post('api/django_resaas/resaas_modulos/', { name: moduleName })
-  } catch (e) {
-    // rollback
-    apps.value = apps.value.filter(a => a.name !== moduleName)
+    await HTTPAuth.post('/api/django_resaas/resaas_modulos/', {
+      name: moduleName
+    })
+
+    apps.value.push({ name: moduleName, models: 0 })
+    name.value = ''
+
     User.getMenus()
-    alert("criado")
+
+    Notify.create({
+      type: 'positive',
+      message: 'Módulo criado com sucesso'
+    })
+
+  } catch (e) {
+    Notify.create({
+      type: 'negative',
+      message: 'Erro ao criar módulo'
+    })
     console.error(e)
   } finally {
     loading.value = false
   }
 }
 
-
-// ----------------------------------
-// DELETE
-// ----------------------------------
-
+// ---------------- DELETE ----------------
 function confirmDelete(app) {
-
   Dialog.create({
     title: 'Confirmar',
     message: `Tem a certeza que deseja apagar o módulo "${app}"?`,
@@ -168,29 +178,41 @@ function confirmDelete(app) {
 async function deleteModule(app) {
   const old = [...apps.value]
 
+  // UI otimista
   apps.value = apps.value.filter(a => a.name !== app)
 
   try {
-    await HTTPAuth.delete(`api/django_resaas/resaas_modulos/${app}/`)
+    await HTTPAuth.delete(`/api/django_resaas/resaas_modulos/${app}/`)
+
     User.getMenus()
-    alert()
+
+    Notify.create({
+      type: 'positive',
+      message: 'Módulo apagado com sucesso'
+    })
+
   } catch (e) {
     apps.value = old
+
+    Notify.create({
+      type: 'negative',
+      message: 'Erro ao apagar módulo'
+    })
   }
 }
 
-
-// ----------------------------------
-// OPEN SCAFFOLD
-// ----------------------------------
-
+// ---------------- OPEN ----------------
 function openScaffold(app) {
-  router.push({ name: 'view_scaffold', query: {modulo: app } })
+  router.push({
+    name: 'view_scaffold',
+    query: { modulo: app.toLowerCase() }
+  })
 }
 
-// ----------------------------------
-
-onMounted(loadApps)
+// ---------------- INIT ----------------
+onMounted(async () => {
+  await loadApps()
+})
 </script>
 
 <style scoped>
