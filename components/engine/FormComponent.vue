@@ -213,7 +213,7 @@ async function save() {
   uploadProgress.value = 0
 
   try {
-    const api = `/api/${props.module}/${props.model.toLowerCase()}s/`
+    const api = `api/${props.module}/${props.model.toLowerCase()}s/`
     const { data, config } = buildPayload()
 
     if (form.value.id) {

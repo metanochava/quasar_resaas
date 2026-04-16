@@ -103,6 +103,7 @@ import { ref, onMounted } from 'vue'
 import { Notify, Dialog } from 'quasar'
 import { useRouter } from 'vue-router'
 import { HTTPAuth } from '../../boot/api'
+import { useUserStore } from '../../stores/UserStore'
 
 // ----------------------------------
 
@@ -111,6 +112,8 @@ const router = useRouter()
 const name = ref('')
 const loading = ref(false)
 const apps = ref([])
+
+const User = useUserStore()
 
 // ----------------------------------
 // LOAD
@@ -139,6 +142,7 @@ async function createModule () {
   } catch (e) {
     // rollback
     apps.value = apps.value.filter(a => a.name !== moduleName)
+    User.getMenus()
     console.error(e)
   } finally {
     loading.value = false
@@ -167,6 +171,7 @@ async function deleteModule(app) {
 
   try {
     await HTTPAuth.delete(`api/django_resaas/resaas_modulos/${app}/`)
+    User.getMenus()
   } catch (e) {
     apps.value = old
   }

@@ -926,7 +926,7 @@ export default defineComponent({
       await HTTPAuth.put(
         url({
           type: "u",
-          url: `/api/django_resaas/entidades/${this.User.Entidade.id}/themePut/`
+          url: `api/django_resaas/entidades/${this.User.Entidade.id}/themePut/`
         }),
         this.User.Theme
       )
@@ -934,7 +934,7 @@ export default defineComponent({
       await HTTPAuth.put(
         url({
           type: "u",
-          url: `/api/django_resaas/entidades/${this.User.Entidade.id}/layoutSettingsPut/`
+          url: `api/django_resaas/entidades/${this.User.Entidade.id}/layoutSettingsPut/`
         }),
         this.User.LayoutSettings
       )
@@ -942,7 +942,7 @@ export default defineComponent({
       await HTTPAuth.put(
         url({
           type: "u",
-          url: `/api/django_resaas/entidades/${this.User.Entidade.id}/typographyPut/`
+          url: `api/django_resaas/entidades/${this.User.Entidade.id}/typographyPut/`
         }),
         this.User.Typography
       )
@@ -950,7 +950,7 @@ export default defineComponent({
       await HTTPAuth.put(
         url({
           type: "u",
-          url: `/api/django_resaas/entidades/${this.User.Entidade.id}/animationSettingsPut/`
+          url: `api/django_resaas/entidades/${this.User.Entidade.id}/animationSettingsPut/`
         }),
         this.User.AnimationSettings
       )
