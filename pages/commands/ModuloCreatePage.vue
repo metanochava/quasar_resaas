@@ -138,7 +138,7 @@ async function createModule () {
   try {
     await HTTPAuth.post('/api/django_resaas/resaas_modulos/', {
       name: moduleName
-    })
+    }) 
 
     apps.value.push({ name: moduleName, models: 0 })
     name.value = ''
