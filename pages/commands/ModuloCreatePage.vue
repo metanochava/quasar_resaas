@@ -143,6 +143,7 @@ async function createModule () {
     // rollback
     apps.value = apps.value.filter(a => a.name !== moduleName)
     User.getMenus()
+    alert("criado")
     console.error(e)
   } finally {
     loading.value = false
@@ -172,6 +173,7 @@ async function deleteModule(app) {
   try {
     await HTTPAuth.delete(`api/django_resaas/resaas_modulos/${app}/`)
     User.getMenus()
+    alert()
   } catch (e) {
     apps.value = old
   }
