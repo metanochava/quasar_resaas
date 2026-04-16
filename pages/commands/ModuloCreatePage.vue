@@ -112,7 +112,7 @@ import { useUserStore } from '../../stores/UserStore'
 
 // ---------------- STATE ----------------
 const router = useRouter()
-const User = useUserStore()
+
 
 const name = ref('')
 const loading = ref(false)
@@ -142,8 +142,9 @@ async function createModule () {
 
     apps.value.push({ name: moduleName, models: 0 })
     name.value = ''
-
+    const User = useUserStore()
     await User.getMenus()
+    
   } catch (e) {
     loading.value = false
   } finally {
@@ -169,7 +170,7 @@ async function deleteModule(app) {
 
   try {
     await HTTPAuth.delete(`/api/django_resaas/resaas_modulos/${app}/`)
-
+    const User = useUserStore()
     await User.getMenus()
 
   } catch (e) {
