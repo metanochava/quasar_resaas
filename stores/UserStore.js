@@ -69,6 +69,7 @@ export const useUserStore = defineStore("user", {
           this.AllMenus = res.data
           this.Menus = this.AllMenus
         })
+      alert("asas")
     },
 
     setSettings(){
