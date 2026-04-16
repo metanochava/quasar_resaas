@@ -148,18 +148,8 @@ async function createModule () {
     name.value = ''
 
     User.getMenus()
-
-    Notify.create({
-      type: 'positive',
-      message: 'Módulo criado com sucesso'
-    })
-
   } catch (e) {
-    Notify.create({
-      type: 'negative',
-      message: 'Erro ao criar módulo'
-    })
-    console.error(e)
+    loading.value = false
   } finally {
     loading.value = false
   }
@@ -186,18 +176,8 @@ async function deleteModule(app) {
 
     User.getMenus()
 
-    Notify.create({
-      type: 'positive',
-      message: 'Módulo apagado com sucesso'
-    })
-
   } catch (e) {
     apps.value = old
-
-    Notify.create({
-      type: 'negative',
-      message: 'Erro ao apagar módulo'
-    })
   }
 }
 
