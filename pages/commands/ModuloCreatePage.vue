@@ -124,10 +124,6 @@ async function loadApps () {
     const { data } = await HTTPAuth.get('/api/django_resaas/resaas_modulos/')
     apps.value = data?.apps || []
   } catch (e) {
-    Notify.create({
-      type: 'negative',
-      message: 'Erro ao carregar módulos'
-    })
     console.error(e)
   }
 }
@@ -147,7 +143,7 @@ async function createModule () {
     apps.value.push({ name: moduleName, models: 0 })
     name.value = ''
 
-    User.getMenus()
+    await User.getMenus()
   } catch (e) {
     loading.value = false
   } finally {
@@ -174,7 +170,7 @@ async function deleteModule(app) {
   try {
     await HTTPAuth.delete(`/api/django_resaas/resaas_modulos/${app}/`)
 
-    User.getMenus()
+    await User.getMenus()
 
   } catch (e) {
     apps.value = old
