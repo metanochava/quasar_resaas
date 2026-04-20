@@ -16,7 +16,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import FormSE from './../../components/auto/FormSE.vue'
+import FormSE from '../../components/auto/FormSaveEdit.vue'
 import { buildFormFromSchema } from '../../utils/autoForm'
 
 // ---------------- STATE ----------------
