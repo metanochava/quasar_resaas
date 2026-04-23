@@ -182,41 +182,6 @@ export const useEntidadeStore = createBaseStore(
         await Sucursal.getUserSucursals()
       },
 
-      async selectWithDialog(userId, q) {
-        if (!userId) return
-
-        const User = useUserStore()
-
-        await this.getUserEntidades(userId)
-
-        const list = this.userEntidades
-
-        if (list.length === 0) {
-          User.redirect = 'welcome'
-          return
-        }
-
-        if (list.length === 1) {
-          return this.select(list[0])
-        }
-
-        const options = list.map(e => ({
-          label: perfilSplint(e.nome),
-          value: e
-        }))
-
-        q.dialog({
-          title: tdc('Seleccione a Entidade'),
-          options: {
-            type: 'radio',
-            model: 'opt1',
-            items: options
-          },
-          cancel: true,
-          persistent: true
-        }).onOk(e => this.select(e))
-         .onCancel(() => User.redirect = 'welcome')
-      },
 
       // ===============================
       // LOAD DIRETO
@@ -239,7 +204,78 @@ export const useEntidadeStore = createBaseStore(
         )
 
         this.Modelos = data || []
-      }
+      },
+      
+
+      async select_ (entidade, q) {
+        const User = useUserStore()
+        const Sucursal = useSucursalStore()
+        this.row = entidade
+        User.Entidade = this.row
+        await this.getLayoutSettings(entidade.id)
+        setStorage('l', 'userEntidade', JSON.stringify(entidade))
+        Sucursal.getUserSucursals_(q)
+      },
+
+      async select (entidade) {
+        const User = useUserStore()
+        const Sucursal = useSucursalStore()
+        this.row = entidade
+        User.Entidade = this.row
+        await this.getLayoutSettings(entidade.id)
+        setStorage('l', 'userEntidade', JSON.stringify(entidade))
+        Sucursal.getUserSucursals()
+      },
+
+      async getUserEntidades_ (UserId, q) {
+        const User = useUserStore()
+        if (!UserId) return
+
+        try {
+          const res = await HTTPAuth.get(
+            url({
+              type: 'u',
+              url: `api/django_resaas/users/${UserId}/userEntidades/`,
+              params: {}
+            })
+          )
+
+          setStorage('l', 'userEntidades', JSON.stringify(res.data))
+          this.s = res.data
+
+          if (res.data.length === 1) {
+            this.select_(res.data[0], q)
+          } else {
+            if (res.data.length === 0) {
+
+              User.redirect = 'welcome'
+              return
+            }
+            const entidades = res.data.map(e => ({
+              label: perfilSplint(e.nome),
+              value: e
+            }))
+
+            q.dialog({
+              title: tdc('Seleccione a Entidade'),
+              options: {
+                type: 'radio',
+                model: 'opt1',
+                items: entidades
+              },
+              cancel: true,
+              persistent: true
+            }).onOk(data => this.select_(data, q))
+            .onCancel(() => {
+
+              User.redirect = 'welcome'
+            })
+          }
+        } catch (err) {
+          console.error(err)
+        }
+      },
+
 
     }
   }
