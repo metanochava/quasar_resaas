@@ -1,26 +1,18 @@
 import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, HTTPClient, url } from './../boot/api'
-import { setCssVar, Dark } from "quasar"
-import { useSucursalStore} from './SucursalStore'
-import { useUserStore} from './UserStore'
+import { useSucursalStore } from './SucursalStore'
+import { useUserStore } from './UserStore'
 import { perfilSplint, tdc } from '../boot/base'
 import { getStorage, setStorage } from './../boot/storage'
-
 
 export const useEntidadeStore = createBaseStore(
   'entidade',
   {
-    url: 'ipa/clinica/entidades',
+    url: 'api/django_resaas/entidades',
     app: 'django_resaas',
     model: 'Entidade'
   },
   {
-
-    getters: {
-  
-    },
-
-
     state: () => ({
       Theme: {},
       LayoutSettings: {},
@@ -28,201 +20,227 @@ export const useEntidadeStore = createBaseStore(
       Typography: {},
       Modulos: [],
       Modelos: [],
-
+      userEntidades: []
     }),
 
     actions: {
 
+      // ===============================
+      // SETTINGS GLOBAIS
+      // ===============================
       async getSettings() {
+        try {
+          const { data } = await HTTPClient.get(url({ type: "u", url: "api/site" }))
 
-        await HTTPClient.get(url({type: "u", url: "api/site", params: {}}) )
-        .then(res => {
-          this.Theme = res.data.theme
-          this.LayoutSettings = res.data.layout_settings
-          this.AnimationSettings = res.data.animation_settings
-          this.Typography = res.data.typography
-
-          this.row =  res.data.entidade
+          this.Theme = data.theme || {}
+          this.LayoutSettings = data.layout_settings || {}
+          this.AnimationSettings = data.animation_settings || {}
+          this.Typography = data.typography || {}
+          this.row = data.entidade || null
 
           const User = useUserStore()
 
-          User.Theme = this.Theme
-          User.AnimationSettings = this.AnimationSettings
-          User.Typography = this.Typography
-          User.LayoutSettings = this.LayoutSettings
-          User.setSettings()
-        })
-        .catch( () => {
-
-        })
-      },
-       
-
-      async setEntidadeModelos (EntidadeId) {
-        const User = useUserStore()
-        const Entidade = EntidadeId || this.row?.id
-        const res = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/modelos', params: {} }))
-          .then(res => {
-            this.Modelos = res.data
+          Object.assign(User, {
+            Theme: this.Theme,
+            AnimationSettings: this.AnimationSettings,
+            Typography: this.Typography,
+            LayoutSettings: this.LayoutSettings
           })
-        if ( EntidadeId) {
-          User.EntidadeModelos = this.Modelos
-        }
-          return res
-      },
 
-      async setEntidadeModulos (EntidadeId) {
-        const User = useUserStore()
-        const Entidade = EntidadeId || this.row?.id
-        if (Entidade !== null) {
+          User.setSettings()
 
-          const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/modulos/', params: { } }))
-            .then(res => {
-              this.Modulos = res.data
-            })
-          if ( EntidadeId) {
-            User.Modulos = this.Modulos
-            setStorage('l', 'entidadeModulos', JSON.stringify(res.data))
-          }
-          return rsp
+        } catch (e) {
+          console.error('getSettings error', e)
         }
       },
 
-
-      async getLayoutSettings (entidadeId) {
-        let Entidade = entidadeId || this.row?.id
-        if (Entidade !== null) {
-
-          const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/themeGet/', params: { } }))
-            .then(res => {
-              setStorage('l', 'EntidadeTheme', JSON.stringify(res.data))
-              this.Theme = res.data || {}
-            })
-
-          const lay = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/layoutSettingsGet/', params: { } }))
-            .then(res => {
-              setStorage('l', 'EntidadeLayoutsettings', JSON.stringify(res.data))
-              this.LayoutSettings = res.data || {}
-
-            })
-
-          const tp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/typographyGet/', params: { } }))
-            .then(res => {
-              setStorage('l', 'EntidadeTypography', JSON.stringify(res.data))
-              this.Typography = res.data || {}
-            })
-
-          const as = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/entidades/' + Entidade + '/animationSettingsGet/', params: { } }))
-            .then(res => {
-              setStorage('l', 'EntidadeAnimationSettings', JSON.stringify(res.data))
-              this.AnimationSettings = res.data || {}
-            })
-
-          if( entidadeId ) {
-            const User = useUserStore()
-
-            User.Theme = this.Theme
-            User.AnimationSettings = this.AnimationSettings
-            User.Typography = this.Typography
-            User.LayoutSettings = this.LayoutSettings
-            User.setSettings()
-          }
-          return lay
-        }
-      },
-      
-      
-
-      async getUserEntidades (UserId) {
-        if (!UserId) return
-        const rsp = await HTTPAuth.get( url({ type: 'u', url: `api/django_resaas/users/${UserId}/userEntidades/`,params: {}}))
-        setStorage('l', 'userEntidades', JSON.stringify(rsp.data))
-        this.s = rsp.data
-        return rsp
-      },
-
-      async getUserEntidades_ (UserId, q) {
-        const User = useUserStore()
-        if (!UserId) return
-
+      // ===============================
+      // MODELOS
+      // ===============================
+      async setEntidadeModelos(entidadeId) {
         try {
-          const res = await HTTPAuth.get(
-            url({
-              type: 'u',
-              url: `api/django_resaas/users/${UserId}/userEntidades/`,
-              params: {}
-            })
+          const id = entidadeId || this.row?.id
+          if (!id) return
+
+          const { data } = await HTTPAuth.get(
+            url({ type: 'u', url: `api/django_resaas/entidades/${id}/modelos` })
           )
 
-          setStorage('l', 'userEntidades', JSON.stringify(res.data))
-          this.s = res.data
+          this.Modelos = data || []
 
-          if (res.data.length === 1) {
-            this.select_(res.data[0], q)
-          } else {
-            if (res.data.length === 0) {
-
-              User.redirect = 'welcome'
-              return
-            }
-            const entidades = res.data.map(e => ({
-              label: perfilSplint(e.nome),
-              value: e
-            }))
-
-            q.dialog({
-              title: tdc('Seleccione a Entidade'),
-              options: {
-                type: 'radio',
-                model: 'opt1',
-                items: entidades
-              },
-              cancel: true,
-              persistent: true
-            }).onOk(data => this.select_(data, q))
-            .onCancel(() => {
-
-              User.redirect = 'welcome'
-            })
+          if (entidadeId) {
+            useUserStore().EntidadeModelos = this.Modelos
           }
-        } catch (err) {
-          console.error(err)
+
+        } catch (e) {
+          console.error('setEntidadeModelos error', e)
         }
       },
 
-      async select_ (entidade, q) {
-        const User = useUserStore()
-        const Sucursal = useSucursalStore()
-        this.row = entidade
-        User.Entidade = this.row
-        await this.getLayoutSettings(entidade.id)
-        setStorage('l', 'userEntidade', JSON.stringify(entidade))
-        Sucursal.getUserSucursals_(q)
+      // ===============================
+      // MODULOS
+      // ===============================
+      async setEntidadeModulos(entidadeId) {
+        try {
+          const id = entidadeId || this.row?.id
+          if (!id) return
+
+          const { data } = await HTTPAuth.get(
+            url({ type: 'u', url: `api/django_resaas/entidades/${id}/modulos/` })
+          )
+
+          this.Modulos = data || []
+
+          if (entidadeId) {
+            const User = useUserStore()
+            User.Modulos = this.Modulos
+            setStorage('l', 'entidadeModulos', JSON.stringify(data))
+          }
+
+        } catch (e) {
+          console.error('setEntidadeModulos error', e)
+        }
       },
 
-      async select (entidade) {
-        const User = useUserStore()
-        const Sucursal = useSucursalStore()
-        this.row = entidade
-        User.Entidade = this.row
-        await this.getLayoutSettings(entidade.id)
-        setStorage('l', 'userEntidade', JSON.stringify(entidade))
-        Sucursal.getUserSucursals()
+      // ===============================
+      // LAYOUT / THEME
+      // ===============================
+      async getLayoutSettings(entidadeId) {
+        try {
+          const id = entidadeId || this.row?.id
+          if (!id) return
+
+          const [theme, layout, typography, animation] = await Promise.all([
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entidades/${id}/themeGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entidades/${id}/layoutSettingsGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entidades/${id}/typographyGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entidades/${id}/animationSettingsGet/` }))
+          ])
+
+          this.Theme = theme.data || {}
+          this.LayoutSettings = layout.data || {}
+          this.Typography = typography.data || {}
+          this.AnimationSettings = animation.data || {}
+
+          setStorage('l', 'EntidadeTheme', JSON.stringify(this.Theme))
+          setStorage('l', 'EntidadeLayoutsettings', JSON.stringify(this.LayoutSettings))
+          setStorage('l', 'EntidadeTypography', JSON.stringify(this.Typography))
+          setStorage('l', 'EntidadeAnimationSettings', JSON.stringify(this.AnimationSettings))
+
+          if (entidadeId) {
+            const User = useUserStore()
+
+            Object.assign(User, {
+              Theme: this.Theme,
+              LayoutSettings: this.LayoutSettings,
+              Typography: this.Typography,
+              AnimationSettings: this.AnimationSettings
+            })
+
+            User.setSettings()
+          }
+
+        } catch (e) {
+          console.error('getLayoutSettings error', e)
+        }
       },
 
+      // ===============================
+      // USER ENTIDADES
+      // ===============================
+      async getUserEntidades(userId) {
+        if (!userId) return
+
+        try {
+          const { data } = await HTTPAuth.get(
+            url({ type: 'u', url: `api/django_resaas/users/${userId}/userEntidades/` })
+          )
+
+          this.userEntidades = data || []
+          setStorage('l', 'userEntidades', JSON.stringify(data))
+
+        } catch (e) {
+          console.error('getUserEntidades error', e)
+        }
+      },
+
+      // ===============================
+      // SELECT ENTIDADE
+      // ===============================
+      async select(entidade) {
+        if (!entidade) return
+
+        const User = useUserStore()
+        const Sucursal = useSucursalStore()
+
+        this.row = entidade
+        User.Entidade = entidade
+
+        setStorage('l', 'userEntidade', JSON.stringify(entidade))
+
+        await this.getLayoutSettings(entidade.id)
+        await Sucursal.getUserSucursals()
+      },
+
+      async selectWithDialog(userId, q) {
+        if (!userId) return
+
+        const User = useUserStore()
+
+        await this.getUserEntidades(userId)
+
+        const list = this.userEntidades
+
+        if (list.length === 0) {
+          User.redirect = 'welcome'
+          return
+        }
+
+        if (list.length === 1) {
+          return this.select(list[0])
+        }
+
+        const options = list.map(e => ({
+          label: perfilSplint(e.nome),
+          value: e
+        }))
+
+        q.dialog({
+          title: tdc('Seleccione a Entidade'),
+          options: {
+            type: 'radio',
+            model: 'opt1',
+            items: options
+          },
+          cancel: true,
+          persistent: true
+        }).onOk(e => this.select(e))
+         .onCancel(() => User.redirect = 'welcome')
+      },
+
+      // ===============================
+      // LOAD DIRETO
+      // ===============================
       async getModulos() {
+        if (!this.row?.id) return
+
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entidades/${this.Entidade?.id}/resaas_modulos/` })
+          url({ type: 'u', url: `api/django_resaas/entidades/${this.row.id}/resaas_modulos/` })
         )
-        this.Modulos = data
+
+        this.Modulos = data || []
       },
 
       async getModelos() {
+        if (!this.row?.id) return
+
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entidades/${this.Entidade?.id}/modelos` })
+          url({ type: 'u', url: `api/django_resaas/entidades/${this.row.id}/modelos` })
         )
-        this.Modelos = data
+
+        this.Modelos = data || []
       }
+
     }
   }
 )

@@ -1,41 +1,51 @@
 <template>
   <div class="q-pa-md">
 
+    <!-- FORM -->
     <FormSE
-      :schema="schema"
-      :module="module"
-      :model="model"
+      v-if="ready"
+      :schema="store.campos"
+      :module="store.app"
+      :model="store.model"
+      :config="store.config"
+      :actions="store.actions"
       :can-do="canDo"
       :ignore-fields="ignoreFields"
-      :data="selectedRow"
+      :data="store.form"
       @saved="onSaved"
     />
+
+    <!-- LOADING -->
+    <div v-else class="flex flex-center q-pa-lg">
+      <q-spinner size="40px" color="primary" />
+    </div>
 
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { useEntidadeStore } from './../../stores/EntidadeStore'
 import FormSE from '../../components/auto/FormSaveEdit.vue'
-import { buildFormFromSchema } from '../../utils/autoForm'
+
+// ---------------- ROUTE ----------------
+const route = useRoute()
+
+// ---------------- STORE ----------------
+const store = useEntidadeStore()
 
 // ---------------- STATE ----------------
-const module = "django_resaas"
-const model = "entidade"
-const schemaPath = "fields"
+const ready = ref(false)
 
-const schema = ref([])
-const actions = ref([])
-const config = ref({})
-const selectedRow = ref(null)
-
-const ignoreFields = ref([
+const ignoreFields = [
   'id',
   'created_at',
   'updated_at',
   'created_by',
-  'updated_by'
-])
+  'updated_by',
+  'deleted_at'
+]
 
 // ---------------- PERMISSIONS ----------------
 function canDo(perm) {
@@ -43,31 +53,51 @@ function canDo(perm) {
   return true
 }
 
-// ---------------- INIT ----------------
-async function init() {
-  try {
-    const data = await buildFormFromSchema({
-      module,
-      model,
-      schemaPath
-    })
+// ---------------- LOAD DATA ----------------
+async function load(id) {
+  // 🔥 evita chamadas duplicadas
+  if (id && store.row?.id === id) return
 
-    schema.value = data.schema || []
-    actions.value = data.actions || []
-    config.value = data.config || {}
-
-  } catch (err) {
-    console.error('Erro ao carregar schema:', err)
+  if (id) {
+    await store.getById(id)
+  } else {
+    store.resetForm?.()
   }
 }
 
+// ---------------- INIT ----------------
+async function init() {
+  try {
+    ready.value = false
+
+    await store.init()
+
+    const id = route.params.id
+    await load(id)
+
+    ready.value = true
+
+  } catch (err) {
+    console.error('Erro ao inicializar página:', err)
+  }
+}
+
+// ---------------- WATCH ROUTE ----------------
+watch(
+  () => route.params.id,
+  async (id) => {
+    await load(id)
+  }
+)
+
 // ---------------- EVENTS ----------------
-function onSaved() {
-  console.log('Salvo com sucesso')
+function onSaved(res) {
+  console.log('Salvo com sucesso', res)
+
+  // opcional
+  // store.getAll?.()
 }
 
 // ---------------- LIFECYCLE ----------------
-onMounted(async () => {
-  await init()
-})
+onMounted(init)
 </script>

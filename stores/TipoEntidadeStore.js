@@ -1,15 +1,12 @@
-
 import { createBaseStore } from './../base/base_store'
-// import { defineStore } from 'pinia'
-import { HTTPAuth, HTTPClient, url } from './../boot/api'
+import { HTTPClient, url } from './../boot/api'
 import { useUserStore } from '../stores/UserStore'
 import { getStorage, setStorage } from './../boot/storage'
 
-
 export const useTipoEntidadeStore = createBaseStore(
-  'tipoentidade', 
+  'tipoentidade',
   {
-    url: 'ipa/clinica/tipoentidades',
+    url: 'api/django_resaas/tipoentidades',
     app: 'django_resaas',
     model: 'TipoEntidade'
   },
@@ -24,63 +21,75 @@ export const useTipoEntidadeStore = createBaseStore(
       Modelos: [],
     }),
 
-    getters: {
-
-    },
-
     actions: {
 
-      async getLayoutSettings (tipoEntidade) {
-        let TipoEntidade = tipoEntidade || this.row?.id
-        if (getStorage('l', 'userTipoEntidade') !== null) {
+      // ===============================
+      // LAYOUT / THEME
+      // ===============================
+      async getLayoutSettings(tipoEntidade) {
+        try {
+          const id = tipoEntidade || this.row?.id
+          if (!id) return
 
-          const rsp = await HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/themeGet/', params: { } }))
-            .then(res => {
-              setStorage('l', 'tipoEntidadeTheme', JSON.stringify(res.data))
-              this.Theme = res.data || {}
-            })
+          // 🔥 evita chamada sem contexto
+          if (!getStorage('l', 'userTipoEntidade')) return
 
-          const lay = await HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/layoutSettingsGet/', params: { } }))
-            .then(res => {
-              setStorage('l', 'tipoEntidadeLayoutsettings', JSON.stringify(res.data))
-              this.LayoutSettings = res.data || {}
+          const [theme, layout, typography, animation] = await Promise.all([
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/themeGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/layoutSettingsGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/typographyGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/animationSettingsGet/` }))
+          ])
 
-            })
+          this.Theme = theme.data || {}
+          this.LayoutSettings = layout.data || {}
+          this.Typography = typography.data || {}
+          this.AnimationSettings = animation.data || {}
 
-          const tp = await HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/typographyGet/', params: { } }))
-            .then(res => {
-              setStorage('l', 'tipoEntidadeTypography', JSON.stringify(res.data))
-              this.Typography = res.data || {}
-            })
+          // 🔥 persistência
+          setStorage('l', 'tipoEntidadeTheme', JSON.stringify(this.Theme))
+          setStorage('l', 'tipoEntidadeLayoutsettings', JSON.stringify(this.LayoutSettings))
+          setStorage('l', 'tipoEntidadeTypography', JSON.stringify(this.Typography))
+          setStorage('l', 'tipoEntidadeAnimationSettings', JSON.stringify(this.AnimationSettings))
 
-          const as = await HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/tipoentidades/' + TipoEntidade + '/animationSettingsGet/', params: { } }))
-            .then(res => {
-              setStorage('l', 'tipoEntidadeAnimationSettings', JSON.stringify(res.data))
-              this.AnimationSettings = res.data || {}
-            })
-
-          if( tipoEntidade) {
+          // 🔥 sync com user
+          if (tipoEntidade) {
             const User = useUserStore()
-            
-            User.Theme = this.Theme
-            User.AnimationSettings = this.AnimationSettings
-            User.Typography = this.Typography
-            User.LayoutSettings = this.LayoutSettings
+
+            Object.assign(User, {
+              Theme: this.Theme,
+              LayoutSettings: this.LayoutSettings,
+              Typography: this.Typography,
+              AnimationSettings: this.AnimationSettings
+            })
 
             User.setSettings()
           }
-          return lay
+
+        } catch (e) {
+          console.error('getLayoutSettings TipoEntidade error', e)
         }
       },
 
-      async getTipoEntidades(){
-        const User = useUserStore()
-        await HTTPClient.get(url({type: "u", url: "api/django_resaas/tipoentidades", params: {}}) )
-        .then(res => {
-          this.rows = res.data
-          User.TipoEntidades =  this.rows
-        })
-      },
+      // ===============================
+      // LISTA
+      // ===============================
+      async getTipoEntidades() {
+        try {
+          const { data } = await HTTPClient.get(
+            url({ type: "u", url: "api/django_resaas/tipoentidades" })
+          )
+
+          this.rows = data || []
+
+          const User = useUserStore()
+          User.TipoEntidades = this.rows
+
+        } catch (e) {
+          console.error('getTipoEntidades error', e)
+        }
+      }
+
     }
   }
 )

@@ -24,6 +24,7 @@ export { default as AuthLayout } from './layouts/AuthLayout.vue'
 
 export { default as AutoForm } from './components/auto/AutoForm.vue'
 export { default as FormSaveEdit } from './components/auto/FormSaveEdit.vue'
+export { default as Form } from './components/engine/FormComponent.vue'
 export { default as AutoTable } from './components/auto/AutoTable.vue'
 export { default as AutoCrud } from './components/auto/AutoCrud.vue'
 export { default as CrudPage } from './components/auto/CrudPage.vue'

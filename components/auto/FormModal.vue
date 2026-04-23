@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { tdc } from '../../boot/base'
 import Form from '../engine/FormComponent.vue'
 
 const props = defineProps({
@@ -23,6 +24,8 @@ const formRef = ref(null)
 const saving = ref(false)
 const uploadProgress = ref(0)
 
+const isEdit = computed(() => !!props.data?.id)
+
 function close() {
   open.value = false
 }
@@ -34,27 +37,48 @@ function save() {
 
 <template>
   <q-dialog v-model="open" persistent>
-    <s-card style="min-width: 760px; max-width: 92vw; max-height: 90vh;" class="column no-wrap">
+    <q-card class="dialog-card column no-wrap">
 
-      <!-- 🔥 HEADER FIXO -->
-      <q-bar class="bg-primary text-white">
-        <div class="text-h6">
-          {{ data?.id ? 'Editar' : 'Novo' }}
+      <!-- 🔥 HEADER PREMIUM -->
+      <div class="dialog-header">
+
+        <!-- LEFT -->
+        <div>
+          <div class="text-h6 text-weight-bold">
+            {{ isEdit
+              ? tdc('Editar') + ' ' + tdc(model)
+              : tdc('Novo') + ' ' + tdc(model)
+            }}
+          </div>
+
+          <!-- BREADCRUMB -->
+          <div class="text-caption text-grey-7">
+            {{ tdc(model) }} / {{ isEdit ? tdc('Editar') : tdc('Novo') }}
+          </div>
         </div>
 
         <q-space />
 
-        <s-btn dense flat icon="close" @click="close">
-          <q-tooltip>Fechar</q-tooltip>
-        </s-btn>
-      </q-bar>
+        <!-- CLOSE -->
+        <q-btn
+          flat
+          round
+          dense
+          icon="close"
+          @click="close"
+        >
+          <q-tooltip>{{ tdc('Fechar') }}</q-tooltip>
+        </q-btn>
+
+      </div>
 
       <q-separator />
 
-      <!-- 🔥 BODY COM SCROLL -->
-      <q-card-section class="scroll col">
-        <div v-if="!schema || !schema.length">
-          <q-spinner />
+      <!-- 🔥 BODY -->
+      <q-card-section class="scroll col dialog-body">
+
+        <div v-if="!schema || !schema.length" class="flex flex-center q-pa-lg">
+          <q-spinner size="30px" color="primary" />
         </div>
 
         <div v-else>
@@ -69,21 +93,61 @@ function save() {
             @saved="() => { emit('saved'); close() }"
           />
 
+          <!-- 🔥 PROGRESS -->
           <q-linear-progress
             v-if="uploadProgress > 0"
             :value="uploadProgress / 100"
+            color="primary"
+            class="q-mt-md"
           />
         </div>
+
       </q-card-section>
 
       <q-separator />
 
-      <!-- 🔥 FOOTER FIXO -->
-      <q-card-actions align="right">
-        <s-btn flat label="Cancelar" @click="close" />
-        <s-btn color="primary" :loading="saving" label="Salvar" @click="save" />
+      <!-- 🔥 FOOTER -->
+      <q-card-actions align="right" class="q-pa-md">
+
+        <q-btn
+          flat
+          color="grey-7"
+          :label="tdc('Cancelar')"
+          @click="close"
+        />
+
+        <q-btn
+          color="primary"
+          unelevated
+          icon="save"
+          :loading="saving"
+          :label="tdc('Salvar')"
+          @click="save"
+        />
+
       </q-card-actions>
 
-    </s-card>
+    </q-card>
   </q-dialog>
 </template>
+
+<style scoped>
+.dialog-card {
+  min-width: 760px;
+  max-width: 92vw;
+  max-height: 90vh;
+  border-radius: 14px;
+}
+
+/* HEADER */
+.dialog-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+/* BODY */
+.dialog-body {
+  padding: 16px 20px;
+}
+</style>
