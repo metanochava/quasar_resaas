@@ -3,7 +3,7 @@
     <q-menu>
       <q-list dense>
         <q-item
-          v-for="idioma in Language.list"
+          v-for="idioma in Language.rows"
           :key="idioma"
           clickable
           @click="Language?.change(idioma)"
