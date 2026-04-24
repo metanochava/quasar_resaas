@@ -30,7 +30,7 @@ function goBack() {
 </script>
 
 <template>
-    <s-card class="full-height column">
+    <s-card class="dialog-card column no-wrap">
 
       <!-- 🔥 HEADER -->
       <q-card-actions class="q-px-lg q-py-md">
@@ -45,7 +45,7 @@ function goBack() {
       <q-separator />
 
       <!-- 🔥 BODY (cresce + scroll) -->
-      <q-card-section class="col scroll q-pa-md">
+      <q-card-section class="scroll col">
 
         <Form
           ref="formRef"
@@ -108,5 +108,11 @@ function goBack() {
 
 <style scoped>
 
+.dialog-card {
+  min-width: 760px;
+  max-width: 92vw;
+  max-height: 90vh;
+  border-radius: 14px;
+}
 
 </style>
