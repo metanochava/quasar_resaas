@@ -30,53 +30,37 @@ function goBack() {
 </script>
 
 <template>
-  <div class="q-pa-lg ">
-
-    <!-- 🔥 HEADER PREMIUM -->
-    <div class="q-mb-md">
-
-      <!-- LEFT -->
-      <div class="row items-center q-gutter-sm">
-
-
-
-        <!-- TITLE + BREADCRUMB -->
-        <div>
-          <div class="text-h5 text-weight-bold">
-            {{ isEdit
-              ? tdc('Editar') + ' ' + tdc(model)
-              : tdc('Novo') + ' ' + tdc(model)
-            }}
-          </div>
-        </div>
-
-      </div>
-
-      <!-- RIGHT ACTIONS -->
-      <div class="row items-center q-gutter-sm">
-
-        <q-btn
-          flat
-          color="grey-7"
-          icon="close"
-          :label="tdc('Cancelar')"
-          @click="goBack"
-        />
-
-        <q-btn
-          color="primary"
-          icon="save"
-          :label="tdc('Salvar')"
-          unelevated
-          @click="save"
-        />
-
-      </div>
-
-    </div>
-
+  <div class="q-pa-sm ">
+    
     <!-- 🔥 CARD FORM -->
     <s-card class="">
+      <q-card-actions align="around">
+        <div class="text-h5 text-weight-bold">
+          {{ isEdit
+            ? tdc('Editar') + ' ' + tdc(model)
+            : tdc('Novo') + ' ' + tdc(model)
+          }}
+        </div>
+        <div class="row items-center q-gutter-sm">
+
+          <q-btn
+            flat
+            color="grey-7"
+            icon="close"
+            :label="tdc('Cancelar')"
+            @click="goBack"
+          />
+
+          <q-btn
+            color="primary"
+            icon="save"
+            :label="tdc('Salvar')"
+            unelevated
+            @click="save"
+          />
+
+        </div>
+      </q-card-actions>
 
       <q-card-section class="q-pa-md">
 
