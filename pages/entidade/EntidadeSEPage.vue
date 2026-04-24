@@ -56,6 +56,7 @@ function canDo(perm) {
 
 // ---------------- LOAD DATA ----------------
 async function load(id) {
+  console.log('metano', id)
   if (!id) {
     Entidade.resetForm?.()
     return
