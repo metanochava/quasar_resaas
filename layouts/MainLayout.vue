@@ -91,22 +91,36 @@
 
     <q-page-container class="page-container">
 
-    <router-view v-slot="{ Component }">
+      <router-view v-slot="{ Component }">
 
-      <transition
-        v-if="ps.animation?.enable_animations"
-        :name="ps.animation?.page_transition || 'fade'"
-        mode="out-in"
-        :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'"
-      >
-        <component :is="Component" class="page-content"/>
-      </transition>
+        <transition
+          v-if="ps.animation?.enable_animations"
+          :name="ps.animation?.page_transition || 'fade'"
+          mode="out-in"
+          :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'"
+        >
+          <component :is="Component" class="page-content"/>
+        </transition>
 
-      <component v-else :is="Component" class="page-content"/>
+        <component v-else :is="Component" class="page-content"/>
 
-    </router-view>
+      </router-view>
+      <br>jksdhlkshdks
+      <br>jksdhlkshdks
+      <br>jksdhlkshdks<br>jksdhlkshdks
+      <br>jksdhlkshdks
+      <br>jksdhlkshdks<br>jksdhlkshdks
+      <br>jksdhlkshdks
+      <br>jksdhlkshdks<br>jksdhlkshdks
+      <br>jksdhlkshdks
+      <br>jksdhlkshdks<br>jksdhlkshdks
+      <br>jksdhlkshdks
+      <br>jksdhlkshdks<br>jksdhlkshdks
+      <br>jksdhlkshdks
+      <br>jksdhlkshdks
 
-  </q-page-container>
+    </q-page-container>
+
 
     <!-- -------------------- RODAPÉ -------------------- -->
 
@@ -275,17 +289,7 @@ html, body, #q-app {
   overflow: hidden;
 }
 
-/* 🔥 layout principal */
-.app-layout {
-  height: 100vh;
-  overflow: hidden;
-}
 
-/* 🔥 sidebar */
-.sidebar {
-  background: #111827;
-  color: white;
-}
 
 /* 🔥 container principal */
 .page-container {
