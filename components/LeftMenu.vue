@@ -2,7 +2,7 @@
 <template>
   <q-layout >
     <s-card  square
-        :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-sm ' : 'bg-primary text-white   q-pa-sm fixed-top'"
+        :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-sm  header-fixed' : 'bg-primary text-white   q-pa-sm fixed-top header-fixed' "
         flat
       >
       <div class="text-center text-h6">{{ User?.username }}</div>
@@ -84,3 +84,13 @@ export default defineComponent({
   }
 })
 </script>
+
+<style scoped>
+.header-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+</style>
