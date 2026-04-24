@@ -103,19 +103,6 @@
         </transition>
 
         <component v-else :is="Component" class="page-content"/>
-        <br>jksdhlkshdks
-      <br>jksdhlkshdks
-      <br>jksdhlkshdks<br>jksdhlkshdks
-      <br>jksdhlkshdks
-      <br>jksdhlkshdks<br>jksdhlkshdks
-      <br>jksdhlkshdks
-      <br>jksdhlkshdks<br>jksdhlkshdks
-      <br>jksdhlkshdks
-      <br>jksdhlkshdks<br>jksdhlkshdks
-      <br>jksdhlkshdks
-      <br>jksdhlkshdks<br>jksdhlkshdks
-      <br>jksdhlkshdks
-      <br>jksdhlkshdks
 
       </router-view>
     </q-page-container>
@@ -277,16 +264,6 @@ export default defineComponent({
 
 
 
-
-
-
-
-
-/* 🔥 bloquear scroll global */
-html, body, #q-app {
-  height: 100%;
-  overflow: hidden;
-}
 
 
 
