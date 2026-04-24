@@ -80,6 +80,8 @@ function goBack() {
 
       </q-card-section>
 
+      <slot />
+
       <q-separator />
 
       <!-- 🔥 FOOTER FIXO -->
