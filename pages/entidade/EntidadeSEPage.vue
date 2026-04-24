@@ -65,6 +65,7 @@ async function load(id) {
     return
   }
   console.log(String(Entidade.row?.id) === String(id))
+  console.log(Entidade.row?.id === id)
   console.log(Entidade.row?.id,  id)
   console.log(String(Entidade.row?.id))
   console.log(String(id))
@@ -75,7 +76,6 @@ async function load(id) {
   // 🔥 evita chamadas duplicadas com comparação segura
   if (String(Entidade.row?.id) === String(id)) {
     Entidade.form = Entidade.row 
-
   }
 
   console.log('step 3', id)
