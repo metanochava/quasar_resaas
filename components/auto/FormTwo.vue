@@ -109,10 +109,10 @@ function goBack() {
 <style scoped>
 
 .dialog-card {
-  min-width: 760px;
-  max-width: 92vw;
-  max-height: 90vh;
-  border-radius: 14px;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 </style>
