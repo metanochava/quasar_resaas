@@ -89,24 +89,24 @@
 
     <!-- -------------------- PAGE CONTAINER -------------------- -->
 
-    <q-page-container>
+    <q-page-container class="page-container">
 
-      <router-view v-slot="{ Component }">
+    <router-view v-slot="{ Component }">
 
-        <transition
-          v-if="ps.animation?.enable_animations"
-          :name="ps.animation?.page_transition || 'fade'"
-          mode="out-in"
-          :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'"
-        >
-          <component :is="Component" />
-        </transition>
+      <transition
+        v-if="ps.animation?.enable_animations"
+        :name="ps.animation?.page_transition || 'fade'"
+        mode="out-in"
+        :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'"
+      >
+        <component :is="Component" class="page-content"/>
+      </transition>
 
-        <component v-else :is="Component" />
+      <component v-else :is="Component" class="page-content"/>
 
-      </router-view>
+    </router-view>
 
-    </q-page-container>
+  </q-page-container>
 
     <!-- -------------------- RODAPÉ -------------------- -->
 
@@ -253,5 +253,50 @@ export default defineComponent({
 .bg-saas-premium > * {
   position: relative;
   z-index: 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 🔥 bloquear scroll global */
+html, body, #q-app {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 🔥 layout principal */
+.app-layout {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 🔥 sidebar */
+.sidebar {
+  background: #111827;
+  color: white;
+}
+
+/* 🔥 container principal */
+.page-container {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 🔥 área de conteúdo (a única que scrolla) */
+.page-content {
+  height: 100%;
+  overflow-y: auto;
+  padding: 16px;
 }
 </style>
