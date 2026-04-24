@@ -1,5 +1,5 @@
 <template>
-  <q-page class="full-height column">
+  <q-page class="q-pa-sm">
     <!-- FORM -->
     <FormSE
       v-if="ready"

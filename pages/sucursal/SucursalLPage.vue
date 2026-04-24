@@ -1,6 +1,6 @@
 
 <template>
-  <q-page class="q-pa-sm full-height column">
+  <q-page class="q-pa-sm ">
     <AutoCrud 
       :module="module" :model="model" :can="User.can" route="view_paciente"  
       :ignoreFields="['created_at','updated_at', 'created_by', 'updated_by', 'deleted_at']" 
