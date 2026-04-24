@@ -4,7 +4,7 @@
     <!-- FORM -->
     <FormSE
       v-if="ready"
-      :schema="store.campos"
+      :schema="store.fields"
       :module="store.app"
       :model="store.model"
       :config="store.config"
@@ -56,7 +56,7 @@ function canDo(perm) {
 // ---------------- LOAD DATA ----------------
 async function load(id) {
   // 🔥 evita chamadas duplicadas
-  if (id && store.row?.id === id) return
+  if (id && String(store.row?.id) === String(id)) return
 
   if (id) {
     await store.getById(id)
@@ -86,6 +86,7 @@ async function init() {
 watch(
   () => route.params.id,
   async (id) => {
+    if (!ready.value) return
     await load(id)
   }
 )
@@ -95,7 +96,7 @@ function onSaved(res) {
   console.log('Salvo com sucesso', res)
 
   // opcional
-  // store.getAll?.()
+  // store.loadData?.()
 }
 
 // ---------------- LIFECYCLE ----------------

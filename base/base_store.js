@@ -4,7 +4,7 @@ import { HTTPAuth, url } from './../boot/api'
 
 export function createBaseStore(name, config, extend = {}) {
   return defineStore(name, {
-
+ 
     // =========================
     // STATE
     // =========================
@@ -75,7 +75,7 @@ export function createBaseStore(name, config, extend = {}) {
         if (!this.app || !this.model) return
 
         await this.runHook('beforeSchema')
-        
+
         // {'schema': out, 'actions': actions, 'config': config }
         const rsp = await buildFormFromSchema(this.app, this.model)
 
