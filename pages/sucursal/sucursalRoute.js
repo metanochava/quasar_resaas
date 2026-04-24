@@ -1,48 +1,48 @@
 import { tdc } from '../../boot/base'
 
-export let entidadeRoutes = [
+export let sucursalRoutes = [
   {
-    path: '/list_entidade',
-    name: 'list_entidade',
+    path: '/list_sucursal',
+    name: 'list_sucursal',
     component: () => import('./SucursalLPage.vue'),
     meta: {
-      title: tdc('Vista de') + ' ' + tdc('entidade'),
+      title: tdc('Vista de') + ' ' + tdc('sucursal'),
       requiresAuth: true,
       icon: 'list',
-      requiredRole: 'list_entidade',
+      requiredRole: 'list_sucursal',
     },
   },
   {
-    path: '/add_entidade',
-    name: 'add_entidade',
+    path: '/add_sucursal',
+    name: 'add_sucursal',
     component: () => import('./SucursalSEPage.vue'),
     meta: {
-      title: tdc('Adicionar') + ' ' + tdc('entidade'),
+      title: tdc('Adicionar') + ' ' + tdc('sucursal'),
       requiresAuth: true,
       icon: 'add',
-      requiredRole: 'add_entidade',
+      requiredRole: 'add_sucursal',
     },
   },
   {
-    path: '/change_entidade/:id',
-    name: 'change_entidade',
+    path: '/change_sucursal/:id',
+    name: 'change_sucursal',
     component: () => import('./SucursalSEPage.vue'),
     meta: {
-      title: tdc('Editar') + ' ' + tdc('entidade'),
+      title: tdc('Editar') + ' ' + tdc('sucursal'),
       requiresAuth: true,
       icon: 'edit',
-      requiredRole: 'change_entidade',
+      requiredRole: 'change_sucursal',
     },
   },
   {
-    path: '/view_entidade/:id',
-    name: 'view_entidade',
+    path: '/view_sucursal/:id',
+    name: 'view_sucursal',
     component: () => import('./SucursalVPage.vue'),
     meta: {
-      title: tdc('Visualizar') + ' ' + tdc('entidade'),
+      title: tdc('Visualizar') + ' ' + tdc('sucursal'),
       requiresAuth: true,
       icon: 'visibility',
-      requiredRole: 'view_entidade',
+      requiredRole: 'view_sucursal',
     },
   }
 ]

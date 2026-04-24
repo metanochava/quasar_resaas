@@ -1,48 +1,48 @@
 import { tdc } from '../../boot/base'
 
-export let entidadeRoutes = [
+export let groupRoutes = [
   {
-    path: '/list_entidade',
-    name: 'list_entidade',
+    path: '/list_group',
+    name: 'list_group',
     component: () => import('./GroupLPage.vue'),
     meta: {
-      title: tdc('Vista de') + ' ' + tdc('entidade'),
+      title: tdc('Vista de') + ' ' + tdc('group'),
       requiresAuth: true,
       icon: 'list',
-      requiredRole: 'list_entidade',
+      requiredRole: 'list_group',
     },
   },
   {
-    path: '/add_entidade',
-    name: 'add_entidade',
+    path: '/add_group',
+    name: 'add_group',
     component: () => import('./GroupSEPage.vue'),
     meta: {
-      title: tdc('Adicionar') + ' ' + tdc('entidade'),
+      title: tdc('Adicionar') + ' ' + tdc('group'),
       requiresAuth: true,
       icon: 'add',
-      requiredRole: 'add_entidade',
+      requiredRole: 'add_group',
     },
   },
   {
-    path: '/change_entidade/:id',
-    name: 'change_entidade',
+    path: '/change_group/:id',
+    name: 'change_group',
     component: () => import('./GroupSEPage.vue'),
     meta: {
-      title: tdc('Editar') + ' ' + tdc('entidade'),
+      title: tdc('Editar') + ' ' + tdc('group'),
       requiresAuth: true,
       icon: 'edit',
-      requiredRole: 'change_entidade',
+      requiredRole: 'change_group',
     },
   },
   {
-    path: '/view_entidade/:id',
-    name: 'view_entidade',
+    path: '/view_group/:id',
+    name: 'view_group',
     component: () => import('./GroupVPage.vue'),
     meta: {
-      title: tdc('Visualizar') + ' ' + tdc('entidade'),
+      title: tdc('Visualizar') + ' ' + tdc('group'),
       requiresAuth: true,
       icon: 'visibility',
-      requiredRole: 'view_entidade',
+      requiredRole: 'view_group',
     },
   }
 ]
