@@ -1,5 +1,6 @@
 import { tdc } from '../boot/base'
 import { entidadeRoutes } from './../pages/entidade/entidadeRoute'
+import { tipo_entidadeRoutes } from './../pages/tipo_entidade/tipo_entidadeRoute'
 
 export let restRoutes = [
 
@@ -33,5 +34,6 @@ export let restRoutes = [
     } 
   },
   ...entidadeRoutes,
+  ...tipo_entidadeRoutes,
 ]
 
