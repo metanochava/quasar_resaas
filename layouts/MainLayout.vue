@@ -95,6 +95,7 @@
         v-if="ps.animation?.enable_animations"
         :name="ps.animation?.page_transition || 'fade'"
         mode="out-in"
+        :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
       >
         <router-view/>
       </transition>
