@@ -25,7 +25,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntidadeStore } from './../../stores/EntidadeStore'
+import { useEntidadeStore } from '../../stores/EntidadeStore'
 import FormSE from '../../components/auto/FormSaveEdit.vue'
 
 // ---------------- ROUTE ----------------

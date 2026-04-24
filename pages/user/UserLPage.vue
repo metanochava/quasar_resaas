@@ -17,10 +17,9 @@ import { ref, onMounted} from 'vue'
 
 const User =useUserStore()
 const module = ref('django_resaas')
-const model = ref('Entidade')
+const model = ref('User')
 
 onMounted(async () => {
 
 })
 </script>
-

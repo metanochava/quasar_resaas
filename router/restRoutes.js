@@ -1,6 +1,10 @@
 import { tdc } from '../boot/base'
 import { entidadeRoutes } from './../pages/entidade/entidadeRoute'
 import { tipo_entidadeRoutes } from './../pages/tipo_entidade/tipo_entidadeRoute'
+import { userRoutes } from '../pages/user/userRoute'
+import { groupRoutes } from '../pages/group/groupRoute'
+import { sucursalRoutes } from '../pages/sucursal/sucursalRoute'
+
 
 export let restRoutes = [
 
@@ -35,5 +39,8 @@ export let restRoutes = [
   },
   ...entidadeRoutes,
   ...tipo_entidadeRoutes,
+  ...groupRoutes,
+  ...sucursalRoutes,
+  ...userRoutes,
 ]
 

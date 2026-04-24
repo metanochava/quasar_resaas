@@ -1,39 +1,38 @@
 <template>
   <div class="q-pa-md">
-
     <!-- FORM -->
     <FormSE
       v-if="ready"
-      :schema="store.fields"
-      :module="store.app"
-      :model="store.model"
-      :config="store.config"
-      :actions="store.actions"
+      :schema="TipoEntidade.fields"
+      :module="TipoEntidade.app"
+      :model="TipoEntidade.model"
+      :config="TipoEntidade.config"
+      :actions="TipoEntidade.actions"
       :can-do="canDo"
       :ignore-fields="ignoreFields"
-      :data="store.form"
+      :data="TipoEntidade.form"
       @saved="onSaved"
     />
 
-    <!-- LOADING -->
-    <div v-else class="flex flex-center q-pa-lg">
+
+    <div v-if="!ready" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
     </div>
-
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntidadeStore } from '../../stores/EntidadeStore'
+import { useTipoEntidadeStore } from './../../stores/TipoEntidadeStore'
 import FormSE from '../../components/auto/FormSaveEdit.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const store = useEntidadeStore()
+const TipoEntidade = useTipoEntidadeStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
@@ -55,14 +54,21 @@ function canDo(perm) {
 
 // ---------------- LOAD DATA ----------------
 async function load(id) {
-  // 🔥 evita chamadas duplicadas
-  if (id && String(store.row?.id) === String(id)) return
 
-  if (id) {
-    await store.getById(id)
-  } else {
-    store.resetForm?.()
+  if (!id) {
+
+    TipoEntidade.resetForm?.()
+    return
   }
+
+
+  // 🔥 evita chamadas duplicadas com comparação segura
+  if (String(TipoEntidade.row?.id) === String(id)) {
+    TipoEntidade.form = TipoEntidade.row 
+    return
+  }
+
+  TipoEntidade.row =  await TipoEntidade.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -70,7 +76,7 @@ async function init() {
   try {
     ready.value = false
 
-    await store.init()
+    await TipoEntidade.init()
 
     const id = route.params.id
     await load(id)
@@ -82,21 +88,23 @@ async function init() {
   }
 }
 
-// ---------------- WATCH ROUTE ----------------
+// ---------------- WATCH ROTA (CORRIGIDO) ----------------
 watch(
-  () => route.params.id,
-  async (id) => {
-    if (!ready.value) return
+  () => route.params,
+  async (params) => {
+    if (!params) return
+
+    const id = params.id
+
+    // 🔥 sempre carrega quando muda rota
     await load(id)
-  }
+  },
+  { immediate: false } // init já trata o primeiro carregamento
 )
 
 // ---------------- EVENTS ----------------
 function onSaved(res) {
-  console.log('Salvo com sucesso', res)
-
-  // opcional
-  // store.loadData?.()
+  // console.log('Salvo com sucesso', res)
 }
 
 // ---------------- LIFECYCLE ----------------
