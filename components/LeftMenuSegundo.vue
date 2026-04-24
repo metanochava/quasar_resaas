@@ -10,6 +10,7 @@
       style="padding: 0px"
     >
       <q-expansion-item
+        group="menu"
         default-opened
         :class="
           $q.dark.isActive
