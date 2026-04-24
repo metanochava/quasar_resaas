@@ -97,7 +97,7 @@
           v-if="ps.animation?.enable_animations"
           :name="ps.animation?.page_transition || 'fade'"
           mode="out-in"
-          :class="$q.dark.isActive ? 'bg-dark text-white' : ''"
+          :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'"
         >
           <component :is="Component" />
         </transition>
@@ -214,4 +214,44 @@ export default defineComponent({
 })
 </script>
 
-<style></style>
+<style>
+  /* 🔥 Fundo SaaS premium (light mode) */
+.bg-saas-premium {
+  position: relative;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4ecf3 100%);
+  overflow: hidden;
+}
+
+/* 🔥 camada decorativa suave */
+.bg-saas-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.04) 2px, transparent 2px),
+    radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.03) 2px, transparent 2px);
+
+  background-size: 120px 120px, 160px 160px;
+  opacity: 0.6;
+}
+
+/* 🔥 glow moderno (efeito SaaS) */
+.bg-saas-premium::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(circle at 10% 10%, rgba(0, 123, 255, 0.15), transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(0, 200, 150, 0.12), transparent 40%);
+
+  pointer-events: none;
+}
+
+/* 🔥 garante que conteúdo fique acima */
+.bg-saas-premium > * {
+  position: relative;
+  z-index: 1;
+}
+</style>
