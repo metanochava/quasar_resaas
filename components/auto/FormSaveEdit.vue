@@ -19,7 +19,7 @@ const props = defineProps({
 const formRef = ref(null)
 
 const isEdit = computed(() => !!props.data?.id)
-
+const saving = ref(false)
 function save() {
   formRef.value?.save()
 }
@@ -34,33 +34,18 @@ function goBack() {
     
     <!-- 🔥 CARD FORM -->
     <s-card class="">
-      <q-card-actions align="around">
-        <div class="text-h5 text-weight-bold">
+      <q-card-actions align="left">
+        <div class="text-h5 text-weight-bold  items-left">
           {{ isEdit
             ? tdc('Editar') + ' ' + tdc(model)
             : tdc('Novo') + ' ' + tdc(model)
           }}
         </div>
-        <div class="row items-center q-gutter-sm">
 
-          <q-btn
-            flat
-            color="grey-7"
-            icon="close"
-            :label="tdc('Cancelar')"
-            @click="goBack"
-          />
-
-          <q-btn
-            color="primary"
-            icon="save"
-            :label="tdc('Salvar')"
-            unelevated
-            @click="save"
-          />
-
-        </div>
       </q-card-actions>
+
+      <q-separator />
+
 
       <q-card-section class="q-pa-md">
 
@@ -76,6 +61,31 @@ function goBack() {
         />
 
       </q-card-section>
+
+
+      <q-separator />
+
+      <!-- 🔥 FOOTER -->
+      <q-card-actions align="right" class="q-pa-md">
+
+        <q-btn
+            flat
+            color="grey-7"
+            icon="close"
+            :label="tdc('Cancelar')"
+            @click="goBack"
+          />
+
+          <q-btn
+            color="primary"
+            icon="save"
+            :label="tdc('Salvar')"
+             :loading="saving"
+            unelevated
+            @click="save"
+          />
+
+      </q-card-actions>
 
     </s-card>
 
