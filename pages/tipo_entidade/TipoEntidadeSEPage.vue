@@ -2,7 +2,6 @@
   <q-page class=" q-pa-sm ">
     <!-- FORM -->
     <FormSE
-    class="full-height"
       v-if="ready"
       :schema="TipoEntidade.fields"
       :module="TipoEntidade.app"

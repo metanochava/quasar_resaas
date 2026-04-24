@@ -57,6 +57,26 @@ function goBack() {
           :ignore-fields="ignoreFields"
           @saved="goBack"
         />
+        <Form
+          ref="formRef"
+          :schema="schema"
+          :module="module"
+          :model="model"
+          :data="data"
+          :can-do="canDo"
+          :ignore-fields="ignoreFields"
+          @saved="goBack"
+        />
+        <Form
+          ref="formRef"
+          :schema="schema"
+          :module="module"
+          :model="model"
+          :data="data"
+          :can-do="canDo"
+          :ignore-fields="ignoreFields"
+          @saved="goBack"
+        />
 
       </q-card-section>
 
@@ -66,9 +86,8 @@ function goBack() {
       <q-card-actions align="right" class="q-pa-md">
 
         <q-btn
-          flat
+          outelined
           color="grey-7"
-          icon="close"
           :label="tdc('Cancelar')"
           @click="goBack"
         />
