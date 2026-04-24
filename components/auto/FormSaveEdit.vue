@@ -48,12 +48,6 @@ function goBack() {
               : tdc('Novo') + ' ' + tdc(model)
             }}
           </div>
-
-          <!-- BREADCRUMB -->
-          <div class="text-caption text-grey-7">
-            {{ tdc('Home') }} / {{ tdc(model) }} / 
-            {{ isEdit ? tdc('Editar') : tdc('Novo') }}
-          </div>
         </div>
 
       </div>
