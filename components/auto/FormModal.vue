@@ -51,10 +51,6 @@ function save() {
             }}
           </div>
 
-          <!-- BREADCRUMB -->
-          <div class="text-caption text-grey-7">
-            {{ tdc(model) }} / {{ isEdit ? tdc('Editar') : tdc('Novo') }}
-          </div>
         </div>
 
         <q-space />
@@ -110,7 +106,7 @@ function save() {
       <q-card-actions align="right" class="q-pa-md">
 
         <q-btn
-          flat
+          outeline
           color="grey-7"
           :label="tdc('Cancelar')"
           @click="close"
