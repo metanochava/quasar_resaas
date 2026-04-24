@@ -3,39 +3,62 @@ import { buildFormFromSchema } from './../utils/autoForm'
 import { HTTPAuth, url } from './../boot/api'
 
 export function createBaseStore(name, config, extend = {}) {
+
+  // 🔥 CONFIG IMUTÁVEL (NUNCA MUDA)
+  const BASE_CONFIG = Object.freeze({
+    url: config.url,
+    app: config.app,
+    model: config.model
+  })
+
   return defineStore(name, {
- 
+
     // =========================
     // STATE
     // =========================
-    state: () => ({
-      url: config.url,
-      model: config.model,
-      app: config.app,
+    state: () => {
+      const extended = extend.state ? extend.state() : {}
 
-      loading: false,
+      return {
+        // 🔥 CONFIG FIXA
+        _config: BASE_CONFIG,
 
-      fields: [],
-      rows: [],
-      row: null,
-      form: {},
+        // 🔥 DERIVADOS (nunca confiar diretamente neles)
+        url: BASE_CONFIG.url,
+        app: BASE_CONFIG.app,
+        model: BASE_CONFIG.model,
 
-      search: '',
-      filters: {},
+        loading: false,
 
-      pagination: {
-        page: 1,
-        rowsPerPage: 10,
-        rowsNumber: 0,
-      },
+        fields: [],
+        rows: [],
+        row: null,
+        form: {},
 
-      ...(extend.state ? extend.state() : {})
-    }),
+        actions: [],
+        config: {},
+
+        search: '',
+        filters: {},
+
+        pagination: {
+          page: 1,
+          rowsPerPage: 10,
+          rowsNumber: 0
+        },
+
+        ...extended
+      }
+    },
 
     // =========================
-    // GETTERS
+    // GETTERS (SEMPRE USAR ESTES)
     // =========================
     getters: {
+      safeApp: (state) => state._config.app,
+      safeModel: (state) => state._config.model,
+      safeUrl: (state) => state._config.url,
+
       item: (state) => state.row,
       items: (state) => state.rows,
 
@@ -47,6 +70,14 @@ export function createBaseStore(name, config, extend = {}) {
     // =========================
     actions: {
 
+      // 🔥 GUARDA DE SEGURANÇA GLOBAL
+      assertConfig() {
+        if (!this._config.app || !this._config.model) {
+          console.error('BaseStore CONFIG ERROR:', this._config)
+          throw new Error('module/model required')
+        }
+      },
+
       // =========================
       // HOOK RUNNER
       // =========================
@@ -57,9 +88,11 @@ export function createBaseStore(name, config, extend = {}) {
       },
 
       // =========================
-      // INIT
+      // INIT SEGURO
       // =========================
       async init() {
+        this.assertConfig()
+
         await this.runHook('beforeInit')
 
         await this.loadSchema()
@@ -72,14 +105,18 @@ export function createBaseStore(name, config, extend = {}) {
       // SCHEMA
       // =========================
       async loadSchema() {
-        if (!this.app || !this.model) return
+        this.assertConfig()
 
         await this.runHook('beforeSchema')
 
-        // {'schema': out, 'actions': actions, 'config': config }
-        const rsp = await buildFormFromSchema(this.app, this.model)
+        const rsp = await buildFormFromSchema({
+          module: this.safeApp,
+          model: this.safeModel
+        })
 
-        this.fields = rsp.schema
+        this.fields = rsp?.schema || []
+        this.actions = rsp?.actions || []
+        this.config = rsp?.config || {}
 
         await this.runHook('afterSchema', this.fields)
       },
@@ -88,6 +125,8 @@ export function createBaseStore(name, config, extend = {}) {
       // LIST
       // =========================
       async loadData(params = {}) {
+        this.assertConfig()
+
         await this.runHook('beforeLoad')
 
         this.loading = true
@@ -96,13 +135,13 @@ export function createBaseStore(name, config, extend = {}) {
           const { data } = await HTTPAuth.get(
             url({
               type: 'u',
-              url: this.url,
+              url: this.safeUrl,
               params: {
                 page: this.pagination.page,
                 page_size: this.pagination.rowsPerPage,
                 search: this.search,
                 ...this.filters,
-                ...params,
+                ...params
               }
             })
           )
@@ -112,8 +151,6 @@ export function createBaseStore(name, config, extend = {}) {
 
           await this.runHook('afterLoad', this.rows)
 
-        } catch (e) {
-          console.error('loadData error', e)
         } finally {
           this.loading = false
         }
@@ -123,18 +160,19 @@ export function createBaseStore(name, config, extend = {}) {
       // GET BY ID
       // =========================
       async getById(id) {
+        this.assertConfig()
+
         await this.runHook('beforeGet', id)
 
         if (!id) return
 
-        // evita request duplicado
         if (this.row?.id === id) return this.row
 
         this.loading = true
 
         try {
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `${this.url}/${id}/` })
+            url({ type: 'u', url: `${this.safeUrl}/${id}/` })
           )
 
           this.row = data
@@ -143,11 +181,6 @@ export function createBaseStore(name, config, extend = {}) {
           await this.runHook('afterGet', data)
 
           return data
-
-        } catch (e) {
-          console.error('getById error', e)
-          this.resetForm()
-          throw e
 
         } finally {
           this.loading = false
@@ -158,13 +191,15 @@ export function createBaseStore(name, config, extend = {}) {
       // CREATE
       // =========================
       async create() {
+        this.assertConfig()
+
         await this.runHook('beforeCreate', this.form)
 
         this.loading = true
 
         try {
           const { data } = await HTTPAuth.post(
-            url({ type: 'u', url: this.url }),
+            url({ type: 'u', url: this.safeUrl }),
             this.form
           )
 
@@ -177,10 +212,6 @@ export function createBaseStore(name, config, extend = {}) {
 
           return data
 
-        } catch (e) {
-          console.error('create error', e)
-          throw e
-
         } finally {
           this.loading = false
         }
@@ -190,16 +221,18 @@ export function createBaseStore(name, config, extend = {}) {
       // UPDATE
       // =========================
       async update() {
-        await this.runHook('beforeUpdate', this.form)
+        this.assertConfig()
 
         const id = this.form?.id
         if (!id) return
+
+        await this.runHook('beforeUpdate', this.form)
 
         this.loading = true
 
         try {
           const { data } = await HTTPAuth.put(
-            url({ type: 'u', url: `${this.url}/${id}/` }),
+            url({ type: 'u', url: `${this.safeUrl}/${id}/` }),
             this.form
           )
 
@@ -213,10 +246,6 @@ export function createBaseStore(name, config, extend = {}) {
 
           return data
 
-        } catch (e) {
-          console.error('update error', e)
-          throw e
-
         } finally {
           this.loading = false
         }
@@ -226,6 +255,8 @@ export function createBaseStore(name, config, extend = {}) {
       // DELETE
       // =========================
       async remove() {
+        this.assertConfig()
+
         const id = this.form?.id
         if (!id) return
 
@@ -235,7 +266,7 @@ export function createBaseStore(name, config, extend = {}) {
 
         try {
           await HTTPAuth.delete(
-            url({ type: 'u', url: `${this.url}/${id}/` })
+            url({ type: 'u', url: `${this.safeUrl}/${id}/` })
           )
 
           this.rows = this.rows.filter(i => i.id !== id)
@@ -244,49 +275,30 @@ export function createBaseStore(name, config, extend = {}) {
 
           await this.runHook('afterDelete', id)
 
-          return true
-
-        } catch (e) {
-          console.error('delete error', e)
-          throw e
-
         } finally {
           this.loading = false
         }
       },
 
       // =========================
-      // SAVE (INTELIGENTE)
+      // SAVE
       // =========================
       async save() {
-        if (this.form?.id) {
-          return await this.update()
-        }
-        return await this.create()
+        return this.form?.id
+          ? this.update()
+          : this.create()
       },
 
       // =========================
-      // SEARCH
-      // =========================
-      async setSearch(search) {
-        this.search = search
-        this.pagination.page = 1
-        await this.loadData()
-      },
-
-      // =========================
-      // FILTERS
-      // =========================
-      async setFilters(filters) {
-        this.filters = filters
-        this.pagination.page = 1
-        await this.loadData()
-      },
-
-      // =========================
-      // RESET FORM (INTELIGENTE)
+      // RESET FORM INTELIGENTE
       // =========================
       resetForm() {
+        if (!this.fields?.length) {
+          this.form = {}
+          this.row = null
+          return
+        }
+
         const newForm = {}
 
         this.fields.forEach(field => {
