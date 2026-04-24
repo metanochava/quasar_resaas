@@ -37,7 +37,7 @@ function save() {
 
 <template>
   <q-dialog v-model="open" persistent>
-    <q-card class="dialog-card column no-wrap">
+    <s-card class="dialog-card column no-wrap">
 
       <!-- 🔥 HEADER PREMIUM -->
       <div class="dialog-header">
@@ -127,7 +127,7 @@ function save() {
 
       </q-card-actions>
 
-    </q-card>
+    </s-card>
   </q-dialog>
 </template>
 

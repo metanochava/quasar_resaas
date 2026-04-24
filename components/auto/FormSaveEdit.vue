@@ -30,11 +30,11 @@ function goBack() {
 </script>
 
 <template>
-  <div class="q-pa-sm ">
+  <div class="q-pa-xs ">
     
     <!-- 🔥 CARD FORM -->
     <s-card class="">
-      <q-card-actions align="left">
+      <q-card-actions align="left" style="padding: 16px 20px;">
         <div class="text-h5 text-weight-bold  items-left">
           {{ isEdit
             ? tdc('Editar') + ' ' + tdc(model)
