@@ -56,16 +56,21 @@ function canDo(perm) {
 
 // ---------------- LOAD DATA ----------------
 async function load(id) {
-  console.log('metano', id)
+  console.log('step 1', id)
   if (!id) {
+    console.log('diferente', id)
     Entidade.resetForm?.()
     return
   }
+  console.log('step 2', id)
 
   // 🔥 evita chamadas duplicadas com comparação segura
   if (String(Entidade.row?.id) === String(id)) return
 
+  console.log('step 3', id)
+
   await Entidade.getById(id)
+   console.log('step 4', id)
 }
 
 // ---------------- INIT ----------------
