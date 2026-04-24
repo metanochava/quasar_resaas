@@ -12,7 +12,14 @@
       :ignore-fields="ignoreFields"
       :data="TipoEntidade.form"
       @saved="onSaved"
-    />
+    >
+      metano {{ 9+7 }}
+
+      <br> 
+      <div  class="flex flex-center q-pa-lg">
+      <q-spinner size="40px" color="primary" />
+    </div>
+    </FormTwo>
 
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
