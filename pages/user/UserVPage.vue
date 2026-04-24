@@ -9,7 +9,14 @@
       :config="Entidade.config"
       :actions="Entidade.actions"
       :can-do="canDo"
-      :ignore-fields="ignoreFields"
+      :ignore-fields="[
+        'id',
+        'created_at',
+        'updated_at',
+        'created_by',
+        'updated_by',
+        'deleted_at'
+      ]"
       :data="Entidade.form"
       @saved="onSaved"
     />
@@ -26,7 +33,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEntidadeStore } from '../../stores/EntidadeStore'
-import FormSE from '../../components/auto/FormSaveEdit.vue'
+import FormSE from '../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
@@ -37,14 +44,7 @@ const Entidade = useEntidadeStore()
 // ---------------- STATE ----------------
 const ready = ref(false)
 
-const ignoreFields = [
-  'id',
-  'created_at',
-  'updated_at',
-  'created_by',
-  'updated_by',
-  'deleted_at'
-]
+
 
 // ---------------- PERMISSIONS ----------------
 function canDo(perm) {

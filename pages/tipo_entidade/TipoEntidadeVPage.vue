@@ -26,7 +26,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTipoEntidadeStore } from './../../stores/TipoEntidadeStore'
-import FormSE from '../../components/auto/FormSaveEdit.vue'
+import FormSE from '../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()

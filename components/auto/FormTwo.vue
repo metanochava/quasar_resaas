@@ -30,21 +30,22 @@ function goBack() {
 </script>
 
 <template>
-    <s-card >
-      <q-card-actions align="left" style="padding: 16px 20px;">
-        <div class="text-h5 text-weight-bold  items-left">
+    <s-card class="full-height column">
+
+      <!-- 🔥 HEADER -->
+      <q-card-actions class="q-px-lg q-py-md">
+        <div class="text-h5 text-weight-bold">
           {{ isEdit
             ? tdc('Editar') + ' ' + tdc(model)
             : tdc('Novo') + ' ' + tdc(model)
           }}
         </div>
-
       </q-card-actions>
 
       <q-separator />
 
-
-      <q-card-section class="q-pa-md">
+      <!-- 🔥 BODY (cresce + scroll) -->
+      <q-card-section class="col scroll q-pa-md">
 
         <Form
           ref="formRef"
@@ -59,30 +60,30 @@ function goBack() {
 
       </q-card-section>
 
-
       <q-separator />
 
-      <!-- 🔥 FOOTER -->
+      <!-- 🔥 FOOTER FIXO -->
       <q-card-actions align="right" class="q-pa-md">
 
         <q-btn
-            flat
-            color="grey-7"
-            icon="close"
-            :label="tdc('Cancelar')"
-            @click="goBack"
-          />
+          flat
+          color="grey-7"
+          icon="close"
+          :label="tdc('Cancelar')"
+          @click="goBack"
+        />
 
-          <q-btn
-            color="primary"
-            icon="save"
-            :label="tdc('Salvar')"
-             :loading="saving"
-            unelevated
-            @click="save"
-          />
+        <q-btn
+          color="primary"
+          icon="save"
+          :label="tdc('Salvar')"
+          :loading="saving"
+          unelevated
+          @click="save"
+        />
 
       </q-card-actions>
+
     </s-card>
 </template>
 

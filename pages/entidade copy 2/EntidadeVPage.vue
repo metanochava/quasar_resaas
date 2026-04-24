@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-sm">
+  <div class="q-pa-md">
     <!-- FORM -->
     <FormSE
       v-if="ready"
@@ -25,7 +25,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntidadeStore } from '../../stores/EntidadeStore'
+import { useEntidadeStore } from './../../stores/EntidadeStore'
 import FormSE from '../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
