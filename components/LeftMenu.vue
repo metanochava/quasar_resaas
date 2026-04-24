@@ -1,9 +1,9 @@
 
 <template>
   <q-layout >
-    <s-card  squared
+    <s-card  square
         :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-sm  header-fixed' : 'bg-primary text-white   q-pa-sm fixed-top header-fixed' "
-        flate
+        flat
       >
       <div class="text-center text-h6">{{ User?.username }}</div>
       <s-btn
