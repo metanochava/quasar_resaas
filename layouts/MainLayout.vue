@@ -67,7 +67,7 @@
     </q-header>
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
-    <s-drawer
+    <q-drawer
       v-model="User.LeftTop"
       show-if-above
       side="left"
@@ -78,14 +78,14 @@
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <LeftMenu />
       </q-scroll-area>
-    </s-drawer>
+    </q-drawer>
 
     <!-- -------------------- RIGHT DRAWER -------------------- -->
-    <s-drawer v-model="User.RightTop" side="right" bordered :width="300">
+    <q-drawer v-model="User.RightTop" side="right" bordered :width="300">
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <RightMenu />
       </q-scroll-area>
-    </s-drawer>
+    </q-drawer>
 
     <!-- -------------------- PAGE CONTAINER -------------------- -->
 
