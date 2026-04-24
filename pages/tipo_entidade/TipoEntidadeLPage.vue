@@ -10,7 +10,7 @@
 
 <script setup>
 
-import { AutoCrud } from './../../components/auto/AutoCrud.vue'
+import  AutoCrud  from './../../components/auto/AutoCrud.vue'
 import useUserStore from './../../stores/UserStore'
 import { ref, onMounted} from 'vue'
 
