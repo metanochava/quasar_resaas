@@ -1,7 +1,8 @@
 <template>
-  <q-page class="full-height ">
+  <q-page class=" q-pa-sm ">
     <!-- FORM -->
-    <FormSE
+    <FormSE 
+      class="full-height"
       v-if="ready"
       :schema="TipoEntidade.fields"
       :module="TipoEntidade.app"
