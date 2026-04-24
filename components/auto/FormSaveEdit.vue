@@ -30,22 +30,15 @@ function goBack() {
 </script>
 
 <template>
-  <div class="q-pa-lg page-container">
+  <div class="q-pa-lg ">
 
     <!-- 🔥 HEADER PREMIUM -->
-    <div class="header-container q-mb-md">
+    <div class="q-mb-md">
 
       <!-- LEFT -->
       <div class="row items-center q-gutter-sm">
 
-        <!-- BACK BUTTON -->
-        <q-btn
-          flat
-          round
-          icon="arrow_back"
-          @click="goBack"
-          class="back-btn"
-        />
+
 
         <!-- TITLE + BREADCRUMB -->
         <div>
@@ -89,7 +82,7 @@ function goBack() {
     </div>
 
     <!-- 🔥 CARD FORM -->
-    <q-card class="form-card shadow-2">
+    <s-card class="">
 
       <q-card-section class="q-pa-md">
 
@@ -106,32 +99,12 @@ function goBack() {
 
       </q-card-section>
 
-    </q-card>
+    </s-card>
 
   </div>
 </template>
 
 <style scoped>
-.page-container {
-  max-width: 1100px;
-  margin: 0 auto;
-}
 
-/* HEADER */
-.header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
-/* BOTÃO VOLTAR */
-.back-btn {
-  background: rgba(0,0,0,0.04);
-}
-
-/* CARD */
-.form-card {
-  border-radius: 14px;
-  background: #fff;
-}
 </style>
