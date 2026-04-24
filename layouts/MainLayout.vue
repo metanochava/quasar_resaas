@@ -91,18 +91,20 @@
 
     <q-page-container>
 
-      <transition
-        v-if="ps.animation?.enable_animations"
-        :name="ps.animation?.page_transition || 'fade'"
-        mode="out-in"
-        :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
-      >
-        <router-view/>
-      </transition>
+      <router-view v-slot="{ Component }">
 
-      <router-view v-else/>
+        <transition
+          v-if="ps.animation?.enable_animations"
+          :name="ps.animation?.page_transition || 'fade'"
+          mode="out-in"
+          :class="$q.dark.isActive ? 'bg-dark text-white' : ''"
+        >
+          <component :is="Component" />
+        </transition>
 
+        <component v-else :is="Component" />
 
+      </router-view>
 
     </q-page-container>
 
