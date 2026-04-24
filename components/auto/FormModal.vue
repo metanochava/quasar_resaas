@@ -36,7 +36,7 @@ function save() {
 </script>
 
 <template>
-  <q-dialog v-model="open" persistent>
+  <q-dialog v-model="open" persistent >
     <s-card class="dialog-card column no-wrap">
 
       <!-- 🔥 HEADER PREMIUM -->

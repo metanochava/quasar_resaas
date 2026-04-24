@@ -30,10 +30,7 @@ function goBack() {
 </script>
 
 <template>
-  <div class="q-pa-xs ">
-    
-    <!-- 🔥 CARD FORM -->
-    <s-card class="">
+    <s-card >
       <q-card-actions align="left" style="padding: 16px 20px;">
         <div class="text-h5 text-weight-bold  items-left">
           {{ isEdit
@@ -86,10 +83,7 @@ function goBack() {
           />
 
       </q-card-actions>
-
     </s-card>
-
-  </div>
 </template>
 
 <style scoped>
