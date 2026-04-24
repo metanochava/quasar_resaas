@@ -267,10 +267,20 @@ export default defineComponent({
 
 
 
+
+
+/* 🔥 bloquear scroll global */
+html, body, #q-app {
+  height: 100%;
+  overflow: hidden;
+}
+
+
 /* 🔥 container principal */
 .page-container {
   height: 100%;
   overflow: hidden;
+  overflow-y: auto;
 }
 
 /* 🔥 área de conteúdo (a única que scrolla) */
