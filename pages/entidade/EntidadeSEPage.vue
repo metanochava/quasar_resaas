@@ -1,6 +1,8 @@
 <template>
   <div class="q-pa-md">
 
+    {{Entidade?.row}} || 
+    {{ Entidade.form }}
     <!-- FORM -->
     <FormSE
       v-if="ready"
