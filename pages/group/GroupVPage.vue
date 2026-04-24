@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-sm">
     <!-- FORM -->
     <FormSE
       v-if="ready"
