@@ -64,13 +64,6 @@ async function load(id) {
     Entidade.resetForm?.()
     return
   }
-  console.log(String(Entidade.row?.id) === String(id))
-  console.log(Entidade.row?.id === id)
-  console.log(Entidade.row?.id,  id)
-  console.log(String(Entidade.row?.id))
-  console.log(String(id))
-  console.log('step 2', id)
-
 
 
   // 🔥 evita chamadas duplicadas com comparação segura

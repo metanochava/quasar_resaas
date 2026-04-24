@@ -29,6 +29,7 @@ export const useEntidadeStore = createBaseStore(
       // SETTINGS GLOBAIS
       // ===============================
       async getSettings() {
+        const User = useUserStore()
         try {
           const { data } = await HTTPClient.get(url({ type: "u", url: "api/site" }))
 
@@ -36,9 +37,9 @@ export const useEntidadeStore = createBaseStore(
           this.LayoutSettings = data.layout_settings || {}
           this.AnimationSettings = data.animation_settings || {}
           this.Typography = data.typography || {}
-          this.row = data.entidade || null
+          User.Entidade = data.entidade || null
 
-          const User = useUserStore()
+          
 
           Object.assign(User, {
             Theme: this.Theme,
@@ -58,8 +59,9 @@ export const useEntidadeStore = createBaseStore(
       // MODELOS
       // ===============================
       async setEntidadeModelos(entidadeId) {
+        const User = useUserStore()
         try {
-          const id = entidadeId || this.row?.id
+          const id = entidadeId || User.Entidade?.id
           if (!id) return
 
           const { data } = await HTTPAuth.get(
@@ -81,8 +83,9 @@ export const useEntidadeStore = createBaseStore(
       // MODULOS
       // ===============================
       async setEntidadeModulos(entidadeId) {
+        const User = useUserStore()
         try {
-          const id = entidadeId || this.row?.id
+          const id = entidadeId || User.Entidade?.id
           if (!id) return
 
           const { data } = await HTTPAuth.get(
@@ -106,8 +109,9 @@ export const useEntidadeStore = createBaseStore(
       // LAYOUT / THEME
       // ===============================
       async getLayoutSettings(entidadeId) {
+        const User = useUserStore()
         try {
-          const id = entidadeId || this.row?.id
+          const id = entidadeId || User.Entidade?.id
           if (!id) return
 
           const [theme, layout, typography, animation] = await Promise.all([
@@ -173,7 +177,6 @@ export const useEntidadeStore = createBaseStore(
         const User = useUserStore()
         const Sucursal = useSucursalStore()
 
-        this.row = entidade
         User.Entidade = entidade
 
         setStorage('l', 'userEntidade', JSON.stringify(entidade))
@@ -187,20 +190,22 @@ export const useEntidadeStore = createBaseStore(
       // LOAD DIRETO
       // ===============================
       async getModulos() {
-        if (!this.row?.id) return
+        const User = useUserStore()
+        if (!User.Entidade?.id) return
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entidades/${this.row.id}/resaas_modulos/` })
+          url({ type: 'u', url: `api/django_resaas/entidades/${User.Entidade.id}/resaas_modulos/` })
         )
 
         this.Modulos = data || []
       },
 
       async getModelos() {
-        if (!this.row?.id) return
+        const User = useUserStore()
+        if (!User.Entidade?.id) return
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entidades/${this.row.id}/modelos` })
+          url({ type: 'u', url: `api/django_resaas/entidades/${User.Entidade.id}/modelos` })
         )
 
         this.Modelos = data || []
@@ -210,8 +215,7 @@ export const useEntidadeStore = createBaseStore(
       async select_ (entidade, q) {
         const User = useUserStore()
         const Sucursal = useSucursalStore()
-        this.row = entidade
-        User.Entidade = this.row
+        User.Entidade = entidade
         await this.getLayoutSettings(entidade.id)
         setStorage('l', 'userEntidade', JSON.stringify(entidade))
         Sucursal.getUserSucursals_(q)
@@ -220,8 +224,7 @@ export const useEntidadeStore = createBaseStore(
       async select (entidade) {
         const User = useUserStore()
         const Sucursal = useSucursalStore()
-        this.row = entidade
-        User.Entidade = this.row
+        User.Entidade = entidade
         await this.getLayoutSettings(entidade.id)
         setStorage('l', 'userEntidade', JSON.stringify(entidade))
         Sucursal.getUserSucursals()
