@@ -1,7 +1,7 @@
 <template>
   <q-page class=" q-pa-sm ">
     <!-- FORM -->
-    <FormSE 
+    <FormTwo 
       v-if="ready"
       :schema="TipoEntidade.fields"
       :module="TipoEntidade.app"
@@ -26,7 +26,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTipoEntidadeStore } from './../../stores/TipoEntidadeStore'
-import FormSE from '../../components/auto/FormTwo.vue'
+import FormTwo from '../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
