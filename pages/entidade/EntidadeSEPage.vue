@@ -69,11 +69,12 @@ async function load(id) {
   // 🔥 evita chamadas duplicadas com comparação segura
   if (String(Entidade.row?.id) === String(id)) {
     Entidade.form = Entidade.row 
+    return
   }
 
   console.log('step 3', id)
 
-  await Entidade.getById(id)
+  Entidade.row =  await Entidade.getById(id)
   console.log('step 4', id)
 }
 
