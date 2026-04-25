@@ -44,11 +44,35 @@ function toggleGroup(models, checked) {
 </script>
 
 <template>
-  <q-page class="q-pa-0">
 
-    <s-card class="column full-height">
+    <s-card class=" ">
+        <!-- HEADER -->
+        <q-bar class="row items-center justify-between bg-primary text-white">
+          <div class="text-h6">{{ tdc("App's") }}</div>
+          <s-btn dense flat icon="close" @click="openApps = !openApps" >
+            <q-tooltip>{{  tdc('Close') }}</q-tooltip>
+          </s-btn>
+        </q-bar>
 
-      <!-- ================= HEADER ================= -->
+        <q-separator />
+        <q-card-section>
+        <q-input
+          v-model="Store.permissions.permissionSearch"
+          outlined
+          dense
+          clearable
+          :label="tdc('Pesquisar')"
+          @update:model-value="Store.filterPermissions"
+        >
+          <template #prepend>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </q-card-section>
+
+        <q-card-section class="scroll col ">
+<s-card>
+          <!-- ================= HEADER ================= -->
       <q-card-section class="row items-center">
 
         <div>
@@ -104,24 +128,6 @@ function toggleGroup(models, checked) {
           </span>
 
         </div>
-      </q-card-section>
-
-      <q-separator />
-
-      <!-- ================= SEARCH ================= -->
-      <q-card-section>
-        <q-input
-          v-model="Store.permissions.permissionSearch"
-          outlined
-          dense
-          clearable
-          :label="tdc('Pesquisar')"
-          @update:model-value="Store.filterPermissions"
-        >
-          <template #prepend>
-            <q-icon name="search" />
-          </template>
-        </q-input>
       </q-card-section>
 
       <q-separator />
@@ -209,8 +215,9 @@ function toggleGroup(models, checked) {
       </q-card-section>
 
     </s-card>
+        </q-card-section>
+    </s-card>
 
-  </q-page>
 </template>
 
 <style scoped>
