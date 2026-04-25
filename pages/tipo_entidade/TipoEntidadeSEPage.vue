@@ -1,7 +1,7 @@
 <template>
   <q-page class=" q-pa-sm ">
     <q-dialog v-model="openApps" persistent >
-      <MudarApp />
+      <MudarApp :tipoEntidadeId="TipoEntidade.form?.id" />
     </q-dialog>
     <!-- FORM -->
     <FormTwo
@@ -27,7 +27,7 @@
       </template>
       <template #footer>
         <div class="q-pa-xs">
-          <MudarApp />
+          <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
         </div>
       </template>
     </FormTwo>
