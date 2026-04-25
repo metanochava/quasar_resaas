@@ -150,7 +150,7 @@ function goBack() {
         <!-- 🔥 FOOTER -->
         <div
           v-if="hasFooter"
-          :class="['col']"
+          :class="['col-12']"
         >
           <slot name="footer" />
         </div>

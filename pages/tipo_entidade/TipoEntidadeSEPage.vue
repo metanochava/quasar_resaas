@@ -34,9 +34,9 @@
       rightCol="col-4"
     >
 
-      <template #right v-if="TipoEntidade.form?.id">
+      <template #right v-if="TipoEntidade.form?.id" >
         <q-card class="q-pa-0" flat >
-          <s-btn @click="openApps = !openApps" label="Apps" ></s-btn>
+          <s-btn @click="openApps = !openApps" label="Apps" class="full-width" ></s-btn>
           
         </q-card>
       </template>
