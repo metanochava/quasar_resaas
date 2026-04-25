@@ -27,7 +27,7 @@ export const useGroupStore = createBaseStore(
       async select_ (group) {
         const User = useUserStore()
         this.row = group
-        User.Groups = this.row
+        User.Group = this.row
         setStorage('l', 'userGroups', JSON.stringify(group))
         await this.getUserPermissions()
         await User.getMenus()
@@ -35,11 +35,11 @@ export const useGroupStore = createBaseStore(
       },
 
 
-      async select (groups) {
+      async select (group) {
         const User = useUserStore()
-        setStorage('l', 'userGroups', JSON.stringify(groups))
-        this.row = groups
-        User.Groups = this.row
+        setStorage('l', 'userGroup', JSON.stringify(group))
+        this.row = group
+        User.Group = this.row
         await this.getUserPermissions()
         await User.getMenus()
       },
@@ -102,7 +102,7 @@ export const useGroupStore = createBaseStore(
       async getPermissions() {
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/groups/${User.data?.id}/permissions/` })
+          url({ type: 'u', url: `api/django_resaas/groups/${this.row?.id}/permissions/` })
         )
   
         this.Permissions = data || []
