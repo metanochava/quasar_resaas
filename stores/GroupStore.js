@@ -5,7 +5,7 @@ import { getStorage, setStorage } from '../boot/storage'
 import { perfilSplint, tdc } from '../boot/base'
 
 
-export const useGroupsStore = createBaseStore(
+export const useGroupStore = createBaseStore(
   'groups',
   {
     url: 'api/django_resaas/groups',
