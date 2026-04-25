@@ -1,5 +1,8 @@
 <template>
   <q-page class=" q-pa-sm ">
+    <q-dialog v-model="openApps" persistent >
+      <MudarApp />
+    </q-dialog>
     <!-- FORM -->
     <FormTwo
       v-if="ready"
@@ -12,26 +15,19 @@
       :ignore-fields="ignoreFields"
       :data="TipoEntidade.form"
       @saved="onSaved"
-      leftCol="col-2"
-      centerCol="col-7"
-      rightCol="col-3"
-    >
 
-      <template #left>
-        <q-list>
-          <q-item clickable>Menu 1</q-item>
-          <q-item clickable>Menu 2</q-item>
-        </q-list>
-      </template>
+      centerCol="col-8"
+      rightCol="col-4"
+    >
 
       <template #right>
         <q-card class="q-pa-xs">
-          Logs / Histórico
+          <s-btn @click="openApps = !openApps" label="Apps" ></s-btn>
         </q-card>
       </template>
       <template #footer>
         <div class="q-pa-xs">
-          <h1>Rodape</h1>
+          <MudarApp />
         </div>
       </template>
     </FormTwo>
@@ -50,6 +46,8 @@ import { useRoute } from 'vue-router'
 import { useTipoEntidadeStore } from './../../stores/TipoEntidadeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
+import MudarApp from './MudarApp.vue'
+
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
@@ -58,6 +56,7 @@ const TipoEntidade = useTipoEntidadeStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
+const openApps = ref(false)
 
 const ignoreFields = [
   'id',

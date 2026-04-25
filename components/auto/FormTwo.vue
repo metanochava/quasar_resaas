@@ -73,15 +73,15 @@ function goBack() {
       </div>
 
       <q-space />
-      
-      <q-btn
+
+      <s-btn
         flat
         color="grey-7"
         :label="tdc('Cancelar')"
         @click="goBack"
       />
 
-      <q-btn
+      <s-btn
         color="primary"
         icon="save"
         :label="tdc('Salvar')"
@@ -164,14 +164,14 @@ function goBack() {
     <!-- 🔥 FOOTER -->
     <q-card-actions align="right" class="q-pa-md">
 
-      <q-btn
+      <s-btn
         flat
         color="grey-7"
         :label="tdc('Cancelar')"
         @click="goBack"
       />
 
-      <q-btn
+      <s-btn
         color="primary"
         icon="save"
         :label="tdc('Salvar')"
