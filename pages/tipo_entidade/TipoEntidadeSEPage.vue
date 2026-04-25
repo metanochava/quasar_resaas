@@ -1,7 +1,36 @@
 <template>
   <q-page class=" q-pa-sm ">
-    <q-dialog v-model="openApps" persistent >
-      <MudarApp :tipoEntidadeId="TipoEntidade.form?.id" />
+    <q-dialog v-model="openApps" persistent full-height >
+      <s-card class="dialog-card column no-wrap">
+        <div class="dialog-header">
+
+          <!-- LEFT -->
+          <div>
+          
+          </div>
+
+          <q-space />
+
+          <!-- CLOSE -->
+          <q-btn
+            flat
+            round
+            dense
+            icon="close"
+            @click="close"
+          >
+            <q-tooltip>{{ tdc('Fechar') }}</q-tooltip>
+          </q-btn>
+
+        </div>
+
+        <q-separator />
+
+        <q-card-section class="scroll col dialog-body">
+
+          <MudarApp :tipoEntidadeId="TipoEntidade.form?.id" />
+        </q-card-section>
+      </s-card>
     </q-dialog>
     <!-- FORM -->
     <FormTwo
@@ -20,12 +49,12 @@
       rightCol="col-4"
     >
 
-      <template #right>
+      <template #right v-if="TipoEntidade.form?.id">
         <q-card class="q-pa-xs">
           <s-btn @click="openApps = !openApps" label="Apps" ></s-btn>
         </q-card>
       </template>
-      <template #footer>
+      <template #footer v-if="TipoEntidade.form?.id">
         <div class="q-pa-xs">
           <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
         </div>
