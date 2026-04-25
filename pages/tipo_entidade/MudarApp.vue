@@ -44,7 +44,7 @@ function toggleGroup(models, checked) {
 </script>
 
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="q-pa-0">
 
     <s-card class="column full-height">
 
@@ -53,7 +53,7 @@ function toggleGroup(models, checked) {
 
         <div>
           <div class="text-h5 text-weight-bold">
-            {{ tdc('Gestão de Permissões') }}
+            {{ tdc('Gestão de Modelos') }}
           </div>
           <div class="text-caption text-grey-7">
             {{ tdc('Selecione os modelos permitidos') }}
@@ -104,17 +104,6 @@ function toggleGroup(models, checked) {
           </span>
 
         </div>
-
-        <!-- 🔥 BOTÃO MANUAL -->
-        <q-btn
-          color="primary"
-          icon="save"
-          dense
-          flat
-          :loading="Store.permissions.savingPermissions"
-          @click="Store.savePermissions(props.tipoEntidadeId)"
-        />
-
       </q-card-section>
 
       <q-separator />
