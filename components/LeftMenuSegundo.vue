@@ -4,10 +4,13 @@
     <s-card
       square
       flat
-      class="col-xs-12 col-md-12 col-lg-12 q-bt-md"
       v-for="App in User.Menus"
       :key="App"
       style="padding: 0px"
+      :class="
+          $q.dark.isActive
+            ? 'bg-dark-custom  col-xs-12 col-md-12 col-lg-12 q-bt-md'
+            : 'bg-saas-premium bg-left-menu-premium  text-primary  col-xs-12 col-md-12 col-lg-12 q-bt-md'"
     >
       <q-expansion-item
         group="menu"
@@ -15,7 +18,7 @@
         :class="
           $q.dark.isActive
             ? 'bg-dark-custom text-subtitle1'
-            : 'bg-saas-premium text-subtitle1 text-primary'
+            : 'bg-transparent text-subtitle1 text-primary'
         "
         :icon="App.icon"
         dense
