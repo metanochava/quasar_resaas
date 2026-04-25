@@ -62,7 +62,6 @@ export const useUserStore = defineStore("user", {
   },
 
   actions: {
-
     async getMenus () {
       await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + this.data.id + '/menus/', params: {} }))
         .then(res => {
