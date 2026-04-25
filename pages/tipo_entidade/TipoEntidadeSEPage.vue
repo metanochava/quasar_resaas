@@ -25,9 +25,14 @@
       </template>
 
       <template #right>
-        <q-card class="q-pa-md">
+        <q-card class="q-pa-xs">
           Logs / Histórico
         </q-card>
+      </template>
+      <template #footer>
+        <div class="q-pa-xs">
+          <h1>Rodape</h1>
+        </div>
       </template>
     </FormTwo>
 
