@@ -63,19 +63,17 @@ function goBack() {
     <!-- 🔥 HEADER -->
 
     <!-- 🔥 HEADER PREMIUM -->
-      
-
-    <q-card-actions class="q-px-lg q-py-md">
+  
+    <q-card-actions align="right" class="q-pa-md">
       <div class="text-h5 text-weight-bold">
         {{ isEdit
           ? tdc('Editar') + ' ' + tdc(model)
           : tdc('Novo') + ' ' + tdc(model)
         }}
       </div>
-    </q-card-actions>
-    <q-space />
-    <q-card-actions align="right" class="q-pa-md">
 
+      <q-space />
+      
       <q-btn
         flat
         color="grey-7"
