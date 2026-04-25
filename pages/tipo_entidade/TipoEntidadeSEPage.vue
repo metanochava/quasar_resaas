@@ -12,13 +12,23 @@
       :ignore-fields="ignoreFields"
       :data="TipoEntidade.form"
       @saved="onSaved"
+      leftCol="col-2"
+      centerCol="col-7"
+      rightCol="col-3"
     >
-      metano {{ 9+7 }}
 
-      <br> 
-      <div  class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
-    </div>
+      <template #left>
+        <q-list>
+          <q-item clickable>Menu 1</q-item>
+          <q-item clickable>Menu 2</q-item>
+        </q-list>
+      </template>
+
+      <template #right>
+        <q-card class="q-pa-md">
+          Logs / Histórico
+        </q-card>
+      </template>
     </FormTwo>
 
 

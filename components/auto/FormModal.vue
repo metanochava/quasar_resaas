@@ -87,43 +87,6 @@ function save() {
             :can-do="canDo"
             :ignore-fields="ignoreFields"
             @saved="() => { emit('saved'); close() }"
-          /><Form
-            ref="formRef"
-            :schema="schema"
-            :module="module"
-            :model="model"
-            :data="data"
-            :can-do="canDo"
-            :ignore-fields="ignoreFields"
-            @saved="() => { emit('saved'); close() }"
-          /><Form
-            ref="formRef"
-            :schema="schema"
-            :module="module"
-            :model="model"
-            :data="data"
-            :can-do="canDo"
-            :ignore-fields="ignoreFields"
-            @saved="() => { emit('saved'); close() }"
-          />
-          <Form
-            ref="formRef"
-            :schema="schema"
-            :module="module"
-            :model="model"
-            :data="data"
-            :can-do="canDo"
-            :ignore-fields="ignoreFields"
-            @saved="() => { emit('saved'); close() }"
-          /><Form
-            ref="formRef"
-            :schema="schema"
-            :module="module"
-            :model="model"
-            :data="data"
-            :can-do="canDo"
-            :ignore-fields="ignoreFields"
-            @saved="() => { emit('saved'); close() }"
           />
 
           <!-- 🔥 PROGRESS -->
