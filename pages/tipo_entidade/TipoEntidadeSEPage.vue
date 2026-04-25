@@ -1,12 +1,12 @@
 <template>
   <q-page class=" q-pa-sm ">
     <q-dialog v-model="openApps" persistent full-height >
-      <s-card class="dialog-card column no-wrap">
-        <div class="dialog-header">
+      <s-card class=" column ">
+        <div class="">
 
           <!-- LEFT -->
           <div>
-          
+          .
           </div>
 
           <q-space />
@@ -26,8 +26,7 @@
 
         <q-separator />
 
-        <q-card-section class="scroll col dialog-body">
-
+        <q-card-section class="scroll col ">
           <MudarApp :tipoEntidadeId="TipoEntidade.form?.id" />
         </q-card-section>
       </s-card>
@@ -50,12 +49,16 @@
     >
 
       <template #right v-if="TipoEntidade.form?.id">
-        <q-card class="q-pa-xs">
+        <q-card class="q-pa-0" flat >
           <s-btn @click="openApps = !openApps" label="Apps" ></s-btn>
+          <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
         </q-card>
       </template>
       <template #footer v-if="TipoEntidade.form?.id">
-        <div class="q-pa-xs">
+        <div class="col">
+          <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
+        </div>
+        <div class="col">
           <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
         </div>
       </template>
