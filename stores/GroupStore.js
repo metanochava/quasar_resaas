@@ -15,12 +15,11 @@ export const useGroupStore = createBaseStore(
 
   {
     state: () => ({
-      Permissions: new Set()
+      Permissions: []
     }),
 
     getters: {
-      can: (state) => (perm) =>
-        state.Permissions.has(String(perm).toLowerCase())
+      
     },
 
     actions: {
@@ -30,7 +29,7 @@ export const useGroupStore = createBaseStore(
         this.row = group
         User.Groups = this.row
         setStorage('l', 'userGroups', JSON.stringify(group))
-        await this.getPermissions()
+        await this.getUserPermissions()
         await User.getMenus()
         User.redirect = 'authwelcome'
       },
@@ -41,7 +40,7 @@ export const useGroupStore = createBaseStore(
         setStorage('l', 'userGroups', JSON.stringify(groups))
         this.row = groups
         User.Groups = this.row
-        await this.getPermissions()
+        await this.getUserPermissions()
         await User.getMenus()
       },
 
@@ -100,22 +99,27 @@ export const useGroupStore = createBaseStore(
         }
         return res
       },
-      
       async getPermissions() {
+
+        const { data } = await HTTPAuth.get(
+          url({ type: 'u', url: `api/django_resaas/groups/${User.data?.id}/permissions/` })
+        )
+  
+        this.Permissions = data || []
+
+      },
+
+      async getUserPermissions() {
 
         const User = useUserStore()
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/groups/${User.data?.id}/permissions/` })
+          url({ type: 'u', url: `api/django_resaas/users/${User.data?.id}/permissions/` })
         )
 
         const Permissions = (data || []).map(p => p.codename)
   
         User.Permissions = new Set(Permissions)
-
-        console.log(User.Permissions)
-
-        console.log(Permissions)
         setStorage('l', 'userPermissions', JSON.stringify(Permissions))
 
       }
