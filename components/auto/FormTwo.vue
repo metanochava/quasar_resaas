@@ -63,40 +63,7 @@ function goBack() {
     <!-- 🔥 HEADER -->
 
     <!-- 🔥 HEADER PREMIUM -->
-      <div class="dialog-header">
-
-        <!-- LEFT -->
-        <div>
-          <div class="text-h6 text-weight-bold">
-            {{ isEdit
-              ? tdc('Editar') + ' ' + tdc(model)
-              : tdc('Novo') + ' ' + tdc(model)
-            }}
-          </div>
-
-        </div>
-
-        <q-space />
-
-        <!-- CLOSE -->
-        <q-btn
-          flat
-          color="grey-7"
-          :label="tdc('Cancelar')"
-          @click="goBack"
-        />
-
-        <q-btn
-          color="primary"
-          icon="save"
-          :label="tdc('Salvar')"
-          :loading="saving"
-          unelevated
-          @click="save"
-        />
-
-      </div>
- <q-separator />
+      
 
     <q-card-actions class="q-px-lg q-py-md">
       <div class="text-h5 text-weight-bold">
@@ -106,7 +73,7 @@ function goBack() {
         }}
       </div>
     </q-card-actions>
-
+    <q-space />
     <q-card-actions align="right" class="q-pa-md">
 
       <q-btn
