@@ -1,21 +1,7 @@
 <template>
   <q-page class=" q-pa-sm ">
     <q-dialog v-model="openApps" persistent full-height full-width >
-      <s-card class=" ">
-        <!-- HEADER -->
-        <q-bar class="row items-center justify-between bg-primary text-white">
-          <div class="text-h6">{{ tdc("App's") }}</div>
-          <s-btn dense flat icon="close" @click="openApps = !openApps" >
-            <q-tooltip>{{  tdc('Close') }}</q-tooltip>
-          </s-btn>
-        </q-bar>
-
-        <q-separator />
-
-        <q-card-section class="scroll col ">
-          <MudarApp :tipoEntidadeId="TipoEntidade.form?.id" />
-        </q-card-section>
-      </s-card>
+      <MudarApp :tipoEntidadeId="TipoEntidade.form?.id" />
     </q-dialog>
     <!-- FORM -->
     <FormTwo

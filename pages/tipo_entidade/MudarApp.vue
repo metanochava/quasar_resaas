@@ -48,46 +48,9 @@ function toggleGroup(models, checked) {
     <s-card class=" ">
         <!-- HEADER -->
         <q-bar class="row items-center justify-between bg-primary text-white">
-          <div class="text-h6">{{ tdc("App's") }}</div>
-          <s-btn dense flat icon="close" @click="openApps = !openApps" >
-            <q-tooltip>{{  tdc('Close') }}</q-tooltip>
-          </s-btn>
-        </q-bar>
-
-        <q-separator />
-        <q-card-section>
-        <q-input
-          v-model="Store.permissions.permissionSearch"
-          outlined
-          dense
-          clearable
-          :label="tdc('Pesquisar')"
-          @update:model-value="Store.filterPermissions"
-        >
-          <template #prepend>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </q-card-section>
-
-        <q-card-section class="scroll col ">
-<s-card>
-          <!-- ================= HEADER ================= -->
-      <q-card-section class="row items-center">
-
-        <div>
-          <div class="text-h5 text-weight-bold">
-            {{ tdc('Gestão de Modelos') }}
-          </div>
-          <div class="text-caption text-grey-7">
-            {{ tdc('Selecione os modelos permitidos') }}
-          </div>
-        </div>
-
-        <q-space />
-
-        <!-- 🔥 STATUS -->
-        <div class="row items-center q-gutter-sm">
+          <div class="text-h6">{{ tdc("Gestão de App's e  Modelos") }}</div>
+            <q-space/>
+          <div class="row items-center q-gutter-sm">
 
           <q-icon
             v-if="Store.permissions.status === 'saving'"
@@ -128,9 +91,30 @@ function toggleGroup(models, checked) {
           </span>
 
         </div>
+          <s-btn dense flat icon="close" @click="openApps = !openApps" >
+            <q-tooltip>{{  tdc('Close') }}</q-tooltip>
+          </s-btn>
+        </q-bar>
+
+        <q-separator />
+        <q-card-section>
+        <q-input
+          v-model="Store.permissions.permissionSearch"
+          outlined
+          dense
+          clearable
+          :label="tdc('Pesquisar')"
+          @update:model-value="Store.filterPermissions"
+        >
+          <template #prepend>
+            <q-icon name="search" />
+          </template>
+        </q-input>
       </q-card-section>
 
-      <q-separator />
+        <q-card-section class="scroll col ">
+<s-card>
+
 
       <!-- ================= LIST ================= -->
       <q-card-section class="col scroll">
