@@ -81,7 +81,7 @@ const createClient = (auth = false, blob = false) => {
     const headersMap = {
       E: 'userEntidade',
       S: 'userSucursal',
-      G: 'userGrupo',
+      G: 'userGroup',
       ET: 'tipoEntidade',
       L: 'userLang'
     }

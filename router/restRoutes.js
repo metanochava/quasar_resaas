@@ -4,6 +4,7 @@ import { tipo_entidadeRoutes } from './../pages/tipo_entidade/tipo_entidadeRoute
 import { userRoutes } from '../pages/user/userRoute'
 import { groupRoutes } from '../pages/group/groupRoute'
 import { sucursalRoutes } from '../pages/sucursal/sucursalRoute'
+import { permissionRoutes } from '../pages/permission/permissionRoute'
 
 
 export let restRoutes = [
@@ -42,5 +43,6 @@ export let restRoutes = [
   ...groupRoutes,
   ...sucursalRoutes,
   ...userRoutes,
+  ...permissionRoutes,
 ]
 

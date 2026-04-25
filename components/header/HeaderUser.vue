@@ -91,13 +91,13 @@
                 </q-item>
               </q-expansion-item>
 
-            <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(perfilSplint(User?.Grupo?.name)) " style="width: 100%; border-color: transparent;">
+            <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(perfilSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
               <q-menu fit>
                 <q-list dense   class="rounded-borders" style="min-width: 100px" >
 
-                  <q-item clickable v-close-popup @click="Grupo.select(grupo)" v-ripple v-for=" grupo in User.Grupos" :key="grupo.id">
+                  <q-item clickable v-close-popup @click="Group.select(group)" v-ripple v-for=" group in User.Groups" :key="group.id">
                     <q-item-section>
-                      <q-item-label overline> {{ tdc(perfilSplint(grupo.name))}}</q-item-label>
+                      <q-item-label overline> {{ tdc(perfilSplint(group.name))}}</q-item-label>
 
                     </q-item-section>
 
@@ -130,7 +130,7 @@
 import { defineComponent } from 'vue'
 import { perfilSplint, tdc } from '../../boot/base'
 import { useUserStore } from '../../stores/UserStore'
-import { useGrupoStore } from '../../stores/GrupoStore'
+import { useGroupStore } from '../../stores/GroupStore'
 import { useEntidadeStore } from '../../stores/EntidadeStore'
 import { useSucursalStore } from '../../stores/SucursalStore'
 import RegistarEntidade from './RegistarEntidade.vue'
@@ -143,9 +143,9 @@ export default defineComponent({
   setup () {
     const User = useUserStore()
     const Entidade = useEntidadeStore()
-    const Grupo = useGrupoStore()
+    const Group = useGroupStore()
     const Sucursal = useSucursalStore()
-    return { User, tdc, Entidade, Grupo, Sucursal}
+    return { User, tdc, Entidade, Group, Sucursal}
   },
 
   data () {
@@ -159,7 +159,7 @@ export default defineComponent({
   },
 
   watch: {
-    'User.Grupo' (val) {
+    'User.Group' (val) {
 
       if (!val) return
       

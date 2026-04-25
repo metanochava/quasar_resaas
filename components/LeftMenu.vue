@@ -8,13 +8,13 @@
       <div class="text-center text-h6">{{ User?.username }}</div>
       <s-btn
         flat dense
-        :label="User.Grupo?.name"
+        :label="User.Group?.name"
         class="full-width"
       >
         <q-menu fit>
           <q-list dense>
-            <q-item v-for="grupo in User.Grupos" :key="grupo.id" clickable @click="User.selectGroup(grupo)">
-              <q-item-section>{{ grupo.name }}</q-item-section>
+            <q-item v-for="group in User.Groups" :key="group.id" clickable @click="User.selectGroup(group)">
+              <q-item-section>{{ group.name }}</q-item-section>
             </q-item>
           </q-list>
         </q-menu>

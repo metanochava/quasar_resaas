@@ -87,12 +87,12 @@
                 </q-item>
               </q-expansion-item>
 
-            <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(perfilSplint(User?.Grupo?.name)) " style="width: 100%; border-color: transparent;">
+            <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(perfilSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
               <q-menu fit>
                 <q-list dense   class="rounded-borders" style="min-width: 100px" >
-                  <q-item clickable v-close-popup @click="selectGroup(grupo)" v-ripple v-for=" grupo in User.Grupos" :key="grupo.id">
+                  <q-item clickable v-close-popup @click="selectGroup(group)" v-ripple v-for=" group in User.Groups" :key="group.id">
                     <q-item-section>
-                      <q-item-label overline> {{ tdc(perfilSplint(grupo.name))}}</q-item-label>
+                      <q-item-label overline> {{ tdc(perfilSplint(group.name))}}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -111,7 +111,7 @@
         </q-menu>
       </q-avatar>
       <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'" v-if="User">{{User?.username }} </q-tooltip>
-      <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'" v-else>{{tdc(User?.Grupo?.name)}}</q-tooltip>
+      <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'" v-else>{{tdc(User?.Group?.name)}}</q-tooltip>
     </s-btn>
   </div>
 </template>
@@ -195,7 +195,7 @@ export default defineComponent({
           .then(res => {
             setStorage('l', 'userPerfils', JSON.stringify(res.data))
 
-            if (this.User) this.User.Grupos = res.data
+            if (this.User) this.User.Groups = res.data
           })
           .catch(err => console.log(err))
       } catch (error) {
@@ -205,9 +205,9 @@ export default defineComponent({
 
     /* --------------------- SELECT GROUP --------------------- */
     async selectGroup (group) {
-      setStorage('l', 'userGrupo', JSON.stringify(group))
+      setStorage('l', 'userGroup', JSON.stringify(group))
 
-      if (this.User) this.User.Grupo = group
+      if (this.User) this.User.Group = group
 
       await this.getUserPermicoes()
       this.$router.push({ name: 'home', params: {} })
@@ -266,17 +266,17 @@ export default defineComponent({
     if (this.User) {
       const ent = getStorage('l', 'userEntidade')
       const suc = getStorage('l', 'userSucursal')
-      const gru = getStorage('l', 'userGrupo')
+      const gru = getStorage('l', 'userGroup')
 
       try {
         this.User.Entidade = ent ? JSON.parse(ent) : null
         this.User.Sucursal = suc ? JSON.parse(suc) : null
-        this.User.Grupo = gru ? JSON.parse(gru) : null
+        this.User.Group = gru ? JSON.parse(gru) : null
       } catch (err) {
-        console.error('Erro ao parsear entidades/grupo:', err)
+        console.error('Erro ao parsear entidades/group:', err)
       }
 
-      if (!this.User?.Grupo?.id) {
+      if (!this.User?.Group?.id) {
         // this.getEntidades()
       }
     }

@@ -5,6 +5,14 @@
       <MudarApp :tipoEntidadeId="TipoEntidade.form?.id" />
     </q-dialog>
 
+    <q-dialog v-model="openPermissions" persistent full-height full-width>
+      <MudarPermission :tipoEntidadeId="TipoEntidade.form?.id" />
+    </q-dialog>
+
+    <q-dialog v-model="openGroups" persistent full-height full-width>
+      <MudarGroup :tipoEntidadeId="TipoEntidade.form?.id" />
+    </q-dialog>
+
     <div class="col overflow-hidden">
 
       <FormTwo
@@ -26,6 +34,8 @@
         <template #right v-if="TipoEntidade.form?.id">
           <q-card class="q-pa-0" flat>
             <s-btn @click="openApps = !openApps" label="Apps" class="full-width" />
+            <s-btn @click="openGroups = !openGroups" label="Groups" class="full-width" />
+            <s-btn @click="openPermissionss = !openPermissions" label="Permissions" class="full-width" />
           </q-card>
         </template>
 
@@ -68,6 +78,9 @@ const TipoEntidade = useTipoEntidadeStore()
 // ---------------- STATE ----------------
 const ready = ref(false)
 const openApps = ref(false)
+const openPermissions = ref(false)
+const openGroups = ref(false)
+
 
 const ignoreFields = [
   'id',

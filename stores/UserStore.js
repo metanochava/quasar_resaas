@@ -18,8 +18,8 @@ export const useUserStore = defineStore("user", {
     EntidadeModulos: [],
     Sucursals: [],
     Sucursal: null,
-    Grupos: [],
-    Grupo: {id: 1,  name: 'Gest' },
+    Groups: [],
+    Group: {id: 1,  name: 'Gest' },
     Menus: [],
     search: '',
     AllMenus: [],
@@ -90,8 +90,8 @@ export const useUserStore = defineStore("user", {
       this.Idioma = idioma
       setStorage('l', 'userLang', JSON.stringify(idioma))
     },
-    selectGroup(grupo){
-      this.Grupo = grupo
+    selectGroup(group){
+      this.Group = group
     },
     toggleSettings(){
       this.Settings = !this.Settings
@@ -177,8 +177,8 @@ export const useUserStore = defineStore("user", {
       this.Sucursals = JSONSafeParse(getStorage('l', 'userSucursals'))
       this.Entidades = JSONSafeParse(getStorage('l', 'userEntidades'))
       this.Sucursal = JSONSafeParse(getStorage('l', 'userSucursal'))
-      this.Grupo   = JSONSafeParse(getStorage('l', 'userGrupo'))
-      this.Grupos   = JSONSafeParse(getStorage('l', 'userGrupos'))
+      this.Group   = JSONSafeParse(getStorage('l', 'userGroup'))
+      this.Groups   = JSONSafeParse(getStorage('l', 'userGroups'))
       this.data   = JSONSafeParse(getStorage('l', 'user'))
       this.access   = getStorage('l', 'access')
       this.refresh   = getStorage('l', 'refresh')
@@ -220,7 +220,7 @@ export const useUserStore = defineStore("user", {
         this.data = null
         this.refresh = null
         this.access = null
-        this.Grupos = []
+        this.Groups = []
     
         this.Sucursals = []
         this.Sucursal = null
@@ -239,8 +239,8 @@ export const useUserStore = defineStore("user", {
         deleteStorage('l', 'userSucursals')
         deleteStorage('l', 'userSucursal')
         deleteStorage('l', 'user')
-        deleteStorage('l', 'userGrupos')
-        deleteStorage('l', 'userGrupo')
+        deleteStorage('l', 'userGroups')
+        deleteStorage('l', 'userGroup')
         deleteStorage('l', 'linga')
         deleteStorage('l', 'entidadeModulos')
         deleteStorage('l', 'entidadeModelos')
@@ -255,7 +255,7 @@ export const useUserStore = defineStore("user", {
           setStorage('l', 'userEntidade', userEntidade)
         }
 
-        setStorage('l', 'userGrupo', this.Grupo)
+        setStorage('l', 'userGroup', this.Group)
         this.isLogout = !this.isLogout
         this.isLogin = false
       }).catch(err => {

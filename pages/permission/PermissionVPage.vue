@@ -3,16 +3,17 @@
     <!-- FORM -->
     <FormTwo
       v-if="ready"
-      :schema="Group.fields"
-      :module="Group.app"
-      :model="Group.model"
-      :config="Group.config"
-      :actions="Group.actions"
+      :schema="Permission.fields"
+      :module="Permission.app"
+      :model="Permission.model"
+      :config="Permission.config"
+      :actions="Permission.actions"
       :can-do="canDo"
       :ignore-fields="ignoreFields"
-      :data="Group.form"
+      :data="Permission.form"
       @saved="onSaved"
     />
+
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
@@ -24,14 +25,14 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useGroupStore } from '../../stores/GroupStore'
+import { usePermissionStore } from '../../stores/PermissionStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const Group = useGroupStore()
+const Permission = usePermissionStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
@@ -56,18 +57,18 @@ async function load(id) {
 
   if (!id) {
 
-    Group.resetForm?.()
+    Permission.resetForm?.()
     return
   }
 
 
   // 🔥 evita chamadas duplicadas com comparação segura
-  if (String(Group.row?.id) === String(id)) {
-    Group.form = Group.row 
+  if (String(Permission.row?.id) === String(id)) {
+    Permission.form = Permission.row 
     return
   }
 
-  Group.row =  await Group.getById(id)
+  Permission.row =  await Permission.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -75,7 +76,7 @@ async function init() {
   try {
     ready.value = false
 
-    await Group.init()
+    await Permission.init()
 
     const id = route.params.id
     await load(id)

@@ -2,7 +2,7 @@ import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, url } from './../boot/api'
 import { getStorage, setStorage } from './../boot/storage'
 import { useUserStore} from './UserStore'
-import { useGrupoStore} from './GrupoStore'
+import { useGroupStore} from './GroupStore'
 import { perfilSplint, tdc } from '../boot/base'
 
 
@@ -60,20 +60,20 @@ export const useSucursalStore = createBaseStore(
 
       select_ (sucursal, q) {
         const User = useUserStore()
-        let Grupo = useGrupoStore()
+        let Group = useGroupStore()
         this.row = sucursal
         User.Sucursal = this.row
         setStorage('l', 'userSucursal', JSON.stringify(sucursal))
-        Grupo.getGrupos_(q)
+        Group.getGroups_(q)
       },
 
       select (sucursal) {
         const User = useUserStore()
-        let Grupo = useGrupoStore()
+        let Group = useGroupStore()
         this.row = sucursal
         User.Sucursal = this.row
         setStorage('l', 'userSucursal', JSON.stringify(sucursal))
-        Grupo.getGrupos()
+        Group.getGroups()
       },
 
       async getUserSucursals() {
