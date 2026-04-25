@@ -15,7 +15,7 @@
         :class="
           $q.dark.isActive
             ? 'bg-dark-custom text-subtitle1'
-            : 'bg-white text-subtitle1 text-primary'
+            : 'bg-saas-premium text-subtitle1 text-primary'
         "
         :icon="App.icon"
         dense
@@ -30,6 +30,7 @@
     </s-card>
   </div>
 </template>
+
 
 
 <style scoped>
