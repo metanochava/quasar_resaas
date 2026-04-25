@@ -271,11 +271,17 @@ html, body, #q-app {
 }
 
 /* 🔥 conteúdo da página */
-.page-content {
+/* .page-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+} */
+
+.page-content {
+   height: 100%;
+  flex: 1;
+  overflow-y: auto;  /* 🔥 AQUI VOLTA O SCROLL */
 }
 
 </style>
