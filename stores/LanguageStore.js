@@ -22,6 +22,7 @@ export const useLanguageStore = createBaseStore(
       this.setTraducao(this.current)
     },
     async setTraducao(idioma) {
+      if (!idioma?.id) return {}
       try {
         // Reset map
         this.TraducaoMap = {}
