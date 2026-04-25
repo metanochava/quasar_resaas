@@ -1,45 +1,51 @@
 <template>
-  <q-page class=" q-pa-sm ">
-    <q-dialog v-model="openApps" persistent full-height full-width >
+  <q-page class="column q-pa-sm full-height overflow-hidden">
+
+    <q-dialog v-model="openApps" persistent full-height full-width>
       <MudarApp :tipoEntidadeId="TipoEntidade.form?.id" />
     </q-dialog>
-    <!-- FORM -->
-    <FormTwo
-      v-if="ready"
-      :schema="TipoEntidade.fields"
-      :module="TipoEntidade.app"
-      :model="TipoEntidade.model"
-      :config="TipoEntidade.config"
-      :actions="TipoEntidade.actions"
-      :can-do="canDo"
-      :ignore-fields="ignoreFields"
-      :data="TipoEntidade.form"
-      @saved="onSaved"
 
-      centerCol="col-8"
-      rightCol="col-4"
-    >
+    <div class="col overflow-hidden">
 
-      <template #right v-if="TipoEntidade.form?.id" >
-        <q-card class="q-pa-0" flat >
-          <s-btn @click="openApps = !openApps" label="Apps" class="full-width" ></s-btn>
-          
-        </q-card>
-      </template>
-      <template #footer v-if="TipoEntidade.form?.id">
-        <div class="col">
-          <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
-        </div>
-        <div class="col">
-          <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
-        </div>
-      </template>
-    </FormTwo>
+      <FormTwo
+        v-if="ready"
+        class="full-height"
+        :schema="TipoEntidade.fields"
+        :module="TipoEntidade.app"
+        :model="TipoEntidade.model"
+        :config="TipoEntidade.config"
+        :actions="TipoEntidade.actions"
+        :can-do="canDo"
+        :ignore-fields="ignoreFields"
+        :data="TipoEntidade.form"
+        @saved="onSaved"
+        centerCol="col-8"
+        rightCol="col-4"
+      >
 
+        <template #right v-if="TipoEntidade.form?.id">
+          <q-card class="q-pa-0" flat>
+            <s-btn @click="openApps = !openApps" label="Apps" class="full-width" />
+          </q-card>
+        </template>
+
+        <template #footer v-if="TipoEntidade.form?.id">
+          <div class="col">
+            <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
+          </div>
+          <div class="col">
+            <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
+          </div>
+        </template>
+
+      </FormTwo>
+
+    </div>
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
     </div>
+
   </q-page>
 </template>
 
