@@ -10,7 +10,7 @@ export const useGroupStore = createBaseStore(
   {
     url: 'api/auth/groups',
     app: 'auth',
-    model: 'Groups'
+    model: 'Group'
   },
 
   {
