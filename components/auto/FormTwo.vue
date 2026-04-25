@@ -60,11 +60,9 @@ function goBack() {
 <template>
   <s-card class="dialog-card column no-wrap">
 
-    <!-- 🔥 HEADER -->
-
-    <!-- 🔥 HEADER PREMIUM -->
-  
+    <!-- ================= HEADER FIXO ================= -->
     <q-card-actions align="right" class="q-pa-md">
+
       <div class="text-h5 text-weight-bold">
         {{ isEdit
           ? tdc('Editar') + ' ' + tdc(model)
@@ -94,40 +92,30 @@ function goBack() {
 
     <q-separator />
 
-    <!-- 🔥 BODY -->
-    <q-card-section class="col">
+    <!-- ================= BODY (SCROLL AQUI) ================= -->
+    <q-card-section class="col scroll">
 
-      <div class="row q-col-gutter-xs full-height">
+      <div class="row q-col-gutter-xs">
 
-        <!-- 🔥 HEADER -->
-        <div
-          v-if="hasHeader"
-          :class="['col']"
-        >
+        <!-- HEADER SLOT (fica fixo dentro do scroll topo) -->
+        <div v-if="hasHeader" class="col-12">
           <slot name="header" />
         </div>
 
-        <!-- 🔥 LEFT -->
-        <div
-          v-if="hasLeft"
-          :class="[leftClass, 'full-height']"
-        >
+        <!-- LEFT -->
+        <div v-if="hasLeft" :class="[leftClass]">
           <slot name="left" />
         </div>
 
-        <!-- 🔥 CENTER (FORM) -->
-        <div
-          :class="[centerClass, 'full-height']"
-        >
+        <!-- CENTER -->
+        <div :class="[centerClass]">
 
-          <div
-            v-if="hasCenter"
-          >
+          <div v-if="hasCenter">
             <slot name="center" />
           </div>
+
           <Form
             v-else
-
             ref="formRef"
             :schema="schema"
             :module="module"
@@ -137,21 +125,16 @@ function goBack() {
             :ignore-fields="ignoreFields"
             @saved="goBack"
           />
+
         </div>
 
-        <!-- 🔥 RIGHT -->
-        <div
-          v-if="hasRight"
-          :class="[rightClass, 'full-height']"
-        >
+        <!-- RIGHT -->
+        <div v-if="hasRight" :class="[rightClass]">
           <slot name="right" />
         </div>
 
-        <!-- 🔥 FOOTER -->
-        <div
-          v-if="hasFooter"
-          :class="['col-12']"
-        >
+        <!-- FOOTER SLOT (fica no fim do scroll) -->
+        <div v-if="hasFooter" class="col-12">
           <slot name="footer" />
         </div>
 
@@ -161,7 +144,7 @@ function goBack() {
 
     <q-separator />
 
-    <!-- 🔥 FOOTER -->
+    <!-- ================= FOOTER FIXO ================= -->
     <q-card-actions align="right" class="q-pa-md">
 
       <s-btn
@@ -185,11 +168,17 @@ function goBack() {
   </s-card>
 </template>
 
+
 <style scoped>
-  .dialog-card {
-    width: 100%;
-    height: 98%;
-    max-width: 100%;
-    max-height: 98%;
-  }
+.dialog-card {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* 🔥 SCROLL CONTROLADO */
+.scroll {
+  overflow-y: auto;
+}
 </style>
