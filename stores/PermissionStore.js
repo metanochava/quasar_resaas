@@ -8,8 +8,8 @@ import { getStorage, setStorage } from '../boot/storage'
 export const usePermissionStore = createBaseStore(
   'permission',
   {
-    url: 'api/django_resaas/permissions',
-    app: 'django_resaas',
+    url: 'api/auth/permissions',
+    app: 'auth',
     model: 'Permission'
   },
   {

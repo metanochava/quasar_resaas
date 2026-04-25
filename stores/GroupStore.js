@@ -8,8 +8,8 @@ import { perfilSplint, tdc } from '../boot/base'
 export const useGroupStore = createBaseStore(
   'groups',
   {
-    url: 'api/django_resaas/groups',
-    app: 'django_resaas',
+    url: 'api/auth/groups',
+    app: 'auth',
     model: 'Groups'
   },
 
