@@ -24,7 +24,7 @@ export const useUserStore = defineStore("user", {
     search: '',
     AllMenus: [],
     Settings: false,
-    Permicoes: new Set(),
+    Permissions: new Set(),
     access: null,
     refresh: null,
     LeftTop: true,
@@ -49,10 +49,10 @@ export const useUserStore = defineStore("user", {
       state.data?.perfil?.url ||
       "https://cdn-icons-png.flaticon.com/512/149/149071.png",
     hasPermission: (state) => (perm) =>
-      state.Permicoes.has(String(perm).toLowerCase()),
+      state.Permissions.has(String(perm).toLowerCase()),
 
     can: (state) => (perm) =>
-      state.Permicoes.has(String(perm).toLowerCase()),
+      state.Permissions.has(String(perm).toLowerCase()),
     ps: (state) => ({
       'theme': state.Theme,
       'layout': state.LayoutSettings,
@@ -184,8 +184,8 @@ export const useUserStore = defineStore("user", {
       this.refresh   = getStorage('l', 'refresh')
       this.RightTop   = ('' + getStorage('l', 'right_top')).toLowerCase() === 'true'
       this.LeftTop   = ('' + getStorage('l', 'left_top')).toLowerCase() === 'true'
-      const perms = JSONSafeParse(getStorage('l', 'userPermicoes'))
-      this.Permicoes = new Set(perms)
+      const perms = JSONSafeParse(getStorage('l', 'userPermissions'))
+      this.Permissions = new Set(perms)
 
       console.log("User Loaded")
 
@@ -246,7 +246,7 @@ export const useUserStore = defineStore("user", {
         deleteStorage('l', 'entidadeModelos')
 
         deleteStorage('l', 'traducao')
-        deleteStorage('l', 'userPermicoes')
+        deleteStorage('l', 'userPermissions')
         deleteStorage('l', 'manterlogado')
         deleteStorage('l', 'username')
         deleteStorage('l', 'password')

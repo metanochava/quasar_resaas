@@ -209,19 +209,19 @@ export default defineComponent({
 
       if (this.User) this.User.Group = group
 
-      await this.getUserPermicoes()
+      await this.getUserPermissions()
       this.$router.push({ name: 'home', params: {} })
     },
 
     /* --------------------- GET USER PERMISSOES --------------------- */
-    async getUserPermicoes () {
+    async getUserPermissions () {
       if (getStorage('l', 'userSucursal') !== null) {
         try {
-          await HTTPAuth.get(url({ type: 'u', url: 'saas/usuarios/' + this.User?.data?.id + '/userPermicoes/', params: {} }))
+          await HTTPAuth.get(url({ type: 'u', url: 'saas/users/' + this.User?.data?.id + '/permissions/', params: {} }))
             .then(res => {
               if (this.User) {
-                this.User.Permicoes = new Set(res.data)
-                setStorage('l', 'userPermicoes', JSON.stringify(this.User.Permicoes))
+                this.User.Permissions = new Set(res.data)
+                setStorage('l', 'userPermissions', JSON.stringify(this.User.Permissions))
               }
             })
             .catch(err => console.log(err))
