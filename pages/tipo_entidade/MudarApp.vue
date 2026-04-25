@@ -42,181 +42,141 @@ function toggleGroup(models, checked) {
   })
 }
 </script>
-
 <template>
 
-    <s-card class=" ">
-        <!-- HEADER -->
-        <q-bar class="row items-center justify-between bg-primary text-white">
-          <div class="text-h6">{{ tdc("Gestão de App's e  Modelos") }}</div>
-            <q-space/>
-          <div class="row items-center q-gutter-sm">
+  <s-card class="column full-height">
 
-          <q-icon
-            v-if="Store.permissions.status === 'saving'"
-            name="sync"
-            class="rotate"
-          />
+    <!-- ================= HEADER FIXO ================= -->
+    <q-bar class="row items-center bg-primary text-white">
+      <div class="text-h6">
+        {{ tdc("Gestão de App's e Modelos") }}
+      </div>
 
-          <q-icon
-            v-else-if="Store.permissions.status === 'saved'"
-            name="check_circle"
-            color="positive"
-          />
+      <q-space />
 
-          <q-icon
-            v-else-if="Store.permissions.status === 'error'"
-            name="error"
-            color="negative"
-          />
+      <!-- STATUS -->
+      <div class="row items-center q-gutter-sm">
 
-          <span class="text-caption">
+        <q-icon v-if="Store.permissions.status === 'saving'" name="sync" class="rotate" />
+        <q-icon v-else-if="Store.permissions.status === 'saved'" name="check_circle" color="positive" />
+        <q-icon v-else-if="Store.permissions.status === 'error'" name="error" color="negative" />
 
-            <span v-if="Store.permissions.status === 'saving'">
-              {{ tdc('Salvando...') }}
-            </span>
+        <span class="text-caption">
+          <span v-if="Store.permissions.status === 'saving'">{{ tdc('Salvando...') }}</span>
+          <span v-else-if="Store.permissions.status === 'saved'">{{ tdc('Salvo') }}</span>
+          <span v-else-if="Store.permissions.status === 'error'">{{ tdc('Erro ao salvar') }}</span>
+          <span v-else>{{ tdc('Alterações pendentes') }}</span>
+        </span>
 
-            <span v-else-if="Store.permissions.status === 'saved'">
-              {{ tdc('Salvo') }}
-            </span>
+      </div>
 
-            <span v-else-if="Store.permissions.status === 'error'">
-              {{ tdc('Erro ao salvar') }}
-            </span>
+      <s-btn dense flat icon="close">
+        <q-tooltip>{{ tdc('Close') }}</q-tooltip>
+      </s-btn>
+    </q-bar>
 
-            <span v-else>
-              {{ tdc('Alterações pendentes') }}
-            </span>
+    <q-separator />
 
-          </span>
+    <!-- ================= SEARCH FIXO ================= -->
+    <q-card-section>
+      <q-input
+        v-model="Store.permissions.permissionSearch"
+        outlined
+        dense
+        clearable
+        :label="tdc('Pesquisar')"
+        @update:model-value="Store.filterPermissions"
+      >
+        <template #prepend>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+    </q-card-section>
 
-        </div>
-          <s-btn dense flat icon="close" @click="openApps = !openApps" >
-            <q-tooltip>{{  tdc('Close') }}</q-tooltip>
-          </s-btn>
-        </q-bar>
+    <q-separator />
 
-        <q-separator />
-        <q-card-section>
-        <q-input
-          v-model="Store.permissions.permissionSearch"
-          outlined
-          dense
-          clearable
-          :label="tdc('Pesquisar')"
-          @update:model-value="Store.filterPermissions"
+    <!-- ================= SCROLL (APENAS AQUI) ================= -->
+    <q-card-section class="col scroll">
+
+      <div v-if="Store.permissions.loadingPermissions" class="flex flex-center q-pa-xl">
+        <q-spinner size="40px" />
+      </div>
+
+      <q-list v-else separator>
+
+        <q-expansion-item
+          v-for="(models, app) in Store.groupedApps"
+          :key="app"
+          expand-separator
+          icon="apps"
         >
-          <template #prepend>
-            <q-icon name="search" />
+
+          <!-- HEADER -->
+          <template #header>
+            <q-item-section avatar>
+              <q-icon name="apps" color="primary" />
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label class="text-weight-bold">
+                {{ formatName(app) }}
+              </q-item-label>
+              <q-item-label caption>
+                {{ models.length }} {{ tdc('modelos') }}
+              </q-item-label>
+            </q-item-section>
+
+            <q-item-section side>
+              <q-checkbox
+                :model-value="allSelected(models)"
+                @click.stop
+                @update:model-value="val => toggleGroup(models, val)"
+              />
+            </q-item-section>
           </template>
-        </q-input>
-      </q-card-section>
 
-        <q-card-section class="scroll col ">
-<s-card>
-
-
-      <!-- ================= LIST ================= -->
-      <q-card-section class="col scroll">
-
-        <div v-if="Store.permissions.loadingPermissions" class="flex flex-center q-pa-xl">
-          <q-spinner size="40px" />
-        </div>
-
-        <q-list v-else separator>
-
-          <q-expansion-item
-            v-for="(models, app) in Store.groupedApps"
-            :key="app"
-            expand-separator
-            icon="apps"
+          <!-- ITEMS -->
+          <q-item
+            v-for="item in models"
+            :key="item.id"
+            clickable
+            v-ripple
+            @click="Store.togglePermission(item)"
           >
+            <q-item-section avatar>
+              <q-checkbox
+                :model-value="Store.isSelected(item.id)"
+                @click.stop
+                @update:model-value="() => Store.togglePermission(item)"
+              />
+            </q-item-section>
 
-            <!-- HEADER -->
-            <template #header>
-              <q-item-section avatar>
-                <q-icon name="apps" color="primary" />
-              </q-item-section>
+            <q-item-section>
+              <q-item-label>
+                {{ formatName(item.model) }}
+              </q-item-label>
+              <q-item-label caption>
+                {{ item.app_label }}
+              </q-item-label>
+            </q-item-section>
 
-              <q-item-section>
-                <q-item-label class="text-weight-bold">
-                  {{ formatName(app) }}
-                </q-item-label>
-                <q-item-label caption>
-                  {{ models.length }} {{ tdc('modelos') }}
-                </q-item-label>
-              </q-item-section>
+            <q-item-section side>
+              <q-badge
+                :color="Store.isSelected(item.id) ? 'primary' : 'grey'"
+                outline
+              >
+                {{ Store.isSelected(item.id) ? tdc('Ativo') : tdc('Inativo') }}
+              </q-badge>
+            </q-item-section>
 
-              <q-item-section side>
-                <q-checkbox
-                  :model-value="allSelected(models)"
-                  @click.stop
-                  @update:model-value="val => toggleGroup(models, val)"
-                />
-              </q-item-section>
-            </template>
+          </q-item>
 
-            <!-- ITEMS -->
-            <q-item
-              v-for="item in models"
-              :key="item.id"
-              clickable
-              v-ripple
-              @click="Store.togglePermission(item)"
-            >
-              <q-item-section avatar>
-                <q-checkbox
-                  :model-value="Store.isSelected(item.id)"
-                  @click.stop
-                  @update:model-value="() => Store.togglePermission(item)"
-                />
-              </q-item-section>
+        </q-expansion-item>
 
-              <q-item-section>
-                <q-item-label>
-                  {{ formatName(item.model) }}
-                </q-item-label>
-                <q-item-label caption>
-                  {{ item.app_label }}
-                </q-item-label>
-              </q-item-section>
+      </q-list>
 
-              <q-item-section side>
-                <q-badge
-                  :color="Store.isSelected(item.id) ? 'primary' : 'grey'"
-                  outline
-                >
-                  {{ Store.isSelected(item.id) ? tdc('Ativo') : tdc('Inativo') }}
-                </q-badge>
-              </q-item-section>
+    </q-card-section>
 
-            </q-item>
-
-          </q-expansion-item>
-
-        </q-list>
-
-      </q-card-section>
-
-    </s-card>
-        </q-card-section>
-    </s-card>
+  </s-card>
 
 </template>
-
-<style scoped>
-.scroll {
-  overflow-y: auto;
-}
-
-/* 🔥 animação */
-.rotate {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-</style>
