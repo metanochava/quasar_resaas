@@ -89,7 +89,7 @@
 
     <!-- -------------------- PAGE CONTAINER -------------------- -->
 
-    <q-page-container class="page-container">
+    <q-page-container class="page-container full-height">
 
       <router-view v-slot="{ Component }">
 
@@ -253,6 +253,29 @@ export default defineComponent({
 .bg-saas-premium > * {
   position: relative;
   z-index: 1;
+}
+
+
+
+html, body, #q-app {
+  height: 100%;
+  overflow: hidden; /* 🔥 trava scroll global */
+}
+
+/* 🔥 container principal */
+.page-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 🔥 conteúdo da página */
+.page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 </style>

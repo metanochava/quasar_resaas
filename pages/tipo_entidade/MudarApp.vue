@@ -70,7 +70,7 @@ function toggleGroup(models, checked) {
 
       </div>
 
-      <s-btn dense flat icon="close">
+      <s-btn dense flat icon="close" v-close-popup >
         <q-tooltip>{{ tdc('Close') }}</q-tooltip>
       </s-btn>
     </q-bar>
