@@ -259,7 +259,7 @@ export default defineComponent({
 
 html, body, #q-app {
   height: 100%;
-  overflow: hidden; /* 🔥 trava scroll global */
+  /* overflow: hidden; 🔥 trava scroll global */
 }
 
 /* 🔥 container principal */
