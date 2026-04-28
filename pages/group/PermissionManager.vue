@@ -101,7 +101,8 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import { usePermissionStore } from 'src/stores/PermissionStore'
+import { usePermissionStore } from '../../stores/PermissionStore'
+
 
 const props = defineProps({
   AllPermissions: Array,
