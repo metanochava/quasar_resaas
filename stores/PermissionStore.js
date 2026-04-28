@@ -13,8 +13,9 @@ export const usePermissionStore = createBaseStore(
     model: 'Permission'
   },
   {
+
     // ===============================
-    // STATE (SEM QUEBRAR PADRÃO)
+    // STATE EXTRA
     // ===============================
     state: () => ({
       allPermissions: [],
@@ -23,7 +24,7 @@ export const usePermissionStore = createBaseStore(
 
       apps: {},
       search: '',
-      loading: false
+      loadingPermission: false
     }),
 
     // ===============================
@@ -31,10 +32,10 @@ export const usePermissionStore = createBaseStore(
     // ===============================
     actions: {
 
-      // --------------------------------
-      // INIT (dados vindos do backend)
-      // --------------------------------
-      init(all, groupPerms, group) {
+      // --------------------------------------------------
+      // 🔥 INIT CUSTOM (NÃO CONFLITA COM baseStore)
+      // --------------------------------------------------
+      initPermissions(all, groupPerms, group) {
         this.allPermissions = all || []
         this.groupPermissions = groupPerms || []
         this.group = group || null
@@ -42,9 +43,9 @@ export const usePermissionStore = createBaseStore(
         this.buildApps()
       },
 
-      // --------------------------------
-      // BUILD UI (agrupamento por app)
-      // --------------------------------
+      // --------------------------------------------------
+      // 🔹 BUILD UI (AGRUPAR POR APP)
+      // --------------------------------------------------
       buildApps() {
         const list = this.search
           ? this.allPermissions.filter(p =>
@@ -61,22 +62,22 @@ export const usePermissionStore = createBaseStore(
         }, {})
       },
 
-      // --------------------------------
-      // CHECK PERMISSION
-      // --------------------------------
+      // --------------------------------------------------
+      // 🔹 CHECK PERMISSION
+      // --------------------------------------------------
       hasPermission(id) {
         return this.groupPermissions.some(p => p.id === id)
       },
 
-      // --------------------------------
-      // TOGGLE (AUTO SAVE)
-      // --------------------------------
+      // --------------------------------------------------
+      // 🔥 TOGGLE PERMISSION (AUTO SAVE)
+      // --------------------------------------------------
       async toggle(permission) {
         if (!this.group) return
 
         const exists = this.hasPermission(permission.id)
 
-        this.loading = true
+        this.loadingPermission = true
 
         try {
 
@@ -89,7 +90,7 @@ export const usePermissionStore = createBaseStore(
               { id: this.group.id }
             )
 
-            // update local state
+            // 🔥 update local state
             this.groupPermissions.push(permission)
 
           } else {
@@ -110,7 +111,7 @@ export const usePermissionStore = createBaseStore(
           console.error('Permission toggle error', e)
         }
 
-        this.loading = false
+        this.loadingPermission = false
       }
 
     }
