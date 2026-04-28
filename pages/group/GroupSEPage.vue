@@ -12,7 +12,18 @@
       :ignore-fields="ignoreFields"
       :data="Group.form"
       @saved="onSaved"
-    />
+      centerCol="col-4"
+      rightCol="col-8"
+    >
+
+      <template #right v-if="Group.form?.id">
+        <PermissionManager
+          :AllPermissions="permissions"
+          :GroupPermissionsRe="Group.form.permissions"
+          :Group="Group.form"
+        />
+      </template>
+    </FormTwo>
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
@@ -25,7 +36,15 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGroupStore } from '../../stores/GroupStore'
+import { PermissionManager } from './PermissionManager.vue'
 import FormTwo from '../../components/auto/FormTwo.vue'
+
+
+
+const permissions = ref([])
+const groupPermissions = ref([])
+const group = ref(null)
+
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
@@ -42,7 +61,8 @@ const ignoreFields = [
   'updated_at',
   'created_by',
   'updated_by',
-  'deleted_at'
+  'deleted_at',
+  'permissions'
 ]
 
 // ---------------- PERMISSIONS ----------------
@@ -82,9 +102,24 @@ async function init() {
 
     ready.value = true
 
+
+
+
+
+
+     // 🔹 todas permissões
+    const { data: all } = await HTTPClient.get(
+      url({ type: 'u', url: 'api/auth/permissions/' })
+    )
+
+    permissions.value = all
+
+
   } catch (err) {
     console.error('Erro ao inicializar página:', err)
   }
+
+
 }
 
 // ---------------- WATCH ROTA (CORRIGIDO) ----------------

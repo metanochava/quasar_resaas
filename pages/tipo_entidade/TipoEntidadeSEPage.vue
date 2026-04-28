@@ -40,10 +40,10 @@
         </template>
 
         <template #footer v-if="TipoEntidade.form?.id">
-          <div class="col">
+          <div class="col-6">
             <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
           </div>
-          <div class="col">
+          <div class="col-6">
             <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
           </div>
         </template>
