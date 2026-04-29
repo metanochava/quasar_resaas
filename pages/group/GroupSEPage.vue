@@ -17,7 +17,7 @@
     >
 
       <template #center v-if="Group.form?.id">
-        <s-input :label="Group.form?.label" :modelValue="Group.form?.name"
+        <s-input label="Name" :modelValue="Group.form?.name"
         />
       </template>
       <template #right v-if="Group.form?.id">
@@ -27,6 +27,8 @@
           :Group="Group.form"
         />
       </template>
+
+      permissions: {{ Group.form }}
     </FormTwo>
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
