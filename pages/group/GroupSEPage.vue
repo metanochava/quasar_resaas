@@ -36,7 +36,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGroupStore } from '../../stores/GroupStore'
-import { PermissionManager } from './PermissionManager.vue'
+import  PermissionManager  from './PermissionManager.vue'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 
