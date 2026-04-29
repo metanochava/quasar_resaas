@@ -42,7 +42,7 @@ import { useRoute } from 'vue-router'
 import { useGroupStore } from '../../stores/GroupStore'
 import  PermissionManager  from './PermissionManager.vue'
 import FormTwo from '../../components/auto/FormTwo.vue'
-import { HTTPAuth, HTTPClient } from '../../boot/api'
+import { HTTPAuth, url } from '../../boot/api'
 
 
 
