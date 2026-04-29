@@ -29,7 +29,7 @@
         />
       </template>
 
-      permissions: {{ Group.form }}
+      permissions: {{ Group.form.permissions }}
     </FormTwo>
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
@@ -111,16 +111,13 @@ async function init() {
     ready.value = true
 
 
-
-
-
-
      // 🔹 todas permissões
     const { data: all } = await HTTPAuth.get(
       url({ type: 'u', url: 'api/auth/permissions/' })
     )
 
     permissions.value = all
+    console.log( permissions.value )
 
 
   } catch (err) {
