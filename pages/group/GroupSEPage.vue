@@ -16,6 +16,10 @@
       rightCol="col-8"
     >
 
+      <template #center v-if="Group.form?.id">
+        <s-input :label="Group.form?.label" :modelValue="Group.form?.name"
+        />
+      </template>
       <template #right v-if="Group.form?.id">
         <PermissionManager
           :AllPermissions="permissions"
