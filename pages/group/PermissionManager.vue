@@ -113,6 +113,11 @@ const props = defineProps({
 const Permission = usePermissionStore()
 
 onMounted(() => {
+  console.log(props.AllPermissions,
+    props.GroupPermissionsRe,
+    props.Group)
+
+    
   Permission.initPermissions(
     props.AllPermissions,
     props.GroupPermissionsRe,
