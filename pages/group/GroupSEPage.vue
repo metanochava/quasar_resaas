@@ -38,6 +38,7 @@ import { useRoute } from 'vue-router'
 import { useGroupStore } from '../../stores/GroupStore'
 import  PermissionManager  from './PermissionManager.vue'
 import FormTwo from '../../components/auto/FormTwo.vue'
+import { HTTPAuth, HTTPClient } from '../../boot/api'
 
 
 
@@ -108,7 +109,7 @@ async function init() {
 
 
      // 🔹 todas permissões
-    const { data: all } = await HTTPClient.get(
+    const { data: all } = await HTTPAuth.get(
       url({ type: 'u', url: 'api/auth/permissions/' })
     )
 
