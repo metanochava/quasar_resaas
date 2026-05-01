@@ -140,8 +140,6 @@ import TopMenu from '../components/TopMenu.vue'
 import RightMenu from '../components/RightMenu.vue'
 import Rodape from '../components/footer/MainFooter.vue'
 
-
-
 import { defineComponent } from 'vue'
 import { barStyle, thumbStyle } from '../boot/app'
 import UserPermissioes from '../components/UserPermissioes.vue'
@@ -164,12 +162,13 @@ export default defineComponent({
     UserPermissioes,
     PagePermissoes,
     DefinicoesLayout
-
   },
+
   setup() {
     const TipoEntidade = useTipoEntidadeStore()
     const Entidade = useEntidadeStore()
     const User = useUserStore()
+
     return {
       TipoEntidade,
       Entidade,
@@ -178,6 +177,7 @@ export default defineComponent({
       thumbStyle
     }
   },
+
   data() {
     return {
       permissoes: false,
@@ -188,29 +188,74 @@ export default defineComponent({
       miniState: false,
     }
   },
-  computed:{
 
+  computed:{
     ps(){
       return this.User.ps || {}
     }
+  },
 
+  // 🔥 WATCH GLOBAL (rota + UI)
+  watch: {
+    $route(to) {
+      const ignore = ['authwelcome','welcome','login']
+
+      if (!ignore.includes(to.name)) {
+        localStorage.setItem('last_route', to.fullPath)
+      }
+    },
+
+    // 🔥 persist menu
+    'User.LeftTop'(val) {
+      localStorage.setItem('ui_left_menu', JSON.stringify(val))
+    },
+
+    'User.RightTop'(val) {
+      localStorage.setItem('ui_right_menu', JSON.stringify(val))
+    }
   },
 
   async mounted(){
 
+    // 🔥 RESTORE USER + SETTINGS (teu código original)
     if(this.User){
       this.User?.loadFromStorage()
       await this.Entidade.getLayoutSettings(this.User?.Entidade?.id)
     }
-    
+
+    // 🔥 RESTORE ROTA
+    const lastRoute = localStorage.getItem('last_route')
+    if (lastRoute && lastRoute !== this.$route.fullPath) {
+      this.$router.replace(lastRoute)
+    }
+
+    // 🔥 RESTORE MENUS
+    const left = localStorage.getItem('ui_left_menu')
+    const right = localStorage.getItem('ui_right_menu')
+
+    if (left !== null) this.User.LeftTop = JSON.parse(left)
+    if (right !== null) this.User.RightTop = JSON.parse(right)
+
+    // 🔥 RESTORE SCROLL
+    const scroll = localStorage.getItem('scroll_position')
+    if (scroll) {
+      setTimeout(() => {
+        window.scrollTo(0, parseInt(scroll))
+      }, 100)
+    }
+
+    // 🔥 teu comportamento original
     if (['authwelcome','welcome'].includes(this.$route.name)){
       this.User.LeftTop = false
     }
+
+    // 🔥 SAVE SCROLL AO SAIR
+    window.addEventListener('beforeunload', () => {
+      localStorage.setItem('scroll_position', window.scrollY)
+    })
   },
 
-  methods: {
-    
-  },
+  methods: {}
 })
 </script>
 
