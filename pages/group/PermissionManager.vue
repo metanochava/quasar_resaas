@@ -19,7 +19,7 @@
 
     <!-- BODY -->
     <div class="col scroll q-pa-sm">
-
+      {{ Permission.apps }}
       <q-card
         v-for="(models, appName) in Permission.apps"
         :key="appName"
