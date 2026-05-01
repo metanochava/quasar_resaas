@@ -120,7 +120,7 @@ export const usePermissionStore = createBaseStore(
         try {
           if (!exists) {
             await HTTPClient.post(
-              url({ type: 'u', url: `permissions/${permission.id}/addToGroup/` }),
+              url({ type: 'u', url: `api/auth/permissions/${permission.id}/addToGroup/` }),
               { id: this.group.id }
             )
 
@@ -128,7 +128,7 @@ export const usePermissionStore = createBaseStore(
 
           } else {
             await HTTPClient.post(
-              url({ type: 'u', url: `permissions/${permission.id}/removeFromGroup/` }),
+              url({ type: 'u', url: `api/auth/permissions/${permission.id}/removeFromGroup/` }),
               { id: this.group.id }
             )
 
