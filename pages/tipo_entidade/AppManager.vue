@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted } from 'vue'
-import { useTipoEntidadeStore }  from './../../stores/TipoEntidadeStore'
-import { tdc } from './../../boot/base'
+import { useTipoEntidadeStore }  from '../../stores/TipoEntidadeStore'
+import { tdc } from '../../boot/base'
 
 
 const props = defineProps({
@@ -11,13 +11,13 @@ const props = defineProps({
   }
 })
 
-const Store = useTipoEntidadeStore()
+const TipoEntidade = useTipoEntidadeStore()
 
 // ===============================
 // INIT
 // ===============================
 onMounted(async () => {
-  await Store.initPermissions(props.tipoEntidadeId)
+  await TipoEntidade.initPermissions(props.tipoEntidadeId)
 })
 
 // ===============================
@@ -30,15 +30,15 @@ function formatName(value) {
 }
 
 function allSelected(models) {
-  return models.every(m => Store.isSelected(m.id))
+  return models.every(m => TipoEntidade.isSelected(m.id))
 }
 
 function toggleGroup(models, checked) {
   models.forEach(item => {
-    const exists = Store.isSelected(item.id)
+    const exists = TipoEntidade.isSelected(item.id)
 
-    if (checked && !exists) Store.togglePermission(item)
-    if (!checked && exists) Store.togglePermission(item)
+    if (checked && !exists) TipoEntidade.togglePermission(item)
+    if (!checked && exissts) TipoEntidade.togglePermission(item)
   })
 }
 </script>
@@ -57,14 +57,14 @@ function toggleGroup(models, checked) {
       <!-- STATUS -->
       <div class="row items-center q-gutter-sm">
 
-        <q-icon v-if="Store.permissions.status === 'saving'" name="sync" class="rotate" />
-        <q-icon v-else-if="Store.permissions.status === 'saved'" name="check_circle" color="positive" />
-        <q-icon v-else-if="Store.permissions.status === 'error'" name="error" color="negative" />
+        <q-icon v-if="TipoEntidade.permissions.status === 'saving'" name="sync" class="rotate" />
+        <q-icon v-else-if="TipoEntidade.permissions.status === 'saved'" name="check_circle" color="positive" />
+        <q-icon v-else-if="TipoEntidade.permissions.status === 'error'" name="error" color="negative" />
 
         <span class="text-caption">
-          <span v-if="Store.permissions.status === 'saving'">{{ tdc('Salvando...') }}</span>
-          <span v-else-if="Store.permissions.status === 'saved'">{{ tdc('Salvo') }}</span>
-          <span v-else-if="Store.permissions.status === 'error'">{{ tdc('Erro ao salvar') }}</span>
+          <span v-if="TipoEntidade.permissions.status === 'saving'">{{ tdc('Salvando...') }}</span>
+          <span v-else-if="TipoEntidade.permissions.status === 'saved'">{{ tdc('Salvo') }}</span>
+          <span v-else-if="TipoEntidade.permissions.status === 'error'">{{ tdc('Erro ao salvar') }}</span>
           <span v-else>{{ tdc('Alterações pendentes') }}</span>
         </span>
 
@@ -80,12 +80,12 @@ function toggleGroup(models, checked) {
     <!-- ================= SEARCH FIXO ================= -->
     <q-card-section>
       <q-input
-        v-model="Store.permissions.permissionSearch"
+        v-model="TipoEntidade.permissions.permissionSearch"
         outlined
         dense
         clearable
         :label="tdc('Pesquisar')"
-        @update:model-value="Store.filterPermissions"
+        @update:model-value="TipoEntidade.filterPermissions"
       >
         <template #prepend>
           <q-icon name="search" />
@@ -98,14 +98,14 @@ function toggleGroup(models, checked) {
     <!-- ================= SCROLL (APENAS AQUI) ================= -->
     <q-card-section class="col scroll">
 
-      <div v-if="Store.permissions.loadingPermissions" class="flex flex-center q-pa-xl">
+      <div v-if="TipoEntidade.permissions.loadingPermissions" class="flex flex-center q-pa-xl">
         <q-spinner size="40px" />
       </div>
 
       <q-list v-else separator>
 
         <q-expansion-item
-          v-for="(models, app) in Store.groupedApps"
+          v-for="(models, app) in TipoEntidade.groupedApps"
           :key="app"
           expand-separator
           icon="apps"
@@ -141,13 +141,13 @@ function toggleGroup(models, checked) {
             :key="item.id"
             clickable
             v-ripple
-            @click="Store.togglePermission(item)"
+            @click="TipoEntidade.togglePermission(item)"
           >
             <q-item-section avatar>
               <q-checkbox
-                :model-value="Store.isSelected(item.id)"
+                :model-value="TipoEntidade.isSelected(item.id)"
                 @click.stop
-                @update:model-value="() => Store.togglePermission(item)"
+                @update:model-value="() => TipoEntidade.togglePermission(item)"
               />
             </q-item-section>
 
@@ -162,10 +162,10 @@ function toggleGroup(models, checked) {
 
             <q-item-section side>
               <q-badge
-                :color="Store.isSelected(item.id) ? 'primary' : 'grey'"
+                :color="TipoEntidade.isSelected(item.id) ? 'primary' : 'grey'"
                 outline
               >
-                {{ Store.isSelected(item.id) ? tdc('Ativo') : tdc('Inativo') }}
+                {{ TipoEntidade.isSelected(item.id) ? tdc('Ativo') : tdc('Inativo') }}
               </q-badge>
             </q-item-section>
 

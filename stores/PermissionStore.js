@@ -1,9 +1,5 @@
 import { createBaseStore } from '../base/base_store'
-import { HTTPAuth, HTTPClient, url } from '../boot/api'
-import { useSucursalStore } from './SucursalStore'
-import { useUserStore } from './UserStore'
-import { perfilSplint, tdc } from '../boot/base'
-import { getStorage, setStorage } from '../boot/storage'
+import { HTTPClient, url } from '../boot/api'
 
 export const usePermissionStore = createBaseStore(
   'permission',
@@ -14,9 +10,6 @@ export const usePermissionStore = createBaseStore(
   },
   {
 
-    // ===============================
-    // STATE EXTRA
-    // ===============================
     state: () => ({
       allPermissions: [],
       groupPermissions: [],
@@ -27,14 +20,9 @@ export const usePermissionStore = createBaseStore(
       loadingPermission: false
     }),
 
-    // ===============================
-    // ACTIONS
-    // ===============================
     actions: {
 
-      // --------------------------------------------------
-      // 🔥 INIT CUSTOM (NÃO CONFLITA COM baseStore)
-      // --------------------------------------------------
+      // INIT
       initPermissions(all, groupPerms, group) {
         this.allPermissions = all || []
         this.groupPermissions = groupPerms || []
@@ -43,44 +31,80 @@ export const usePermissionStore = createBaseStore(
         this.buildApps()
       },
 
-      // --------------------------------------------------
-      // 🔹 BUILD UI (AGRUPAR POR APP)
-      // --------------------------------------------------
+      // BUILD (APP → MODEL → PERMS)
       buildApps() {
         const list = this.search
           ? this.allPermissions.filter(p =>
-              p.content_type_model.toLowerCase().includes(this.search.toLowerCase())
+              p.content_type_model
+                .toLowerCase()
+                .includes(this.search.toLowerCase())
             )
           : this.allPermissions
 
         this.apps = list.reduce((acc, item) => {
-          if (!acc[item.content_type_app]) {
-            acc[item.content_type_app] = []
-          }
-          acc[item.content_type_app].push(item)
+          const app = item.content_type_app
+          const model = item.content_type_model
+
+          if (!acc[app]) acc[app] = {}
+          if (!acc[app][model]) acc[app][model] = []
+
+          acc[app][model].push(item)
+
           return acc
         }, {})
       },
 
-      // --------------------------------------------------
-      // 🔹 CHECK PERMISSION
-      // --------------------------------------------------
+      // CHECK
       hasPermission(id) {
         return this.groupPermissions.some(p => p.id === id)
       },
 
-      // --------------------------------------------------
-      // 🔥 TOGGLE PERMISSION (AUTO SAVE)
-      // --------------------------------------------------
+      // 🔥 STATE APP
+      appState(models) {
+        const all = Object.values(models).flat()
+
+        const total = all.length
+        const checked = all.filter(p => this.hasPermission(p.id)).length
+
+        return {
+          checked: checked === total,
+          indeterminate: checked > 0 && checked < total
+        }
+      },
+
+      // 🔥 STATE MODEL
+      modelState(perms) {
+        const total = perms.length
+        const checked = perms.filter(p => this.hasPermission(p.id)).length
+
+        return {
+          checked: checked === total,
+          indeterminate: checked > 0 && checked < total
+        }
+      },
+
+      // 🔥 TOGGLE APP
+      toggleApp(models, state) {
+        Object.values(models).forEach(perms => {
+          perms.forEach(p => {
+            const has = this.hasPermission(p.id)
+
+            if (state && !has) this.toggle(p)
+            if (!state && has) this.toggle(p)
+          })
+        })
+      },
+
+      // 🔥 TOGGLE
       async toggle(permission) {
         if (!this.group) return
 
         const exists = this.hasPermission(permission.id)
-
         this.loadingPermission = true
 
-        try {
+        const backup = [...this.groupPermissions]
 
+        try {
           if (!exists) {
             await HTTPClient.post(
               url({
@@ -90,8 +114,10 @@ export const usePermissionStore = createBaseStore(
               { id: this.group.id }
             )
 
-            // 🔥 update local state
-            this.groupPermissions.push(permission)
+            this.groupPermissions = [
+              ...this.groupPermissions,
+              permission
+            ]
 
           } else {
             await HTTPClient.post(
@@ -108,12 +134,12 @@ export const usePermissionStore = createBaseStore(
           }
 
         } catch (e) {
-          console.error('Permission toggle error', e)
+          console.error(e)
+          this.groupPermissions = backup
         }
 
         this.loadingPermission = false
       }
-
     }
   }
 )

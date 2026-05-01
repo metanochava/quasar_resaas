@@ -2,15 +2,15 @@
   <q-page class="column q-pa-sm full-height overflow-hidden">
 
     <q-dialog v-model="openApps" persistent full-height full-width>
-      <MudarApp :tipoEntidadeId="TipoEntidade.form?.id" />
+      <AppManager :tipoEntidadeId="TipoEntidade.form?.id" />
     </q-dialog>
 
     <q-dialog v-model="openPermissions" persistent full-height full-width>
-      <MudarPermission :tipoEntidadeId="TipoEntidade.form?.id" />
+      <PermissionManager :tipoEntidadeId="TipoEntidade.form?.id" />
     </q-dialog>
 
     <q-dialog v-model="openGroups" persistent full-height full-width>
-      <MudarGroup :tipoEntidadeId="TipoEntidade.form?.id" />
+      <GroupManager :tipoEntidadeId="TipoEntidade.form?.id" />
     </q-dialog>
 
     <div class="col overflow-hidden">
@@ -66,8 +66,11 @@ import { useRoute } from 'vue-router'
 import { useTipoEntidadeStore } from './../../stores/TipoEntidadeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
-import MudarApp from './MudarApp.vue'
-import { tdc } from '../..'
+import AppManager from './AppManager.vue'
+import GroupManager from './GroupManager.vue'
+import PermissionManager from './PermissionManager.vue'
+import { tdc } from '../../boot/base'
+
 
 // ---------------- ROUTE ----------------
 const route = useRoute()

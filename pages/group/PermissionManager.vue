@@ -1,12 +1,10 @@
 <template>
   <q-page class="column full-height">
 
-    <!-- 🔥 HEADER -->
+    <!-- HEADER -->
     <div class="q-pa-sm">
-
       <q-input
-        dense
-        outlined
+        dense outlined
         v-model="Permission.search"
         label="Pesquisar"
         @update:model-value="Permission.buildApps"
@@ -15,89 +13,82 @@
           <q-icon name="search" />
         </template>
       </q-input>
-
-      <!-- 🔥 STATUS -->
-      <div class="text-caption q-mt-xs text-grey">
-        <span v-if="Permission.saving">💾 Salvando...</span>
-        <span v-else-if="Permission.lastSaved">
-          ✔ Salvo {{ formatTime(Permission.lastSaved) }}
-        </span>
-      </div>
-
     </div>
 
     <q-separator />
 
-      AllPermissions: {{AllPermissions}},
-      GroupPermissionsRe: {{GroupPermissionsRe}},
-      Group: {{Group}}
-
-    <!-- 🔥 BODY -->
+    <!-- BODY -->
     <div class="col scroll q-pa-sm">
 
       <q-card
-        v-for="(app, appName) in Permission.apps"
+        v-for="(models, appName) in Permission.apps"
         :key="appName"
-        bordered flat class="q-mb-sm"
+        class="q-mb-sm"
+        flat bordered
       >
 
-        <q-expansion-item>
+        <q-expansion-item expand-separator>
 
-          <!-- 🔥 APP HEADER -->
+          <!-- 🔥 APP -->
           <template #header>
+
+            <q-item-section avatar>
+              <q-checkbox
+                :model-value="Permission.appState(models).checked"
+                :indeterminate="Permission.appState(models).indeterminate"
+                @update:model-value="val => Permission.toggleApp(models, val)"
+              />
+            </q-item-section>
+
             <q-item-section>
               {{ appName }}
             </q-item-section>
 
-            <q-item-section side>
-              <q-btn
-                dense flat icon="done_all"
-                @click.stop="Permission.toggleApp(app, true)"
-              />
-              <q-btn
-                dense flat icon="clear"
-                @click.stop="Permission.toggleApp(app, false)"
-              />
-            </q-item-section>
           </template>
 
           <!-- 🔥 MODELS -->
           <div
-            v-for="(modelPerms, modelName) in groupByModel(app)"
+            v-for="(perms, modelName) in models"
             :key="modelName"
-            class="row items-center q-pa-sm"
+            class="q-pa-sm"
           >
 
-            <!-- MODEL -->
-            <div class="col-4">
-              {{ modelName }}
+            <div class="row items-center">
+
+              <!-- MODEL -->
+              <div class="col-4">
+                <q-checkbox
+                  :label="modelName"
+                  :model-value="Permission.modelState(perms).checked"
+                  :indeterminate="Permission.modelState(perms).indeterminate"
+                  @update:model-value="val => toggleModel(perms, val)"
+                />
+              </div>
+
+              <!-- PERMISSIONS -->
+              <div class="col-8 row q-gutter-sm">
+
+                <q-checkbox
+                  v-for="perm in orderPermissions(perms)"
+                  :key="perm.id"
+                  :model-value="Permission.hasPermission(perm.id)"
+                  @update:model-value="() => Permission.toggle(perm)"
+                  :label="label(perm.codename)"
+                  dense
+                  :disable="Permission.loadingPermission"
+                />
+
+              </div>
+
             </div>
 
-            <!-- MODEL ACTIONS -->
-            <div class="col-2">
-              <q-btn dense flat icon="done"
-                @click="Permission.toggleModel(modelPerms, true)" />
-              <q-btn dense flat icon="close"
-                @click="Permission.toggleModel(modelPerms, false)" />
-            </div>
-
-            <!-- PERMISSIONS -->
-            <div class="col-6 row">
-
-              <q-checkbox
-                v-for="perm in orderPermissions(modelPerms)"
-                :key="perm.id"
-                :model-value="Permission.hasPermission(perm.id)"
-                @update:model-value="() => Permission.toggle(perm)"
-                dense
-                :label="label(perm.codename)"
-              />
-
-            </div>
+            <q-separator class="q-my-sm" />
 
           </div>
+
         </q-expansion-item>
       </q-card>
+
     </div>
   </q-page>
 </template>
@@ -106,7 +97,6 @@
 <script setup>
 import { onMounted } from 'vue'
 import { usePermissionStore } from '../../stores/PermissionStore'
-
 
 const props = defineProps({
   AllPermissions: Array,
@@ -117,11 +107,6 @@ const props = defineProps({
 const Permission = usePermissionStore()
 
 onMounted(() => {
-  console.log(props.AllPermissions,
-    props.GroupPermissionsRe,
-    props.Group)
-
-    
   Permission.initPermissions(
     props.AllPermissions,
     props.GroupPermissionsRe,
@@ -129,20 +114,18 @@ onMounted(() => {
   )
 })
 
-// helpers
-function groupByModel(arr) {
-  return arr.reduce((acc, item) => {
-    if (!acc[item.content_type_model]) {
-      acc[item.content_type_model] = []
-    }
-    acc[item.content_type_model].push(item)
-    return acc
-  }, {})
+function toggleModel(perms, state) {
+  perms.forEach(p => {
+    const has = Permission.hasPermission(p.id)
+
+    if (state && !has) Permission.toggle(p)
+    if (!state && has) Permission.toggle(p)
+  })
 }
 
 function orderPermissions(arr) {
   const order = ['add', 'view', 'change', 'delete', 'list']
-  return arr.sort((a, b) => {
+  return [...arr].sort((a, b) => {
     const ra = order.findIndex(o => a.codename.includes(o))
     const rb = order.findIndex(o => b.codename.includes(o))
     return ra - rb
@@ -151,9 +134,5 @@ function orderPermissions(arr) {
 
 function label(c) {
   return c.split('_')[0]
-}
-
-function formatTime(date) {
-  return new Date(date).toLocaleTimeString()
 }
 </script>
