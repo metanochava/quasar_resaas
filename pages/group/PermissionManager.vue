@@ -64,9 +64,10 @@
                   @update:model-value="val => toggleModel(perms, val)"
                 >
                   <div>
-                    <div class="text-bold">{{ modelName }}</div>
-                    <div class="text-caption text-grey">
-                      {{ perms.length }} permissões
+                    <div class="text-bold">{{ modelName }}
+                      <label class="text-grey">
+                        {{ perms.length }} permissões
+                      </label>
                     </div>
                   </div>
                 </q-checkbox>
@@ -141,6 +142,7 @@ function orderPermissions(arr) {
 }
 
 function label(c,m) {
+  m = m.replaceAll("_", '')
   return c.replaceAll(m,'')
 }
 </script>
