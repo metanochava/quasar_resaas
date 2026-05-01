@@ -142,9 +142,14 @@ function orderPermissions(arr) {
 }
 
 function label(c, m) {
-  const model = (m || '').replaceAll(' ', '').toLowerCase()
-  const code = (c || '').toLowerCase()
+  const model = (m || '')
+    .replaceAll(' ', '')
+    .toLowerCase()
 
-  return code.replaceAll(model, '').replaceAll('_', '')
+  let code = (c || '').toLowerCase()
+
+  code = code.replace(model, '')   // só primeira ocorrência
+
+  return code.replace(/_$/, '')
 }
 </script>
