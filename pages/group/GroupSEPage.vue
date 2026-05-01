@@ -27,9 +27,10 @@
           :GroupPermissionsRe="Group.form.permissions"
           :Group="Group.form"
         />
+         PermissionManager permissions: {{ Group.form.permissions }}
       </template>
 
-      permissions: {{ Group.form.permissions }}
+     
     </FormTwo>
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
@@ -110,20 +111,17 @@ async function init() {
 
     ready.value = true
 
-
      // 🔹 todas permissões
     const { data: all } = await HTTPAuth.get(
       url({ type: 'u', url: 'api/auth/permissions/' })
     )
 
     permissions.value = all
-    console.log( permissions.value )
-
+    console.log("meta",  permissions.value )
 
   } catch (err) {
     console.error('Erro ao inicializar página:', err)
   }
-
 
 }
 
