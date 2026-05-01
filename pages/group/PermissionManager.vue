@@ -79,7 +79,7 @@
                   :key="perm.id"
                   :model-value="Permission.hasPermission(perm.id)"
                   @update:model-value="() => Permission.toggle(perm)"
-                  :label="label(perm.codename)"
+                  :label="label(perm.codename, modelName )"
                   dense
                   :disable="Permission.loadingPermission"
                 />
@@ -140,8 +140,7 @@ function orderPermissions(arr) {
   })
 }
 
-function label(c) {
-  console.log(c.split('_'))
-  return c.split('_')[0]
+function label(c,m) {
+  return c.replaceAll(m,'')
 }
 </script>
