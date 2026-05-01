@@ -1,5 +1,6 @@
 <template>
   <q-page class="q-pa-sm">
+
     <!-- FORM -->
     <FormTwo
       v-if="ready"
@@ -17,9 +18,12 @@
     >
 
       <template #center v-if="Group.form?.id">
-        <s-input label="Name" :modelValue="Group.form?.name"
+        <s-input
+          label="Name"
+          :modelValue="Group.form?.name"
         />
       </template>
+
       <template #right v-if="Group.form?.id">
         <PermissionManager
           :AllPermissions="permissions"
@@ -28,39 +32,29 @@
         />
       </template>
 
-     
     </FormTwo>
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
     </div>
+
   </q-page>
 </template>
-
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGroupStore } from '../../stores/GroupStore'
-import  PermissionManager  from './PermissionManager.vue'
+import PermissionManager from './PermissionManager.vue'
 import FormTwo from '../../components/auto/FormTwo.vue'
 import { HTTPAuth, url } from '../../boot/api'
 
-
-
-const permissions = ref([])
-const groupPermissions = ref([])
-const group = ref(null)
-
-
-// ---------------- ROUTE ----------------
+const Group = useGroupStore()
 const route = useRoute()
 
-// ---------------- STORE ----------------
-const Group = useGroupStore()
-
-// ---------------- STATE ----------------
 const ready = ref(false)
+
+const permissions = ref([])
 
 const ignoreFields = [
   'id',
@@ -73,28 +67,23 @@ const ignoreFields = [
 ]
 
 // ---------------- PERMISSIONS ----------------
-function canDo(perm) {
-  if (!perm) return true
+function canDo() {
   return true
 }
 
-// ---------------- LOAD DATA ----------------
+// ---------------- LOAD GROUP ----------------
 async function load(id) {
-
   if (!id) {
-
     Group.resetForm?.()
     return
   }
 
-
-  // 🔥 evita chamadas duplicadas com comparação segura
   if (String(Group.row?.id) === String(id)) {
-    Group.form = Group.row 
+    Group.form = Group.row
     return
   }
 
-  Group.row =  await Group.getById(id)
+  Group.row = await Group.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -107,39 +96,33 @@ async function init() {
     const id = route.params.id
     await load(id)
 
-    ready.value = true
-
-     // 🔹 todas permissões
+    // 🔥 PRIMEIRO: buscar permissões
     const { data: all } = await HTTPAuth.get(
       url({ type: 'u', url: 'api/auth/permissions/' })
     )
 
-    permissions.value = all
-    console.log("meta",  permissions.value )
+    permissions.value = all || []
+
+    // 🔥 SÓ DEPOIS libera UI
+    ready.value = true
 
   } catch (err) {
     console.error('Erro ao inicializar página:', err)
   }
-
 }
 
-// ---------------- WATCH ROTA (CORRIGIDO) ----------------
+// ---------------- ROUTE CHANGE ----------------
 watch(
-  () => route.params,
-  async (params) => {
-    if (!params) return
-
-    const id = params.id
-
-    // 🔥 sempre carrega quando muda rota
+  () => route.params.id,
+  async (id) => {
+    if (!id) return
     await load(id)
-  },
-  { immediate: false } // init já trata o primeiro carregamento
+  }
 )
 
 // ---------------- EVENTS ----------------
 function onSaved(res) {
-  // console.log('Salvo com sucesso', res)
+  // opcional
 }
 
 // ---------------- LIFECYCLE ----------------
