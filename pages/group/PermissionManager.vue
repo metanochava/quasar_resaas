@@ -141,8 +141,10 @@ function orderPermissions(arr) {
   })
 }
 
-function label(c,m) {
-  m = m.replaceAll(" ", '')
-  return c.replaceAll(m,'')
+function label(c, m) {
+  const model = (m || '').replaceAll(' ', '').toLowerCase()
+  const code = (c || '').toLowerCase()
+
+  return code.replaceAll(model, '').replaceAll('_', '')
 }
 </script>
