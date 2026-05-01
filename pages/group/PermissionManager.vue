@@ -57,7 +57,7 @@
             <div class="row items-center">
 
               <!-- MODEL -->
-              <div class="col-4">
+              <div class="col-12 text-center">
                 <q-checkbox
                   :model-value="Permission.modelState(perms).checked"
                   :indeterminate="Permission.modelState(perms).indeterminate"
@@ -73,7 +73,7 @@
               </div>
 
               <!-- PERMISSIONS -->
-              <div class="col-8 row q-gutter-sm">
+              <div class="col-12 row q-gutter-sm">
                 <q-checkbox
                   v-for="perm in orderPermissions(perms)"
                   :key="perm.id"
