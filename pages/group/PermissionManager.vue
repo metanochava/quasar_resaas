@@ -28,6 +28,10 @@
 
     <q-separator />
 
+      AllPermissions: {{AllPermissions}},
+      GroupPermissionsRe: {{GroupPermissionsRe}},
+      Group: {{Group}}
+
     <!-- 🔥 BODY -->
     <div class="col scroll q-pa-sm">
 

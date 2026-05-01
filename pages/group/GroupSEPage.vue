@@ -19,7 +19,6 @@
       <template #center v-if="Group.form?.id">
         <s-input label="Name" :modelValue="Group.form?.name"
         />
-        permissions: {{ Group.form }}
       </template>
       <template #right v-if="Group.form?.id">
         <PermissionManager
@@ -27,7 +26,6 @@
           :GroupPermissionsRe="Group.form.permissions"
           :Group="Group.form"
         />
-         PermissionManager permissions: {{ Group.form.permissions }}
       </template>
 
      
