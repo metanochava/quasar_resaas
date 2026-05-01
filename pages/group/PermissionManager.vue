@@ -142,7 +142,7 @@ function orderPermissions(arr) {
 }
 
 function label(c,m) {
-  m = m.replaceAll("_", '')
+  m = m.replaceAll(" ", '')
   return c.replaceAll(m,'')
 }
 </script>
