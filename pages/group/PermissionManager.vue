@@ -142,6 +142,6 @@ function orderPermissions(arr) {
 
 function label(c) {
   console.log(c.split('_'))
-  return c.split('_')[1]
+  return c.split('_')[0]
 }
 </script>
