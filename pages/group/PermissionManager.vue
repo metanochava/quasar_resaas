@@ -19,19 +19,17 @@
 
     <!-- BODY -->
     <div class="col scroll q-pa-sm">
-      {{ Permission.apps }}
+
       <q-card
         v-for="(models, appName) in Permission.apps"
         :key="appName"
         class="q-mb-sm"
         flat bordered
       >
-
         <q-expansion-item expand-separator>
 
-          <!-- 🔥 APP -->
+          <!-- APP -->
           <template #header>
-
             <q-item-section avatar>
               <q-checkbox
                 :model-value="Permission.appState(models).checked"
@@ -41,33 +39,41 @@
             </q-item-section>
 
             <q-item-section>
-              {{ appName }}
+              <div class="text-bold text-primary">
+                {{ appName }}
+              </div>
+              <div class="text-caption text-grey">
+                {{ Object.keys(models).length }} modelos
+              </div>
             </q-item-section>
-
           </template>
 
-          <!-- 🔥 MODELS -->
+          <!-- MODELS -->
           <div
             v-for="(perms, modelName) in models"
             :key="modelName"
             class="q-pa-sm"
           >
-
             <div class="row items-center">
 
               <!-- MODEL -->
               <div class="col-4">
                 <q-checkbox
-                  :label="modelName"
                   :model-value="Permission.modelState(perms).checked"
                   :indeterminate="Permission.modelState(perms).indeterminate"
                   @update:model-value="val => toggleModel(perms, val)"
-                />
+                >
+                  <div>
+                    <div class="text-bold">{{ modelName }}</div>
+                    <div class="text-caption text-grey">
+                      {{ perms.length }} permissões
+                    </div>
+                  </div>
+                </q-checkbox>
               </div>
 
               <!-- PERMISSIONS -->
               <div class="col-8 row q-gutter-sm">
-
                 <q-checkbox
                   v-for="perm in orderPermissions(perms)"
                   :key="perm.id"
@@ -77,13 +83,11 @@
                   dense
                   :disable="Permission.loadingPermission"
                 />
-
               </div>
 
             </div>
 
             <q-separator class="q-my-sm" />
-
           </div>
 
         </q-expansion-item>
@@ -93,9 +97,8 @@
   </q-page>
 </template>
 
-
 <script setup>
-import { onMounted } from 'vue'
+import { watch } from 'vue'
 import { usePermissionStore } from '../../stores/PermissionStore'
 
 const props = defineProps({
@@ -106,13 +109,18 @@ const props = defineProps({
 
 const Permission = usePermissionStore()
 
-onMounted(() => {
-  Permission.initPermissions(
-    props.AllPermissions,
-    props.GroupPermissionsRe,
-    props.Group
-  )
-})
+// 🔥 REATIVO (resolve problema de dados vazios)
+watch(
+  () => [props.AllPermissions, props.GroupPermissionsRe, props.Group],
+  () => {
+    Permission.initPermissions(
+      props.AllPermissions,
+      props.GroupPermissionsRe,
+      props.Group
+    )
+  },
+  { immediate: true }
+)
 
 function toggleModel(perms, state) {
   perms.forEach(p => {
@@ -124,7 +132,7 @@ function toggleModel(perms, state) {
 }
 
 function orderPermissions(arr) {
-  const order = ['add', 'view', 'change', 'delete', 'list']
+  const order = ['add', 'view', 'change', 'delete', 'list', 'pdf']
   return [...arr].sort((a, b) => {
     const ra = order.findIndex(o => a.codename.includes(o))
     const rb = order.findIndex(o => b.codename.includes(o))
@@ -133,6 +141,7 @@ function orderPermissions(arr) {
 }
 
 function label(c) {
-  return c.split('_')[0]
+  console.log(c.split('_'))
+  return c.split('_')[1]
 }
 </script>

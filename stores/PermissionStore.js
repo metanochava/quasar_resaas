@@ -9,7 +9,6 @@ export const usePermissionStore = createBaseStore(
     model: 'Permission'
   },
   {
-
     state: () => ({
       allPermissions: [],
       groupPermissions: [],
@@ -31,59 +30,74 @@ export const usePermissionStore = createBaseStore(
         this.buildApps()
       },
 
-      // BUILD (APP → MODEL → PERMS)
+      // 🔥 BUILD CORRIGIDO (USA content_type.label)
       buildApps() {
-        const list = this.search
-          ? this.allPermissions.filter(p =>
-              p.content_type_model
-                .toLowerCase()
-                .includes(this.search.toLowerCase())
-            )
-          : this.allPermissions
+        const search = (this.search || '').toLowerCase()
 
-        this.apps = list.reduce((acc, item) => {
-          const app = item.content_type_app
-          const model = item.content_type_model
+        const list = this.allPermissions.filter(p => {
+          const label = (p.content_type?.label || '').toLowerCase()
+          const codename = (p.codename || '').toLowerCase()
 
-          if (!acc[app]) acc[app] = {}
-          if (!acc[app][model]) acc[app][model] = []
+          if (!search) return true
 
-          acc[app][model].push(item)
+          return label.includes(search) || codename.includes(search)
+        })
+
+        const grouped = list.reduce((acc, item) => {
+
+          // 🔥 EXTRAI APP E MODEL DO LABEL
+          const label = item.content_type?.label || 'Sem App | Sem Modelo'
+          const [app, model] = label.split('|').map(s => s.trim())
+
+          const appName = app || 'Sem App'
+          const modelName = model || 'Sem Modelo'
+
+          if (!acc[appName]) acc[appName] = {}
+          if (!acc[appName][modelName]) acc[appName][modelName] = []
+
+          acc[appName][modelName].push(item)
 
           return acc
         }, {})
+
+        // 🔥 ordenar apps e models
+        this.apps = Object.fromEntries(
+          Object.entries(grouped)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([app, models]) => [
+              app,
+              Object.fromEntries(
+                Object.entries(models).sort(([a], [b]) => a.localeCompare(b))
+              )
+            ])
+        )
       },
 
-      // CHECK
       hasPermission(id) {
         return this.groupPermissions.some(p => p.id === id)
       },
 
-      // 🔥 STATE APP
       appState(models) {
         const all = Object.values(models).flat()
-
         const total = all.length
         const checked = all.filter(p => this.hasPermission(p.id)).length
 
         return {
-          checked: checked === total,
+          checked: checked === total && total > 0,
           indeterminate: checked > 0 && checked < total
         }
       },
 
-      // 🔥 STATE MODEL
       modelState(perms) {
         const total = perms.length
         const checked = perms.filter(p => this.hasPermission(p.id)).length
 
         return {
-          checked: checked === total,
+          checked: checked === total && total > 0,
           indeterminate: checked > 0 && checked < total
         }
       },
 
-      // 🔥 TOGGLE APP
       toggleApp(models, state) {
         Object.values(models).forEach(perms => {
           perms.forEach(p => {
@@ -95,7 +109,6 @@ export const usePermissionStore = createBaseStore(
         })
       },
 
-      // 🔥 TOGGLE
       async toggle(permission) {
         if (!this.group) return
 
@@ -107,24 +120,15 @@ export const usePermissionStore = createBaseStore(
         try {
           if (!exists) {
             await HTTPClient.post(
-              url({
-                type: 'u',
-                url: `permissions/${permission.id}/addToGroup/`
-              }),
+              url({ type: 'u', url: `permissions/${permission.id}/addToGroup/` }),
               { id: this.group.id }
             )
 
-            this.groupPermissions = [
-              ...this.groupPermissions,
-              permission
-            ]
+            this.groupPermissions = [...this.groupPermissions, permission]
 
           } else {
             await HTTPClient.post(
-              url({
-                type: 'u',
-                url: `permissions/${permission.id}/removeFromGroup/`
-              }),
+              url({ type: 'u', url: `permissions/${permission.id}/removeFromGroup/` }),
               { id: this.group.id }
             )
 
