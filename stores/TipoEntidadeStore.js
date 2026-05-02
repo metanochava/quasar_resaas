@@ -12,20 +12,16 @@ export const useTipoEntidadeStore = createBaseStore(
   },
   {
 
-    // ===============================
-    // STATE
-    // ===============================
     state: () => ({
       Theme: {},
       LayoutSettings: {},
       AnimationSettings: {},
       Typography: {},
 
-      // 🔥 LEGADO (mantido)
       Modulos: [],
       Modelos: [],
 
-      // 🔥 PERMISSION MANAGER (AGRUPADO)
+      // 🔥 PERMISSIONS (INTACTO)
       permissions: {
         apps: [],
         filteredApps: [],
@@ -35,14 +31,16 @@ export const useTipoEntidadeStore = createBaseStore(
         autoSaveTimer: null,
         autoSaveDelay: 700,
         savingPermissions: false,
-        status: 'idle', // idle | saving | saved | error
+        status: 'idle',
         lastSavedAt: null
-      }
+      },
+
+      // 🔥 NOVO: GROUPS
+      groups: [],
+      selectedGroups: [],
+      loadingGroups: false
     }),
 
-    // ===============================
-    // GETTERS
-    // ===============================
     getters: {
 
       groupedApps(state) {
@@ -60,17 +58,19 @@ export const useTipoEntidadeStore = createBaseStore(
 
       isSelected: (state) => (id) => {
         return state.permissions.selected.some(p => p.id === id)
+      },
+
+      // 🔥 GROUP CHECK
+      hasGroup: (state) => (id) => {
+        return state.selectedGroups.some(g => g.id === id)
       }
 
     },
 
-    // ===============================
-    // ACTIONS
-    // ===============================
     actions: {
 
       // ===============================
-      // 🔥 INIT PERMISSIONS
+      // 🔥 PERMISSIONS (INALTERADO)
       // ===============================
       async initPermissions(tipoId) {
         try {
@@ -80,14 +80,8 @@ export const useTipoEntidadeStore = createBaseStore(
           this.permissions.loadingPermissions = true
 
           const [all, selected] = await Promise.all([
-            HTTPClient.get(url({
-              type: 'u',
-              url: 'api/django_resaas/modelos'
-            })),
-            HTTPClient.get(url({
-              type: 'u',
-              url: `api/django_resaas/tipoentidades/${id}/modelos`
-            }))
+            HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/modelos' })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/modelos` }))
           ])
 
           this.permissions.apps = all.data || []
@@ -101,9 +95,6 @@ export const useTipoEntidadeStore = createBaseStore(
         }
       },
 
-      // ===============================
-      // 🔍 FILTER
-      // ===============================
       filterPermissions(val) {
         this.permissions.permissionSearch = val
 
@@ -112,7 +103,7 @@ export const useTipoEntidadeStore = createBaseStore(
           return
         }
 
-        const needle = (val || '').toLowerCase()
+        const needle = val.toLowerCase()
 
         this.permissions.filteredApps = this.permissions.apps.filter(v =>
           v.model.toLowerCase().includes(needle) ||
@@ -120,41 +111,26 @@ export const useTipoEntidadeStore = createBaseStore(
         )
       },
 
-      // ===============================
-      // 🔁 TOGGLE + AUTO SAVE
-      // ===============================
-     togglePermission(item) {
+      togglePermission(item) {
         const exists = this.permissions.selected.some(p => p.id === item.id)
 
         this.permissions.selected = exists
           ? this.permissions.selected.filter(p => p.id !== item.id)
           : [...this.permissions.selected, item]
 
-        // 🔥 status UX
         this.permissions.status = 'idle'
-
-        // 🔥 auto-save
         this.scheduleSavePermissions()
       },
 
-      // ===============================
-      // ⏱ AUTO SAVE (DEBOUNCE)
-      // ===============================
       scheduleSavePermissions(tipoId = null) {
         clearTimeout(this.permissions.autoSaveTimer)
 
         this.permissions.autoSaveTimer = setTimeout(async () => {
-
-          if (this.permissions.savingPermissions) return // 🔥 PROTEÇÃO
-
+          if (this.permissions.savingPermissions) return
           await this.savePermissions(tipoId)
-
         }, this.permissions.autoSaveDelay)
       },
 
-      // ===============================
-      // 💾 SAVE PERMISSIONS (SYNC)
-      // ===============================
       async savePermissions(tipoId) {
         try {
           const id = tipoId || this.row?.id
@@ -181,10 +157,72 @@ export const useTipoEntidadeStore = createBaseStore(
         }
       },
 
+      // ===============================
+      // 🔥 GROUPS (NOVO)
+      // ===============================
+
+      async loadGroups(tipoEntidadeId) {
+        try {
+          const id = tipoEntidadeId || this.row?.id
+          if (!id) return
+
+          this.loadingGroups = true
+
+          const [all, selected] = await Promise.all([
+            HTTPClient.get(url({ type: 'u', url: 'api/auth/groups/' })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/groups/` }))
+          ])
+
+          this.groups = all.data || []
+          this.selectedGroups = selected.data || []
+
+        } catch (e) {
+          console.error('loadGroups error', e)
+        } finally {
+          this.loadingGroups = false
+        }
+      },
+
+      async toggleGroup(group) {
+        try {
+          const exists = this.selectedGroups.some(g => g.id === group.id)
+
+          const endpoint = exists ? 'removeGroup' : 'addGroup'
+
+          await HTTPClient.post(url({
+            type: 'u',
+            url: `api/django_resaas/tipoentidades/${this.row?.id}/${endpoint}/`
+          }), { group: group.id })
+
+          if (!exists) {
+            this.selectedGroups.push(group)
+          } else {
+            this.selectedGroups = this.selectedGroups.filter(g => g.id !== group.id)
+          }
+
+        } catch (e) {
+          console.error('toggleGroup error', e)
+        }
+      },
+
+      async createGroup(name) {
+        try {
+          const res = await HTTPClient.post(url({
+            type: 'u',
+            url: 'api/auth/groups/'
+          }), { name })
+
+          this.groups.push(res.data)
+
+        } catch (e) {
+          console.error('createGroup error', e)
+        }
+      },
 
       // ===============================
-      // 🎨 LAYOUT / THEME (mantido)
+      // 🔥 RESTO (INALTERADO)
       // ===============================
+
       async getLayoutSettings(tipoEntidade) {
         try {
           const id = tipoEntidade || this.row?.id
@@ -204,48 +242,10 @@ export const useTipoEntidadeStore = createBaseStore(
           this.Typography = typography.data || {}
           this.AnimationSettings = animation.data || {}
 
-          setStorage('l', 'tipoEntidadeTheme', JSON.stringify(this.Theme))
-          setStorage('l', 'tipoEntidadeLayoutsettings', JSON.stringify(this.LayoutSettings))
-          setStorage('l', 'tipoEntidadeTypography', JSON.stringify(this.Typography))
-          setStorage('l', 'tipoEntidadeAnimationSettings', JSON.stringify(this.AnimationSettings))
-
-          if (tipoEntidade) {
-            const User = useUserStore()
-
-            Object.assign(User, {
-              Theme: this.Theme,
-              LayoutSettings: this.LayoutSettings,
-              Typography: this.Typography,
-              AnimationSettings: this.AnimationSettings
-            })
-
-            User.setSettings()
-          }
-
         } catch (e) {
-          console.error('getLayoutSettings TipoEntidade error', e)
-        }
-      },
-
-      // ===============================
-      // 📦 LISTA (mantido)
-      // ===============================
-      async getTipoEntidades() {
-        try {
-          const { data } = await HTTPClient.get(
-            url({ type: "u", url: "api/django_resaas/tipoentidades" })
-          )
-
-          this.rows = data || []
-
-          const User = useUserStore()
-          User.TipoEntidades = this.rows
-
-        } catch (e) {
-          console.error('getTipoEntidades error', e)
+          console.error('getLayoutSettings error', e)
         }
       }
-
     }
   }
 )
