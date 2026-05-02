@@ -1,4 +1,35 @@
 <template>
+  <q-dialog v-model="permissionsModal">
+
+    <q-card style="min-width: 600px; max-width: 90vw">
+
+      <q-bar class="bg-primary text-white">
+        <div class="text-subtitle2">
+          Permissões - {{ Group?.name }}
+        </div>
+        <q-space />
+        <q-btn dense flat icon="close" v-close-popup />
+      </q-bar>
+
+      <q-separator />
+
+      <q-card-section>
+
+        <!-- 🔥 AQUI VAI O COMPONENTE DE PERMISSIONS -->
+        <!-- podes reutilizar o PermissionManager -->
+        <div class="text-grey">
+          <PermissionManager
+          :AllPermissions="permissions"
+          :GroupPermissionsRe="Group.form.permissions"
+          :Group="Group.form"
+        />
+        </div>
+
+      </q-card-section>
+
+    </q-card>
+
+  </q-dialog>
   <s-card class="column full-height group-manager-card">
 
     <!-- HEADER -->
@@ -142,6 +173,16 @@
             <q-item-section side>
               <div class="row items-center q-gutter-sm">
 
+                <q-btn
+                  icon="security"
+                  size="sm"
+                  flat
+                  color="primary"
+                  @click.stop="openPermissions(group)"
+                >
+                  <q-tooltip>Permissões</q-tooltip>
+                </q-btn>
+
                 <q-chip
                   dense
                   size="sm"
@@ -187,10 +228,53 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
 import { useTipoEntidadeStore } from '../../stores/TipoEntidadeStore'
+import PermissionManager from '../permission/PermissionManager.vue'
+
+import { useGroupStore } from '../../stores/GroupStore'
+import PermissionManager from '../permission/PermissionManager.vue'
+import FormTwo from '../../components/auto/FormTwo.vue'
+import { HTTPAuth, url } from '../../boot/api'
+
+const Group = useGroupStore()
+
+
+const ready = ref(false)
+
+const permissions = ref([])
+
+
+
+
+
+
+
 
 const props = defineProps({
   tipoEntidadeId: [String, Number]
 })
+
+const permissionsModal = ref(false)
+const selectedGroup = ref(null)
+
+async function openPermissions(group) {
+  selectedGroup.value = group
+
+  ready.value = false
+
+  await Group.init()
+  await Group.getById(group.id)
+
+  // 🔥 PRIMEIRO: buscar permissões
+  const { data: all } = await HTTPAuth.get(
+    url({ type: 'u', url: 'api/auth/permissions/' })
+  )
+
+  permissions.value = all || []
+
+  // 🔥 SÓ DEPOIS libera UI
+  ready.value = true
+  permissionsModal.value = true
+}
 
 const TipoEntidade = useTipoEntidadeStore()
 const newGroup = ref('')
