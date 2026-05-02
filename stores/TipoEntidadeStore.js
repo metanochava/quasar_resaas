@@ -181,7 +181,7 @@ export const useTipoEntidadeStore = createBaseStore(
             })),
             HTTPClient.get(url({
               type: 'u',
-              url: `django_resaas/tipoentidades/${id}/groups/`
+              url: `api/django_resaas/tipoentidades/${id}/groups/`
             }))
           ])
 
@@ -209,7 +209,7 @@ export const useTipoEntidadeStore = createBaseStore(
           await HTTPClient.post(
             url({
               type: 'u',
-              url: `django_resaas/tipoentidades/${id}/${endpoint}/`
+              url: `api/django_resaas/tipoentidades/${id}/${endpoint}/`
             }),
             { group: group.id }
           )
@@ -240,7 +240,7 @@ export const useTipoEntidadeStore = createBaseStore(
           const res = await HTTPClient.post(
             url({
               type: 'u',
-              url: `django_resaas/tipoentidades/${id}/createGroup/`
+              url: `api/django_resaas/tipoentidades/${id}/createGroup/`
             }),
             { name: cleanName }
           )
