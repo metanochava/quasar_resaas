@@ -33,13 +33,11 @@ export const useTipoEntidadeStore = createBaseStore(
         lastSavedAt: null
       },
 
-      groups: {
-        groups: [],
-        selectedGroups: [],
-        loadingGroups: false,
-        groupSearch: '',
-        groupFilter: 'all' // all | active | inactive
-      }
+      groups: [],
+      selectedGroups: [],
+      loadingGroups: false,
+      groupSearch: '',
+      groupFilter: 'all' // all | active | inactive
     }),
 
     getters: {
