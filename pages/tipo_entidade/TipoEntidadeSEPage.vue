@@ -67,8 +67,8 @@ import { useTipoEntidadeStore } from './../../stores/TipoEntidadeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 import AppManager from './AppManager.vue'
-import GroupManager from './GroupManager.vue'
-import PermissionManager from './PermissionManager.vue'
+import GroupManager from '../group/GroupManager.vue'
+import PermissionManager from '../permission/PermissionManager.vue'
 import { tdc } from '../../boot/base'
 
 
