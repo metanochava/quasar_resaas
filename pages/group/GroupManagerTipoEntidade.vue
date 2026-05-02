@@ -228,7 +228,6 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
 import { useTipoEntidadeStore } from '../../stores/TipoEntidadeStore'
-import PermissionManager from '../permission/PermissionManager.vue'
 
 import { useGroupStore } from '../../stores/GroupStore'
 import PermissionManager from '../permission/PermissionManager.vue'
