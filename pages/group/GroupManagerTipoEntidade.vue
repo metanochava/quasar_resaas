@@ -1,11 +1,11 @@
 <template>
   <q-dialog v-model="permissionsModal">
 
-    <q-card style="min-width: 600px; max-width: 90vw">
+    <q-card style="min-width: 70%; max-width: 90vw"  >
 
       <q-bar class="bg-primary text-white">
         <div class="text-subtitle2">
-          Permissões - {{ Group?.name }}
+          Permissões - {{ Group?.row.name }}
         </div>
         <q-space />
         <q-btn dense flat icon="close" v-close-popup />
@@ -20,8 +20,8 @@
         <div class="text-grey">
           <PermissionManager
           :AllPermissions="permissions"
-          :GroupPermissionsRe="Group.form.permissions"
-          :Group="Group.form"
+          :GroupPermissionsRe="Group.row.permissions"
+          :Group="Group.row"
         />
         </div>
 
