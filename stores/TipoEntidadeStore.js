@@ -177,7 +177,7 @@ export const useTipoEntidadeStore = createBaseStore(
           const [all, selected] = await Promise.all([
             HTTPClient.get(url({
               type: 'u',
-              url: 'auth/groups/'
+              url: 'api/auth/groups/'
             })),
             HTTPClient.get(url({
               type: 'u',
