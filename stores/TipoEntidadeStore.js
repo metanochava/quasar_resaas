@@ -12,6 +12,9 @@ export const useTipoEntidadeStore = createBaseStore(
   },
   {
 
+    // ===============================
+    // STATE
+    // ===============================
     state: () => ({
       Theme: {},
       LayoutSettings: {},
@@ -21,7 +24,7 @@ export const useTipoEntidadeStore = createBaseStore(
       Modulos: [],
       Modelos: [],
 
-      // 🔥 PERMISSIONS (INTACTO)
+      // 🔥 PERMISSIONS (INALTERADO)
       permissions: {
         apps: [],
         filteredApps: [],
@@ -35,12 +38,15 @@ export const useTipoEntidadeStore = createBaseStore(
         lastSavedAt: null
       },
 
-      // 🔥 NOVO: GROUPS
+      // 🔥 GROUPS (NOVO)
       groups: [],
       selectedGroups: [],
       loadingGroups: false
     }),
 
+    // ===============================
+    // GETTERS
+    // ===============================
     getters: {
 
       groupedApps(state) {
@@ -67,10 +73,13 @@ export const useTipoEntidadeStore = createBaseStore(
 
     },
 
+    // ===============================
+    // ACTIONS
+    // ===============================
     actions: {
 
       // ===============================
-      // 🔥 PERMISSIONS (INALTERADO)
+      // 🔥 INIT PERMISSIONS
       // ===============================
       async initPermissions(tipoId) {
         try {
@@ -95,6 +104,9 @@ export const useTipoEntidadeStore = createBaseStore(
         }
       },
 
+      // ===============================
+      // 🔍 FILTER
+      // ===============================
       filterPermissions(val) {
         this.permissions.permissionSearch = val
 
@@ -103,7 +115,7 @@ export const useTipoEntidadeStore = createBaseStore(
           return
         }
 
-        const needle = val.toLowerCase()
+        const needle = (val || '').toLowerCase()
 
         this.permissions.filteredApps = this.permissions.apps.filter(v =>
           v.model.toLowerCase().includes(needle) ||
@@ -111,6 +123,9 @@ export const useTipoEntidadeStore = createBaseStore(
         )
       },
 
+      // ===============================
+      // 🔁 TOGGLE PERMISSION
+      // ===============================
       togglePermission(item) {
         const exists = this.permissions.selected.some(p => p.id === item.id)
 
@@ -122,6 +137,9 @@ export const useTipoEntidadeStore = createBaseStore(
         this.scheduleSavePermissions()
       },
 
+      // ===============================
+      // ⏱ AUTO SAVE
+      // ===============================
       scheduleSavePermissions(tipoId = null) {
         clearTimeout(this.permissions.autoSaveTimer)
 
@@ -131,6 +149,9 @@ export const useTipoEntidadeStore = createBaseStore(
         }, this.permissions.autoSaveDelay)
       },
 
+      // ===============================
+      // 💾 SAVE PERMISSIONS
+      // ===============================
       async savePermissions(tipoId) {
         try {
           const id = tipoId || this.row?.id
@@ -158,7 +179,7 @@ export const useTipoEntidadeStore = createBaseStore(
       },
 
       // ===============================
-      // 🔥 GROUPS (NOVO)
+      // 🔥 GROUPS (FINAL LIMPO)
       // ===============================
 
       async loadGroups(tipoEntidadeId) {
@@ -169,8 +190,14 @@ export const useTipoEntidadeStore = createBaseStore(
           this.loadingGroups = true
 
           const [all, selected] = await Promise.all([
-            HTTPClient.get(url({ type: 'u', url: 'api/auth/groups/' })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/groups/` }))
+            HTTPClient.get(url({
+              type: 'u',
+              url: 'api/auth/groups/'
+            })),
+            HTTPClient.get(url({
+              type: 'u',
+              url: `api/django_resaas/tipoentidades/${id}/groups/`
+            }))
           ])
 
           this.groups = all.data || []
@@ -183,21 +210,32 @@ export const useTipoEntidadeStore = createBaseStore(
         }
       },
 
+      hasGroup(id) {
+        return this.selectedGroups.some(g => g.id === id)
+      },
+
       async toggleGroup(group) {
         try {
-          const exists = this.selectedGroups.some(g => g.id === group.id)
+          const id = this.row?.id
+          if (!id) return
 
+          const exists = this.hasGroup(group.id)
           const endpoint = exists ? 'removeGroup' : 'addGroup'
 
-          await HTTPClient.post(url({
-            type: 'u',
-            url: `api/django_resaas/tipoentidades/${this.row?.id}/${endpoint}/`
-          }), { group: group.id })
+          await HTTPClient.post(
+            url({
+              type: 'u',
+              url: `api/django_resaas/tipoentidades/${id}/${endpoint}/`
+            }),
+            { group: group.id }
+          )
 
           if (!exists) {
-            this.selectedGroups.push(group)
+            this.selectedGroups = [...this.selectedGroups, group]
           } else {
-            this.selectedGroups = this.selectedGroups.filter(g => g.id !== group.id)
+            this.selectedGroups = this.selectedGroups.filter(
+              g => g.id !== group.id
+            )
           }
 
         } catch (e) {
@@ -207,22 +245,29 @@ export const useTipoEntidadeStore = createBaseStore(
 
       async createGroup(name) {
         try {
-          const res = await HTTPClient.post(url({
-            type: 'u',
-            url: 'api/auth/groups/'
-          }), { name })
+          const id = this.row?.id
+          if (!id) return
 
-          this.groups.push(res.data)
+          const res = await HTTPClient.post(
+            url({
+              type: 'u',
+              url: `api/django_resaas/tipoentidades/${id}/createGroup/`
+            }),
+            { name }
+          )
+
+          const newGroup = res.data
+
+          this.groups = [...this.groups, newGroup]
+          this.selectedGroups = [...this.selectedGroups, newGroup]
 
         } catch (e) {
           console.error('createGroup error', e)
         }
       },
-
       // ===============================
-      // 🔥 RESTO (INALTERADO)
+      // 🎨 LAYOUT
       // ===============================
-
       async getLayoutSettings(tipoEntidade) {
         try {
           const id = tipoEntidade || this.row?.id
@@ -242,10 +287,29 @@ export const useTipoEntidadeStore = createBaseStore(
           this.Typography = typography.data || {}
           this.AnimationSettings = animation.data || {}
 
+          setStorage('l', 'tipoEntidadeTheme', JSON.stringify(this.Theme))
+          setStorage('l', 'tipoEntidadeLayoutsettings', JSON.stringify(this.LayoutSettings))
+          setStorage('l', 'tipoEntidadeTypography', JSON.stringify(this.Typography))
+          setStorage('l', 'tipoEntidadeAnimationSettings', JSON.stringify(this.AnimationSettings))
+
+          if (tipoEntidade) {
+            const User = useUserStore()
+
+            Object.assign(User, {
+              Theme: this.Theme,
+              LayoutSettings: this.LayoutSettings,
+              Typography: this.Typography,
+              AnimationSettings: this.AnimationSettings
+            })
+
+            User.setSettings()
+          }
+
         } catch (e) {
           console.error('getLayoutSettings error', e)
         }
       }
+
     }
   }
 )
