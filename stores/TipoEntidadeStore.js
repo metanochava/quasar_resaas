@@ -151,7 +151,7 @@ async toggleModulo(modulo) {
           this.models.loadingModels = true
 
           const [all, selected] = await Promise.all([
-            HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/modelos' })),
+            HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/modelos', params: {"tipoentidade" : this.row?.id} })),
             HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/modelos` }))
           ])
 
