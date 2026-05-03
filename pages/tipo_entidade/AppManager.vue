@@ -4,6 +4,9 @@
     <q-bar class="bg-primary text-white">
       <div class="text-h6">Gestão de Módulos</div>
       <q-space />
+      <s-btn dense flat icon="close" v-close-popup >
+        <q-tooltip>{{ tdc('Close') }}</q-tooltip>
+      </s-btn>
     </q-bar>
 
     <q-separator />
