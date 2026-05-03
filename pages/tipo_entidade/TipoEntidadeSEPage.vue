@@ -40,7 +40,6 @@
             <s-btn @click="openApps = !openApps" label="Apps" class="full-width primary outelined" />
             <s-btn @click="openModels = !openModels" label="Models" class="full-width" />
             <s-btn @click="openGroups = !openGroups" label="Groups" class="full-width" />
-            <s-btn @click="openPermissionss = !openPermissions" label="Permissions" class="full-width" />
           </s-card>
         </template>
 
