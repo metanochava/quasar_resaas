@@ -17,7 +17,7 @@ const TipoEntidade = useTipoEntidadeStore()
 // INIT
 // ===============================
 onMounted(async () => {
-  await TipoEntidade.initPermissions(props.tipoEntidadeId)
+  await TipoEntidade.initModels(props.tipoEntidadeId)
 })
 
 // ===============================
@@ -37,8 +37,8 @@ function toggleGroup(models, checked) {
   models.forEach(item => {
     const exists = TipoEntidade.isSelected(item.id)
 
-    if (checked && !exists) TipoEntidade.togglePermission(item)
-    if (!checked && exissts) TipoEntidade.togglePermission(item)
+    if (checked && !exists) TipoEntidade.toggleApp(item)
+    if (!checked && exissts) TipoEntidade.toggleApp(item)
   })
 }
 </script>
@@ -57,14 +57,14 @@ function toggleGroup(models, checked) {
       <!-- STATUS -->
       <div class="row items-center q-gutter-sm">
 
-        <q-icon v-if="TipoEntidade.permissions.status === 'saving'" name="sync" class="rotate" />
-        <q-icon v-else-if="TipoEntidade.permissions.status === 'saved'" name="check_circle" color="positive" />
-        <q-icon v-else-if="TipoEntidade.permissions.status === 'error'" name="error" color="negative" />
+        <q-icon v-if="TipoEntidade.models.status === 'saving'" name="sync" class="rotate" />
+        <q-icon v-else-if="TipoEntidade.models.status === 'saved'" name="check_circle" color="positive" />
+        <q-icon v-else-if="TipoEntidade.models.status === 'error'" name="error" color="negative" />
 
         <span class="text-caption">
-          <span v-if="TipoEntidade.permissions.status === 'saving'">{{ tdc('Salvando...') }}</span>
-          <span v-else-if="TipoEntidade.permissions.status === 'saved'">{{ tdc('Salvo') }}</span>
-          <span v-else-if="TipoEntidade.permissions.status === 'error'">{{ tdc('Erro ao salvar') }}</span>
+          <span v-if="TipoEntidade.models.status === 'saving'">{{ tdc('Salvando...') }}</span>
+          <span v-else-if="TipoEntidade.models.status === 'saved'">{{ tdc('Salvo') }}</span>
+          <span v-else-if="TipoEntidade.models.status === 'error'">{{ tdc('Erro ao salvar') }}</span>
           <span v-else>{{ tdc('Alterações pendentes') }}</span>
         </span>
 
@@ -80,7 +80,7 @@ function toggleGroup(models, checked) {
     <!-- ================= SEARCH FIXO ================= -->
     <q-card-section>
       <q-input
-        v-model="TipoEntidade.permissions.permissionSearch"
+        v-model="TipoEntidade.models.permissionSearch"
         outlined
         dense
         clearable
@@ -98,23 +98,23 @@ function toggleGroup(models, checked) {
     <!-- ================= SCROLL (APENAS AQUI) ================= -->
     <q-card-section class="col scroll">
 
-      <div v-if="TipoEntidade.permissions.loadingPermissions" class="flex flex-center q-pa-xl">
+      <div v-if="TipoEntidade.models.loadingModels" class="flex flex-center q-pa-xl">
         <q-spinner size="40px" />
       </div>
 
       <q-list v-else separator>
 
         <q-expansion-item
-          v-for="(models, app) in TipoEntidade.groupedApps"
+          v-for="(models, app) in TipoEntidade.groupedModels"
           :key="app"
           expand-separator
-          icon="apps"
+          icon="models"
         >
 
           <!-- HEADER -->
           <template #header>
             <q-item-section avatar>
-              <q-icon name="apps" color="primary" />
+              <q-icon name="models" color="primary" />
             </q-item-section>
 
             <q-item-section>
@@ -141,13 +141,13 @@ function toggleGroup(models, checked) {
             :key="item.id"
             clickable
             v-ripple
-            @click="TipoEntidade.togglePermission(item)"
+            @click="TipoEntidade.toggleApp(item)"
           >
             <q-item-section avatar>
               <q-checkbox
                 :model-value="TipoEntidade.isSelected(item.id)"
                 @click.stop
-                @update:model-value="() => TipoEntidade.togglePermission(item)"
+                @update:model-value="() => TipoEntidade.toggleApp(item)"
               />
             </q-item-section>
 

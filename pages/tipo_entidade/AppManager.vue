@@ -17,7 +17,7 @@ const TipoEntidade = useTipoEntidadeStore()
 // INIT
 // ===============================
 onMounted(async () => {
-  await TipoEntidade.initApps(props.tipoEntidadeId)
+  await TipoEntidade.initModels(props.tipoEntidadeId)
 })
 
 // ===============================
@@ -57,14 +57,14 @@ function toggleGroup(models, checked) {
       <!-- STATUS -->
       <div class="row items-center q-gutter-sm">
 
-        <q-icon v-if="TipoEntidade.apps.status === 'saving'" name="sync" class="rotate" />
-        <q-icon v-else-if="TipoEntidade.apps.status === 'saved'" name="check_circle" color="positive" />
-        <q-icon v-else-if="TipoEntidade.apps.status === 'error'" name="error" color="negative" />
+        <q-icon v-if="TipoEntidade.models.status === 'saving'" name="sync" class="rotate" />
+        <q-icon v-else-if="TipoEntidade.models.status === 'saved'" name="check_circle" color="positive" />
+        <q-icon v-else-if="TipoEntidade.models.status === 'error'" name="error" color="negative" />
 
         <span class="text-caption">
-          <span v-if="TipoEntidade.apps.status === 'saving'">{{ tdc('Salvando...') }}</span>
-          <span v-else-if="TipoEntidade.apps.status === 'saved'">{{ tdc('Salvo') }}</span>
-          <span v-else-if="TipoEntidade.apps.status === 'error'">{{ tdc('Erro ao salvar') }}</span>
+          <span v-if="TipoEntidade.models.status === 'saving'">{{ tdc('Salvando...') }}</span>
+          <span v-else-if="TipoEntidade.models.status === 'saved'">{{ tdc('Salvo') }}</span>
+          <span v-else-if="TipoEntidade.models.status === 'error'">{{ tdc('Erro ao salvar') }}</span>
           <span v-else>{{ tdc('Alterações pendentes') }}</span>
         </span>
 
@@ -80,7 +80,7 @@ function toggleGroup(models, checked) {
     <!-- ================= SEARCH FIXO ================= -->
     <q-card-section>
       <q-input
-        v-model="TipoEntidade.apps.permissionSearch"
+        v-model="TipoEntidade.models.permissionSearch"
         outlined
         dense
         clearable
@@ -98,23 +98,23 @@ function toggleGroup(models, checked) {
     <!-- ================= SCROLL (APENAS AQUI) ================= -->
     <q-card-section class="col scroll">
 
-      <div v-if="TipoEntidade.apps.loadingApps" class="flex flex-center q-pa-xl">
+      <div v-if="TipoEntidade.models.loadingModels" class="flex flex-center q-pa-xl">
         <q-spinner size="40px" />
       </div>
 
       <q-list v-else separator>
 
         <q-expansion-item
-          v-for="(models, app) in TipoEntidade.groupedApps"
+          v-for="(models, app) in TipoEntidade.groupedModels"
           :key="app"
           expand-separator
-          icon="apps"
+          icon="models"
         >
 
           <!-- HEADER -->
           <template #header>
             <q-item-section avatar>
-              <q-icon name="apps" color="primary" />
+              <q-icon name="models" color="primary" />
             </q-item-section>
 
             <q-item-section>
