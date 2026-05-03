@@ -20,12 +20,12 @@ export const useTipoEntidadeStore = createBaseStore(
       Modulos: [],
       Modelos: [],
 
-      permissions: {
+      apps: {
         apps: [],
         filteredApps: [],
         selected: [],
         permissionSearch: '',
-        loadingPermissions: false,
+        loadingApps: false,
         autoSaveTimer: null,
         autoSaveDelay: 700,
         savingPermissions: false,
@@ -44,7 +44,7 @@ export const useTipoEntidadeStore = createBaseStore(
       groupedApps(state) {
         const groups = {}
 
-        state.permissions.filteredApps.forEach(item => {
+        state.apps.filteredApps.forEach(item => {
           if (!groups[item.app_label]) {
             groups[item.app_label] = []
           }
@@ -55,7 +55,7 @@ export const useTipoEntidadeStore = createBaseStore(
       },
 
       isSelected: (state) => (id) => {
-        return state.permissions.selected.some(p => p.id === id)
+        return state.apps.selected.some(p => p.id === id)
       },
 
       hasGroup: (state) => (id) => {
@@ -82,63 +82,63 @@ export const useTipoEntidadeStore = createBaseStore(
     },
 
     actions: {
-      async initPermissions(tipoId) {
+      async initApps(tipoId) {
         try {
           const id = tipoId || this.row?.id
           if (!id) return
 
-          this.permissions.loadingPermissions = true
+          this.apps.loadingApps = true
 
           const [all, selected] = await Promise.all([
             HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/modelos' })),
             HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/modelos` }))
           ])
 
-          this.permissions.apps = all.data || []
-          this.permissions.filteredApps = all.data || []
-          this.permissions.selected = selected.data || []
+          this.apps.apps = all.data || []
+          this.apps.filteredApps = all.data || []
+          this.apps.selected = selected.data || []
 
         } catch (e) {
-          console.error('initPermissions error', e)
+          console.error('initApps error', e)
         } finally {
-          this.permissions.loadingPermissions = false
+          this.apps.loadingApps = false
         }
       },
 
       filterPermissions(val) {
-        this.permissions.permissionSearch = val
+        this.apps.permissionSearch = val
 
         if (!val) {
-          this.permissions.filteredApps = this.permissions.apps
+          this.apps.filteredApps = this.apps.apps
           return
         }
 
         const needle = (val || '').toLowerCase()
 
-        this.permissions.filteredApps = this.permissions.apps.filter(v =>
+        this.apps.filteredApps = this.apps.apps.filter(v =>
           v.model.toLowerCase().includes(needle) ||
           v.app_label.toLowerCase().includes(needle)
         )
       },
 
-      togglePermission(item) {
-        const exists = this.permissions.selected.some(p => p.id === item.id)
+      toggleApp(item) {
+        const exists = this.apps.selected.some(p => p.id === item.id)
 
-        this.permissions.selected = exists
-          ? this.permissions.selected.filter(p => p.id !== item.id)
-          : [...this.permissions.selected, item]
+        this.apps.selected = exists
+          ? this.apps.selected.filter(p => p.id !== item.id)
+          : [...this.apps.selected, item]
 
-        this.permissions.status = 'idle'
+        this.apps.status = 'idle'
         this.scheduleSavePermissions()
       },
 
       scheduleSavePermissions(tipoId = null) {
-        clearTimeout(this.permissions.autoSaveTimer)
+        clearTimeout(this.apps.autoSaveTimer)
 
-        this.permissions.autoSaveTimer = setTimeout(async () => {
-          if (this.permissions.savingPermissions) return
+        this.apps.autoSaveTimer = setTimeout(async () => {
+          if (this.apps.savingPermissions) return
           await this.savePermissions(tipoId)
-        }, this.permissions.autoSaveDelay)
+        }, this.apps.autoSaveDelay)
       },
 
       async savePermissions(tipoId) {
@@ -146,24 +146,24 @@ export const useTipoEntidadeStore = createBaseStore(
           const id = tipoId || this.row?.id
           if (!id) return
 
-          this.permissions.savingPermissions = true
-          this.permissions.status = 'saving'
+          this.apps.savingPermissions = true
+          this.apps.status = 'saving'
 
           await HTTPClient.post(url({
             type: 'u',
             url: `api/django_resaas/tipoentidades/${id}/syncModelos/`
           }), {
-            ids: this.permissions.selected.map(i => i.id)
+            ids: this.apps.selected.map(i => i.id)
           })
 
-          this.permissions.status = 'saved'
-          this.permissions.lastSavedAt = new Date()
+          this.apps.status = 'saved'
+          this.apps.lastSavedAt = new Date()
 
         } catch (e) {
           console.error('savePermissions error', e)
-          this.permissions.status = 'error'
+          this.apps.status = 'error'
         } finally {
-          this.permissions.savingPermissions = false
+          this.apps.savingPermissions = false
         }
       },
 

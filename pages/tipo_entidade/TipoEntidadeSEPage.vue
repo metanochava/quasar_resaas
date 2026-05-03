@@ -13,6 +13,10 @@
       <GroupManager :tipoEntidadeId="TipoEntidade.form?.id" />
     </q-dialog>
 
+     <q-dialog v-model="openModels" persistent full-height full-width>
+      <ModelManager :tipoEntidadeId="TipoEntidade.form?.id" />
+    </q-dialog>
+
     <div class="col overflow-hidden">
 
       <FormTwo
@@ -32,11 +36,12 @@
       >
 
         <template #right v-if="TipoEntidade.form?.id">
-          <q-card class="q-pa-0" flat>
-            <s-btn @click="openApps = !openApps" label="Apps" class="full-width" />
+          <s-card class="q-pa-0 q-gutter-sm " flat>
+            <s-btn @click="openApps = !openApps" label="Apps" class="full-width primary outelined" />
+            <s-btn @click="openModels = !openModels" label="Models" class="full-width" />
             <s-btn @click="openGroups = !openGroups" label="Groups" class="full-width" />
             <s-btn @click="openPermissionss = !openPermissions" label="Permissions" class="full-width" />
-          </q-card>
+          </s-card>
         </template>
 
         <template #footer v-if="TipoEntidade.form?.id">
@@ -66,6 +71,7 @@ import { useRoute } from 'vue-router'
 import { useTipoEntidadeStore } from './../../stores/TipoEntidadeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
+import ModelManager from './ModelManager.vue'
 import AppManager from './AppManager.vue'
 import GroupManager from '../group/GroupManagerTipoEntidade.vue'
 import PermissionManager from '../permission/PermissionManager.vue'
@@ -83,6 +89,7 @@ const ready = ref(false)
 const openApps = ref(false)
 const openPermissions = ref(false)
 const openGroups = ref(false)
+const openModels = ref(false)
 
 
 const ignoreFields = [
