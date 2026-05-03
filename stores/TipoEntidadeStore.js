@@ -262,6 +262,25 @@ export const useTipoEntidadeStore = createBaseStore(
         }
       },
 
+      // ===============================
+      // 📦 LISTA (mantido)
+      // ===============================
+      async getTipoEntidades() {
+        try {
+          const { data } = await HTTPClient.get(
+            url({ type: "u", url: "api/django_resaas/tipoentidades" })
+          )
+
+          this.rows = data || []
+
+          const User = useUserStore()
+          User.TipoEntidades = this.rows
+
+        } catch (e) {
+          console.error('getTipoEntidades error', e)
+        }
+      },
+
       async getLayoutSettings(tipoEntidade) {
         try {
           const id = tipoEntidade || this.row?.id
