@@ -20,6 +20,10 @@ export const useTipoEntidadeStore = createBaseStore(
       Modulos: [],
       Modelos: [],
 
+      modulos: [],
+      selectedModulos: [],
+      loadingModulos: false,
+
       models: {
         models: [],
         filteredModels: [],
@@ -32,6 +36,9 @@ export const useTipoEntidadeStore = createBaseStore(
         status: 'idle',
         lastSavedAt: null
       },
+
+
+      
 
       groups: [],
       selectedGroups: [],
@@ -82,6 +89,60 @@ export const useTipoEntidadeStore = createBaseStore(
     },
 
     actions: {
+
+async loadModulos(tipoId) {
+  try {
+    const id = tipoId || this.row?.id
+    if (!id) return
+
+    this.loadingModulos = true
+
+    const [all, selected] = await Promise.all([
+      HTTPClient.get(url({
+        type: 'u',
+        url: 'api/django_resaas/modulos/'
+      })),
+      HTTPClient.get(url({
+        type: 'u',
+        url: `api/django_resaas/tipoentidades/${id}/modulos/`
+      }))
+    ])
+
+    this.modulos = all.data || []
+    this.selectedModulos = selected.data || []
+
+  } finally {
+    this.loadingModulos = false
+  }
+},
+
+hasModulo(id) {
+  return this.selectedModulos.some(m => m.id === id)
+},
+
+async toggleModulo(modulo) {
+  const id = this.row?.id
+  if (!id) return
+
+  const exists = this.hasModulo(modulo.id)
+  const endpoint = exists ? 'removeModulo' : 'addModulo'
+
+  await HTTPClient.post(
+    url({
+      type: 'u',
+      url: `api/django_resaas/tipoentidades/${id}/${endpoint}/`
+    }),
+    { id: modulo.id }
+  )
+
+  if (!exists) {
+    this.selectedModulos.push(modulo)
+  } else {
+    this.selectedModulos = this.selectedModulos.filter(
+      m => m.id !== modulo.id
+    )
+  }
+},
       async initModels(tipoId) {
         try {
           const id = tipoId || this.row?.id

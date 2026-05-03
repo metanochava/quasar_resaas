@@ -49,7 +49,7 @@ function toggleGroup(models, checked) {
     <!-- ================= HEADER FIXO ================= -->
     <q-bar class="row items-center bg-primary text-white">
       <div class="text-h6">
-        {{ tdc("Gestão de App's e Modelos") }}
+        {{ tdc("Gestão de Modelos") }}
       </div>
 
       <q-space />
