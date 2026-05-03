@@ -4,6 +4,7 @@ import { useTipoEntidadeStore }  from '../../stores/TipoEntidadeStore'
 import { tdc } from '../../boot/base'
 
 
+
 const props = defineProps({
   tipoEntidadeId: {
     type: [String, Number],
@@ -38,7 +39,7 @@ function toggleGroup(models, checked) {
     const exists = TipoEntidade.isSelected(item.id)
 
     if (checked && !exists) TipoEntidade.toggleApp(item)
-    if (!checked && exissts) TipoEntidade.toggleApp(item)
+    if (!checked && exists) TipoEntidade.toggleApp(item)
   })
 }
 </script>

@@ -115,6 +115,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useTipoEntidadeStore } from '../../stores/TipoEntidadeStore'
+import { tdc } from '../../boot/base'
 
 const props = defineProps({
   tipoEntidadeId: [String, Number]
