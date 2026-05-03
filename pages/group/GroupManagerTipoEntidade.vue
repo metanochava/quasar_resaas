@@ -1,33 +1,37 @@
 <template>
   <q-dialog v-model="permissionsModal">
 
-    <q-card style="min-width: 70%; max-width: 90vw"  >
+    <s-card class="modal-card">
 
-      <q-bar class="bg-primary text-white">
-        <div class="text-subtitle2">
-          Permissões - {{ Group?.row.name }}
-        </div>
-        <q-space />
-        <q-btn dense flat icon="close" v-close-popup />
-      </q-bar>
+  <!-- HEADER FIXO -->
+  <div class="modal-header">
 
-      <q-separator />
+    <q-bar class="bg-primary text-white">
+      <div class="text-subtitle2">
+        Permissões - {{ Group?.row?.name }}
+      </div>
 
-      <q-card-section>
+      <q-space />
 
-        <!-- 🔥 AQUI VAI O COMPONENTE DE PERMISSIONS -->
-        <!-- podes reutilizar o PermissionManager -->
-        <div class="text-grey">
-          <PermissionManager
-          :AllPermissions="permissions"
-          :GroupPermissionsRe="Group.row.permissions"
-          :Group="Group.row"
-        />
-        </div>
+      <q-btn dense flat icon="close" v-close-popup />
+    </q-bar>
 
-      </q-card-section>
+    <q-separator />
 
-    </q-card>
+  </div>
+
+  <!-- CONTEÚDO SCROLL -->
+  <q-card-section class="modal-body">
+
+    <PermissionManager
+      :AllPermissions="permissions"
+      :GroupPermissionsRe="Group.row.permissions"
+      :Group="Group.row"
+    />
+
+  </q-card-section>
+
+</s-card>
 
   </q-dialog>
   <s-card class="column full-height group-manager-card">
@@ -257,6 +261,7 @@ const selectedGroup = ref(null)
 
 async function openPermissions(group) {
   selectedGroup.value = group
+  permissionsModal.value = true
 
   ready.value = false
 
@@ -272,7 +277,7 @@ async function openPermissions(group) {
 
   // 🔥 SÓ DEPOIS libera UI
   ready.value = true
-  permissionsModal.value = true
+  
 }
 
 const TipoEntidade = useTipoEntidadeStore()
@@ -308,5 +313,25 @@ async function addGroup() {
 .group-item--active {
   background: rgba(25, 118, 210, 0.08);
   border-left-color: var(--q-primary);
+}
+
+.modal-card {
+  min-width: 70%;
+  max-width: 90vw;
+  height: 80vh;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
 }
 </style>

@@ -95,6 +95,23 @@
       </q-card>
 
     </div>
+
+    <q-separator />
+     <!-- HEADER -->
+    <div class="q-pa-sm">
+      <q-input
+        dense outlined
+        v-model="Permission.search"
+        label="Pesquisar"
+        @update:model-value="Permission.buildApps"
+      >
+        <template #append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+    </div>
+
+    
   </q-page>
 </template>
 
