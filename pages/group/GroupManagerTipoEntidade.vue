@@ -37,7 +37,7 @@
 
     </q-card>
 
-  </q-dialog>
+  </q-dialog> 
 
   <!-- 🔥 MAIN CARD -->
   <s-card class="column full-height group-manager-card">
@@ -47,7 +47,7 @@
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        Gestão de Grupos
+        Gestão de Grupos de {{TipoEntidade.row.nome}}
       </div>
 
       <q-space />

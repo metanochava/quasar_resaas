@@ -112,7 +112,7 @@
       </q-input>
     </q-card-section>
 
-    <q-separator />
+    <q-separator /> 
 
     <!-- LIST -->
     <q-card-section class="col scroll q-pa-none">
@@ -242,7 +242,6 @@ const canAdd = computed(() => newGroup.value?.trim().length > 0)
 
 // INIT
 onMounted(() => {
-  console.log(Entidade.row)
   Entidade.loadGroups(props.entidadeId)
   TipoEntidade.loadGroups(Entidade.row.tipo_entidade.id)
 })

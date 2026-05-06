@@ -25,8 +25,9 @@ export const useEntidadeStore = createBaseStore(
 
       groups: [],
       selectedGroups: [],
+      loadingGroups: false,
       groupSearch: '',
-      loadingGroups: false
+      groupFilter: 'all' // all | active | inactive
     }),
 
     getters: {
