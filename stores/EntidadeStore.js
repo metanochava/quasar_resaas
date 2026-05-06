@@ -70,7 +70,7 @@ export const useEntidadeStore = createBaseStore(
                 const [all, selected] = await Promise.all([
                   HTTPClient.get(url({
                     type: 'u',
-                    url: `api/django_resaas/tipoentidades/${id}/groups/`
+                    url: `api/django_resaas/tipoentidades/${this.row?.tipo_entidade?.id}/groups/`
                   })),
                   HTTPClient.get(url({
                     type: 'u',
