@@ -23,7 +23,7 @@
 
       <template #right v-if="Entidade.form?.id">
           <s-card class="q-pa-0 q-gutter-sm " flat>
-            <s-btn @click="openGroups = !openGroups" label="Groups" class="full-width" />
+            <s-btn @click="openGroups = !openGroups" label="Groups" color="primary" class="full-width" />
           </s-card>
         </template>
 
