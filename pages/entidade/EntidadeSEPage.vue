@@ -1,5 +1,12 @@
 <template>
+  
   <q-page class="q-pa-sm">
+
+
+      <q-dialog v-model="openGroups" persistent full-height full-width>
+        <GroupManager tipo="Entidade" :id="Entidade.form?.id" />
+      </q-dialog>
+
     <!-- FORM -->
     <FormTwo
       v-if="ready"
@@ -12,8 +19,20 @@
       :ignore-fields="ignoreFields"
       :data="Entidade.form"
       @saved="onSaved"
-    />
+    >
 
+      <template #right v-if="Entidade.form?.id">
+          <s-card class="q-pa-0 q-gutter-sm " flat>
+            <s-btn @click="openGroups = !openGroups" label="Groups" class="full-width" />
+          </s-card>
+        </template>
+
+        <template #footer v-if="Entidade.form?.id">
+          
+        </template>
+
+    </FormTwo>
+ 
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
@@ -27,6 +46,11 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEntidadeStore } from './../../stores/EntidadeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
+
+
+
+import GroupManager from '../group/GroupManagerEntidade.vue'
+
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
@@ -60,7 +84,6 @@ async function load(id) {
     Entidade.resetForm?.()
     return
   }
-
 
   // 🔥 evita chamadas duplicadas com comparação segura
   if (String(Entidade.row?.id) === String(id)) {

@@ -55,6 +55,101 @@ export const useEntidadeStore = createBaseStore(
         }
       },
 
+            async loadGroups(EntidadeId) {
+              try {
+                const id = EntidadeId || this.row?.id
+                if (!id) return
+      
+                this.loadingGroups = true
+      
+                const [all, selected] = await Promise.all([
+                  HTTPClient.get(url({
+                    type: 'u',
+                    url: `api/django_resaas/tipoentidades/${id}/groups/`
+                  })),
+                  HTTPClient.get(url({
+                    type: 'u',
+                    url: `api/django_resaas/entidades/${id}/groups/`
+                  }))
+                ])
+      
+                this.groups = (all.data || []).sort((a, b) =>
+                  String(a.name || '').localeCompare(String(b.name || ''))
+                )
+      
+                this.selectedGroups = selected.data || []
+      
+              } catch (e) {
+                console.error('loadGroups error', e)
+              } finally {
+                this.loadingGroups = false
+              }
+            },
+      
+            async toggleGroup(group) {
+              try {
+                const id = this.row?.id
+                if (!id) return
+      
+                const exists = this.hasGroup(group.id)
+                const endpoint = exists ? 'removeGroup' : 'addGroup'
+      
+                await HTTPClient.post(
+                  url({
+                    type: 'u',
+                    url: `api/django_resaas/entidades/${id}/${endpoint}/`
+                  }),
+                  { group: group.id }
+                )
+      
+                if (!exists) {
+                  if (!this.hasGroup(group.id)) {
+                    this.selectedGroups = [...this.selectedGroups, group]
+                  }
+                } else {
+                  this.selectedGroups = this.selectedGroups.filter(
+                    g => g.id !== group.id
+                  )
+                }
+      
+              } catch (e) {
+                console.error('toggleGroup error', e)
+              }
+            },
+      
+            async createGroup(name) {
+              try {
+                const id = this.row?.id
+                if (!id) return
+      
+                const cleanName = String(name || '').trim()
+                if (!cleanName) return
+      
+                const res = await HTTPClient.post(
+                  url({
+                    type: 'u',
+                    url: `api/django_resaas/entidades/${id}/createGroup/`
+                  }),
+                  { name: cleanName }
+                )
+      
+                const newGroup = res.data
+      
+                if (!this.groups.some(g => g.id === newGroup.id)) {
+                  this.groups = [...this.groups, newGroup].sort((a, b) =>
+                    String(a.name || '').localeCompare(String(b.name || ''))
+                  )
+                }
+      
+                if (!this.hasGroup(newGroup.id)) {
+                  this.selectedGroups = [...this.selectedGroups, newGroup]
+                }
+      
+              } catch (e) {
+                console.error('createGroup error', e)
+              }
+            },
+
       // ===============================
       // MODELOS
       // ===============================
