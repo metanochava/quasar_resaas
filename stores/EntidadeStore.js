@@ -20,7 +20,12 @@ export const useEntidadeStore = createBaseStore(
       Typography: {},
       Modulos: [],
       Modelos: [],
-      userEntidades: []
+      userEntidades: [],
+
+
+      groups: [],
+      selectedGroups: [],
+      loadingGroups: false
     }),
 
     actions: {
