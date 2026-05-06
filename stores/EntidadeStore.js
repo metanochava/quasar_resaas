@@ -25,8 +25,34 @@ export const useEntidadeStore = createBaseStore(
 
       groups: [],
       selectedGroups: [],
+      groupSearch: '',
       loadingGroups: false
     }),
+
+    getters: {
+
+      hasGroup: (state) => (id) => {
+        return state.selectedGroups.some(g => g.id === id)
+      },
+
+      filteredGroups(state) {
+        const search = (state.groupSearch || '').toLowerCase()
+
+        return state.groups.filter(group => {
+          const name = (group.name || '').toLowerCase()
+          const active = state.selectedGroups.some(g => g.id === group.id)
+
+          const matchSearch = !search || name.includes(search)
+
+          const matchFilter =
+            state.groupFilter === 'all' ||
+            (state.groupFilter === 'active' && active) ||
+            (state.groupFilter === 'inactive' && !active)
+
+          return matchSearch && matchFilter
+        })
+      }
+    }, 
 
     actions: {
 
