@@ -105,7 +105,18 @@ export const useEntidadeStore = createBaseStore(
                   }))
                 ])
       
-                this.groups = (all.data || []).sort((a, b) =>
+                const merged = [
+                  ...(all.data || []),
+                  ...(selected.data || [])
+                ]
+
+                // remover duplicados por id
+                this.groups = Object.values(
+                  merged.reduce((acc, g) => {
+                    acc[g.id] = g
+                    return acc
+                  }, {})
+                ).sort((a, b) =>
                   String(a.name || '').localeCompare(String(b.name || ''))
                 )
       

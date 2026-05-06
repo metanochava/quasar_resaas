@@ -117,6 +117,8 @@
     <!-- LIST -->
     <q-card-section class="col scroll q-pa-none">
 
+      {{ Entidade.selectedGroups }}
+
       <div v-if="Entidade.loadingGroups" class="flex flex-center q-pa-xl">
         <q-spinner color="primary" size="42px" />
       </div>
