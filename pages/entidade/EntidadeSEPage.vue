@@ -4,7 +4,7 @@
 
 
       <q-dialog v-model="openGroups" persistent full-height full-width>
-        <GroupManager tipo="Entidade" :id="Entidade.form?.id" />
+        <GroupManager  :entidadeId="Entidade.form?.id" />
       </q-dialog>
 
     <!-- FORM -->
@@ -60,7 +60,7 @@ const Entidade = useEntidadeStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
-
+const openGroups = ref(false)
 const ignoreFields = [
   'id',
   'created_at',

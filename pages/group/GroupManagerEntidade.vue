@@ -198,7 +198,7 @@ import PermissionManager from '../permission/PermissionManager.vue'
 import { HTTPAuth, url } from '../../boot/api'
 
 const props = defineProps({
-  tipoEntidadeId: [String, Number]
+  entidadeId: [String, Number]
 })
 
 
@@ -243,7 +243,7 @@ const canAdd = computed(() => newGroup.value?.trim().length > 0)
 // INIT
 onMounted(() => {
   console.log(Entidade.row)
-  Entidade.loadGroups(props.tipoEntidadeId)
+  Entidade.loadGroups(props.entidadeId)
   TipoEntidade.loadGroups(Entidade.row.tipo_entidade.id)
 })
 </script>
