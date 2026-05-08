@@ -9,7 +9,7 @@ import { JSONSafeParse, setSettings } from '../boot/base'
 export const useUserStore = defineStore("user", {
   state: () => ({
     data: null,
-    Idioma: {},
+    Language: {},
     EntityTypes: [],
     EntityType: {},
     Entitys: [],
@@ -85,9 +85,9 @@ export const useUserStore = defineStore("user", {
       }
     },
 
-    setIdioma(idioma){
-      this.Idioma = idioma
-      setStorage('l', 'userLang', JSON.stringify(idioma))
+    setLanguage(language){
+      this.Language = language
+      setStorage('l', 'userLang', JSON.stringify(language))
     },
     selectGroup(group){
       this.Group = group

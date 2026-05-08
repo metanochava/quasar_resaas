@@ -5,9 +5,9 @@ import { defineStore } from 'pinia'
 export const useLanguageStore = createBaseStore(
   "lang", 
   {
-    url: 'ipa/django_resaas/idiomas',
+    url: 'ipa/django_resaas/languages',
     app: 'django_resaas',
-    model: 'Idioma'
+    model: 'Language'
   },
   {
   state: () => ({
@@ -21,8 +21,8 @@ export const useLanguageStore = createBaseStore(
       this.current = lang
       this.setTraducao(this.current)
     },
-    async setTraducao(idioma) {
-      if (!idioma?.id) return {}
+    async setTraducao(language) {
+      if (!language?.id) return {}
       try {
         // Reset map
         this.TraducaoMap = {}
@@ -30,7 +30,7 @@ export const useLanguageStore = createBaseStore(
         const res = await HTTPClient.get(
           url({
             type: "u",
-            url: `api/django_resaas/idiomas/${idioma?.id}/traducaos`,
+            url: `api/django_resaas/languages/${language?.id}/traducaos`,
             params: {}
           })
         )
@@ -60,7 +60,7 @@ export const useLanguageStore = createBaseStore(
     },
 
     async get() {
-      await HTTPClient.get(url({type: "u", url: "api/django_resaas/idiomas", params: {}}) )
+      await HTTPClient.get(url({type: "u", url: "api/django_resaas/languages", params: {}}) )
       .then(res => {
         this.rows = res.data.results || res.data
         this.current = this.rows[0]

@@ -48,7 +48,7 @@
         <!-- Full Screen -->
         <HeaderFullScreen />
 
-        <!-- Idiomas -->
+        <!-- Languages -->
         <HeaderLanguage />
 
         <!-- Serviços -->

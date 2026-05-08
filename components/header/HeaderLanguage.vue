@@ -3,13 +3,13 @@
     <q-menu>
       <q-list dense>
         <q-item
-          v-for="idioma in Language.rows"
-          :key="idioma"
+          v-for="language in Language.rows"
+          :key="language"
           clickable
-          @click="Language?.change(idioma)"
+          @click="Language?.change(language)"
         >
-          <q-item-section v-if="Language.current?.id == idioma.id" ><b>{{ idioma.nome }}</b></q-item-section>
-          <q-item-section v-else >{{ idioma.nome }}</q-item-section>
+          <q-item-section v-if="Language.current?.id == language.id" ><b>{{ language.nome }}</b></q-item-section>
+          <q-item-section v-else >{{ language.nome }}</q-item-section>
         </q-item>
       </q-list>
     </q-menu>
