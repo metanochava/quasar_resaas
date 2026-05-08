@@ -37,10 +37,10 @@ function replaceTraducao (texto = '', textDeTraducao = '') {
 }
 
 // Initialize the annoying-background directive.
-export const IsTipoEntidade = {
+export const IsEntityType = {
   bind (el, binding, _vnode) {
     if (el) {
-      const ite = decrypt(localStorage.getItem(('tipo_entidade_nome')) + '')
+      const ite = decrypt(localStorage.getItem(('entity_type_nome')) + '')
 
       if (!(binding.value === ite)) {
         el.style.display = 'none'
@@ -57,8 +57,8 @@ export const JSONSafeParse = function (value) {
   }
 }
 
-export const isTipoEntidadeMe = function (x) {
-  const ite = decrypt(localStorage.getItem(('tipo_entidade_nome')) + '')
+export const isEntityTypeMe = function (x) {
+  const ite = decrypt(localStorage.getItem(('entity_type_nome')) + '')
   if (x === ite) { return true } else { return false }
 }
 

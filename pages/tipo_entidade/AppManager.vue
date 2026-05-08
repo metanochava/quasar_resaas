@@ -11,7 +11,7 @@
         </div>
         <q-space />
         <q-badge color="white" text-color="primary">
-          {{ TipoEntidade.selectedModulos.length }} ativos
+          {{ EntityType.selectedModulos.length }} ativos
         </q-badge>
 
         <s-btn dense flat icon="close" v-close-popup >
@@ -41,7 +41,7 @@
     <!-- 🔥 LIST (SCROLL) -->
     <q-card-section class="modulo-body">
 
-      <div v-if="TipoEntidade.loadingModulos" class="flex flex-center q-pa-xl">
+      <div v-if="EntityType.loadingModulos" class="flex flex-center q-pa-xl">
         <q-spinner size="40px" color="primary" />
       </div>
 
@@ -53,15 +53,15 @@
           clickable
           v-ripple
           class="modulo-item"
-          :class="{ 'modulo-active': TipoEntidade.hasModulo(mod.id) }"
-          @click="TipoEntidade.toggleModulo(mod)"
+          :class="{ 'modulo-active': EntityType.hasModulo(mod.id) }"
+          @click="EntityType.toggleModulo(mod)"
         >
 
           <!-- ICON -->
           <q-item-section avatar>
             <q-avatar
-              :color="TipoEntidade.hasModulo(mod.id) ? 'primary' : 'grey-4'"
-              :text-color="TipoEntidade.hasModulo(mod.id) ? 'white' : 'dark'"
+              :color="EntityType.hasModulo(mod.id) ? 'primary' : 'grey-4'"
+              :text-color="EntityType.hasModulo(mod.id) ? 'white' : 'dark'"
               icon="extension"
             />
           </q-item-section>
@@ -80,16 +80,16 @@
               <q-chip
                 dense
                 size="sm"
-                :color="TipoEntidade.hasModulo(mod.id) ? 'primary' : 'grey-5'"
+                :color="EntityType.hasModulo(mod.id) ? 'primary' : 'grey-5'"
                 text-color="white"
               >
-                {{ TipoEntidade.hasModulo(mod.id) ? 'Ativo' : 'Inativo' }}
+                {{ EntityType.hasModulo(mod.id) ? 'Ativo' : 'Inativo' }}
               </q-chip>
 
               <q-checkbox
-                :model-value="TipoEntidade.hasModulo(mod.id)"
+                :model-value="EntityType.hasModulo(mod.id)"
                 @click.stop
-                @update:model-value="() => TipoEntidade.toggleModulo(mod)"
+                @update:model-value="() => EntityType.toggleModulo(mod)"
               />
 
             </div>
@@ -114,14 +114,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useTipoEntidadeStore } from '../../stores/TipoEntidadeStore'
+import { useEntityTypeStore } from '../../stores/EntityTypeStore'
 import { tdc } from '../../boot/base'
 
 const props = defineProps({
-  tipoEntidadeId: [String, Number]
+  entityTypeId: [String, Number]
 })
 
-const TipoEntidade = useTipoEntidadeStore()
+const EntityType = useEntityTypeStore()
 
 const search = ref('')
 
@@ -129,16 +129,16 @@ const search = ref('')
 const filteredModulos = computed(() => {
   const s = search.value.toLowerCase()
 
-  if (!s) return TipoEntidade.modulos
+  if (!s) return EntityType.modulos
 
-  return TipoEntidade.modulos.filter(m =>
+  return EntityType.modulos.filter(m =>
     (m.nome || '').toLowerCase().includes(s)
   )
 })
 
 // INIT
 onMounted(() => {
-  TipoEntidade.loadModulos(props.tipoEntidadeId)
+  EntityType.loadModulos(props.entityTypeId)
 })
 </script>
 

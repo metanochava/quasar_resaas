@@ -2,12 +2,12 @@
 <template>
   <div>
     <q-dialog
-        v-model="showRegistarEntidade"
+        v-model="showRegistarEntity"
         persistent
         :maximized="maximizedToggle"
         full-height
       >
-      <RegistarEntidade />
+      <RegistarEntity />
     </q-dialog>
     <q-dialog v-model="pergunta" persistent class="row">
         <s-card style="width: 400px;" flat>
@@ -20,11 +20,11 @@
           <q-separator />
 
           <q-card-actions class="row" >
-            <s-btn flat   class="col-12" color="primary"  @click="pergunta = false, User.logout(User.Entidade?.id)" > {{tdc(User.Entidade?.nome)}}</s-btn>
+            <s-btn flat   class="col-12" color="primary"  @click="pergunta = false, User.logout(User.Entity?.id)" > {{tdc(User.Entity?.nome)}}</s-btn>
           </q-card-actions>
 
           <q-card-actions class="row" >
-            <s-btn flat   class="col-12" color="primary"  @click="pergunta = false, User.logout('x')" > {{tdc(User?.TipoEntidade?.nome)}}</s-btn>
+            <s-btn flat   class="col-12" color="primary"  @click="pergunta = false, User.logout('x')" > {{tdc(User?.EntityType?.nome)}}</s-btn>
           </q-card-actions>
           <q-separator/>
           <q-card-actions class="row" >
@@ -58,19 +58,19 @@
                 v-if="User.data"
                 dense
                 group="group"
-                :label="User?.Entidade?.nome || tdc('Entidade') "
+                :label="User?.Entity?.nome || tdc('Entity') "
                 header-class=" text-grey-9"
-                v-model="entidadeClosed"
+                v-model="entityClosed"
               >
                 <q-separator />
-                <q-item dense clickable v-if="User.TipoEntidade?.crair_entidade"   :to="{name:'add_entidade_self', params:{}}"  >
+                <q-item dense clickable v-if="User.EntityType?.crair_entity"   :to="{name:'add_entity_self', params:{}}"  >
                   <q-item-section>
-                    <center><q-item-label overline class="text-blue"> {{ tdc('Registar Entidade')}}</q-item-label> </center>
+                    <center><q-item-label overline class="text-blue"> {{ tdc('Registar Entity')}}</q-item-label> </center>
                   </q-item-section>
                 </q-item>
-                <q-item dense clickable v-for="entidade in User?.Entidades" :key="entidade?.id" @click=" entidadeClosed = false, sucursalClosed = true, Entidade.select(entidade)">
+                <q-item dense clickable v-for="entity in User?.Entitys" :key="entity?.id" @click=" entityClosed = false, branchClosed = true, Entity.select(entity)">
                   <q-item-section>
-                    <center><q-item-label overline> {{ tdc((entidade?.nome))}}</q-item-label> </center>
+                    <center><q-item-label overline> {{ tdc((entity?.nome))}}</q-item-label> </center>
                   </q-item-section>
                 </q-item>
               </q-expansion-item>
@@ -79,19 +79,19 @@
                 v-if="User.data"
                 dense
                 group="group"
-                :label="User?.Sucursal?.nome || tdc('Sucursal') "
+                :label="User?.Branch?.nome || tdc('Branch') "
                 header-class=" text-grey-9"
-                v-model="sucursalClosed"
+                v-model="branchClosed"
               >
                 <q-separator />
-                <q-item dense clickable v-for="sucursal in User?.Sucursals" :key="sucursal?.id"   @click=" sucursalClosed = false, Sucursal.select(sucursal)">
+                <q-item dense clickable v-for="branch in User?.Branchs" :key="branch?.id"   @click=" branchClosed = false, Branch.select(branch)">
                   <q-item-section>
-                    <center><q-item-label overline> {{ tdc(sucursal?.nome)}}</q-item-label> </center>
+                    <center><q-item-label overline> {{ tdc(branch?.nome)}}</q-item-label> </center>
                   </q-item-section>
                 </q-item>
               </q-expansion-item>
 
-            <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(perfilSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
+            <s-btn dense  flat  size="" @click="branchClosed = false" color="grey" :label="tdc(perfilSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
               <q-menu fit>
                 <q-list dense   class="rounded-borders" style="min-width: 100px" >
 
@@ -131,29 +131,29 @@ import { defineComponent } from 'vue'
 import { perfilSplint, tdc } from '../../boot/base'
 import { useUserStore } from '../../stores/UserStore'
 import { useGroupStore } from '../../stores/GroupStore'
-import { useEntidadeStore } from '../../stores/EntidadeStore'
-import { useSucursalStore } from '../../stores/SucursalStore'
-import RegistarEntidade from './RegistarEntidade.vue'
+import { useEntityStore } from '../../stores/EntityStore'
+import { useBranchStore } from '../../stores/BranchStore'
+import RegistarEntity from './RegistarEntity.vue'
 
 
 export default defineComponent({
   name: 'HeaderUser',
-  components: { RegistarEntidade },
+  components: { RegistarEntity },
 
   setup () {
     const User = useUserStore()
-    const Entidade = useEntidadeStore()
+    const Entity = useEntityStore()
     const Group = useGroupStore()
-    const Sucursal = useSucursalStore()
-    return { User, tdc, Entidade, Group, Sucursal}
+    const Branch = useBranchStore()
+    return { User, tdc, Entity, Group, Branch}
   },
 
   data () {
     return {
-      sucursalClosed: false,
-      entidadeClosed: false,
+      branchClosed: false,
+      entityClosed: false,
       pergunta: false,
-      showRegistarEntidade: false,
+      showRegistarEntity: false,
       perfilSplint: perfilSplint,
     }
   },
@@ -170,16 +170,16 @@ export default defineComponent({
       this.User.getMenus()
     },
 
-    'User.Entidade' (val) {
+    'User.Entity' (val) {
       if (!val) return
       this.User.getMenus()
-      this.Entidade.setEntidadeModelos(this.User.Entidade.id)
+      this.Entity.setEntityModelos(this.User.Entity.id)
     },
 
     'User.isLogout' (val) {
       if (!val) return
-      if (this.User.Entidade){
-        this.$router.push({ name: 'login' , query: { entidade: this.User.Entidade.id}})
+      if (this.User.Entity){
+        this.$router.push({ name: 'login' , query: { entity: this.User.Entity.id}})
       }else{
         this.$router.push({ name: 'login' })
       }
@@ -198,7 +198,7 @@ export default defineComponent({
   },
 
   async mounted () {
-    this.sucursalClosed = false
+    this.branchClosed = false
 
     if(this.User){
       this.startSessionWatcher()

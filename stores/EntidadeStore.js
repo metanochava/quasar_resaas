@@ -1,16 +1,16 @@
 import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, HTTPClient, url } from './../boot/api'
-import { useSucursalStore } from './SucursalStore'
+import { useBranchStore } from './BranchStore'
 import { useUserStore } from './UserStore'
 import { perfilSplint, tdc } from '../boot/base'
 import { getStorage, setStorage } from './../boot/storage'
 
-export const useEntidadeStore = createBaseStore(
-  'entidade',
+export const useEntityStore = createBaseStore(
+  'entity',
   {
-    url: 'api/django_resaas/entidades',
+    url: 'api/django_resaas/entitys',
     app: 'django_resaas',
-    model: 'Entidade'
+    model: 'Entity'
   },
   {
     state: () => ({
@@ -20,7 +20,7 @@ export const useEntidadeStore = createBaseStore(
       Typography: {},
       Modulos: [],
       Modelos: [],
-      userEntidades: [],
+      userEntitys: [],
 
 
       groups: [],
@@ -69,7 +69,7 @@ export const useEntidadeStore = createBaseStore(
           this.LayoutSettings = data.layout_settings || {}
           this.AnimationSettings = data.animation_settings || {}
           this.Typography = data.typography || {}
-          User.Entidade = data.entidade || null
+          User.Entity = data.entity || null
 
           
 
@@ -87,9 +87,9 @@ export const useEntidadeStore = createBaseStore(
         }
       },
 
-            async loadGroups(EntidadeId) {
+            async loadGroups(EntityId) {
               try {
-                const id = EntidadeId || this.row?.id
+                const id = EntityId || this.row?.id
                 if (!id) return
       
                 this.loadingGroups = true
@@ -97,11 +97,11 @@ export const useEntidadeStore = createBaseStore(
                 const [all, selected] = await Promise.all([
                   HTTPClient.get(url({
                     type: 'u',
-                    url: `api/django_resaas/tipoentidades/${this.row?.tipo_entidade?.id}/groups/`
+                    url: `api/django_resaas/tipoentitys/${this.row?.entity_type?.id}/groups/`
                   })),
                   HTTPClient.get(url({
                     type: 'u',
-                    url: `api/django_resaas/entidades/${id}/groups/`
+                    url: `api/django_resaas/entitys/${id}/groups/`
                   }))
                 ])
       
@@ -140,7 +140,7 @@ export const useEntidadeStore = createBaseStore(
                 await HTTPClient.post(
                   url({
                     type: 'u',
-                    url: `api/django_resaas/entidades/${id}/${endpoint}/`
+                    url: `api/django_resaas/entitys/${id}/${endpoint}/`
                   }),
                   { group: group.id }
                 )
@@ -171,7 +171,7 @@ export const useEntidadeStore = createBaseStore(
                 const res = await HTTPClient.post(
                   url({
                     type: 'u',
-                    url: `api/django_resaas/entidades/${id}/createGroup/`
+                    url: `api/django_resaas/entitys/${id}/createGroup/`
                   }),
                   { name: cleanName }
                 )
@@ -196,67 +196,67 @@ export const useEntidadeStore = createBaseStore(
       // ===============================
       // MODELOS
       // ===============================
-      async setEntidadeModelos(entidadeId) {
+      async setEntityModelos(entityId) {
         const User = useUserStore()
         try {
-          const id = entidadeId || User.Entidade?.id
+          const id = entityId || User.Entity?.id
           if (!id) return
 
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `api/django_resaas/entidades/${id}/modelos` })
+            url({ type: 'u', url: `api/django_resaas/entitys/${id}/modelos` })
           )
 
           this.Modelos = data || []
 
-          if (entidadeId) {
-            useUserStore().EntidadeModelos = this.Modelos
+          if (entityId) {
+            useUserStore().EntityModelos = this.Modelos
           }
 
         } catch (e) {
-          console.error('setEntidadeModelos error', e)
+          console.error('setEntityModelos error', e)
         }
       },
 
       // ===============================
       // MODULOS
       // ===============================
-      async setEntidadeModulos(entidadeId) {
+      async setEntityModulos(entityId) {
         const User = useUserStore()
         try {
-          const id = entidadeId || User.Entidade?.id
+          const id = entityId || User.Entity?.id
           if (!id) return
 
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `api/django_resaas/entidades/${id}/modulos/` })
+            url({ type: 'u', url: `api/django_resaas/entitys/${id}/modulos/` })
           )
 
           this.Modulos = data || []
 
-          if (entidadeId) {
+          if (entityId) {
             const User = useUserStore()
             User.Modulos = this.Modulos
-            setStorage('l', 'entidadeModulos', JSON.stringify(data))
+            setStorage('l', 'entityModulos', JSON.stringify(data))
           }
 
         } catch (e) {
-          console.error('setEntidadeModulos error', e)
+          console.error('setEntityModulos error', e)
         }
       },
 
       // ===============================
       // LAYOUT / THEME
       // ===============================
-      async getLayoutSettings(entidadeId) {
+      async getLayoutSettings(entityId) {
         const User = useUserStore()
         try {
-          const id = entidadeId || User.Entidade?.id
+          const id = entityId || User.Entity?.id
           if (!id) return
 
           const [theme, layout, typography, animation] = await Promise.all([
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entidades/${id}/themeGet/` })),
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entidades/${id}/layoutSettingsGet/` })),
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entidades/${id}/typographyGet/` })),
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entidades/${id}/animationSettingsGet/` }))
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/themeGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/layoutSettingsGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/typographyGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/animationSettingsGet/` }))
           ])
 
           this.Theme = theme.data || {}
@@ -264,12 +264,12 @@ export const useEntidadeStore = createBaseStore(
           this.Typography = typography.data || {}
           this.AnimationSettings = animation.data || {}
 
-          setStorage('l', 'EntidadeTheme', JSON.stringify(this.Theme))
-          setStorage('l', 'EntidadeLayoutsettings', JSON.stringify(this.LayoutSettings))
-          setStorage('l', 'EntidadeTypography', JSON.stringify(this.Typography))
-          setStorage('l', 'EntidadeAnimationSettings', JSON.stringify(this.AnimationSettings))
+          setStorage('l', 'EntityTheme', JSON.stringify(this.Theme))
+          setStorage('l', 'EntityLayoutsettings', JSON.stringify(this.LayoutSettings))
+          setStorage('l', 'EntityTypography', JSON.stringify(this.Typography))
+          setStorage('l', 'EntityAnimationSettings', JSON.stringify(this.AnimationSettings))
 
-          if (entidadeId) {
+          if (entityId) {
             const User = useUserStore()
 
             Object.assign(User, {
@@ -290,37 +290,37 @@ export const useEntidadeStore = createBaseStore(
       // ===============================
       // USER ENTIDADES
       // ===============================
-      async getUserEntidades(userId) {
+      async getUserEntitys(userId) {
         if (!userId) return
 
         try {
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `api/django_resaas/users/${userId}/userEntidades/` })
+            url({ type: 'u', url: `api/django_resaas/users/${userId}/userEntitys/` })
           )
 
-          this.userEntidades = data || []
-          setStorage('l', 'userEntidades', JSON.stringify(data))
+          this.userEntitys = data || []
+          setStorage('l', 'userEntitys', JSON.stringify(data))
 
         } catch (e) {
-          console.error('getUserEntidades error', e)
+          console.error('getUserEntitys error', e)
         }
       },
 
       // ===============================
       // SELECT ENTIDADE
       // ===============================
-      async select(entidade) {
-        if (!entidade) return
+      async select(entity) {
+        if (!entity) return
 
         const User = useUserStore()
-        const Sucursal = useSucursalStore()
+        const Branch = useBranchStore()
 
-        User.Entidade = entidade
+        User.Entity = entity
 
-        setStorage('l', 'userEntidade', JSON.stringify(entidade))
+        setStorage('l', 'userEntity', JSON.stringify(entity))
 
-        await this.getLayoutSettings(entidade.id)
-        await Sucursal.getUserSucursals()
+        await this.getLayoutSettings(entity.id)
+        await Branch.getUserBranchs()
       },
 
 
@@ -329,10 +329,10 @@ export const useEntidadeStore = createBaseStore(
       // ===============================
       async getModulos() {
         const User = useUserStore()
-        if (!User.Entidade?.id) return
+        if (!User.Entity?.id) return
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entidades/${User.Entidade.id}/resaas_modulos/` })
+          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/resaas_modulos/` })
         )
 
         this.Modulos = data || []
@@ -340,35 +340,35 @@ export const useEntidadeStore = createBaseStore(
 
       async getModelos() {
         const User = useUserStore()
-        if (!User.Entidade?.id) return
+        if (!User.Entity?.id) return
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entidades/${User.Entidade.id}/modelos` })
+          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/modelos` })
         )
 
         this.Modelos = data || []
       },
       
 
-      async select_ (entidade, q) {
+      async select_ (entity, q) {
         const User = useUserStore()
-        const Sucursal = useSucursalStore()
-        User.Entidade = entidade
-        await this.getLayoutSettings(entidade.id)
-        setStorage('l', 'userEntidade', JSON.stringify(entidade))
-        Sucursal.getUserSucursals_(q)
+        const Branch = useBranchStore()
+        User.Entity = entity
+        await this.getLayoutSettings(entity.id)
+        setStorage('l', 'userEntity', JSON.stringify(entity))
+        Branch.getUserBranchs_(q)
       },
 
-      async select (entidade) {
+      async select (entity) {
         const User = useUserStore()
-        const Sucursal = useSucursalStore()
-        User.Entidade = entidade
-        await this.getLayoutSettings(entidade.id)
-        setStorage('l', 'userEntidade', JSON.stringify(entidade))
-        Sucursal.getUserSucursals()
+        const Branch = useBranchStore()
+        User.Entity = entity
+        await this.getLayoutSettings(entity.id)
+        setStorage('l', 'userEntity', JSON.stringify(entity))
+        Branch.getUserBranchs()
       },
 
-      async getUserEntidades_ (UserId, q) {
+      async getUserEntitys_ (UserId, q) {
         const User = useUserStore()
         if (!UserId) return
 
@@ -376,12 +376,12 @@ export const useEntidadeStore = createBaseStore(
           const res = await HTTPAuth.get(
             url({
               type: 'u',
-              url: `api/django_resaas/users/${UserId}/userEntidades/`,
+              url: `api/django_resaas/users/${UserId}/userEntitys/`,
               params: {}
             })
           )
 
-          setStorage('l', 'userEntidades', JSON.stringify(res.data))
+          setStorage('l', 'userEntitys', JSON.stringify(res.data))
           this.s = res.data
 
           if (res.data.length === 1) {
@@ -392,17 +392,17 @@ export const useEntidadeStore = createBaseStore(
               User.redirect = 'welcome'
               return
             }
-            const entidades = res.data.map(e => ({
+            const entitys = res.data.map(e => ({
               label: perfilSplint(e.nome),
               value: e
             }))
 
             q.dialog({
-              title: tdc('Seleccione a Entidade'),
+              title: tdc('Seleccione a Entity'),
               options: {
                 type: 'radio',
                 model: 'opt1',
-                items: entidades
+                items: entitys
               },
               cancel: true,
               persistent: true

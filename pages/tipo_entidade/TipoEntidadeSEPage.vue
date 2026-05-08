@@ -2,19 +2,19 @@
   <q-page class="column q-pa-sm full-height overflow-hidden">
 
     <q-dialog v-model="openApps" persistent full-height full-width>
-      <AppManager :tipoEntidadeId="TipoEntidade.form?.id" />
+      <AppManager :entityTypeId="EntityType.form?.id" />
     </q-dialog>
 
     <q-dialog v-model="openPermissions" persistent full-height full-width>
-      <PermissionManager :tipoEntidadeId="TipoEntidade.form?.id" />
+      <PermissionManager :entityTypeId="EntityType.form?.id" />
     </q-dialog>
 
     <q-dialog v-model="openGroups" persistent full-height full-width>
-      <GroupManager :tipoEntidadeId="TipoEntidade.form?.id" />
+      <GroupManager :entityTypeId="EntityType.form?.id" />
     </q-dialog>
 
      <q-dialog v-model="openModels" persistent full-height full-width>
-      <ModelManager :tipoEntidadeId="TipoEntidade.form?.id" />
+      <ModelManager :entityTypeId="EntityType.form?.id" />
     </q-dialog>
 
     <div class="col overflow-hidden">
@@ -22,20 +22,20 @@
       <FormTwo
         v-if="ready"
         class="full-height"
-        :schema="TipoEntidade.fields"
-        :module="TipoEntidade.app"
-        :model="TipoEntidade.model"
-        :config="TipoEntidade.config"
-        :actions="TipoEntidade.actions"
+        :schema="EntityType.fields"
+        :module="EntityType.app"
+        :model="EntityType.model"
+        :config="EntityType.config"
+        :actions="EntityType.actions"
         :can-do="canDo"
         :ignore-fields="ignoreFields"
-        :data="TipoEntidade.form"
+        :data="EntityType.form"
         @saved="onSaved"
         centerCol="col-8"
         rightCol="col-4"
       >
 
-        <template #right v-if="TipoEntidade.form?.id">
+        <template #right v-if="EntityType.form?.id">
           <s-card class="q-pa-0 q-gutter-sm " flat>
             <s-btn @click="openApps = !openApps" label="Apps" class="full-width primary outelined" />
             <s-btn @click="openModels = !openModels" label="Models" class="full-width" />
@@ -43,12 +43,12 @@
           </s-card>
         </template>
 
-        <template #footer v-if="TipoEntidade.form?.id">
+        <template #footer v-if="EntityType.form?.id">
           <div class="col-6">
-            <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
+            <MudarApp :entityTypeId="EntityType.form?.id"/>
           </div>
           <div class="col-6">
-            <MudarApp :tipoEntidadeId="TipoEntidade.form?.id"/>
+            <MudarApp :entityTypeId="EntityType.form?.id"/>
           </div>
         </template>
 
@@ -67,12 +67,12 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useTipoEntidadeStore } from './../../stores/TipoEntidadeStore'
+import { useEntityTypeStore } from './../../stores/EntityTypeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 import ModelManager from './ModelManager.vue'
 import AppManager from './AppManager.vue'
-import GroupManager from '../group/GroupManagerTipoEntidade.vue'
+import GroupManager from '../group/GroupManagerEntityType.vue'
 import PermissionManager from '../permission/PermissionManager.vue'
 import { tdc } from '../../boot/base'
 
@@ -81,7 +81,7 @@ import { tdc } from '../../boot/base'
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const TipoEntidade = useTipoEntidadeStore()
+const EntityType = useEntityTypeStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
@@ -111,18 +111,18 @@ async function load(id) {
 
   if (!id) {
 
-    TipoEntidade.resetForm?.()
+    EntityType.resetForm?.()
     return
   }
 
 
   // 🔥 evita chamadas duplicadas com comparação segura
-  if (String(TipoEntidade.row?.id) === String(id)) {
-    TipoEntidade.form = TipoEntidade.row 
+  if (String(EntityType.row?.id) === String(id)) {
+    EntityType.form = EntityType.row 
     return
   }
 
-  TipoEntidade.row =  await TipoEntidade.getById(id)
+  EntityType.row =  await EntityType.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -130,7 +130,7 @@ async function init() {
   try {
     ready.value = false
 
-    await TipoEntidade.init()
+    await EntityType.init()
 
     const id = route.params.id
     await load(id)

@@ -1,48 +1,48 @@
 import { tdc } from '../../boot/base'
 
-export let sucursalRoutes = [
+export let branchRoutes = [
   {
-    path: '/list_sucursal',
-    name: 'list_sucursal',
-    component: () => import('./SucursalLPage.vue'),
+    path: '/list_branch',
+    name: 'list_branch',
+    component: () => import('./BranchLPage.vue'),
     meta: {
-      title: tdc('Vista de') + ' ' + tdc('sucursal'),
+      title: tdc('Vista de') + ' ' + tdc('branch'),
       requiresAuth: true,
       icon: 'list',
-      requiredRole: 'list_sucursal',
+      requiredRole: 'list_branch',
     },
   },
   {
-    path: '/add_sucursal',
-    name: 'add_sucursal',
-    component: () => import('./SucursalSEPage.vue'),
+    path: '/add_branch',
+    name: 'add_branch',
+    component: () => import('./BranchSEPage.vue'),
     meta: {
-      title: tdc('Adicionar') + ' ' + tdc('sucursal'),
+      title: tdc('Adicionar') + ' ' + tdc('branch'),
       requiresAuth: true,
       icon: 'add',
-      requiredRole: 'add_sucursal',
+      requiredRole: 'add_branch',
     },
   },
   {
-    path: '/change_sucursal/:id',
-    name: 'change_sucursal',
-    component: () => import('./SucursalSEPage.vue'),
+    path: '/change_branch/:id',
+    name: 'change_branch',
+    component: () => import('./BranchSEPage.vue'),
     meta: {
-      title: tdc('Editar') + ' ' + tdc('sucursal'),
+      title: tdc('Editar') + ' ' + tdc('branch'),
       requiresAuth: true,
       icon: 'edit',
-      requiredRole: 'change_sucursal',
+      requiredRole: 'change_branch',
     },
   },
   {
-    path: '/view_sucursal/:id',
-    name: 'view_sucursal',
-    component: () => import('./SucursalVPage.vue'),
+    path: '/view_branch/:id',
+    name: 'view_branch',
+    component: () => import('./BranchVPage.vue'),
     meta: {
-      title: tdc('Visualizar') + ' ' + tdc('sucursal'),
+      title: tdc('Visualizar') + ' ' + tdc('branch'),
       requiresAuth: true,
       icon: 'visibility',
-      requiredRole: 'view_sucursal',
+      requiredRole: 'view_branch',
     },
   }
 ]

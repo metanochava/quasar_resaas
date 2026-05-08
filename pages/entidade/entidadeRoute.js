@@ -1,48 +1,48 @@
 import { tdc } from '../../boot/base'
 
-export let entidadeRoutes = [
+export let entityRoutes = [
   {
-    path: '/list_entidade',
-    name: 'list_entidade',
-    component: () => import('./EntidadeLPage.vue'),
+    path: '/list_entity',
+    name: 'list_entity',
+    component: () => import('./EntityLPage.vue'),
     meta: {
-      title: tdc('Vista de') + ' ' + tdc('entidade'),
+      title: tdc('Vista de') + ' ' + tdc('entity'),
       requiresAuth: true,
       icon: 'list',
-      requiredRole: 'list_entidade',
+      requiredRole: 'list_entity',
     },
   },
   {
-    path: '/add_entidade',
-    name: 'add_entidade',
-    component: () => import('./EntidadeSEPage.vue'),
+    path: '/add_entity',
+    name: 'add_entity',
+    component: () => import('./EntitySEPage.vue'),
     meta: {
-      title: tdc('Adicionar') + ' ' + tdc('entidade'),
+      title: tdc('Adicionar') + ' ' + tdc('entity'),
       requiresAuth: true,
       icon: 'add',
-      requiredRole: 'add_entidade',
+      requiredRole: 'add_entity',
     },
   },
   {
-    path: '/change_entidade/:id',
-    name: 'change_entidade',
-    component: () => import('./EntidadeSEPage.vue'),
+    path: '/change_entity/:id',
+    name: 'change_entity',
+    component: () => import('./EntitySEPage.vue'),
     meta: {
-      title: tdc('Editar') + ' ' + tdc('entidade'),
+      title: tdc('Editar') + ' ' + tdc('entity'),
       requiresAuth: true,
       icon: 'edit',
-      requiredRole: 'change_entidade',
+      requiredRole: 'change_entity',
     },
   },
   {
-    path: '/view_entidade/:id',
-    name: 'view_entidade',
-    component: () => import('./EntidadeVPage.vue'),
+    path: '/view_entity/:id',
+    name: 'view_entity',
+    component: () => import('./EntityVPage.vue'),
     meta: {
-      title: tdc('Visualizar') + ' ' + tdc('entidade'),
+      title: tdc('Visualizar') + ' ' + tdc('entity'),
       requiresAuth: true,
       icon: 'visibility',
-      requiredRole: 'view_entidade',
+      requiredRole: 'view_entity',
     },
   }
 ]

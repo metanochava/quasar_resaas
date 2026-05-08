@@ -47,13 +47,13 @@
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        Gestão de Grupos de {{ Entidade.row.nome }}
+        Gestão de Grupos de {{ Entity.row.nome }}
       </div>
 
       <q-space />
 
       <q-badge color="white" text-color="primary">
-        {{ Entidade.selectedGroups.length }} ativos
+        {{ Entity.selectedGroups.length }} ativos
       </q-badge>
 
       <s-btn dense flat icon="close" v-close-popup>
@@ -100,7 +100,7 @@
     <!-- FILTER -->
     <q-card-section class="q-pa-md">
       <q-input
-        v-model="Entidade.groupSearch"
+        v-model="Entity.groupSearch"
         dense
         outlined
         clearable
@@ -117,28 +117,28 @@
     <!-- LIST -->
     <q-card-section class="col scroll q-pa-none">
 
-      {{ Entidade.selectedGroups }}
+      {{ Entity.selectedGroups }}
 
-      <div v-if="Entidade.loadingGroups" class="flex flex-center q-pa-xl">
+      <div v-if="Entity.loadingGroups" class="flex flex-center q-pa-xl">
         <q-spinner color="primary" size="42px" />
       </div>
 
       <q-list v-else separator>
 
         <q-item
-          v-for="group in (Entidade.filteredGroups || [])"
+          v-for="group in (Entity.filteredGroups || [])"
           :key="group?.id"
           clickable
           v-ripple
           class="group-item"
-          :class="{ 'group-item--active': Entidade.hasGroup(group.id) }"
-          @click="Entidade.toggleGroup(group)"
+          :class="{ 'group-item--active': Entity.hasGroup(group.id) }"
+          @click="Entity.toggleGroup(group)"
         >
 
           <q-item-section avatar>
             <q-avatar
-              :color="Entidade.hasGroup(group.id) ? 'primary' : 'grey-4'"
-              :text-color="Entidade.hasGroup(group.id) ? 'white' : 'dark'"
+              :color="Entity.hasGroup(group.id) ? 'primary' : 'grey-4'"
+              :text-color="Entity.hasGroup(group.id) ? 'white' : 'dark'"
               icon="group"
             />
           </q-item-section>
@@ -164,17 +164,17 @@
               <q-chip
                 dense
                 size="sm"
-                :color="Entidade.hasGroup(group.id) ? 'primary' : 'grey-5'"
+                :color="Entity.hasGroup(group.id) ? 'primary' : 'grey-5'"
                 text-color="white"
               >
-                {{ Entidade.hasGroup(group.id) ? 'Ativo' : 'Inativo' }}
+                {{ Entity.hasGroup(group.id) ? 'Ativo' : 'Inativo' }}
               </q-chip>
 
               <q-checkbox
-                :model-value="Entidade.hasGroup(group.id)"
+                :model-value="Entity.hasGroup(group.id)"
                 color="primary"
                 @click.stop
-                @update:model-value="() => Entidade.toggleGroup(group)"
+                @update:model-value="() => Entity.toggleGroup(group)"
               />
 
             </div>
@@ -192,20 +192,20 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useEntidadeStore } from '../../stores/EntidadeStore'
+import { useEntityStore } from '../../stores/EntityStore'
 
-import { useTipoEntidadeStore } from '../../stores/TipoEntidadeStore'
+import { useEntityTypeStore } from '../../stores/EntityTypeStore'
 import { useGroupStore } from '../../stores/GroupStore'
 import PermissionManager from '../permission/PermissionManager.vue'
 import { HTTPAuth, url } from '../../boot/api'
 
 const props = defineProps({
-  entidadeId: [String, Number]
+  entityId: [String, Number]
 })
 
 
-const Entidade = useEntidadeStore()
-const TipoEntidade = useTipoEntidadeStore() 
+const Entity = useEntityStore()
+const EntityType = useEntityTypeStore() 
 
 const Group = useGroupStore()
 
@@ -236,7 +236,7 @@ async function addGroup() {
   const name = newGroup.value?.trim()
   if (!name) return
 
-  await Entidade.createGroup(name)
+  await Entity.createGroup(name)
   newGroup.value = ''
 }
 
@@ -244,8 +244,8 @@ const canAdd = computed(() => newGroup.value?.trim().length > 0)
 
 // INIT
 onMounted(() => {
-  Entidade.loadGroups(props.entidadeId)
-  TipoEntidade.loadGroups(Entidade.row.tipo_entidade.id)
+  Entity.loadGroups(props.entityId)
+  EntityType.loadGroups(Entity.row.entity_type.id)
 })
 </script>
 

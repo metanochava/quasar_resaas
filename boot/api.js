@@ -21,7 +21,7 @@ const safeParse = (value) => {
 export const url = (payload = { type: 'u', url: '', params: {} }) => {
 
   const User = useUserStore()
-  const tipoEntidadeNome = User?.TipoEntidade?.nome
+  const entityTypeNome = User?.EntityType?.nome
 
   let urlFinal = ''
 
@@ -30,7 +30,7 @@ export const url = (payload = { type: 'u', url: '', params: {} }) => {
   }
 
   if (payload.type === 'nu') {
-    urlFinal = `${apiBaseUrl}/${tipoEntidadeNome?.toLowerCase()}/${payload.url}`
+    urlFinal = `${apiBaseUrl}/${entityTypeNome?.toLowerCase()}/${payload.url}`
   }
 
   urlFinal += '?format=json'
@@ -79,10 +79,10 @@ const createClient = (auth = false, blob = false) => {
     }
 
     const headersMap = {
-      E: 'userEntidade',
-      S: 'userSucursal',
+      E: 'userEntity',
+      S: 'userBranch',
       G: 'userGroup',
-      ET: 'tipoEntidade',
+      ET: 'entityType',
       L: 'userLang'
     }
 

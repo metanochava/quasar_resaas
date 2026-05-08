@@ -3,12 +3,12 @@ import { HTTPClient, url } from './../boot/api'
 import { useUserStore } from '../stores/UserStore'
 import { getStorage, setStorage } from './../boot/storage'
 
-export const useTipoEntidadeStore = createBaseStore(
-  'tipoentidade',
+export const useEntityTypeStore = createBaseStore(
+  'tipoentity',
   {
-    url: 'api/django_resaas/tipoentidades',
+    url: 'api/django_resaas/tipoentitys',
     app: 'django_resaas',
-    model: 'TipoEntidade'
+    model: 'EntityType'
   },
   {
     state: () => ({
@@ -104,7 +104,7 @@ async loadModulos(tipoId) {
       })),
       HTTPClient.get(url({
         type: 'u',
-        url: `api/django_resaas/tipoentidades/${id}/modulos/`
+        url: `api/django_resaas/tipoentitys/${id}/modulos/`
       }))
     ])
 
@@ -130,7 +130,7 @@ async toggleModulo(modulo) {
   await HTTPClient.post(
     url({
       type: 'u',
-      url: `api/django_resaas/tipoentidades/${id}/${endpoint}/`
+      url: `api/django_resaas/tipoentitys/${id}/${endpoint}/`
     }),
     { id: modulo.id }
   )
@@ -151,8 +151,8 @@ async toggleModulo(modulo) {
           this.models.loadingModels = true
 
           const [all, selected] = await Promise.all([
-            HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/modelos', params: {"tipoentidade" : this.row?.id} })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/modelos` }))
+            HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/modelos', params: {"tipoentity" : this.row?.id} })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/modelos` }))
           ])
 
           this.models.models = all.data || []
@@ -212,7 +212,7 @@ async toggleModulo(modulo) {
 
           await HTTPClient.post(url({
             type: 'u',
-            url: `api/django_resaas/tipoentidades/${id}/syncModelos/`
+            url: `api/django_resaas/tipoentitys/${id}/syncModelos/`
           }), {
             ids: this.models.selected.map(i => i.id)
           })
@@ -228,9 +228,9 @@ async toggleModulo(modulo) {
         }
       },
 
-      async loadGroups(tipoEntidadeId) {
+      async loadGroups(entityTypeId) {
         try {
-          const id = tipoEntidadeId || this.row?.id
+          const id = entityTypeId || this.row?.id
           if (!id) return
 
           this.loadingGroups = true
@@ -242,7 +242,7 @@ async toggleModulo(modulo) {
             })),
             HTTPClient.get(url({
               type: 'u',
-              url: `api/django_resaas/tipoentidades/${id}/groups/`
+              url: `api/django_resaas/tipoentitys/${id}/groups/`
             }))
           ])
 
@@ -270,7 +270,7 @@ async toggleModulo(modulo) {
           await HTTPClient.post(
             url({
               type: 'u',
-              url: `api/django_resaas/tipoentidades/${id}/${endpoint}/`
+              url: `api/django_resaas/tipoentitys/${id}/${endpoint}/`
             }),
             { group: group.id }
           )
@@ -301,7 +301,7 @@ async toggleModulo(modulo) {
           const res = await HTTPClient.post(
             url({
               type: 'u',
-              url: `api/django_resaas/tipoentidades/${id}/createGroup/`
+              url: `api/django_resaas/tipoentitys/${id}/createGroup/`
             }),
             { name: cleanName }
           )
@@ -326,34 +326,34 @@ async toggleModulo(modulo) {
       // ===============================
       // 📦 LISTA (mantido)
       // ===============================
-      async getTipoEntidades() {
+      async getEntityTypes() {
         try {
           const { data } = await HTTPClient.get(
-            url({ type: "u", url: "api/django_resaas/tipoentidades" })
+            url({ type: "u", url: "api/django_resaas/tipoentitys" })
           )
 
           this.rows = data || []
 
           const User = useUserStore()
-          User.TipoEntidades = this.rows
+          User.EntityTypes = this.rows
 
         } catch (e) {
-          console.error('getTipoEntidades error', e)
+          console.error('getEntityTypes error', e)
         }
       },
 
-      async getLayoutSettings(tipoEntidade) {
+      async getLayoutSettings(entityType) {
         try {
-          const id = tipoEntidade || this.row?.id
+          const id = entityType || this.row?.id
           if (!id) return
 
-          if (!getStorage('l', 'userTipoEntidade')) return
+          if (!getStorage('l', 'userEntityType')) return
 
           const [theme, layout, typography, animation] = await Promise.all([
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/themeGet/` })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/layoutSettingsGet/` })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/typographyGet/` })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentidades/${id}/animationSettingsGet/` }))
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/themeGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/layoutSettingsGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/typographyGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/animationSettingsGet/` }))
           ])
 
           this.Theme = theme.data || {}
@@ -361,12 +361,12 @@ async toggleModulo(modulo) {
           this.Typography = typography.data || {}
           this.AnimationSettings = animation.data || {}
 
-          setStorage('l', 'tipoEntidadeTheme', JSON.stringify(this.Theme))
-          setStorage('l', 'tipoEntidadeLayoutsettings', JSON.stringify(this.LayoutSettings))
-          setStorage('l', 'tipoEntidadeTypography', JSON.stringify(this.Typography))
-          setStorage('l', 'tipoEntidadeAnimationSettings', JSON.stringify(this.AnimationSettings))
+          setStorage('l', 'entityTypeTheme', JSON.stringify(this.Theme))
+          setStorage('l', 'entityTypeLayoutsettings', JSON.stringify(this.LayoutSettings))
+          setStorage('l', 'entityTypeTypography', JSON.stringify(this.Typography))
+          setStorage('l', 'entityTypeAnimationSettings', JSON.stringify(this.AnimationSettings))
 
-          if (tipoEntidade) {
+          if (entityType) {
             const User = useUserStore()
 
             Object.assign(User, {

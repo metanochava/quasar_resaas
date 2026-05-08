@@ -10,14 +10,14 @@ export const useUserStore = defineStore("user", {
   state: () => ({
     data: null,
     Idioma: {},
-    TipoEntidades: [],
-    TipoEntidade: {},
-    Entidades: [],
-    Entidade: null,
-    EntidadeModelos: [],
-    EntidadeModulos: [],
-    Sucursals: [],
-    Sucursal: null,
+    EntityTypes: [],
+    EntityType: {},
+    Entitys: [],
+    Entity: null,
+    EntityModelos: [],
+    EntityModulos: [],
+    Branchs: [],
+    Branch: null,
     Groups: [],
     Group: {id: 1,  name: 'Gest' },
     Menus: [],
@@ -168,14 +168,14 @@ export const useUserStore = defineStore("user", {
 
     loadFromStorage () {
 
-      this.Theme = JSONSafeParse(getStorage('l', 'entidadeTheme'))
-      this.LayoutSettings = JSONSafeParse(getStorage('l', 'entidadeLayoutsettings'))
-      this.Typography = JSONSafeParse(getStorage('l', 'entidadeTypography'))
-      this.AnimationSettings = JSONSafeParse(getStorage('l', 'entidadeAnimationSettings'))
-      this.Entidade = JSONSafeParse(getStorage('l', 'userEntidade'))
-      this.Sucursals = JSONSafeParse(getStorage('l', 'userSucursals'))
-      this.Entidades = JSONSafeParse(getStorage('l', 'userEntidades'))
-      this.Sucursal = JSONSafeParse(getStorage('l', 'userSucursal'))
+      this.Theme = JSONSafeParse(getStorage('l', 'entityTheme'))
+      this.LayoutSettings = JSONSafeParse(getStorage('l', 'entityLayoutsettings'))
+      this.Typography = JSONSafeParse(getStorage('l', 'entityTypography'))
+      this.AnimationSettings = JSONSafeParse(getStorage('l', 'entityAnimationSettings'))
+      this.Entity = JSONSafeParse(getStorage('l', 'userEntity'))
+      this.Branchs = JSONSafeParse(getStorage('l', 'userBranchs'))
+      this.Entitys = JSONSafeParse(getStorage('l', 'userEntitys'))
+      this.Branch = JSONSafeParse(getStorage('l', 'userBranch'))
       this.Group   = JSONSafeParse(getStorage('l', 'userGroup'))
       this.Groups   = JSONSafeParse(getStorage('l', 'userGroups'))
       this.data   = JSONSafeParse(getStorage('l', 'user'))
@@ -221,28 +221,28 @@ export const useUserStore = defineStore("user", {
         this.access = null
         this.Groups = []
     
-        this.Sucursals = []
-        this.Sucursal = null
+        this.Branchs = []
+        this.Branch = null
 
-        const userEntidade = getStorage('l', 'userEntidade')
+        const userEntity = getStorage('l', 'userEntity')
         
-        deleteStorage('l', 'entidadeTheme')
-        deleteStorage('l', 'entidadeLayoutsettings')
-        deleteStorage('l', 'entidadeTypography')
-        deleteStorage('l', 'entidadeAnimationSettings')
+        deleteStorage('l', 'entityTheme')
+        deleteStorage('l', 'entityLayoutsettings')
+        deleteStorage('l', 'entityTypography')
+        deleteStorage('l', 'entityAnimationSettings')
 
         deleteStorage('l', 'access')
         deleteStorage('l', 'refresh')
-        deleteStorage('l', 'userEntidades')
-        deleteStorage('l', 'userEntidade')
-        deleteStorage('l', 'userSucursals')
-        deleteStorage('l', 'userSucursal')
+        deleteStorage('l', 'userEntitys')
+        deleteStorage('l', 'userEntity')
+        deleteStorage('l', 'userBranchs')
+        deleteStorage('l', 'userBranch')
         deleteStorage('l', 'user')
         deleteStorage('l', 'userGroups')
         deleteStorage('l', 'userGroup')
         deleteStorage('l', 'linga')
-        deleteStorage('l', 'entidadeModulos')
-        deleteStorage('l', 'entidadeModelos')
+        deleteStorage('l', 'entityModulos')
+        deleteStorage('l', 'entityModelos')
 
         deleteStorage('l', 'traducao')
         deleteStorage('l', 'userPermissions')
@@ -251,7 +251,7 @@ export const useUserStore = defineStore("user", {
         deleteStorage('l', 'password')
 
         if (x !== 'x') {
-          setStorage('l', 'userEntidade', userEntidade)
+          setStorage('l', 'userEntity', userEntity)
         }
 
         setStorage('l', 'userGroup', this.Group)

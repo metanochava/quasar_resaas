@@ -6,12 +6,12 @@ import { useGroupStore} from './GroupStore'
 import { perfilSplint, tdc } from '../boot/base'
 
 
-export const useSucursalStore = createBaseStore(
-  'sucursal',
+export const useBranchStore = createBaseStore(
+  'branch',
   {
     url: 'api/django_resaas/sucursais',
     app: 'django_resaas',
-    model: 'Entidade'
+    model: 'Entity'
   },
 
   {
@@ -21,11 +21,11 @@ export const useSucursalStore = createBaseStore(
 
     actions: {
 
-      async getUserSucursals_ (q) {
+      async getUserBranchs_ (q) {
         const User = useUserStore()
-        await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + User.data?.id + '/userSucursals/', params: { } }))
+        await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + User.data?.id + '/userBranchs/', params: { } }))
           .then(async res => {
-            setStorage('l', 'userSucursals', JSON.stringify(res.data))
+            setStorage('l', 'userBranchs', JSON.stringify(res.data))
 
             if (res.data.length === 1) {
               this.select_(res.data[0], q)
@@ -35,17 +35,17 @@ export const useSucursalStore = createBaseStore(
                 User.redirect = 'authwelcome'
                 return
               }
-              const sucursals = []
+              const branchs = []
               res.data.forEach(element => {
-                sucursals.push({ label: perfilSplint(element.nome), value: element })
+                branchs.push({ label: perfilSplint(element.nome), value: element })
               })
               q.dialog({
-                title: tdc('Seleccione a Sucursal'),
+                title: tdc('Seleccione a Branch'),
                 options: {
                   type: 'radio',
                   model: 'opt1',
                   isValid: val => true,
-                  items: sucursals
+                  items: branchs
                 },
                 cancel: true,
                 persistent: true
@@ -58,34 +58,34 @@ export const useSucursalStore = createBaseStore(
           })
       },
 
-      select_ (sucursal, q) {
+      select_ (branch, q) {
         const User = useUserStore()
         let Group = useGroupStore()
-        this.row = sucursal
-        User.Sucursal = this.row
-        setStorage('l', 'userSucursal', JSON.stringify(sucursal))
+        this.row = branch
+        User.Branch = this.row
+        setStorage('l', 'userBranch', JSON.stringify(branch))
         Group.getGroups_(q)
       },
 
-      select (sucursal) {
+      select (branch) {
         const User = useUserStore()
         let Group = useGroupStore()
-        this.row = sucursal
-        User.Sucursal = this.row
-        setStorage('l', 'userSucursal', JSON.stringify(sucursal))
+        this.row = branch
+        User.Branch = this.row
+        setStorage('l', 'userBranch', JSON.stringify(branch))
         Group.getGroups()
       },
 
-      async getUserSucursals() {
+      async getUserBranchs() {
         const User = useUserStore()
-        if (getStorage('l', 'userEntidade') !== null) {
-          const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + User.data?.id + '/userSucursals/', params: { } }))
+        if (getStorage('l', 'userEntity') !== null) {
+          const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + User.data?.id + '/userBranchs/', params: { } }))
             .then(res => {
               this.row = {}
-              setStorage('l', 'userSucursal', JSON.stringify({}))
-              setStorage('l', 'userSucursals', JSON.stringify(res.data))
+              setStorage('l', 'userBranch', JSON.stringify({}))
+              setStorage('l', 'userBranchs', JSON.stringify(res.data))
               this.rows = res.data
-              User.Sucursals = this.rows
+              User.Branchs = this.rows
             })
           return rsp
         }

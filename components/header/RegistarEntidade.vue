@@ -12,11 +12,11 @@
           <q-separator />
 
           <q-card-actions class="row" >
-            <s-btn flat   class="col-12" color="primary" type="submit" @click="logout(User?.Entidade?.id)" > {{tdc(User?.Entidade?.nome)}}</s-btn>
+            <s-btn flat   class="col-12" color="primary" type="submit" @click="logout(User?.Entity?.id)" > {{tdc(User?.Entity?.nome)}}</s-btn>
           </q-card-actions>
 
           <q-card-actions class="row" >
-            <s-btn flat   class="col-12" color="primary" type="submit" @click="logout('x')" > {{tdc(User?.TipoEntidade?.nome)}}</s-btn>
+            <s-btn flat   class="col-12" color="primary" type="submit" @click="logout('x')" > {{tdc(User?.EntityType?.nome)}}</s-btn>
           </q-card-actions>
           <q-separator/>
           <q-card-actions class="row" >
@@ -28,7 +28,7 @@
 
     <s-btn round flat>
       <q-avatar class="" size="45px" :class="$q.dark.isActive ? 'bg-white' : 'bg-white'" >
-        <img  v-if="UserPessoa" :src="User?.perfil?.url" >
+        <img  v-if="UserPerson" :src="User?.perfil?.url" >
         <img  v-else src="https://awsacademy.instructure.com/images/messages/avatar-50.png" >
         <q-card-actions align="center" v-if="User" flat>
           <div class="text-h6 text-gry-8 row text-center">{{User?.username}}</div>
@@ -52,42 +52,42 @@
                 v-if="User"
                 dense
                 group="group"
-                :label="tdc('Entidade') "
+                :label="tdc('Entity') "
                 header-class=" text-grey-9"
-                :caption="UserEntidade?.nome"
+                :caption="UserEntity?.nome"
               >
                 <q-separator />
-                <q-item dense clickable v-if="User?.TipoEntidade?.crair_entidade"   :to="{name:'add_entidade_self', params:{}}"  >
+                <q-item dense clickable v-if="User?.EntityType?.crair_entity"   :to="{name:'add_entity_self', params:{}}"  >
                   <q-item-section>
-                    <center><q-item-label overline class="text-blue"> {{ tdc('Registar Entidade')}}</q-item-label> </center>
+                    <center><q-item-label overline class="text-blue"> {{ tdc('Registar Entity')}}</q-item-label> </center>
                   </q-item-section>
                 </q-item>
-                <q-item dense clickable v-for="entidade in User?.Entidades" :key="entidade?.id" @click="selectEntidade(entidade)">
+                <q-item dense clickable v-for="entity in User?.Entitys" :key="entity?.id" @click="selectEntity(entity)">
                   <q-item-section>
-                    <center><q-item-label overline> {{ tdc((entidade?.nome))}}</q-item-label> </center>
+                    <center><q-item-label overline> {{ tdc((entity?.nome))}}</q-item-label> </center>
                   </q-item-section>
                 </q-item>
               </q-expansion-item>
 
               <q-expansion-item
-                v-if="User?.Entidade"
+                v-if="User?.Entity"
                 dense
                 group="group"
-                :label="tdc('Sucursal') "
+                :label="tdc('Branch') "
                 header-class=" text-grey-9"
-                :caption="User?.Sucursal?.nome"
+                :caption="User?.Branch?.nome"
                 default-opened
-                v-model="sucursalClosed"
+                v-model="branchClosed"
               >
                 <q-separator />
-                <q-item dense clickable v-for="sucursal in User?.Sucursals" :key="sucursal?.id"   @click="selectSucursal(sucursal)">
+                <q-item dense clickable v-for="branch in User?.Branchs" :key="branch?.id"   @click="selectBranch(branch)">
                   <q-item-section>
-                    <center><q-item-label overline> {{ tdc(sucursal?.nome)}}</q-item-label> </center>
+                    <center><q-item-label overline> {{ tdc(branch?.nome)}}</q-item-label> </center>
                   </q-item-section>
                 </q-item>
               </q-expansion-item>
 
-            <s-btn dense  flat  size="" @click="sucursalClosed = false" color="grey" :label="tdc(perfilSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
+            <s-btn dense  flat  size="" @click="branchClosed = false" color="grey" :label="tdc(perfilSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
               <q-menu fit>
                 <q-list dense   class="rounded-borders" style="min-width: 100px" >
                   <q-item clickable v-close-popup @click="selectGroup(group)" v-ripple v-for=" group in User.Groups" :key="group.id">
@@ -125,7 +125,7 @@ import { deleteStorage, getStorage, setStorage } from '../../boot/storage'
 import { useUserStore } from '../../stores/UserStore'
 
 export default defineComponent({
-  name: 'RegistarEntidade',
+  name: 'RegistarEntity',
   components: {
 
   },
@@ -138,48 +138,48 @@ export default defineComponent({
   data () {
     return {
       tdc: tdc,
-      sucursalClosed: true,
+      branchClosed: true,
       pergunta: false,
-      selectSucursalModal: false,
+      selectBranchModal: false,
       perfilSplint: perfilSplint,
     }
   },
 
   methods: {
     /* --------------------- SELECT ENTIDADE --------------------- */
-    selectEntidade (entidade) {
-      setStorage('l', 'userEntidade', JSON.stringify(entidade))
+    selectEntity (entity) {
+      setStorage('l', 'userEntity', JSON.stringify(entity))
 
-      if (this.User) this.User.Entidade = JSON.parse(getStorage('l', 'userEntidade'))
+      if (this.User) this.User.Entity = JSON.parse(getStorage('l', 'userEntity'))
 
-      this.selectSucursalModal = false
-      this.getUserSucursals()
-      this.getEntidadeModulos()
-      this.sucursalClosed = true
+      this.selectBranchModal = false
+      this.getUserBranchs()
+      this.getEntityModulos()
+      this.branchClosed = true
     },
 
     /* --------------------- SELECT SUCURSAL --------------------- */
-    selectSucursal (sucursal) {
-      setStorage('l', 'userSucursal', JSON.stringify(sucursal))
+    selectBranch (branch) {
+      setStorage('l', 'userBranch', JSON.stringify(branch))
 
-      if (this.User) this.User.Sucursal = JSON.parse(getStorage('l', 'userSucursal'))
+      if (this.User) this.User.Branch = JSON.parse(getStorage('l', 'userBranch'))
 
-      this.selectSucursalModal = false
+      this.selectBranchModal = false
       this.getUserPerfils()
-      this.sucursalClosed = false
+      this.branchClosed = false
     },
 
     /* --------------------- GET USER SUCURSALS --------------------- */
-    async getUserSucursals () {
+    async getUserBranchs () {
       this.spiner = true
 
-      if (getStorage('l', 'userEntidade') !== null) {
+      if (getStorage('l', 'userEntity') !== null) {
         try {
-          await HTTPAuth.get(url({ type: 'u', url: 'saas/usuarios/' + this.User?.id + '/userSucursals/', params: {} }))
+          await HTTPAuth.get(url({ type: 'u', url: 'saas/usuarios/' + this.User?.id + '/userBranchs/', params: {} }))
             .then(res => {
-              setStorage('l', 'userSucursals', JSON.stringify(res.data))
+              setStorage('l', 'userBranchs', JSON.stringify(res.data))
 
-              if (this.User) this.User.Sucursals = res.data
+              if (this.User) this.User.Branchs = res.data
             })
             .catch(err => console.log(err))
         } catch (error) {
@@ -215,7 +215,7 @@ export default defineComponent({
 
     /* --------------------- GET USER PERMISSOES --------------------- */
     async getUserPermissions () {
-      if (getStorage('l', 'userSucursal') !== null) {
+      if (getStorage('l', 'userBranch') !== null) {
         try {
           await HTTPAuth.get(url({ type: 'u', url: 'saas/users/' + this.User?.data?.id + '/permissions/', params: {} }))
             .then(res => {
@@ -232,14 +232,14 @@ export default defineComponent({
     },
 
     /* --------------------- GET ENTIDADE MODULOS --------------------- */
-    async getEntidadeModulos () {
-      if (getStorage('l', 'userEntidade') !== null) {
+    async getEntityModulos () {
+      if (getStorage('l', 'userEntity') !== null) {
         try {
-          await HTTPAuth.get(url({ type: 'u', url: 'api/entidades/' + this.User?.Entidade.id + '/resaas_modulos/', params: {} }))
+          await HTTPAuth.get(url({ type: 'u', url: 'api/entitys/' + this.User?.Entity.id + '/resaas_modulos/', params: {} }))
             .then(res => {
-              setStorage('l', 'entidadeModulos', JSON.stringify(res.data))
+              setStorage('l', 'entityModulos', JSON.stringify(res.data))
 
-              if (this.User) this.User.EntidadeModulos = res.data
+              if (this.User) this.User.EntityModulos = res.data
             })
             .catch(err => console.log(err))
         } catch (error) {
@@ -264,20 +264,20 @@ export default defineComponent({
     }
 
     if (this.User) {
-      const ent = getStorage('l', 'userEntidade')
-      const suc = getStorage('l', 'userSucursal')
+      const ent = getStorage('l', 'userEntity')
+      const suc = getStorage('l', 'userBranch')
       const gru = getStorage('l', 'userGroup')
 
       try {
-        this.User.Entidade = ent ? JSON.parse(ent) : null
-        this.User.Sucursal = suc ? JSON.parse(suc) : null
+        this.User.Entity = ent ? JSON.parse(ent) : null
+        this.User.Branch = suc ? JSON.parse(suc) : null
         this.User.Group = gru ? JSON.parse(gru) : null
       } catch (err) {
-        console.error('Erro ao parsear entidades/group:', err)
+        console.error('Erro ao parsear entitys/group:', err)
       }
 
       if (!this.User?.Group?.id) {
-        // this.getEntidades()
+        // this.getEntitys()
       }
     }
   }

@@ -1,24 +1,24 @@
 <template>
   <div class="row items-center no-wrap q-gutter-sm">
     <q-avatar size="40px">
-      <img   v-if="User.Entidade" :src="User?.Entidade?.logo?.url" />
-      <img   v-else :src="User.TipoEntidade?.icon?.url" />
+      <img   v-if="User.Entity" :src="User?.Entity?.logo?.url" />
+      <img   v-else :src="User.EntityType?.icon?.url" />
     </q-avatar>
 
     <div class="text-h6 text-weight-medium">
-      <label v-if="User?.Entidade">
-        {{ tdc(User?.Entidade?.nome) }}
+      <label v-if="User?.Entity">
+        {{ tdc(User?.Entity?.nome) }}
 
         <q-tooltip
-          v-if="User?.Sucursal?.nome"
+          v-if="User?.Branch?.nome"
           :class="$q.dark.isActive
             ? 'bg-dark text-white text-subtitle1'
             : 'bg-primary text-white text-subtitle1'"
         >
-          {{ tdc(User?.Sucursal?.nome) }}
+          {{ tdc(User?.Branch?.nome) }}
         </q-tooltip>
       </label>
-      <label v-else >{{tdc( User.TipoEntidade?.nome )}}</label>
+      <label v-else >{{tdc( User.EntityType?.nome )}}</label>
     </div>
   </div>
 </template>

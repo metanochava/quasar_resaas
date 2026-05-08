@@ -1,9 +1,9 @@
 import { tdc } from '../boot/base'
-import { entidadeRoutes } from './../pages/entidade/entidadeRoute'
-import { tipo_entidadeRoutes } from './../pages/tipo_entidade/tipo_entidadeRoute'
+import { entityRoutes } from './../pages/entity/entityRoute'
+import { entity_typeRoutes } from './../pages/entity_type/entity_typeRoute'
 import { userRoutes } from '../pages/user/userRoute'
 import { groupRoutes } from '../pages/group/groupRoute'
-import { sucursalRoutes } from '../pages/sucursal/sucursalRoute'
+import { branchRoutes } from '../pages/branch/branchRoute'
 import { permissionRoutes } from '../pages/permission/permissionRoute'
 
 
@@ -38,10 +38,10 @@ export let restRoutes = [
       title: tdc('Rota ') + ' ' + tdc(' inexistente'), 
     } 
   },
-  ...entidadeRoutes,
-  ...tipo_entidadeRoutes,
+  ...entityRoutes,
+  ...entity_typeRoutes,
   ...groupRoutes,
-  ...sucursalRoutes,
+  ...branchRoutes,
   ...userRoutes,
   ...permissionRoutes,
 ]

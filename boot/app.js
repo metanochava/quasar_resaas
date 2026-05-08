@@ -39,10 +39,10 @@ export const autoLabel = function (name) {
 }
 
 // Initialize the annoying-background directive.
-export const IsTipoEntidade = {
+export const IsEntityType = {
   bind (el, binding, _vnode) {
     if (el) {
-      const ite = decrypt(localStorage.getItem(('tipo_entidade_nome')) + '')
+      const ite = decrypt(localStorage.getItem(('entity_type_nome')) + '')
 
       if (!(binding.value === ite)) {
         el.style.display = 'none'
@@ -66,9 +66,9 @@ export const urlBase = (url = '') => {
   }
 }
 
-export const isTipoEntidade = (nome) => {
+export const isEntityType = (nome) => {
   let result = false
-  if (JSON.parse(getStorage('l', 'tipoEntidade'))?.nome === nome) {
+  if (JSON.parse(getStorage('l', 'entityType'))?.nome === nome) {
     result = true
   }
   return result

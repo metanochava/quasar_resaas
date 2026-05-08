@@ -47,13 +47,13 @@
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        Gestão de Grupos de {{TipoEntidade.row.nome}}
+        Gestão de Grupos de {{EntityType.row.nome}}
       </div>
 
       <q-space />
 
       <q-badge color="white" text-color="primary">
-        {{ TipoEntidade.selectedGroups.length }} ativos
+        {{ EntityType.selectedGroups.length }} ativos
       </q-badge>
 
       <s-btn dense flat icon="close" v-close-popup>
@@ -100,7 +100,7 @@
     <!-- FILTER -->
     <q-card-section class="q-pa-md">
       <q-input
-        v-model="TipoEntidade.groupSearch"
+        v-model="EntityType.groupSearch"
         dense
         outlined
         clearable
@@ -117,26 +117,26 @@
     <!-- LIST -->
     <q-card-section class="col scroll q-pa-none">
 
-      <div v-if="TipoEntidade.loadingGroups" class="flex flex-center q-pa-xl">
+      <div v-if="EntityType.loadingGroups" class="flex flex-center q-pa-xl">
         <q-spinner color="primary" size="42px" />
       </div>
 
       <q-list v-else separator>
 
         <q-item
-          v-for="group in (TipoEntidade.filteredGroups || [])"
+          v-for="group in (EntityType.filteredGroups || [])"
           :key="group?.id"
           clickable
           v-ripple
           class="group-item"
-          :class="{ 'group-item--active': TipoEntidade.hasGroup(group.id) }"
-          @click="TipoEntidade.toggleGroup(group)"
+          :class="{ 'group-item--active': EntityType.hasGroup(group.id) }"
+          @click="EntityType.toggleGroup(group)"
         >
 
           <q-item-section avatar>
             <q-avatar
-              :color="TipoEntidade.hasGroup(group.id) ? 'primary' : 'grey-4'"
-              :text-color="TipoEntidade.hasGroup(group.id) ? 'white' : 'dark'"
+              :color="EntityType.hasGroup(group.id) ? 'primary' : 'grey-4'"
+              :text-color="EntityType.hasGroup(group.id) ? 'white' : 'dark'"
               icon="group"
             />
           </q-item-section>
@@ -162,17 +162,17 @@
               <q-chip
                 dense
                 size="sm"
-                :color="TipoEntidade.hasGroup(group.id) ? 'primary' : 'grey-5'"
+                :color="EntityType.hasGroup(group.id) ? 'primary' : 'grey-5'"
                 text-color="white"
               >
-                {{ TipoEntidade.hasGroup(group.id) ? 'Ativo' : 'Inativo' }}
+                {{ EntityType.hasGroup(group.id) ? 'Ativo' : 'Inativo' }}
               </q-chip>
 
               <q-checkbox
-                :model-value="TipoEntidade.hasGroup(group.id)"
+                :model-value="EntityType.hasGroup(group.id)"
                 color="primary"
                 @click.stop
-                @update:model-value="() => TipoEntidade.toggleGroup(group)"
+                @update:model-value="() => EntityType.toggleGroup(group)"
               />
 
             </div>
@@ -190,16 +190,16 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useTipoEntidadeStore } from '../../stores/TipoEntidadeStore'
+import { useEntityTypeStore } from '../../stores/EntityTypeStore'
 import { useGroupStore } from '../../stores/GroupStore'
 import PermissionManager from '../permission/PermissionManager.vue'
 import { HTTPAuth, url } from '../../boot/api'
 
 const props = defineProps({
-  tipoEntidadeId: [String, Number]
+  entityTypeId: [String, Number]
 })
 
-const TipoEntidade = useTipoEntidadeStore()
+const EntityType = useEntityTypeStore()
 const Group = useGroupStore()
 
 const newGroup = ref('')
@@ -229,7 +229,7 @@ async function addGroup() {
   const name = newGroup.value?.trim()
   if (!name) return
 
-  await TipoEntidade.createGroup(name)
+  await EntityType.createGroup(name)
   newGroup.value = ''
 }
 
@@ -237,7 +237,7 @@ const canAdd = computed(() => newGroup.value?.trim().length > 0)
 
 // INIT
 onMounted(() => {
-  TipoEntidade.loadGroups(props.tipoEntidadeId)
+  EntityType.loadGroups(props.entityTypeId)
 })
 </script>
 

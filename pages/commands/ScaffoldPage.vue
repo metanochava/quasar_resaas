@@ -851,7 +851,7 @@ export default {
       const data = await buildFormFromSchema({'module': this.form.modulo, 'model': this.form.modelo})
       this.form.fields = data.schema
       this.form.fields = (this.form.fields || []).filter(f =>
-        !['id', 'created_at', 'is_deleted', 'updated_at', 'estado', 'created_by', 'updated_by', 'deleted_at', 'entidade', 'sucursal'].includes(f?.name)
+        !['id', 'created_at', 'is_deleted', 'updated_at', 'estado', 'created_by', 'updated_by', 'deleted_at', 'entity', 'branch'].includes(f?.name)
       )
       this.form.actions =data.actions
       this.accaoTeste = true

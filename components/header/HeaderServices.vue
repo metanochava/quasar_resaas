@@ -12,7 +12,7 @@
                     style="height: 300px"
                   >
                     <div class="row col-xs-12"  >
-                      <div  v-for=" te in User.TipoEntidades" :key="te">
+                      <div  v-for=" te in User.EntityTypes" :key="te">
                         <q-item   v-close-popup   flat bordered   class="col-4 " v-if="getHostname(te)"  >
                           <q-item-label  clickable @click="selectteidadeLink(te)"  class="localhover">
                             <q-avatar class="" size="45px" style="border-radius:5px;" >
@@ -36,7 +36,7 @@
 import { defineComponent } from 'vue'
 import { tdc } from '../../boot/base'
 import { useUserStore } from '../../stores/UserStore'
-import { useTipoEntidadeStore } from '../../stores/TipoEntidadeStore'
+import { useEntityTypeStore } from '../../stores/EntityTypeStore'
 import { setStorage } from '../../boot/storage';
 
 
@@ -44,10 +44,10 @@ export default defineComponent({
 
   setup () {
     const User = useUserStore()
-    const TipoEntidade = useTipoEntidadeStore()
+    const EntityType = useEntityTypeStore()
     return {
       User,
-      TipoEntidade
+      EntityType
     }
   },
   props: {
@@ -64,9 +64,9 @@ export default defineComponent({
   computed: {
   },
   async mounted () {
-    await this.TipoEntidade.getTipoEntidades()
-    this.User.TipoEntidades?.forEach(async tipoEntidade => {
-      await this.getHostname(tipoEntidade)
+    await this.EntityType.getEntityTypes()
+    this.User.EntityTypes?.forEach(async entityType => {
+      await this.getHostname(entityType)
     })
   },
 
@@ -80,8 +80,8 @@ export default defineComponent({
 
       if (this.isIP(window.location.hostname)){
         const url = new URL(window.location.href);
-        const tipoentidade = url.pathname.split("/").filter(Boolean)[0];
-        domain = tipoentidade
+        const tipoentity = url.pathname.split("/").filter(Boolean)[0];
+        domain = tipoentity
 
       }else{
         domain = window.location.href.split('/')[2].split('.')[0]
@@ -94,10 +94,10 @@ export default defineComponent({
         if (domain.toLocaleLowerCase() !== tipoEnt.nome.toLowerCase()) {
           return true
         } else {
-          this.User.TipoEntidade = tipoEnt
-          this.TipoEntidade.row = tipoEnt
-          await this.TipoEntidade.getLayoutSettings(tipoEnt?.id)
-          setStorage('l', 'tipoEntidade', JSON.stringify(this.User.TipoEntidade))
+          this.User.EntityType = tipoEnt
+          this.EntityType.row = tipoEnt
+          await this.EntityType.getLayoutSettings(tipoEnt?.id)
+          setStorage('l', 'entityType', JSON.stringify(this.User.EntityType))
           return false
         }
       }

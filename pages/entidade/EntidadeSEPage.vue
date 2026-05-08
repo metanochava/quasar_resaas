@@ -4,30 +4,30 @@
 
 
       <q-dialog v-model="openGroups" persistent full-height full-width>
-        <GroupManager  :entidadeId="Entidade.form?.id" />
+        <GroupManager  :entityId="Entity.form?.id" />
       </q-dialog>
 
     <!-- FORM -->
     <FormTwo
       v-if="ready"
-      :schema="Entidade.fields"
-      :module="Entidade.app"
-      :model="Entidade.model"
-      :config="Entidade.config"
-      :actions="Entidade.actions"
+      :schema="Entity.fields"
+      :module="Entity.app"
+      :model="Entity.model"
+      :config="Entity.config"
+      :actions="Entity.actions"
       :can-do="canDo"
       :ignore-fields="ignoreFields"
-      :data="Entidade.form"
+      :data="Entity.form"
       @saved="onSaved"
     >
 
-      <template #right v-if="Entidade.form?.id">
+      <template #right v-if="Entity.form?.id">
           <s-card class="q-pa-0 q-gutter-sm " flat>
             <s-btn @click="openGroups = !openGroups" label="Groups" color="primary" class="full-width" />
           </s-card>
         </template>
 
-        <template #footer v-if="Entidade.form?.id">
+        <template #footer v-if="Entity.form?.id">
           
         </template>
 
@@ -44,19 +44,19 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntidadeStore } from './../../stores/EntidadeStore'
+import { useEntityStore } from './../../stores/EntityStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 
 
-import GroupManager from '../group/GroupManagerEntidade.vue'
+import GroupManager from '../group/GroupManagerEntity.vue'
 
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const Entidade = useEntidadeStore()
+const Entity = useEntityStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
@@ -81,17 +81,17 @@ async function load(id) {
 
   if (!id) {
 
-    Entidade.resetForm?.()
+    Entity.resetForm?.()
     return
   }
 
   // 🔥 evita chamadas duplicadas com comparação segura
-  if (String(Entidade.row?.id) === String(id)) {
-    Entidade.form = Entidade.row 
+  if (String(Entity.row?.id) === String(id)) {
+    Entity.form = Entity.row 
     return
   }
 
-  Entidade.row =  await Entidade.getById(id)
+  Entity.row =  await Entity.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -99,7 +99,7 @@ async function init() {
   try {
     ready.value = false
 
-    await Entidade.init()
+    await Entity.init()
 
     const id = route.params.id
     await load(id)

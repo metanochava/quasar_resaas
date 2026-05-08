@@ -81,7 +81,7 @@
 import { defineComponent } from 'vue'
 import { tdc } from '../boot/base'
 import { useUserStore } from '../stores/UserStore'
-import { useTipoEntidadeStore } from '../stores/TipoEntidadeStore'
+import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import { setStorage, getStorage } from '../boot/storage'
 import AllLogo  from './../components/AllLogo.vue'
 import { useQuasar } from 'quasar'
@@ -98,12 +98,12 @@ export default defineComponent({
     AllLogo
   },
   setup () {
-    const TipoEntidade = useTipoEntidadeStore()
+    const EntityType = useEntityTypeStore()
     const  User = useUserStore()
     const q = useQuasar()
     const router = useRouter()
     return {
-      TipoEntidade,
+      EntityType,
       tdc,
       User,
       q,
@@ -113,13 +113,13 @@ export default defineComponent({
   data () {
     return {
       user_id: null,
-      entidade_id: null,
+      entity_id: null,
       isPwd: true,
       readonly: false,
       identifier: '',
       password: '',
-      incorrectTipoEntidade: false,
-      correctTipoEntidade: false,
+      incorrectEntityType: false,
+      correctEntityType: false,
       latitude: '',
       longitude: '',
       local: '',
@@ -183,15 +183,15 @@ export default defineComponent({
 
       setStorage('l', 'manterlogado', this.User.manterLogado)
 
-      this.correctTipoEntidade = false
+      this.correctEntityType = false
 
       await this.User.login({
         identifier: this.identifier,
         password: this.password,
       }, this.q).then(res => {
-        this.correctTipoEntidade = true
+        this.correctEntityType = true
       }).catch(err => {
-        this.incorrectTipoEntidade = true
+        this.incorrectEntityType = true
       })
     }
   }

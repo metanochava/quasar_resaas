@@ -17,7 +17,7 @@ import { ref, onMounted} from 'vue'
 
 const User =useUserStore()
 const module = ref('django_resaas')
-const model = ref('Sucursal')
+const model = ref('Branch')
 
 onMounted(async () => {
 

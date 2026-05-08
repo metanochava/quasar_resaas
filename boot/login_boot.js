@@ -1,16 +1,16 @@
-import { useEntidadeStore } from "../stores/EntidadeStore"
+import { useEntityStore } from "../stores/EntityStore"
 import { useUserStore } from "../stores/UserStore"
 
 
 export async function loadUserSaas (q) {
 
   const User = useUserStore()
-  const Entidade = useEntidadeStore()
+  const Entity = useEntityStore()
 
   await User.me()
 
   if (!User.data?.id) return
 
-  await Entidade.getUserEntidades_(User.data?.id, q)
+  await Entity.getUserEntitys_(User.data?.id, q)
  
 }

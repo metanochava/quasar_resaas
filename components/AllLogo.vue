@@ -8,15 +8,15 @@
 
     <!-- LOGO -->
     <img
-      v-else-if="User.Entidade?.logo?.url"
-      :src="User.Entidade.logo.url"
+      v-else-if="User.Entity?.logo?.url"
+      :src="User.Entity.logo.url"
       style="width:60%"
     />
 
     <!-- FALLBACK TIPO ENTIDADE -->
     <img
-      v-else-if="User.TipoEntidade?.icon?.url"
-      :src="User.TipoEntidade.icon.url"
+      v-else-if="User.EntityType?.icon?.url"
+      :src="User.EntityType.icon.url"
       style="width:60%"
     />
 
@@ -32,17 +32,17 @@
     <!-- NOME -->
     <!-- <br />
     <label
-      v-if="User.Entidade?.nome"
+      v-if="User.Entity?.nome"
       class="text-grey-6 text-h4"
     >
-      {{ tdc(User.Entidade.nome) }}
+      {{ tdc(User.Entity.nome) }}
     </label>
 
     <label
       v-else
       class="text-grey-6 text-h4"
     >
-      {{ tdc(User.TipoEntidade?.nome) }}
+      {{ tdc(User.EntityType?.nome) }}
     </label> -->
 
   </div>
@@ -64,19 +64,19 @@ const loading = ref(false)
 /* =========================
    LOAD ENTIDADE
 ========================= */
-async function loadEntidade(id) {
+async function loadEntity(id) {
   if (!id) return
 
   loading.value = true
 
   try {
     const { data } = await HTTPClient.get(
-      url({ type: 'u', url: 'saas/entidades/' + id, params:{} })
+      url({ type: 'u', url: 'saas/entitys/' + id, params:{} })
     )
 
-    User.Entidade = data
+    User.Entity = data
   } catch (err) {
-    console.error('Erro ao carregar entidade:', err)
+    console.error('Erro ao carregar entity:', err)
   } finally {
     loading.value = false
   }
@@ -86,8 +86,8 @@ async function loadEntidade(id) {
    AUTO LOAD ON MOUNT
 ========================= */
 onMounted(() => {
-  if (route.params.entidade_id) {
-    loadEntidade(route.params.entidade_id)
+  if (route.params.entity_id) {
+    loadEntity(route.params.entity_id)
   }
 })
 
@@ -95,10 +95,10 @@ onMounted(() => {
    AUTO RELOAD WHEN ROUTE CHANGES
 ========================= */
 watch(
-  () => route.params.entidade_id,
+  () => route.params.entity_id,
   (newId, oldId) => {
     if (newId && newId !== oldId) {
-      loadEntidade(newId)
+      loadEntity(newId)
     }
   }
 )

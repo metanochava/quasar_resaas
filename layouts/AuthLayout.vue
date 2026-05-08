@@ -28,8 +28,8 @@
 /* -------------------- IMPORT STORES -------------------- */
 
 import { useUserStore } from '../stores/UserStore'
-import { useTipoEntidadeStore } from '../stores/TipoEntidadeStore'
-import { useEntidadeStore } from '../stores/EntidadeStore'
+import { useEntityTypeStore } from '../stores/EntityTypeStore'
+import { useEntityStore } from '../stores/EntityStore'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
@@ -52,13 +52,13 @@ export default defineComponent({
     Rodape,
   },
   setup() {
-    const TipoEntidade = useTipoEntidadeStore()
-    const Entidade = useEntidadeStore()
+    const EntityType = useEntityTypeStore()
+    const Entity = useEntityStore()
     const User = useUserStore()
 
     return {
-      TipoEntidade,
-      Entidade,
+      EntityType,
+      Entity,
       User,
     }
   },
@@ -75,7 +75,7 @@ export default defineComponent({
   async mounted(){
     if(this.User){
       this.User?.loadFromStorage()
-      await this.TipoEntidade.getLayoutSettings(this.User?.TipoEntidade?.id)
+      await this.EntityType.getLayoutSettings(this.User?.EntityType?.id)
     }
   },
 

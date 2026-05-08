@@ -123,8 +123,8 @@
 /* -------------------- IMPORT STORES -------------------- */
 
 import { useUserStore } from '../stores/UserStore'
-import { useTipoEntidadeStore } from '../stores/TipoEntidadeStore'
-import { useEntidadeStore } from '../stores/EntidadeStore'
+import { useEntityTypeStore } from '../stores/EntityTypeStore'
+import { useEntityStore } from '../stores/EntityStore'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
@@ -165,13 +165,13 @@ export default defineComponent({
   },
 
   setup() {
-    const TipoEntidade = useTipoEntidadeStore()
-    const Entidade = useEntidadeStore()
+    const EntityType = useEntityTypeStore()
+    const Entity = useEntityStore()
     const User = useUserStore()
 
     return {
-      TipoEntidade,
-      Entidade,
+      EntityType,
+      Entity,
       User,
       barStyle,
       thumbStyle
@@ -220,7 +220,7 @@ export default defineComponent({
     // 🔥 RESTORE USER + SETTINGS (teu código original)
     if(this.User){
       this.User?.loadFromStorage()
-      await this.Entidade.getLayoutSettings(this.User?.Entidade?.id)
+      await this.Entity.getLayoutSettings(this.User?.Entity?.id)
     }
 
     // 🔥 RESTORE ROTA
