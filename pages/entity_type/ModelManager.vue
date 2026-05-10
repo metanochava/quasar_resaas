@@ -38,8 +38,8 @@ function toggleGroup(models, checked) {
   models.forEach(item => {
     const exists = EntityType.isSelected(item.id)
 
-    if (checked && !exists) EntityType.toggleApp(item)
-    if (!checked && exists) EntityType.toggleApp(item)
+    if (checked && !exists) EntityType.toggleModel(item)
+    if (!checked && exists) EntityType.toggleModel(item)
   })
 }
 </script>
