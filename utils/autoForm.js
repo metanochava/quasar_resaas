@@ -103,7 +103,7 @@ export async function buildFormFromSchema({
 
   if (!app || !model) throw new Error('app/model required')
 
-  const { data } = await HTTPAuth.get(url({type:'u', url:`api/django_resaas/resaas_apps/${app}/${model}/schema/`, params:{}}))
+  const { data } = await HTTPAuth.get(url({type:'u', url:`api/django_resaas/resaasapps/${app}/${model}/schema/`, params:{}}))
 
   // ✅ resolve schemaPath
   const fields = schemaPath === 'data.fields' ? (data?.data?.fields || []) : (data?.fields || [])

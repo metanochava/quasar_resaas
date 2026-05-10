@@ -244,7 +244,7 @@ export const useUserStore = defineStore("user", {
         deleteStorage('l', 'entityApps')
         deleteStorage('l', 'entityModelos')
 
-        deleteStorage('l', 'traducao')
+        deleteStorage('l', 'translation')
         deleteStorage('l', 'userPermissions')
         deleteStorage('l', 'manterlogado')
         deleteStorage('l', 'username')

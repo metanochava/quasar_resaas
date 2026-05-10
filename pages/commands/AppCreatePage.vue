@@ -121,7 +121,7 @@ const apps = ref([])
 // ---------------- LOAD ----------------
 async function loadApps () {
   try {
-    const { data } = await HTTPAuth.get('/api/django_resaas/resaas_apps/')
+    const { data } = await HTTPAuth.get('/api/django_resaas/resaasapps/')
     apps.value = data?.apps || []
   } catch (e) {
     console.error(e)
@@ -136,7 +136,7 @@ async function createApp () {
   const appName = name.value.trim()
 
   try {
-    await HTTPAuth.post('/api/django_resaas/resaas_apps/', {
+    await HTTPAuth.post('/api/django_resaas/resaasapps/', {
       name: appName
     }) 
 
@@ -169,7 +169,7 @@ async function deleteApp(app) {
   apps.value = apps.value.filter(a => a.name !== app)
 
   try {
-    await HTTPAuth.delete(`/api/django_resaas/resaas_apps/${app}/`)
+    await HTTPAuth.delete(`/api/django_resaas/resaasapps/${app}/`)
     const User = useUserStore()
     await User.getMenus()
 

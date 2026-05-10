@@ -30,7 +30,7 @@ export const useLanguageStore = createBaseStore(
         const res = await HTTPClient.get(
           url({
             type: "u",
-            url: `api/django_resaas/languages/${language?.id}/traducaos`,
+            url: `api/django_resaas/languages/${language?.id}/translations`,
             params: {}
           })
         )

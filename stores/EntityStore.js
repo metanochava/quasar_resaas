@@ -332,7 +332,7 @@ export const useEntityStore = createBaseStore(
         if (!User.Entity?.id) return
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/resaas_apps/` })
+          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/resaasapps/` })
         )
 
         this.Apps = data || []
