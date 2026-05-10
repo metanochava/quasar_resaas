@@ -4,9 +4,9 @@ import { useUserStore } from './UserStore'
 import { getStorage, setStorage } from '../boot/storage'
 
 export const useEntityTypeStore = createBaseStore(
-  'tipoentity',
+  'entitytype',
   {
-    url: 'api/django_resaas/tipoentitys',
+    url: 'api/django_resaas/entitytypes',
     app: 'django_resaas',
     model: 'EntityType'
   },
@@ -104,7 +104,7 @@ async loadApps(tipoId) {
       })),
       HTTPClient.get(url({
         type: 'u',
-        url: `api/django_resaas/tipoentitys/${id}/apps/`
+        url: `api/django_resaas/entitytypes/${id}/apps/`
       }))
     ])
 
@@ -130,7 +130,7 @@ async toggleApp(app) {
   await HTTPClient.post(
     url({
       type: 'u',
-      url: `api/django_resaas/tipoentitys/${id}/${endpoint}/`
+      url: `api/django_resaas/entitytypes/${id}/${endpoint}/`
     }),
     { id: app.id }
   )
@@ -151,8 +151,8 @@ async toggleApp(app) {
           this.models.loadingModels = true
 
           const [all, selected] = await Promise.all([
-            HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/models', params: {"tipoentity" : this.row?.id} })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/models` }))
+            HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/models', params: {"entitytype" : this.row?.id} })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/entitytypes/${id}/models` }))
           ])
 
           this.models.models = all.data || []
@@ -212,7 +212,7 @@ async toggleApp(app) {
 
           await HTTPClient.post(url({
             type: 'u',
-            url: `api/django_resaas/tipoentitys/${id}/syncModelos/`
+            url: `api/django_resaas/entitytypes/${id}/syncModelos/`
           }), {
             ids: this.models.selected.map(i => i.id)
           })
@@ -242,7 +242,7 @@ async toggleApp(app) {
             })),
             HTTPClient.get(url({
               type: 'u',
-              url: `api/django_resaas/tipoentitys/${id}/groups/`
+              url: `api/django_resaas/entitytypes/${id}/groups/`
             }))
           ])
 
@@ -270,7 +270,7 @@ async toggleApp(app) {
           await HTTPClient.post(
             url({
               type: 'u',
-              url: `api/django_resaas/tipoentitys/${id}/${endpoint}/`
+              url: `api/django_resaas/entitytypes/${id}/${endpoint}/`
             }),
             { group: group.id }
           )
@@ -301,7 +301,7 @@ async toggleApp(app) {
           const res = await HTTPClient.post(
             url({
               type: 'u',
-              url: `api/django_resaas/tipoentitys/${id}/createGroup/`
+              url: `api/django_resaas/entitytypes/${id}/createGroup/`
             }),
             { name: cleanName }
           )
@@ -329,7 +329,7 @@ async toggleApp(app) {
       async getEntityTypes() {
         try {
           const { data } = await HTTPClient.get(
-            url({ type: "u", url: "api/django_resaas/tipoentitys" })
+            url({ type: "u", url: "api/django_resaas/entitytypes" })
           )
 
           this.rows = data || []
@@ -350,10 +350,10 @@ async toggleApp(app) {
           if (!getStorage('l', 'userEntityType')) return
 
           const [theme, layout, typography, animation] = await Promise.all([
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/themeGet/` })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/layoutSettingsGet/` })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/typographyGet/` })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/animationSettingsGet/` }))
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/entitytypes/${id}/themeGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/entitytypes/${id}/layoutSettingsGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/entitytypes/${id}/typographyGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/entitytypes/${id}/animationSettingsGet/` }))
           ])
 
           this.Theme = theme.data || {}

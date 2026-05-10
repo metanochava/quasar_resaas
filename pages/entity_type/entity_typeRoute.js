@@ -2,47 +2,47 @@ import { tdc } from '../../boot/base'
 
 export let entity_typeRoutes = [
   {
-    path: '/list_tipoentity',
-    name: 'list_tipoentity',
+    path: '/list_entitytype',
+    name: 'list_entitytype',
     component: () => import('./EntityTypeLPage.vue'),
     meta: {
       title: tdc('Vista de') + ' ' + tdc('tipo entity'),
       requiresAuth: true,
       icon: 'list',
-      requiredRole: 'list_tipoentity',
+      requiredRole: 'list_entitytype',
     },
   },
   {
-    path: '/add_tipoentity',
-    name: 'add_tipoentity',
+    path: '/add_entitytype',
+    name: 'add_entitytype',
     component: () => import('./EntityTypeSEPage.vue'),
     meta: {
       title: tdc('Adicionar') + ' ' + tdc('tipo entity'),
       requiresAuth: true,
       icon: 'add',
-      requiredRole: 'add_tipoentity',
+      requiredRole: 'add_entitytype',
     },
   },
   {
-    path: '/change_tipoentity/:id',
-    name: 'change_tipoentity',
+    path: '/change_entitytype/:id',
+    name: 'change_entitytype',
     component: () => import('./EntityTypeSEPage.vue'),
     meta: {
       title: tdc('Editar') + ' ' + tdc('tipo entity'),
       requiresAuth: true,
       icon: 'edit',
-      requiredRole: 'change_tipoentity',
+      requiredRole: 'change_entitytype',
     },
   },
   {
-    path: '/view_tipoentity/:id',
-    name: 'view_tipoentity',
+    path: '/view_entitytype/:id',
+    name: 'view_entitytype',
     component: () => import('./EntityTypeVPage.vue'),
     meta: {
       title: tdc('Visualizar') + ' ' + tdc('tipo entity'),
       requiresAuth: true,
       icon: 'visibility',
-      requiredRole: 'view_tipoentity',
+      requiredRole: 'view_entitytype',
     },
   }
 ]

@@ -80,8 +80,8 @@ export default defineComponent({
 
       if (this.isIP(window.location.hostname)){
         const url = new URL(window.location.href);
-        const tipoentity = url.pathname.split("/").filter(Boolean)[0];
-        domain = tipoentity
+        const entitytype = url.pathname.split("/").filter(Boolean)[0];
+        domain = entitytype
 
       }else{
         domain = window.location.href.split('/')[2].split('.')[0]
