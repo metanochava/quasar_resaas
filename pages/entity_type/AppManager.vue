@@ -7,7 +7,7 @@
       <q-bar class="bg-primary text-white">
         <q-icon name="view_app" class="q-mr-sm" />
         <div class="text-subtitle1 text-weight-bold">
-          Apps Manager
+          {{ tdc("Gestão de Apps") }}
         </div>
         <q-space />
         <q-badge color="white" text-color="primary">

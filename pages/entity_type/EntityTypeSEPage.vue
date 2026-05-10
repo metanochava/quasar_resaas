@@ -5,9 +5,7 @@
       <AppManager :entityTypeId="EntityType.form?.id" />
     </q-dialog>
 
-    <q-dialog v-model="openPermissions" persistent full-height full-width>
-      <PermissionManager :entityTypeId="EntityType.form?.id" />
-    </q-dialog>
+
 
     <q-dialog v-model="openGroups" persistent full-height full-width>
       <GroupManager :entityTypeId="EntityType.form?.id" />
@@ -86,7 +84,6 @@ const EntityType = useEntityTypeStore()
 // ---------------- STATE ----------------
 const ready = ref(false)
 const openApps = ref(false)
-const openPermissions = ref(false)
 const openGroups = ref(false)
 const openModels = ref(false)
 
