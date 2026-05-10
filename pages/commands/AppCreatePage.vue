@@ -22,7 +22,7 @@
 
               <s-input
                 v-model="name"
-                label="Nome do módulo"
+                label="Name do módulo"
                 outlined
                 @keyup.enter="createApp"
               />

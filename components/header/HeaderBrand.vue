@@ -7,18 +7,18 @@
 
     <div class="text-h6 text-weight-medium">
       <label v-if="User?.Entity">
-        {{ tdc(User?.Entity?.nome) }}
+        {{ tdc(User?.Entity?.name) }}
 
         <q-tooltip
-          v-if="User?.Branch?.nome"
+          v-if="User?.Branch?.name"
           :class="$q.dark.isActive
             ? 'bg-dark text-white text-subtitle1'
             : 'bg-primary text-white text-subtitle1'"
         >
-          {{ tdc(User?.Branch?.nome) }}
+          {{ tdc(User?.Branch?.name) }}
         </q-tooltip>
       </label>
-      <label v-else >{{tdc( User.EntityType?.nome )}}</label>
+      <label v-else >{{tdc( User.EntityType?.name )}}</label>
     </div>
   </div>
 </template>

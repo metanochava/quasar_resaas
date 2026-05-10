@@ -12,11 +12,11 @@
           <q-separator />
 
           <q-card-actions class="row" >
-            <s-btn flat   class="col-12" color="primary" type="submit" @click="logout(User?.Entity?.id)" > {{tdc(User?.Entity?.nome)}}</s-btn>
+            <s-btn flat   class="col-12" color="primary" type="submit" @click="logout(User?.Entity?.id)" > {{tdc(User?.Entity?.name)}}</s-btn>
           </q-card-actions>
 
           <q-card-actions class="row" >
-            <s-btn flat   class="col-12" color="primary" type="submit" @click="logout('x')" > {{tdc(User?.EntityType?.nome)}}</s-btn>
+            <s-btn flat   class="col-12" color="primary" type="submit" @click="logout('x')" > {{tdc(User?.EntityType?.name)}}</s-btn>
           </q-card-actions>
           <q-separator/>
           <q-card-actions class="row" >
@@ -54,7 +54,7 @@
                 group="group"
                 :label="tdc('Entity') "
                 header-class=" text-grey-9"
-                :caption="UserEntity?.nome"
+                :caption="UserEntity?.name"
               >
                 <q-separator />
                 <q-item dense clickable v-if="User?.EntityType?.crair_entity"   :to="{name:'add_entity_self', params:{}}"  >
@@ -64,7 +64,7 @@
                 </q-item>
                 <q-item dense clickable v-for="entity in User?.Entitys" :key="entity?.id" @click="selectEntity(entity)">
                   <q-item-section>
-                    <center><q-item-label overline> {{ tdc((entity?.nome))}}</q-item-label> </center>
+                    <center><q-item-label overline> {{ tdc((entity?.name))}}</q-item-label> </center>
                   </q-item-section>
                 </q-item>
               </q-expansion-item>
@@ -75,14 +75,14 @@
                 group="group"
                 :label="tdc('Branch') "
                 header-class=" text-grey-9"
-                :caption="User?.Branch?.nome"
+                :caption="User?.Branch?.name"
                 default-opened
                 v-model="branchClosed"
               >
                 <q-separator />
                 <q-item dense clickable v-for="branch in User?.Branchs" :key="branch?.id"   @click="selectBranch(branch)">
                   <q-item-section>
-                    <center><q-item-label overline> {{ tdc(branch?.nome)}}</q-item-label> </center>
+                    <center><q-item-label overline> {{ tdc(branch?.name)}}</q-item-label> </center>
                   </q-item-section>
                 </q-item>
               </q-expansion-item>

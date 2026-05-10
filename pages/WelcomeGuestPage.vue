@@ -3,7 +3,7 @@
     <s-card class="welcome-card shadow-10">
       <q-card-section class="text-center">
          <AllLogo />
-        <div class="text-h4 q-mt-md text-weight-bold"> {{ tdc('Welcome to') }} {{ tdc(User.EntityType?.nome) }} {{ tdc('SaaS') }}</div>
+        <div class="text-h4 q-mt-md text-weight-bold"> {{ tdc('Welcome to') }} {{ tdc(User.EntityType?.name) }} {{ tdc('SaaS') }}</div>
 
         <div class="text-subtitle1 text-grey-7 q-mt-sm">
           {{  tdc('Plataforma inteligente para gestão empresarial moderna') }}

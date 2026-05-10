@@ -85,10 +85,10 @@ async function defaultFetchRelationOptions(relationStr, search = '') {
   // Se tu não tens, troca aqui por GET /saas/<model-endpoint>/
   const { data } = await HTTPAuth.get(url({type:'u', url: 'api/django_resaas/relations/',  params: { model: relationStr, search: search || '' }}))
 
-  // esperado: [{id, label}] ou [{id, nome}] etc
+  // esperado: [{id, label}] ou [{id, name}] etc
   const rows = data?.results || data?.data || data || []
   return rows.map(r => ({
-    label: tdc(String(r.label || r.nome || r.name || r.title || r.id)),
+    label: tdc(String(r.label || r.name || r.name || r.title || r.id)),
     value: r.id
   }))
 }

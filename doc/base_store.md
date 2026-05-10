@@ -65,7 +65,7 @@ await store.getById(1)
 ## 📌 Criar
 
 ```js
-store.form = { nome: 'Maria' }
+store.form = { name: 'Maria' }
 await store.create()
 ```
 

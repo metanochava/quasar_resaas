@@ -42,7 +42,7 @@ export const autoLabel = function (name) {
 export const IsEntityType = {
   bind (el, binding, _vnode) {
     if (el) {
-      const ite = decrypt(localStorage.getItem(('entity_type_nome')) + '')
+      const ite = decrypt(localStorage.getItem(('entity_type_name')) + '')
 
       if (!(binding.value === ite)) {
         el.style.display = 'none'
@@ -66,9 +66,9 @@ export const urlBase = (url = '') => {
   }
 }
 
-export const isEntityType = (nome) => {
+export const isEntityType = (name) => {
   let result = false
-  if (JSON.parse(getStorage('l', 'entityType'))?.nome === nome) {
+  if (JSON.parse(getStorage('l', 'entityType'))?.name === name) {
     result = true
   }
   return result

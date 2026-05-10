@@ -393,7 +393,7 @@ export const useEntityStore = createBaseStore(
               return
             }
             const entitys = res.data.map(e => ({
-              label: perfilSplint(e.nome),
+              label: perfilSplint(e.name),
               value: e
             }))
 

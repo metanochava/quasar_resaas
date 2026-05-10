@@ -69,7 +69,7 @@
           <!-- NAME -->
           <q-item-section>
             <q-item-label class="text-weight-medium">
-              {{ mod.nome }}
+              {{ mod.name }}
             </q-item-label>
           </q-item-section>
 
@@ -132,7 +132,7 @@ const filteredApps = computed(() => {
   if (!s) return EntityType.apps
 
   return EntityType.apps.filter(m =>
-    (m.nome || '').toLowerCase().includes(s)
+    (m.name || '').toLowerCase().includes(s)
   )
 })
 

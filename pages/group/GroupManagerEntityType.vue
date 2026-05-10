@@ -47,7 +47,7 @@
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        Gestão de Grupos de {{EntityType.row.nome}}
+        Gestão de Grupos de {{EntityType.row.name}}
       </div>
 
       <q-space />

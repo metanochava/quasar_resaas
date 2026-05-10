@@ -304,7 +304,7 @@ async function executeAction() {
         </div>
 
         <b>
-          {{ selectedRow?.nome || selectedRow?.name || selectedRow?.id }}
+          {{ selectedRow?.name || selectedRow?.name || selectedRow?.id }}
         </b>
 
         <div v-if="actionType === 'hard_delete'" class="text-red q-mt-sm">

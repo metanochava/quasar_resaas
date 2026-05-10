@@ -37,7 +37,7 @@ export const useBranchStore = createBaseStore(
               }
               const branchs = []
               res.data.forEach(element => {
-                branchs.push({ label: perfilSplint(element.nome), value: element })
+                branchs.push({ label: perfilSplint(element.name), value: element })
               })
               q.dialog({
                 title: tdc('Seleccione a Branch'),

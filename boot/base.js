@@ -40,7 +40,7 @@ function replaceTraducao (texto = '', textDeTraducao = '') {
 export const IsEntityType = {
   bind (el, binding, _vnode) {
     if (el) {
-      const ite = decrypt(localStorage.getItem(('entity_type_nome')) + '')
+      const ite = decrypt(localStorage.getItem(('entity_type_name')) + '')
 
       if (!(binding.value === ite)) {
         el.style.display = 'none'
@@ -58,7 +58,7 @@ export const JSONSafeParse = function (value) {
 }
 
 export const isEntityTypeMe = function (x) {
-  const ite = decrypt(localStorage.getItem(('entity_type_nome')) + '')
+  const ite = decrypt(localStorage.getItem(('entity_type_name')) + '')
   if (x === ite) { return true } else { return false }
 }
 
@@ -231,7 +231,7 @@ function matchCase(original, transformed) {
 
 export function guessLabelKey(obj) {
   // tenta achar um campo “humano” pra label
-  const candidates = ['label','nome', 'name', 'titulo', 'title', 'descricao', 'description', 'username', 'email']
+  const candidates = ['label','name', 'name', 'titulo', 'title', 'descricao', 'description', 'username', 'email']
   for (const k of candidates) if (obj && obj[k]) return k
   return 'id'
 }
@@ -273,7 +273,7 @@ function normalizeTheme(theme = {}) {
     'updated_at',
     'deleted_at',
     'estado',
-    'nome',
+    'name',
     'created_by',
     'updated_by'
   ]

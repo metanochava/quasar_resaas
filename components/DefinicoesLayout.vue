@@ -59,7 +59,7 @@
                   v-for="(value, key) in filteredColors"
                   :key="key"
                   class="col-6"
-                  v-show="!['id','nome', 'created_by', 'updated_by', 'created_at', 'updated_at', 'estado', 'deleted_at'].includes(key)"
+                  v-show="!['id','name', 'created_by', 'updated_by', 'created_at', 'updated_at', 'estado', 'deleted_at'].includes(key)"
                 >
                   <s-card
                     flat
@@ -502,7 +502,7 @@
                           <div class="col-12 col-md-6">
                             <s-input
                               v-model="previewForm.name"
-                              label="Nome"
+                              label="Name"
                             />
                           </div>
 

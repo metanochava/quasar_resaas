@@ -21,7 +21,7 @@ const safeParse = (value) => {
 export const url = (payload = { type: 'u', url: '', params: {} }) => {
 
   const User = useUserStore()
-  const entityTypeNome = User?.EntityType?.nome
+  const entityTypeName = User?.EntityType?.name
 
   let urlFinal = ''
 
@@ -30,7 +30,7 @@ export const url = (payload = { type: 'u', url: '', params: {} }) => {
   }
 
   if (payload.type === 'nu') {
-    urlFinal = `${apiBaseUrl}/${entityTypeNome?.toLowerCase()}/${payload.url}`
+    urlFinal = `${apiBaseUrl}/${entityTypeName?.toLowerCase()}/${payload.url}`
   }
 
   urlFinal += '?format=json'

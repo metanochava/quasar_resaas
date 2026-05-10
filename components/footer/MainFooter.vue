@@ -9,7 +9,7 @@
         <q-toolbar-title>
           <div class="row q-py-sm  justify-between ">
             <div class="col-md-9   items-center" style="font-size:13px;" >
-              &copy; {{ User?.Entity?.created_at==null? '2020' : User?.Entity?.created_at }} - {{ new Date().getFullYear() }} {{ User?.Entity?.entityType }} {{ User?.Entity?.nome }}
+              &copy; {{ User?.Entity?.created_at==null? '2020' : User?.Entity?.created_at }} - {{ new Date().getFullYear() }} {{ User?.Entity?.entityType }} {{ User?.Entity?.name }}
             </div>
             <div class="col-md-3 text-right  items-center" style="font-size:12px;">
               <q-spinner-gears size="md" color="white" v-show="Load.count !==0"/>

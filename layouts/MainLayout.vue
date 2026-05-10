@@ -37,7 +37,7 @@
         <!-- Menu Esquerdo -->
         <s-btn dense flat round icon="menu" @click="User.toggleLeftTop()" />
 
-        <!-- Marca (logo + nome) -->
+        <!-- Marca (logo + name) -->
         <HeaderBrand />
 
         <q-space />

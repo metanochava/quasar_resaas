@@ -32,17 +32,17 @@
     <!-- NOME -->
     <!-- <br />
     <label
-      v-if="User.Entity?.nome"
+      v-if="User.Entity?.name"
       class="text-grey-6 text-h4"
     >
-      {{ tdc(User.Entity.nome) }}
+      {{ tdc(User.Entity.name) }}
     </label>
 
     <label
       v-else
       class="text-grey-6 text-h4"
     >
-      {{ tdc(User.EntityType?.nome) }}
+      {{ tdc(User.EntityType?.name) }}
     </label> -->
 
   </div>

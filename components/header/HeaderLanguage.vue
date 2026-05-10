@@ -8,13 +8,13 @@
           clickable
           @click="Language?.change(language)"
         >
-          <q-item-section v-if="Language.current?.id == language.id" ><b>{{ language.nome }}</b></q-item-section>
-          <q-item-section v-else >{{ language.nome }}</q-item-section>
+          <q-item-section v-if="Language.current?.id == language.id" ><b>{{ language.name }}</b></q-item-section>
+          <q-item-section v-else >{{ language.name }}</q-item-section>
         </q-item>
       </q-list>
     </q-menu>
     <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-      {{Language.current?.nome }}
+      {{Language.current?.name }}
     </q-tooltip>
   </s-btn>
 </template>

@@ -19,7 +19,7 @@
                               <img :src="te?.icon?.url" >
                             </q-avatar>
                             <br>
-                            {{tdc(te.nome)}}
+                            {{tdc(te.name)}}
                           </q-item-label>
                         </q-item  >
                         </div>
@@ -91,7 +91,7 @@ export default defineComponent({
       }
      
       if(domain){
-        if (domain.toLocaleLowerCase() !== tipoEnt.nome.toLowerCase()) {
+        if (domain.toLocaleLowerCase() !== tipoEnt.name.toLowerCase()) {
           return true
         } else {
           this.User.EntityType = tipoEnt
@@ -110,10 +110,10 @@ export default defineComponent({
       var url = ''
       if (this.isIP(window.location.hostname)){
         url = new URL(window.location.href)
-        url.pathname = `/${x.nome}/`
+        url.pathname = `/${x.name}/`
       }else{
         const parts = window.location.hostname.split('.')
-        parts[0] = x.nome
+        parts[0] = x.name
         url = `${window.location.protocol}//${parts.join('.')}`
       }
       window.open(url.toString(), '_blank');
