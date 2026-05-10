@@ -186,7 +186,7 @@ export const useEntityTypeStore = createBaseStore(
         )
       },
 
-      toggleApp_(item) {
+      toggleModel(item) {
         const exists = this.models.selected.some(p => p.id === item.id)
 
         this.models.selected = exists
