@@ -90,59 +90,63 @@ export const useEntityTypeStore = createBaseStore(
 
     actions: {
 
-async loadApps(tipoId) {
-  try {
-    const id = tipoId || this.row?.id
-    if (!id) return
+      async loadApps(tipoId) {
+        try {
+          const id = tipoId || this.row?.id
+          if (!id) return
 
-    this.loadingApps = true
+          this.loadingApps = true
 
-    const [all, selected] = await Promise.all([
-      HTTPClient.get(url({
-        type: 'u',
-        url: 'api/django_resaas/apps/'
-      })),
-      HTTPClient.get(url({
-        type: 'u',
-        url: `api/django_resaas/entitytypes/${id}/apps/`
-      }))
-    ])
+          const [all, selected] = await Promise.all([
+            HTTPClient.get(url({
+              type: 'u',
+              url: 'api/django_resaas/apps/'
+            })),
+            HTTPClient.get(url({
+              type: 'u',
+              url: `api/django_resaas/entitytypes/${id}/apps/`
+            }))
+          ])
 
-    this.apps = all.data || []
-    this.selectedApps = selected.data || []
+          this.apps = all.data || []
+          this.selectedApps = selected.data || []
 
-  } finally {
-    this.loadingApps = false
-  }
-},
+        } finally {
+          this.loadingApps = false
+        }
+      },
 
-hasApp(id) {
-  return this.selectedApps.some(m => m.id === id)
-},
+      hasApp(id) {
+        return this.selectedApps.some(m => m.id === id)
+      },
 
-async toggleApp(app) {
-  const id = this.row?.id
-  if (!id) return
+      async toggleApp(app) {
+        const id = this.row?.id
+        if (!id) return
 
-  const exists = this.hasApp(app.id)
-  const endpoint = exists ? 'removeApp' : 'addApp'
+        const exists = this.hasApp(app.id)
+        const endpoint = exists ? 'removeApp' : 'addApp'
 
-  await HTTPClient.post(
-    url({
-      type: 'u',
-      url: `api/django_resaas/entitytypes/${id}/${endpoint}/`
-    }),
-    { id: app.id }
-  )
+        await HTTPClient.post(
+          url({
+            type: 'u',
+            url: `api/django_resaas/entitytypes/${id}/${endpoint}/`
+          }),
+          { id: app.id }
+        )
 
-  if (!exists) {
-    this.selectedApps.push(app)
-  } else {
-    this.selectedApps = this.selectedApps.filter(
-      m => m.id !== app.id
-    )
-  }
-},
+        if (!exists) {
+          this.selectedApps.push(app)
+        } else {
+          this.selectedApps = this.selectedApps.filter(
+            m => m.id !== app.id
+          )
+        }
+      },
+
+
+
+
       async initModels(tipoId) {
         try {
           const id = tipoId || this.row?.id
@@ -182,7 +186,7 @@ async toggleApp(app) {
         )
       },
 
-      toggleApp(item) {
+      toggleApp_(item) {
         const exists = this.models.selected.some(p => p.id === item.id)
 
         this.models.selected = exists

@@ -71,7 +71,6 @@ import FormTwo from '../../components/auto/FormTwo.vue'
 import ModelManager from './ModelManager.vue'
 import AppManager from './AppManager.vue'
 import GroupManager from '../group/GroupManagerEntityType.vue'
-import PermissionManager from '../permission/PermissionManager.vue'
 import { tdc } from '../../boot/base'
 
 
