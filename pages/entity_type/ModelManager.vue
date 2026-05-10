@@ -142,13 +142,13 @@ function toggleGroup(models, checked) {
             :key="item.id"
             clickable
             v-ripple
-            @click="EntityType.toggleApp(item)"
+            @click="EntityType.toggleModel(item)"
           >
             <q-item-section avatar>
               <q-checkbox
                 :model-value="EntityType.isSelected(item.id)"
                 @click.stop
-                @update:model-value="() => EntityType.toggleApp(item)"
+                @update:model-value="() => EntityType.toggleModel(item)"
               />
             </q-item-section>
 

@@ -186,16 +186,7 @@ export const useEntityTypeStore = createBaseStore(
         )
       },
 
-      toggleModel(item) {
-        const exists = this.models.selected.some(p => p.id === item.id)
-
-        this.models.selected = exists
-          ? this.models.selected.filter(p => p.id !== item.id)
-          : [...this.models.selected, item]
-
-        this.models.status = 'idle'
-        this.scheduleSavePermissions()
-      },
+     
 
       scheduleSavePermissions(tipoId = null) {
         clearTimeout(this.models.autoSaveTimer)
@@ -263,6 +254,16 @@ export const useEntityTypeStore = createBaseStore(
         }
       },
 
+      toggleModel(item) {
+        const exists = this.models.selected.some(p => p.id === item.id)
+
+        this.models.selected = exists
+          ? this.models.selected.filter(p => p.id !== item.id)
+          : [...this.models.selected, item]
+
+        this.models.status = 'idle'
+        this.scheduleSavePermissions()
+      },
       async toggleGroup(group) {
         try {
           const id = this.row?.id
