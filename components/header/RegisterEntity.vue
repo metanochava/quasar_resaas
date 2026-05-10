@@ -125,7 +125,7 @@ import { deleteStorage, getStorage, setStorage } from '../../boot/storage'
 import { useUserStore } from '../../stores/UserStore'
 
 export default defineComponent({
-  name: 'RegistarEntity',
+  name: 'RegisterEntity',
   components: {
 
   },

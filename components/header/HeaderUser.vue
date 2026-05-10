@@ -2,12 +2,12 @@
 <template>
   <div>
     <q-dialog
-        v-model="showRegistarEntity"
+        v-model="showRegisterEntity"
         persistent
         :maximized="maximizedToggle"
         full-height
       >
-      <RegistarEntity />
+      <RegisterEntity />
     </q-dialog>
     <q-dialog v-model="pergunta" persistent class="row">
         <s-card style="width: 400px;" flat>
@@ -133,12 +133,12 @@ import { useUserStore } from '../../stores/UserStore'
 import { useGroupStore } from '../../stores/GroupStore'
 import { useEntityStore } from '../../stores/EntityStore'
 import { useBranchStore } from '../../stores/BranchStore'
-import RegistarEntity from './RegistarEntity.vue'
+import RegisterEntity from './RegisterEntity.vue'
 
 
 export default defineComponent({
   name: 'HeaderUser',
-  components: { RegistarEntity },
+  components: { RegisterEntity },
 
   setup () {
     const User = useUserStore()
@@ -153,7 +153,7 @@ export default defineComponent({
       branchClosed: false,
       entityClosed: false,
       pergunta: false,
-      showRegistarEntity: false,
+      showRegisterEntity: false,
       perfilSplint: perfilSplint,
     }
   },
