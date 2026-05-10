@@ -212,7 +212,7 @@ async toggleApp(app) {
 
           await HTTPClient.post(url({
             type: 'u',
-            url: `api/django_resaas/entitytypes/${id}/syncModelos/`
+            url: `api/django_resaas/entitytypes/${id}/syncModels/`
           }), {
             ids: this.models.selected.map(i => i.id)
           })
