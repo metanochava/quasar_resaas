@@ -1,16 +1,16 @@
 <template>
-  <q-page class="q-pa-sm">
+  <q-page class=" q-pa-sm ">
     <!-- FORM -->
-    <FormTwo
+    <FormTwo 
       v-if="ready"
-      :schema="Entity.fields"
-      :module="Entity.app"
-      :model="Entity.model"
-      :config="Entity.config"
-      :actions="Entity.actions"
+      :schema="EntityType.fields"
+      :app="EntityType.app"
+      :model="EntityType.model"
+      :config="EntityType.config"
+      :actions="EntityType.actions"
       :can-do="canDo"
       :ignore-fields="ignoreFields"
-      :data="Entity.form"
+      :data="EntityType.form"
       @saved="onSaved"
     />
 
@@ -25,14 +25,14 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntityStore } from '../../stores/EntityStore'
+import { useEntityTypeStore } from '../../stores/EntityTypeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const Entity = useEntityStore()
+const EntityType = useEntityTypeStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
@@ -57,18 +57,18 @@ async function load(id) {
 
   if (!id) {
 
-    Entity.resetForm?.()
+    EntityType.resetForm?.()
     return
   }
 
 
   // 🔥 evita chamadas duplicadas com comparação segura
-  if (String(Entity.row?.id) === String(id)) {
-    Entity.form = Entity.row 
+  if (String(EntityType.row?.id) === String(id)) {
+    EntityType.form = EntityType.row 
     return
   }
 
-  Entity.row =  await Entity.getById(id)
+  EntityType.row =  await EntityType.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -76,7 +76,7 @@ async function init() {
   try {
     ready.value = false
 
-    await Entity.init()
+    await EntityType.init()
 
     const id = route.params.id
     await load(id)

@@ -12,7 +12,7 @@ const props = defineProps({
   modelValue: { type: Boolean, required: true },
   schema: { type: Array, default: () => [] },
   data: { type: Object, default: null },
-  module: { type: String, required: true },
+  app: { type: String, required: true },
   model: { type: String, required: true },
   canDo: { type: Function, default: () => true },
   ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
@@ -120,7 +120,7 @@ async function save() {
   uploadProgress.value = 0
   try {
 
-    const api = `api/${props.module}/${props.model.toLowerCase()}s/`
+    const api = `api/${props.app}/${props.model.toLowerCase()}s/`
     const { data, config } = buildPayload()
 
     if (form.value.id) {

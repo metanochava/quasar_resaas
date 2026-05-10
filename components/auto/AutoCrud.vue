@@ -8,7 +8,7 @@
     />
 
     <AutoTable
-      :module="module"
+      :app="app"
       :model="model"
       :rows="rows"
       :columns="columns"
@@ -41,7 +41,7 @@
     <AutoForm
       v-model="showForm"
       :schema="schema"
-      :module="module"
+      :app="app"
       :model="model"
       :data="selectedRow"
       :can-do="canDo"
@@ -54,7 +54,7 @@
     <FormModal
       v-model="showForm"
       :schema="schema"
-      :module="module"
+      :app="app"
       :model="model"
       :data="selectedRow"
       :can-do="canDo"
@@ -89,7 +89,7 @@ import { buildFormFromSchema } from '../../utils/autoForm'
 
 // --- props ---
 const props = defineProps({
-  module: { type: String, required: true },
+  app: { type: String, required: true },
   model: { type: String, required: true },
   can: { type: Function, default: null },
   schemaPath: { type: String, default: 'fields' },
@@ -148,10 +148,10 @@ function canDo(perm) {
 
 // --- INIT ---
 async function init() {
-  if (!props.module || !props.model) return
+  if (!props.app || !props.model) return
 
   const data = await buildFormFromSchema({
-    module: props.module,
+    app: props.app,
     model: props.model,
     schemaPath: props.schemaPath,
   })
@@ -184,7 +184,7 @@ async function loadData(token = null) {
     const { data } = await HTTPAuth.get(
       url({
         type: 'u',
-        url: `api/${props.module}/${props.model.toLowerCase()}s/`,
+        url: `api/${props.app}/${props.model.toLowerCase()}s/`,
         params
       })
     )
@@ -222,7 +222,7 @@ function openEdit(row) {
 async function openPdf(row) {
   const res = await HTTPAuthBlob.get(url({
     type: 'u',
-    url: `api/${props.module}/${props.model.toLowerCase()}s/${row.id}/pdf/`
+    url: `api/${props.app}/${props.model.toLowerCase()}s/${row.id}/pdf/`
   }))
 
   const blob = new Blob([res.data], { type: 'application/pdf' })
@@ -235,7 +235,7 @@ async function openPdf(row) {
 async function onDelete(row) {
   await HTTPAuth.delete(url({
     type: 'u',
-    url: `api/${props.module}/${props.model.toLowerCase()}s/${row.id}/`
+    url: `api/${props.app}/${props.model.toLowerCase()}s/${row.id}/`
   }))
   await loadData()
 }
@@ -243,7 +243,7 @@ async function onDelete(row) {
 async function onHardDelete(row) {
   await HTTPAuth.delete(url({
     type: 'u',
-    url: `api/${props.module}/${props.model.toLowerCase()}s/${row.id}/hard_delete/`
+    url: `api/${props.app}/${props.model.toLowerCase()}s/${row.id}/hard_delete/`
   }))
   await loadData()
 }
@@ -251,7 +251,7 @@ async function onHardDelete(row) {
 async function onRestore(row) {
   await HTTPAuth.post(url({
     type: 'u',
-    url: `api/${props.module}/${props.model.toLowerCase()}s/${row.id}/restore/`
+    url: `api/${props.app}/${props.model.toLowerCase()}s/${row.id}/restore/`
   }), {})
   await loadData()
 }
@@ -286,7 +286,7 @@ function onApplyFilter(payload) {
 // --- INLINE PATCH ---
 async function onInlinePatch({ id, field, value }) {
   await HTTPAuth.patch(
-    url({ type: 'u', url: `api/${props.module}/${props.model.toLowerCase()}s/${id}/` }),
+    url({ type: 'u', url: `api/${props.app}/${props.model.toLowerCase()}s/${id}/` }),
     { [field]: value }
   )
   await loadData()

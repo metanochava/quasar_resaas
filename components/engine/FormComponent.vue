@@ -7,7 +7,7 @@ import { HTTPAuth, url } from '../../boot/api'
 const props = defineProps({
   schema: { type: Array, default: () => [] },
   data: { type: Object, default: null },
-  module: { type: String, required: true },
+  app: { type: String, required: true },
   model: { type: String, required: true },
   ignoreFields: { type: Array, default: () => [] }
 })
@@ -213,7 +213,7 @@ async function save() {
   uploadProgress.value = 0
 
   try {
-    const api = `api/${props.module}/${props.model.toLowerCase()}s/`
+    const api = `api/${props.app}/${props.model.toLowerCase()}s/`
     const { data, config } = buildPayload()
 
     if (form.value.id) {

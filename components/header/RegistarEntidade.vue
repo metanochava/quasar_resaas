@@ -154,7 +154,7 @@ export default defineComponent({
 
       this.selectBranchModal = false
       this.getUserBranchs()
-      this.getEntityModulos()
+      this.getEntityApps()
       this.branchClosed = true
     },
 
@@ -232,14 +232,14 @@ export default defineComponent({
     },
 
     /* --------------------- GET ENTIDADE MODULOS --------------------- */
-    async getEntityModulos () {
+    async getEntityApps () {
       if (getStorage('l', 'userEntity') !== null) {
         try {
-          await HTTPAuth.get(url({ type: 'u', url: 'api/entitys/' + this.User?.Entity.id + '/resaas_modulos/', params: {} }))
+          await HTTPAuth.get(url({ type: 'u', url: 'api/entitys/' + this.User?.Entity.id + '/resaas_apps/', params: {} }))
             .then(res => {
-              setStorage('l', 'entityModulos', JSON.stringify(res.data))
+              setStorage('l', 'entityApps', JSON.stringify(res.data))
 
-              if (this.User) this.User.EntityModulos = res.data
+              if (this.User) this.User.EntityApps = res.data
             })
             .catch(err => console.log(err))
         } catch (error) {

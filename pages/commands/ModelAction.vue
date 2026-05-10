@@ -3,7 +3,7 @@
 
     <s-card>
         <q-bar :class="$q.dark.isActive ? 'bg-primary text-white' : 'bg-primary text-white'">
-        &nbsp; {{tdc('')}} {{ modulo }}  | {{ modelo }} 
+        &nbsp; {{tdc('')}} {{ app }}  | {{ model }} 
         <q-space />
         <s-btn dense flat icon="close" v-close-popup>
             <q-tooltip>{{tdc('Fechar')}}</q-tooltip>
@@ -47,12 +47,12 @@ export default defineComponent({
     }
   },
   props: {
-    modulo: {
+    app: {
       type: String,
       required: false,
       default: ''
     },
-    modelo: {
+    model: {
       type: String,
       required: false,
       default: ''

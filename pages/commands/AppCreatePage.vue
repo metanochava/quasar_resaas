@@ -24,7 +24,7 @@
                 v-model="name"
                 label="Nome do módulo"
                 outlined
-                @keyup.enter="createModule"
+                @keyup.enter="createApp"
               />
 
               <s-btn
@@ -33,7 +33,7 @@
                 icon="add"
                 label="Criar"
                 :loading="loading"
-                @click="createModule"
+                @click="createApp"
               />
 
             </s-card>
@@ -47,7 +47,7 @@
               :key="app.name + '_' + index"
               class="col-12 col-sm-3"
             >
-              <s-card bordered flat class="module-card">
+              <s-card bordered flat class="app-card">
 
                 <q-card-section class="row items-center">
 
@@ -121,7 +121,7 @@ const apps = ref([])
 // ---------------- LOAD ----------------
 async function loadApps () {
   try {
-    const { data } = await HTTPAuth.get('/api/django_resaas/resaas_modulos/')
+    const { data } = await HTTPAuth.get('/api/django_resaas/resaas_apps/')
     apps.value = data?.apps || []
   } catch (e) {
     console.error(e)
@@ -129,18 +129,18 @@ async function loadApps () {
 }
 
 // ---------------- CREATE ----------------
-async function createModule () {
+async function createApp () {
   if (!name.value?.trim()) return
 
   loading.value = true
-  const moduleName = name.value.trim()
+  const appName = name.value.trim()
 
   try {
-    await HTTPAuth.post('/api/django_resaas/resaas_modulos/', {
-      name: moduleName
+    await HTTPAuth.post('/api/django_resaas/resaas_apps/', {
+      name: appName
     }) 
 
-    apps.value.push({ name: moduleName, models: 0 })
+    apps.value.push({ name: appName, models: 0 })
     name.value = ''
     const User = useUserStore()
     await User.getMenus()
@@ -159,17 +159,17 @@ function confirmDelete(app) {
     message: `Tem a certeza que deseja apagar o módulo "${app}"?`,
     cancel: true,
     persistent: true
-  }).onOk(() => deleteModule(app))
+  }).onOk(() => deleteApp(app))
 }
 
-async function deleteModule(app) {
+async function deleteApp(app) {
   const old = [...apps.value]
 
   // UI otimista
   apps.value = apps.value.filter(a => a.name !== app)
 
   try {
-    await HTTPAuth.delete(`/api/django_resaas/resaas_modulos/${app}/`)
+    await HTTPAuth.delete(`/api/django_resaas/resaas_apps/${app}/`)
     const User = useUserStore()
     await User.getMenus()
 
@@ -182,7 +182,7 @@ async function deleteModule(app) {
 function openScaffold(app) {
   router.push({
     name: 'view_scaffold',
-    query: { modulo: app.toLowerCase() }
+    query: { app: app.toLowerCase() }
   })
 }
 
@@ -193,10 +193,10 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.module-card {
+.app-card {
   transition: 0.2s;
 }
-.module-card:hover {
+.app-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 14px rgba(0,0,0,0.12);
 }

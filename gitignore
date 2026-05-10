@@ -54,7 +54,7 @@ copilot-messages.log
 
 
 
-/node_modules/
+/node_apps/
 /files/
 /.project/
 /.vscode

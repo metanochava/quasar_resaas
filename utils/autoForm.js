@@ -94,16 +94,16 @@ async function defaultFetchRelationOptions(relationStr, search = '') {
 }
 
 export async function buildFormFromSchema({
-  module,
+  app,
   model,
   fetchRelationOptions = null, // opcional: injeta a tua função
   schemaPath = 'fields',        // 'fields' OR 'data.fields' (se o teu ok() embrulhar)
   moneyMask = '#.##0,00',       // se usares mask monetária custom
 } = {}) {
 
-  if (!module || !model) throw new Error('module/model required')
+  if (!app || !model) throw new Error('app/model required')
 
-  const { data } = await HTTPAuth.get(url({type:'u', url:`api/django_resaas/resaas_modulos/${module}/${model}/schema/`, params:{}}))
+  const { data } = await HTTPAuth.get(url({type:'u', url:`api/django_resaas/resaas_apps/${app}/${model}/schema/`, params:{}}))
 
   // ✅ resolve schemaPath
   const fields = schemaPath === 'data.fields' ? (data?.data?.fields || []) : (data?.fields || [])

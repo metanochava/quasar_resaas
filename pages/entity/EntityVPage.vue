@@ -1,16 +1,16 @@
 <template>
-  <q-page class=" q-pa-sm ">
+  <div class="q-pa-sm">
     <!-- FORM -->
-    <FormTwo 
+    <FormTwo
       v-if="ready"
-      :schema="EntityType.fields"
-      :module="EntityType.app"
-      :model="EntityType.model"
-      :config="EntityType.config"
-      :actions="EntityType.actions"
+      :schema="Entity.fields"
+      :app="Entity.app"
+      :model="Entity.model"
+      :config="Entity.config"
+      :actions="Entity.actions"
       :can-do="canDo"
       :ignore-fields="ignoreFields"
-      :data="EntityType.form"
+      :data="Entity.form"
       @saved="onSaved"
     />
 
@@ -18,21 +18,21 @@
     <div v-if="!ready" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
     </div>
-  </q-page>
+  </div>
 </template>
 
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntityTypeStore } from './../../stores/EntityTypeStore'
+import { useEntityStore } from '../../stores/EntityStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const EntityType = useEntityTypeStore()
+const Entity = useEntityStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
@@ -57,18 +57,18 @@ async function load(id) {
 
   if (!id) {
 
-    EntityType.resetForm?.()
+    Entity.resetForm?.()
     return
   }
 
 
   // 🔥 evita chamadas duplicadas com comparação segura
-  if (String(EntityType.row?.id) === String(id)) {
-    EntityType.form = EntityType.row 
+  if (String(Entity.row?.id) === String(id)) {
+    Entity.form = Entity.row 
     return
   }
 
-  EntityType.row =  await EntityType.getById(id)
+  Entity.row =  await Entity.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -76,7 +76,7 @@ async function init() {
   try {
     ready.value = false
 
-    await EntityType.init()
+    await Entity.init()
 
     const id = route.params.id
     await load(id)

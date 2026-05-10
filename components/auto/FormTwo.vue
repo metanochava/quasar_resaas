@@ -9,7 +9,7 @@ const slots = useSlots()
 
 const props = defineProps({
   schema: { type: Array, default: () => [] },
-  module: { type: String, required: true },
+  app: { type: String, required: true },
   model: { type: String, required: true },
   data: { type: Object, default: null },
 
@@ -118,7 +118,7 @@ function goBack() {
             v-else
             ref="formRef"
             :schema="schema"
-            :module="module"
+            :app="app"
             :model="model"
             :data="data"
             :can-do="canDo"

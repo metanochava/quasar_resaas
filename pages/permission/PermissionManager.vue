@@ -43,7 +43,7 @@
                 {{ appName }}
               </div>
               <div class="text-caption text-grey">
-                {{ Object.keys(models).length }} modelos
+                {{ Object.keys(models).length }} models
               </div>
             </q-item-section>
           </template>

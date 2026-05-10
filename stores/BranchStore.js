@@ -1,6 +1,6 @@
-import { createBaseStore } from './../base/base_store'
-import { HTTPAuth, url } from './../boot/api'
-import { getStorage, setStorage } from './../boot/storage'
+import { createBaseStore } from '../base/base_store'
+import { HTTPAuth, url } from '../boot/api'
+import { getStorage, setStorage } from '../boot/storage'
 import { useUserStore} from './UserStore'
 import { useGroupStore} from './GroupStore'
 import { perfilSplint, tdc } from '../boot/base'
@@ -9,7 +9,7 @@ import { perfilSplint, tdc } from '../boot/base'
 export const useBranchStore = createBaseStore(
   'branch',
   {
-    url: 'api/django_resaas/sucursais',
+    url: 'api/django_resaas/branchs',
     app: 'django_resaas',
     model: 'Entity'
   },

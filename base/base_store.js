@@ -74,7 +74,7 @@ export function createBaseStore(name, config, extend = {}) {
       assertConfig() {
         if (!this._config.app || !this._config.model) {
           console.error('BaseStore CONFIG ERROR:', this._config)
-          throw new Error('module/model required')
+          throw new Error('app/model required')
         }
       },
 
@@ -110,7 +110,7 @@ export function createBaseStore(name, config, extend = {}) {
         await this.runHook('beforeSchema')
 
         const rsp = await buildFormFromSchema({
-          module: this.safeApp,
+          app: this.safeApp,
           model: this.safeModel
         })
 

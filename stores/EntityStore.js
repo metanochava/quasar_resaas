@@ -1,9 +1,9 @@
-import { createBaseStore } from './../base/base_store'
-import { HTTPAuth, HTTPClient, url } from './../boot/api'
+import { createBaseStore } from '../base/base_store'
+import { HTTPAuth, HTTPClient, url } from '../boot/api'
 import { useBranchStore } from './BranchStore'
 import { useUserStore } from './UserStore'
 import { perfilSplint, tdc } from '../boot/base'
-import { getStorage, setStorage } from './../boot/storage'
+import { getStorage, setStorage } from '../boot/storage'
 
 export const useEntityStore = createBaseStore(
   'entity',
@@ -18,7 +18,7 @@ export const useEntityStore = createBaseStore(
       LayoutSettings: {},
       AnimationSettings: {},
       Typography: {},
-      Modulos: [],
+      Apps: [],
       Modelos: [],
       userEntitys: [],
 
@@ -203,7 +203,7 @@ export const useEntityStore = createBaseStore(
           if (!id) return
 
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `api/django_resaas/entitys/${id}/modelos` })
+            url({ type: 'u', url: `api/django_resaas/entitys/${id}/models` })
           )
 
           this.Modelos = data || []
@@ -220,26 +220,26 @@ export const useEntityStore = createBaseStore(
       // ===============================
       // MODULOS
       // ===============================
-      async setEntityModulos(entityId) {
+      async setEntityApps(entityId) {
         const User = useUserStore()
         try {
           const id = entityId || User.Entity?.id
           if (!id) return
 
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `api/django_resaas/entitys/${id}/modulos/` })
+            url({ type: 'u', url: `api/django_resaas/entitys/${id}/apps/` })
           )
 
-          this.Modulos = data || []
+          this.Apps = data || []
 
           if (entityId) {
             const User = useUserStore()
-            User.Modulos = this.Modulos
-            setStorage('l', 'entityModulos', JSON.stringify(data))
+            User.Apps = this.Apps
+            setStorage('l', 'entityApps', JSON.stringify(data))
           }
 
         } catch (e) {
-          console.error('setEntityModulos error', e)
+          console.error('setEntityApps error', e)
         }
       },
 
@@ -327,15 +327,15 @@ export const useEntityStore = createBaseStore(
       // ===============================
       // LOAD DIRETO
       // ===============================
-      async getModulos() {
+      async getApps() {
         const User = useUserStore()
         if (!User.Entity?.id) return
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/resaas_modulos/` })
+          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/resaas_apps/` })
         )
 
-        this.Modulos = data || []
+        this.Apps = data || []
       },
 
       async getModelos() {
@@ -343,7 +343,7 @@ export const useEntityStore = createBaseStore(
         if (!User.Entity?.id) return
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/modelos` })
+          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/models` })
         )
 
         this.Modelos = data || []

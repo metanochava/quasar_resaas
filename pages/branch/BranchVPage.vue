@@ -1,10 +1,10 @@
 <template>
-  <q-page class="q-pa-sm ">
+  <q-page class="q-pa-sm">
     <!-- FORM -->
     <FormTwo
       v-if="ready"
       :schema="Entity.fields"
-      :module="Entity.app"
+      :app="Entity.app"
       :model="Entity.model"
       :config="Entity.config"
       :actions="Entity.actions"
@@ -13,6 +13,7 @@
       :data="Entity.form"
       @saved="onSaved"
     />
+
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />

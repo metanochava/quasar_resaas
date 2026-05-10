@@ -4,7 +4,7 @@
     <FormTwo
       v-if="ready"
       :schema="Permission.fields"
-      :module="Permission.app"
+      :app="Permission.app"
       :model="Permission.model"
       :config="Permission.config"
       :actions="Permission.actions"

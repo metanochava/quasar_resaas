@@ -23,7 +23,7 @@
         v-if="ready"
         class="full-height"
         :schema="EntityType.fields"
-        :module="EntityType.app"
+        :app="EntityType.app"
         :model="EntityType.model"
         :config="EntityType.config"
         :actions="EntityType.actions"
@@ -67,7 +67,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntityTypeStore } from './../../stores/EntityTypeStore'
+import { useEntityTypeStore } from '../../stores/EntityTypeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 import ModelManager from './ModelManager.vue'

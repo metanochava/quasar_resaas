@@ -70,7 +70,7 @@ function openPreview(url) {
 
 // ---------------- PROPS ----------------
 const props = defineProps({
-  module: { type: String, default:'' },
+  app: { type: String, default:'' },
   model:  { type: String, default:'' },
   rows: { type: Array, default: () => [] },
   columns: { type: Array, default: () => [] },
@@ -557,7 +557,7 @@ async function executeAction() {
                 v-for="a in singularActions"
                 :key="a.url"
                 clickable
-                :disable="a.permission && !canDo(a.method + '_' + a.permission + '_' + a.modelo.toLowerCase())"
+                :disable="a.permission && !canDo(a.method + '_' + a.permission + '_' + a.model.toLowerCase())"
                 @click="runAction(a, props.row)"
               >
                 <q-item-section avatar v-if="a.icon">

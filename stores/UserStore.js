@@ -15,7 +15,7 @@ export const useUserStore = defineStore("user", {
     Entitys: [],
     Entity: null,
     EntityModelos: [],
-    EntityModulos: [],
+    EntityApps: [],
     Branchs: [],
     Branch: null,
     Groups: [],
@@ -241,7 +241,7 @@ export const useUserStore = defineStore("user", {
         deleteStorage('l', 'userGroups')
         deleteStorage('l', 'userGroup')
         deleteStorage('l', 'linga')
-        deleteStorage('l', 'entityModulos')
+        deleteStorage('l', 'entityApps')
         deleteStorage('l', 'entityModelos')
 
         deleteStorage('l', 'traducao')

@@ -20,14 +20,14 @@ export let restRoutes = [
     } 
   },
   { 
-    path: '/add_modulo', 
-    name: 'add_modulo', 
-    component: () => import('../pages/commands/ModuloCreatePage.vue'), 
+    path: '/add_app', 
+    name: 'add_app', 
+    component: () => import('../pages/commands/AppCreatePage.vue'), 
     meta: { 
-      title: tdc('Add de') + ' ' + tdc('Modulo'), 
+      title: tdc('Add de') + ' ' + tdc('App'), 
       requiresAuth: true, 
       icon: 'inventory_2',
-      requiredRole: 'add_modulo'
+      requiredRole: 'add_app'
     } 
   },
   { 

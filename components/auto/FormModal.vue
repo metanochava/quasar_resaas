@@ -6,7 +6,7 @@ import Form from '../engine/FormComponent.vue'
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   schema: { type: Array, default: () => [] },
-  module: { type: String, required: true },
+  app: { type: String, required: true },
   model: { type: String, required: true },
   data: { type: Object, default: null },
   canDo: { type: Function, default: null },
@@ -81,7 +81,7 @@ function save() {
           <Form
             ref="formRef"
             :schema="schema"
-            :module="module"
+            :app="app"
             :model="model"
             :data="data"
             :can-do="canDo"

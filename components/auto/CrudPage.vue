@@ -7,7 +7,7 @@
         {{ tdc('Explorar Modelos') }}
       </div>
       <div class="text-subtitle2 text-grey-7">
-        {{ tdc('Selecione o módulo e o modelo para visualizar os dados') }}
+        {{ tdc('Selecione o módulo e o model para visualizar os dados') }}
       </div>
     </div>
 
@@ -21,8 +21,8 @@
         <!-- MÓDULO -->
         <div class="col-12 col-md-6">
           <s-select
-            v-model="module"
-            :options="modules"
+            v-model="app"
+            :options="apps"
             option-value="name"
             option-label="name"
             emit-value
@@ -54,7 +54,7 @@
       <q-card-section>
 
         <AutoCrud
-          :module="module"
+          :app="app"
           :model="model"
           :can="User.can"
         />
@@ -79,28 +79,28 @@ const User = useUserStore()
 const route = useRoute()
 
 // estado
-const module = ref('')
+const app = ref('')
 const model = ref('')
 
-const modules = ref([])
+const apps = ref([])
 const models = ref([])
 
 // carregar módulos
 async function loadApps() {
   const { data } = await HTTPAuth.get(
-    url({ type: 'u', url: 'api/django_resaas/resaas_modulos/', params: {} })
+    url({ type: 'u', url: 'api/django_resaas/resaas_apps/', params: {} })
   )
-  modules.value = data.apps
+  apps.value = data.apps
 }
 
-// carregar modelos
+// carregar models
 async function loadModelsRelation() {
-  if (!module.value) return
+  if (!app.value) return
 
   const { data } = await HTTPAuth.get(
     url({
       type: 'u',
-      url: 'api/django_resaas/resaas_modulos/' + module.value,
+      url: 'api/django_resaas/resaas_apps/' + app.value,
       params: {}
     })
   )
@@ -116,9 +116,9 @@ onMounted(async () => {
 watch(
   () => route.params,
   (params) => {
-    if (!params?.module || !params?.model) return
+    if (!params?.app || !params?.model) return
 
-    module.value = params.module
+    app.value = params.app
     model.value = params.model
   },
   { immediate: true }

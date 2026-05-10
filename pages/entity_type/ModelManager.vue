@@ -123,7 +123,7 @@ function toggleGroup(models, checked) {
                 {{ formatName(app) }}
               </q-item-label>
               <q-item-label caption>
-                {{ models.length }} {{ tdc('modelos') }}
+                {{ models.length }} {{ tdc('models') }}
               </q-item-label>
             </q-item-section>
 

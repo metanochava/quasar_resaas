@@ -4,7 +4,7 @@
     <FormTwo
       v-if="ready"
       :schema="Entity.fields"
-      :module="Entity.app"
+      :app="Entity.app"
       :model="Entity.model"
       :config="Entity.config"
       :actions="Entity.actions"

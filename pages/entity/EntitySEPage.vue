@@ -1,10 +1,17 @@
 <template>
-  <div class="q-pa-sm">
+  
+  <q-page class="q-pa-sm">
+
+
+      <q-dialog v-model="openGroups" persistent full-height full-width>
+        <GroupManager  :entityId="Entity.form?.id" />
+      </q-dialog>
+
     <!-- FORM -->
     <FormTwo
       v-if="ready"
       :schema="Entity.fields"
-      :module="Entity.app"
+      :app="Entity.app"
       :model="Entity.model"
       :config="Entity.config"
       :actions="Entity.actions"
@@ -12,21 +19,38 @@
       :ignore-fields="ignoreFields"
       :data="Entity.form"
       @saved="onSaved"
-    />
+    >
 
+      <template #right v-if="Entity.form?.id">
+          <s-card class="q-pa-0 q-gutter-sm " flat>
+            <s-btn @click="openGroups = !openGroups" label="Groups" color="primary" class="full-width" />
+          </s-card>
+        </template>
+
+        <template #footer v-if="Entity.form?.id">
+          
+        </template>
+
+    </FormTwo>
+ 
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
     </div>
-  </div>
+  </q-page>
 </template>
 
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntityStore } from './../../stores/EntityStore'
+import { useEntityStore } from '../../stores/EntityStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
+
+
+
+import GroupManager from '../group/GroupManagerEntity.vue'
+
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
@@ -36,7 +60,7 @@ const Entity = useEntityStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
-
+const openGroups = ref(false)
 const ignoreFields = [
   'id',
   'created_at',
@@ -60,7 +84,6 @@ async function load(id) {
     Entity.resetForm?.()
     return
   }
-
 
   // 🔥 evita chamadas duplicadas com comparação segura
   if (String(Entity.row?.id) === String(id)) {

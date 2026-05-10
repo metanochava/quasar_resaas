@@ -5,7 +5,7 @@
     <FormTwo
       v-if="ready"
       :schema="Group.fields"
-      :module="Group.app"
+      :app="Group.app"
       :model="Group.model"
       :config="Group.config"
       :actions="Group.actions"

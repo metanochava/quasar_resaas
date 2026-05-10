@@ -1,7 +1,7 @@
-import { createBaseStore } from './../base/base_store'
-import { HTTPClient, url } from './../boot/api'
-import { useUserStore } from '../stores/UserStore'
-import { getStorage, setStorage } from './../boot/storage'
+import { createBaseStore } from '../base/base_store'
+import { HTTPClient, url } from '../boot/api'
+import { useUserStore } from './UserStore'
+import { getStorage, setStorage } from '../boot/storage'
 
 export const useEntityTypeStore = createBaseStore(
   'tipoentity',
@@ -17,12 +17,12 @@ export const useEntityTypeStore = createBaseStore(
       AnimationSettings: {},
       Typography: {},
 
-      Modulos: [],
+      Apps: [],
       Modelos: [],
 
-      modulos: [],
-      selectedModulos: [],
-      loadingModulos: false,
+      apps: [],
+      selectedApps: [],
+      loadingApps: false,
 
       models: {
         models: [],
@@ -90,56 +90,56 @@ export const useEntityTypeStore = createBaseStore(
 
     actions: {
 
-async loadModulos(tipoId) {
+async loadApps(tipoId) {
   try {
     const id = tipoId || this.row?.id
     if (!id) return
 
-    this.loadingModulos = true
+    this.loadingApps = true
 
     const [all, selected] = await Promise.all([
       HTTPClient.get(url({
         type: 'u',
-        url: 'api/django_resaas/modulos/'
+        url: 'api/django_resaas/apps/'
       })),
       HTTPClient.get(url({
         type: 'u',
-        url: `api/django_resaas/tipoentitys/${id}/modulos/`
+        url: `api/django_resaas/tipoentitys/${id}/apps/`
       }))
     ])
 
-    this.modulos = all.data || []
-    this.selectedModulos = selected.data || []
+    this.apps = all.data || []
+    this.selectedApps = selected.data || []
 
   } finally {
-    this.loadingModulos = false
+    this.loadingApps = false
   }
 },
 
-hasModulo(id) {
-  return this.selectedModulos.some(m => m.id === id)
+hasApp(id) {
+  return this.selectedApps.some(m => m.id === id)
 },
 
-async toggleModulo(modulo) {
+async toggleApp(app) {
   const id = this.row?.id
   if (!id) return
 
-  const exists = this.hasModulo(modulo.id)
-  const endpoint = exists ? 'removeModulo' : 'addModulo'
+  const exists = this.hasApp(app.id)
+  const endpoint = exists ? 'removeApp' : 'addApp'
 
   await HTTPClient.post(
     url({
       type: 'u',
       url: `api/django_resaas/tipoentitys/${id}/${endpoint}/`
     }),
-    { id: modulo.id }
+    { id: app.id }
   )
 
   if (!exists) {
-    this.selectedModulos.push(modulo)
+    this.selectedApps.push(app)
   } else {
-    this.selectedModulos = this.selectedModulos.filter(
-      m => m.id !== modulo.id
+    this.selectedApps = this.selectedApps.filter(
+      m => m.id !== app.id
     )
   }
 },
@@ -151,8 +151,8 @@ async toggleModulo(modulo) {
           this.models.loadingModels = true
 
           const [all, selected] = await Promise.all([
-            HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/modelos', params: {"tipoentity" : this.row?.id} })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/modelos` }))
+            HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/models', params: {"tipoentity" : this.row?.id} })),
+            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/tipoentitys/${id}/models` }))
           ])
 
           this.models.models = all.data || []

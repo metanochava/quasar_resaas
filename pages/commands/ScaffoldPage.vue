@@ -2,7 +2,7 @@
   <q-page class=" q-pa-sm">
 
     <q-dialog v-model="model_action" persistent full-width full-height>
-      <ModelAction :modulo="form.modulo" :modelo="form.modelo"  :accao="accao" />
+      <ModelAction :app="form.app" :model="form.model"  :accao="accao" />
     </q-dialog>
 
     <!-- HEADER -->
@@ -26,22 +26,22 @@
           <div class="row  q-col-gutter-md ">
             <div class="col">
               <s-select
-                v-model="form.modulo"
-                :options="modules"
-                label="Module"
+                v-model="form.app"
+                :options="apps"
+                label="App"
                 outlined
                 dense 
                 map-options
                 emit-value
                 option-value="name"
                 option-label="name"
-                @update:model-value="loadModelsSchema(form.modulo)"
+                @update:model-value="loadModelsSchema(form.app)"
               />
             </div>
 
             <div class="col">
               <s-input dense
-                v-model="form.modelo"
+                v-model="form.model"
                 label="Model Name"
                 outlined
 
@@ -97,7 +97,7 @@
 
 
 
-            <div class="col" v-if="models.includes(form.modelo)">
+            <div class="col" v-if="models.includes(form.model)">
               <s-btn class="full-width" color="primary" icon="refresh"  label="Reload Model" @click="reloadModelShema" />
             </div>
           </div>
@@ -312,9 +312,9 @@
                   <div class="row q-col-gutter-sm q-pa-0">
                     <div class="col">
                       <s-select
-                        v-model="f.relModule"
-                        :options="modules"
-                        label="module"
+                        v-model="f.relApp"
+                        :options="apps"
+                        label="app"
                         outlined
                         dense 
                         map-options
@@ -359,7 +359,7 @@
         <!-- ================= actions ================= -->
         <s-card flat bordered class="q-mt-md" v-if="accaoTeste">
           <q-card-section class="row q-col-gutter-sm q-gutter-s">
-            <div class="text-h6 text-grey col-12">🔐 Extra actions of {{ form.modulo }}.{{form.modelo}}</div>
+            <div class="text-h6 text-grey col-12">🔐 Extra actions of {{ form.app }}.{{form.model}}</div>
             <div class="col-12">
               <s-select
                 v-model="accao.Icon"
@@ -412,7 +412,7 @@
             <s-input class="col" dense v-model="accao.Permission" @keyup.enter="addPerm()" outlined label="Permission" placeholder="Permission"/>
             <s-input class="col-12" dense v-model="accao.Url" @keyup.enter="addPerm()" placeholder="'(?P<model>[^/.]+)/schema'" outlined/>
 
-            <s-btn v-if="form.modelo" class=" col-12" flat icon="arrow_upward" color="success" :label="'Permissions Updade' + ' '+ form.modelo" @click="permissionUpdade" />
+            <s-btn v-if="form.model" class=" col-12" flat icon="arrow_upward" color="success" :label="'Permissions Updade' + ' '+ form.model" @click="permissionUpdade" />
 
             <q-chip
               @dblclick="accaoMetodo(p)"
@@ -445,7 +445,7 @@
       
       <div class="col-8">
         <div class="row" >
-          <s-btn v-if="form.modulo" class=" col" flat icon="refresh" color="accent" :label="'Migrate' + ' '+ form.modulo" @click="generateMigrate" />
+          <s-btn v-if="form.app" class=" col" flat icon="refresh" color="accent" :label="'Migrate' + ' '+ form.app" @click="generateMigrate" />
         </div>
         <div class="col" v-if="out">
           <br>
@@ -528,7 +528,7 @@ export default {
         key: ''
       },
 
-      modules: [],
+      apps: [],
       icons: [],
       models: [],
       filteredTypes: [],
@@ -645,8 +645,8 @@ export default {
       onDeletes: ['CASCADE','PROTECT','SET_NULL','SET_DEFAULT','DO_NOTHING','RESTRICT'],
 
       form: {
-        modulo: '',
-        modelo: '',
+        app: '',
+        model: '',
         icon: 'list',
         crud: false,
         fields: [],
@@ -801,8 +801,8 @@ export default {
         }
 
         // RELAÇÃO
-        if (f.relModule && f.relation) {
-          field.relation = `${f.relModule}.${f.relation}`
+        if (f.relApp && f.relation) {
+          field.relation = `${f.relApp}.${f.relation}`
         }
 
         return field
@@ -829,7 +829,7 @@ export default {
     async generateMigrate () {
       this.out=null
       const payload = {
-        modulo: this.form.modulo,
+        app: this.form.app,
       }
       const { data } = await HTTPAuth.post('api/django_resaas/scaffolds/migrate/', payload)
       this.out = data.out 
@@ -838,8 +838,8 @@ export default {
     async permissionUpdade () {
       this.out=null
       const payload = {
-        modulo: this.form.modulo,
-        modelo: this.form.modelo,
+        app: this.form.app,
+        model: this.form.model,
         actions: this.form.actions,
       }
       const { data } = await HTTPAuth.post('api/django_resaas/scaffolds/permissions/', payload)
@@ -848,7 +848,7 @@ export default {
 
     async reloadModelShema(){
       this.accaoTeste = false
-      const data = await buildFormFromSchema({'module': this.form.modulo, 'model': this.form.modelo})
+      const data = await buildFormFromSchema({'app': this.form.app, 'model': this.form.model})
       this.form.fields = data.schema
       this.form.fields = (this.form.fields || []).filter(f =>
         !['id', 'created_at', 'is_deleted', 'updated_at', 'estado', 'created_by', 'updated_by', 'deleted_at', 'entity', 'branch'].includes(f?.name)
@@ -868,17 +868,17 @@ export default {
     },
 
     async loadApps() {
-      const {data} = await HTTPAuth.get('api/django_resaas/resaas_modulos/')
-      this.modules = data.apps
+      const {data} = await HTTPAuth.get('api/django_resaas/resaas_apps/')
+      this.apps = data.apps
     },
 
     async loadModelsRelation(f){
-      const {data} = await HTTPAuth.get('api/django_resaas/resaas_modulos/'+ f.relModule)
+      const {data} = await HTTPAuth.get('api/django_resaas/resaas_apps/'+ f.relApp)
       f.models = data.models
     },
 
     async loadModelsSchema(f){
-      const {data} = await HTTPAuth.get('api/django_resaas/resaas_modulos/'+ f)
+      const {data} = await HTTPAuth.get('api/django_resaas/resaas_apps/'+ f)
       this.models = data.models
       this.accaoTeste = false
     },

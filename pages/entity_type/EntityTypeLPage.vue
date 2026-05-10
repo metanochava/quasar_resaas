@@ -1,8 +1,8 @@
 
 <template>
-  <q-page class="q-pa-sm">
+  <q-page class="q-pa-sm ">
     <AutoCrud 
-      :module="module" :model="model" :can="User.can" route="view_paciente"  
+      :app="app" :model="model" :can="User.can" route="view_paciente"  
       :ignoreFields="['created_at','updated_at', 'created_by', 'updated_by', 'deleted_at']" 
     />
   </q-page>
@@ -11,16 +11,15 @@
 <script setup>
 
 import  AutoCrud  from './../../components/auto/AutoCrud.vue'
-import { useUserStore }  from './../../stores/UserStore'
+import { useUserStore }  from '../../stores/UserStore'
 import { ref, onMounted} from 'vue'
 
 
 const User =useUserStore()
-const module = ref('django_resaas')
-const model = ref('Entity')
+const app = ref('django_resaas')
+const model = ref('EntityType')
 
 onMounted(async () => {
 
 })
 </script>
-
