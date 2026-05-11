@@ -19,7 +19,6 @@
 
       <!-- BODY -->
       <q-card-section class="modal-body">
- {{ Entity.form }}
         <!-- LOADING -->
         <div v-if="!ready" class="flex flex-center q-pa-lg">
           <q-spinner size="40px" color="primary" />
@@ -222,7 +221,7 @@ async function openPermissions(group) {
   await Group.getById(group.id)
  console.log(Entity)
   const { data } = await HTTPAuth.get(
-    url({ type: 'u', url: 'api/django_resaas/entitytypes/'+ Entity.form.entitytype.id + '/permissions' })
+    url({ type: 'u', url: 'api/django_resaas/entitytypes/'+ Entity.form.entity_type.id + '/permissions' })
   )
 
   permissions.value = data || []
