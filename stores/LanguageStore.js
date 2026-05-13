@@ -5,7 +5,6 @@ import { defineStore } from 'pinia'
 export const useLanguageStore = createBaseStore(
   "lang", 
   {
-    url: 'ipa/django_resaas/languages',
     app: 'django_resaas',
     model: 'Language'
   },

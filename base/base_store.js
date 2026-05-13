@@ -6,7 +6,7 @@ export function createBaseStore(name, config, extend = {}) {
 
   // 🔥 CONFIG IMUTÁVEL (NUNCA MUDA)
   const BASE_CONFIG = Object.freeze({
-    url: config.url,
+    url: 'api/' + config.app + '/' + config.model.toLowerCase() + 's',
     app: config.app,
     model: config.model
   })

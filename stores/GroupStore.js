@@ -8,7 +8,6 @@ import { perfilSplint, tdc } from '../boot/base'
 export const useGroupStore = createBaseStore(
   'groups',
   {
-    url: 'api/auth/groups',
     app: 'auth',
     model: 'Group'
   },

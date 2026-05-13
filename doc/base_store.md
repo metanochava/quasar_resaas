@@ -24,7 +24,6 @@ O `BaseStore` é um gerador de stores que:
 import { createBaseStore } from 'src/stores/BaseStore'
 
 export const usePacienteStore = createBaseStore('paciente', {
-  url: 'ipa/clinica/pacientes',
   app: 'clinica',
   model: 'Paciente'
 })
@@ -110,7 +109,7 @@ Os hooks permitem executar lógica antes/depois das ações.
 ```js
 export const usePacienteStore = createBaseStore(
   'paciente',
-  { url: 'ipa/clinica/pacientes', app: 'clinica', model: 'Paciente' },
+  {  app: 'clinica', model: 'Paciente' },
   {
     hooks: {
       beforeLoad() {
@@ -139,7 +138,6 @@ export const usePacienteStore = createBaseStore(
 export const usePacienteStore = createBaseStore(
   'paciente',
   {
-    url: 'ipa/clinica/pacientes',
     app: 'clinica',
     model: 'Paciente'
   },

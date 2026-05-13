@@ -2,6 +2,7 @@ import { tdc } from '../boot/base'
 import { entityRoutes } from './../pages/entity/entityRoute'
 import { entity_typeRoutes } from './../pages/entity_type/entity_typeRoute'
 import { userRoutes } from '../pages/user/userRoute'
+import { employeeRoutes } from '../pages/employee/employeeRoute'
 import { groupRoutes } from '../pages/group/groupRoute'
 import { branchRoutes } from '../pages/branch/branchRoute'
 import { permissionRoutes } from '../pages/permission/permissionRoute'
@@ -44,5 +45,6 @@ export let restRoutes = [
   ...branchRoutes,
   ...userRoutes,
   ...permissionRoutes,
+  ...employeeRoutes,
 ]
 

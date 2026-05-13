@@ -5,11 +5,11 @@ import { useUserStore } from './UserStore'
 import { perfilSplint, tdc } from '../boot/base'
 import { getStorage, setStorage } from '../boot/storage'
 
-export const useEntityStore = createBaseStore(
-  'entity',
+export const useEmployeeStore = createBaseStore(
+  'employee',
   {
     app: 'django_resaas',
-    model: 'Entity'
+    model: 'Employee'
   },
   {
     state: () => ({
@@ -19,7 +19,7 @@ export const useEntityStore = createBaseStore(
       Typography: {},
       Apps: [],
       Modelos: [],
-      userEntitys: [],
+      userEmployees: [],
 
 
       groups: [],
@@ -68,7 +68,7 @@ export const useEntityStore = createBaseStore(
           this.LayoutSettings = data.layout_settings || {}
           this.AnimationSettings = data.animation_settings || {}
           this.Typography = data.typography || {}
-          User.Entity = data.entity || null
+          User.Employee = data.employee || null
 
           
 
@@ -86,9 +86,9 @@ export const useEntityStore = createBaseStore(
         }
       },
 
-            async loadGroups(EntityId) {
+            async loadGroups(EmployeeId) {
               try {
-                const id = EntityId || this.row?.id
+                const id = EmployeeId || this.row?.id
                 if (!id) return
       
                 this.loadingGroups = true
@@ -96,11 +96,11 @@ export const useEntityStore = createBaseStore(
                 const [all, selected] = await Promise.all([
                   HTTPClient.get(url({
                     type: 'u',
-                    url: `api/django_resaas/entitytypes/${this.row?.entity_type?.id}/groups/`
+                    url: `api/django_resaas/employeetypes/${this.row?.employee_type?.id}/groups/`
                   })),
                   HTTPClient.get(url({
                     type: 'u',
-                    url: `api/django_resaas/entitys/${id}/groups/`
+                    url: `api/django_resaas/employees/${id}/groups/`
                   }))
                 ])
       
@@ -139,7 +139,7 @@ export const useEntityStore = createBaseStore(
                 await HTTPClient.post(
                   url({
                     type: 'u',
-                    url: `api/django_resaas/entitys/${id}/${endpoint}/`
+                    url: `api/django_resaas/employees/${id}/${endpoint}/`
                   }),
                   { group: group.id }
                 )
@@ -170,7 +170,7 @@ export const useEntityStore = createBaseStore(
                 const res = await HTTPClient.post(
                   url({
                     type: 'u',
-                    url: `api/django_resaas/entitys/${id}/createGroup/`
+                    url: `api/django_resaas/employees/${id}/createGroup/`
                   }),
                   { name: cleanName }
                 )
@@ -195,67 +195,67 @@ export const useEntityStore = createBaseStore(
       // ===============================
       // MODELOS
       // ===============================
-      async setEntityModelos(entityId) {
+      async setEmployeeModelos(employeeId) {
         const User = useUserStore()
         try {
-          const id = entityId || User.Entity?.id
+          const id = employeeId || User.Employee?.id
           if (!id) return
 
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `api/django_resaas/entitys/${id}/models` })
+            url({ type: 'u', url: `api/django_resaas/employees/${id}/models` })
           )
 
           this.Modelos = data || []
 
-          if (entityId) {
-            useUserStore().EntityModelos = this.Modelos
+          if (employeeId) {
+            useUserStore().EmployeeModelos = this.Modelos
           }
 
         } catch (e) {
-          console.error('setEntityModelos error', e)
+          console.error('setEmployeeModelos error', e)
         }
       },
 
       // ===============================
       // MODULOS
       // ===============================
-      async setEntityApps(entityId) {
+      async setEmployeeApps(employeeId) {
         const User = useUserStore()
         try {
-          const id = entityId || User.Entity?.id
+          const id = employeeId || User.Employee?.id
           if (!id) return
 
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `api/django_resaas/entitys/${id}/apps/` })
+            url({ type: 'u', url: `api/django_resaas/employees/${id}/apps/` })
           )
 
           this.Apps = data || []
 
-          if (entityId) {
+          if (employeeId) {
             const User = useUserStore()
             User.Apps = this.Apps
-            setStorage('l', 'entityApps', JSON.stringify(data))
+            setStorage('l', 'employeeApps', JSON.stringify(data))
           }
 
         } catch (e) {
-          console.error('setEntityApps error', e)
+          console.error('setEmployeeApps error', e)
         }
       },
 
       // ===============================
       // LAYOUT / THEME
       // ===============================
-      async getLayoutSettings(entityId) {
+      async getLayoutSettings(employeeId) {
         const User = useUserStore()
         try {
-          const id = entityId || User.Entity?.id
+          const id = employeeId || User.Employee?.id
           if (!id) return
 
           const [theme, layout, typography, animation] = await Promise.all([
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/themeGet/` })),
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/layoutSettingsGet/` })),
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/typographyGet/` })),
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/animationSettingsGet/` }))
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/employees/${id}/themeGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/employees/${id}/layoutSettingsGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/employees/${id}/typographyGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/employees/${id}/animationSettingsGet/` }))
           ])
 
           this.Theme = theme.data || {}
@@ -263,12 +263,12 @@ export const useEntityStore = createBaseStore(
           this.Typography = typography.data || {}
           this.AnimationSettings = animation.data || {}
 
-          setStorage('l', 'EntityTheme', JSON.stringify(this.Theme))
-          setStorage('l', 'EntityLayoutsettings', JSON.stringify(this.LayoutSettings))
-          setStorage('l', 'EntityTypography', JSON.stringify(this.Typography))
-          setStorage('l', 'EntityAnimationSettings', JSON.stringify(this.AnimationSettings))
+          setStorage('l', 'EmployeeTheme', JSON.stringify(this.Theme))
+          setStorage('l', 'EmployeeLayoutsettings', JSON.stringify(this.LayoutSettings))
+          setStorage('l', 'EmployeeTypography', JSON.stringify(this.Typography))
+          setStorage('l', 'EmployeeAnimationSettings', JSON.stringify(this.AnimationSettings))
 
-          if (entityId) {
+          if (employeeId) {
             const User = useUserStore()
 
             Object.assign(User, {
@@ -289,36 +289,36 @@ export const useEntityStore = createBaseStore(
       // ===============================
       // USER ENTIDADES
       // ===============================
-      async getUserEntitys(userId) {
+      async getUserEmployees(userId) {
         if (!userId) return
 
         try {
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `api/django_resaas/users/${userId}/userEntitys/` })
+            url({ type: 'u', url: `api/django_resaas/users/${userId}/userEmployees/` })
           )
 
-          this.userEntitys = data || []
-          setStorage('l', 'userEntitys', JSON.stringify(data))
+          this.userEmployees = data || []
+          setStorage('l', 'userEmployees', JSON.stringify(data))
 
         } catch (e) {
-          console.error('getUserEntitys error', e)
+          console.error('getUserEmployees error', e)
         }
       },
 
       // ===============================
       // SELECT ENTIDADE
       // ===============================
-      async select(entity) {
-        if (!entity) return
+      async select(employee) {
+        if (!employee) return
 
         const User = useUserStore()
         const Branch = useBranchStore()
 
-        User.Entity = entity
+        User.Employee = employee
 
-        setStorage('l', 'userEntity', JSON.stringify(entity))
+        setStorage('l', 'userEmployee', JSON.stringify(employee))
 
-        await this.getLayoutSettings(entity.id)
+        await this.getLayoutSettings(employee.id)
         await Branch.getUserBranchs()
       },
 
@@ -328,10 +328,10 @@ export const useEntityStore = createBaseStore(
       // ===============================
       async getApps() {
         const User = useUserStore()
-        if (!User.Entity?.id) return
+        if (!User.Employee?.id) return
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/resaasapps/` })
+          url({ type: 'u', url: `api/django_resaas/employees/${User.Employee.id}/resaasapps/` })
         )
 
         this.Apps = data || []
@@ -339,35 +339,35 @@ export const useEntityStore = createBaseStore(
 
       async getModelos() {
         const User = useUserStore()
-        if (!User.Entity?.id) return
+        if (!User.Employee?.id) return
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/models` })
+          url({ type: 'u', url: `api/django_resaas/employees/${User.Employee.id}/models` })
         )
 
         this.Modelos = data || []
       },
       
 
-      async select_ (entity, q) {
+      async select_ (employee, q) {
         const User = useUserStore()
         const Branch = useBranchStore()
-        User.Entity = entity
-        await this.getLayoutSettings(entity.id)
-        setStorage('l', 'userEntity', JSON.stringify(entity))
+        User.Employee = employee
+        await this.getLayoutSettings(employee.id)
+        setStorage('l', 'userEmployee', JSON.stringify(employee))
         Branch.getUserBranchs_(q)
       },
 
-      async select (entity) {
+      async select (employee) {
         const User = useUserStore()
         const Branch = useBranchStore()
-        User.Entity = entity
-        await this.getLayoutSettings(entity.id)
-        setStorage('l', 'userEntity', JSON.stringify(entity))
+        User.Employee = employee
+        await this.getLayoutSettings(employee.id)
+        setStorage('l', 'userEmployee', JSON.stringify(employee))
         Branch.getUserBranchs()
       },
 
-      async getUserEntitys_ (UserId, q) {
+      async getUserEmployees_ (UserId, q) {
         const User = useUserStore()
         if (!UserId) return
 
@@ -375,12 +375,12 @@ export const useEntityStore = createBaseStore(
           const res = await HTTPAuth.get(
             url({
               type: 'u',
-              url: `api/django_resaas/users/${UserId}/userEntitys/`,
+              url: `api/django_resaas/users/${UserId}/userEmployees/`,
               params: {}
             })
           )
 
-          setStorage('l', 'userEntitys', JSON.stringify(res.data))
+          setStorage('l', 'userEmployees', JSON.stringify(res.data))
           this.s = res.data
 
           if (res.data.length === 1) {
@@ -391,17 +391,17 @@ export const useEntityStore = createBaseStore(
               User.redirect = 'welcome'
               return
             }
-            const entitys = res.data.map(e => ({
+            const employees = res.data.map(e => ({
               label: perfilSplint(e.name),
               value: e
             }))
 
             q.dialog({
-              title: tdc('Seleccione a Entity'),
+              title: tdc('Seleccione a Employee'),
               options: {
                 type: 'radio',
                 model: 'opt1',
-                items: entitys
+                items: employees
               },
               cancel: true,
               persistent: true

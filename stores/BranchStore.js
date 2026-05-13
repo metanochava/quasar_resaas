@@ -9,9 +9,8 @@ import { perfilSplint, tdc } from '../boot/base'
 export const useBranchStore = createBaseStore(
   'branch',
   {
-    url: 'api/django_resaas/branchs',
     app: 'django_resaas',
-    model: 'Entity'
+    model: 'Branch'
   },
 
   {

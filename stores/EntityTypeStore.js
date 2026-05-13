@@ -6,7 +6,6 @@ import { getStorage, setStorage } from '../boot/storage'
 export const useEntityTypeStore = createBaseStore(
   'entitytype',
   {
-    url: 'api/django_resaas/entitytypes',
     app: 'django_resaas',
     model: 'EntityType'
   },

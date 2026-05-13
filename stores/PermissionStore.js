@@ -4,7 +4,6 @@ import { HTTPClient, url } from '../boot/api'
 export const usePermissionStore = createBaseStore(
   'permission',
   {
-    url: 'api/auth/permissions',
     app: 'auth',
     model: 'Permission'
   },
