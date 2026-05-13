@@ -1,6 +1,5 @@
 import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, HTTPClient, url } from './../boot/api'
-import { defineStore } from 'pinia'
 
 export const useLanguageStore = createBaseStore(
   "lang", 
