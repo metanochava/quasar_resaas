@@ -13,8 +13,7 @@
       :data="User.form"
       @saved="onSaved"
     />
-
-
+    
     <div v-if="!ready" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
     </div>

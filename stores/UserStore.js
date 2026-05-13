@@ -1,12 +1,18 @@
-import { defineStore } from 'pinia'
+
 import { getStorage, setStorage, deleteStorage } from '../boot/storage'
 import { HTTPAuth, HTTPClient, url } from '../boot/api'
 import { useLanguageStore } from  './LanguageStore'
 import { JSONSafeParse, setSettings } from '../boot/base'
+import { createBaseStore } from '../base/base_store'
 
 
-
-export const useUserStore = defineStore("user", {
+export const useUserStore = createBaseStore(
+  'user',
+  {
+    app: 'django_resaas',
+    model: 'User'
+  },
+  {
   state: () => ({
     data: null,
     Language: {},
