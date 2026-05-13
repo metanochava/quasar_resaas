@@ -3,14 +3,14 @@
     <!-- FORM -->
     <FormTwo
       v-if="ready"
-      :schema="Entity.fields"
-      :app="Entity.app"
-      :model="Entity.model"
-      :config="Entity.config"
-      :actions="Entity.actions"
+      :schema="User.fields"
+      :app="User.app"
+      :model="User.model"
+      :config="User.config"
+      :actions="User.actions"
       :can-do="canDo"
       :ignore-fields="ignoreFields"
-      :data="Entity.form"
+      :data="User.form"
       @saved="onSaved"
     />
 
@@ -25,14 +25,14 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntityStore } from '../../stores/EntityStore'
+import { useUserStore } from '../../stores/UserStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const Entity = useEntityStore()
+const User = useUserStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
@@ -57,18 +57,18 @@ async function load(id) {
 
   if (!id) {
 
-    Entity.resetForm?.()
+    User.resetForm?.()
     return
   }
 
 
   // 🔥 evita chamadas duplicadas com comparação segura
-  if (String(Entity.row?.id) === String(id)) {
-    Entity.form = Entity.row 
+  if (String(User.row?.id) === String(id)) {
+    User.form = User.row 
     return
   }
 
-  Entity.row =  await Entity.getById(id)
+  User.row =  await User.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -76,7 +76,7 @@ async function init() {
   try {
     ready.value = false
 
-    await Entity.init()
+    await User.init()
 
     const id = route.params.id
     await load(id)
