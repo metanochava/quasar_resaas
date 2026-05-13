@@ -96,7 +96,7 @@ watch(
 
     const id = params.id
 
-    // 🔥 sempre carrega quando muda rota
+    // 🔥 sempre carrega quando muda route
     await load(id)
   },
   { immediate: false } // init já trata o primeiro carregamento

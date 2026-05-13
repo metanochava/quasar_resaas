@@ -58,7 +58,7 @@ function toggleGroup(models, checked) {
       <!-- STATUS -->
       <div class="row items-center q-gutter-sm">
 
-        <q-icon v-if="EntityType.models.status === 'saving'" name="sync" class="rotate" />
+        <q-icon v-if="EntityType.models.status === 'saving'" name="sync" class="routete" />
         <q-icon v-else-if="EntityType.models.status === 'saved'" name="check_circle" color="positive" />
         <q-icon v-else-if="EntityType.models.status === 'error'" name="error" color="negative" />
 

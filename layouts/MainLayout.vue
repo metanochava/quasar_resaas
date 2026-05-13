@@ -195,7 +195,7 @@ export default defineComponent({
     }
   },
 
-  // 🔥 WATCH GLOBAL (rota + UI)
+  // 🔥 WATCH GLOBAL (route + UI)
   watch: {
     $route(to) {
       const ignore = ['authwelcome','welcome','login']

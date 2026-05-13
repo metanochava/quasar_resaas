@@ -246,17 +246,17 @@ export function resolveRoute(item, add) {
     }
   }
   if(add==0){
-    if (item.rota) {
+    if (item.route) {
       return {
-        name: item.rota,
+        name: item.route,
       }
     }
   }
   if(add==1){
 
-    if (item.add_rota) {
+    if (item.add_route) {
       return {
-        name: item.add_rota,
+        name: item.add_route,
       }
     }
   }

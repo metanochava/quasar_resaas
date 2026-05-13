@@ -18,7 +18,7 @@
       </q-item-section>
 
       <!-- ADD BUTTON -->
-      <q-item-section side v-if="item.add_rota">
+      <q-item-section side v-if="item.add_route">
         <s-btn dense flat icon="add" :to="resolveRoute(item, 1)" />
       </q-item-section>
 

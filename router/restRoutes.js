@@ -31,8 +31,8 @@ export let restRoutes = [
     } 
   },
   { 
-    path: '/rota/:rota/:id', 
-    name: 'rota_inexistente', 
+    path: '/route/:route/:id', 
+    name: 'route_inexistente', 
     component: () => import('../pages/RotaEnexistente.vue'), 
     meta: { 
       title: tdc('Rota ') + ' ' + tdc(' inexistente'), 
