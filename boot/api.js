@@ -79,10 +79,10 @@ const createClient = (auth = false, blob = false) => {
     }
 
     const headersMap = {
-      E: 'userEntity',
-      S: 'userBranch',
-      G: 'userGroup',
       ET: 'entityType',
+      E: 'userEntity',
+      B: 'userBranch',
+      G: 'userGroup',
       L: 'userLang'
     }
 
@@ -152,4 +152,4 @@ export const HTTPAuthBlob = createClient(true, true)
    WEBSOCKET URL
 ====================================================== */
 
-export const wsApi = (apiBaseUrl.replace('http', 'ws'))
+export const wsApi = apiBaseUrl.replace('http', 'ws').replace('https', 'ws')
