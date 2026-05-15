@@ -28,7 +28,7 @@
 
     <s-btn round flat>
       <q-avatar class="" size="45px" :class="$q.dark.isActive ? 'bg-white' : 'bg-white'" >
-        <img  v-if="UserPerson" :src="User?.perfil?.url" >
+        <img  v-if="UserPerson" :src="User?.profile?.url" >
         <img  v-else src="https://awsacademy.instructure.com/images/messages/avatar-50.png" >
         <q-card-actions align="center" v-if="User" flat>
           <div class="text-h6 text-gry-8 row text-center">{{User?.username}}</div>
@@ -39,7 +39,7 @@
             <q-card-actions class="text-center row" v-if="User">
               <div class=" col-12">
                 <q-avatar class="" size="120px"  >
-                  <img  v-if="User" :src="User?.perfil?.url" >
+                  <img  v-if="User" :src="User?.profile?.url" >
                   <img  v-else src="https://awsacademy.instructure.com/images/messages/avatar-50.png" >
                 </q-avatar>
               </div>
@@ -87,12 +87,12 @@
                 </q-item>
               </q-expansion-item>
 
-            <s-btn dense  flat  size="" @click="branchClosed = false" color="grey" :label="tdc(perfilSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
+            <s-btn dense  flat  size="" @click="branchClosed = false" color="grey" :label="tdc(profileSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
               <q-menu fit>
                 <q-list dense   class="rounded-borders" style="min-width: 100px" >
                   <q-item clickable v-close-popup @click="selectGroup(group)" v-ripple v-for=" group in User.Groups" :key="group.id">
                     <q-item-section>
-                      <q-item-label overline> {{ tdc(perfilSplint(group.name))}}</q-item-label>
+                      <q-item-label overline> {{ tdc(profileSplint(group.name))}}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -120,7 +120,7 @@
 
 import { defineComponent } from 'vue'
 import { HTTPAuth, url } from '../../boot/api'
-import { tdc, perfilSplint } from '../../boot/base'
+import { tdc, profileSplint } from '../../boot/base'
 import { deleteStorage, getStorage, setStorage } from '../../boot/storage'
 import { useUserStore } from '../../stores/UserStore'
 
@@ -141,7 +141,7 @@ export default defineComponent({
       branchClosed: true,
       pergunta: false,
       selectBranchModal: false,
-      perfilSplint: perfilSplint,
+      profileSplint: profileSplint,
     }
   },
 
@@ -165,7 +165,7 @@ export default defineComponent({
       if (this.User) this.User.Branch = JSON.parse(getStorage('l', 'userBranch'))
 
       this.selectBranchModal = false
-      this.getUserPerfils()
+      this.getUserProfiles()
       this.branchClosed = false
     },
 
@@ -189,11 +189,11 @@ export default defineComponent({
     },
 
     /* --------------------- GET USER PERFILS --------------------- */
-    async getUserPerfils () {
+    async getUserProfiles () {
       try {
-        await HTTPAuth.get(url({ type: 'u', url: 'saas/usuarios/' + this.User?.id + '/userPerfils/', params: {} }))
+        await HTTPAuth.get(url({ type: 'u', url: 'saas/usuarios/' + this.User?.id + '/userProfiles/', params: {} }))
           .then(res => {
-            setStorage('l', 'userPerfils', JSON.stringify(res.data))
+            setStorage('l', 'userProfiles', JSON.stringify(res.data))
 
             if (this.User) this.User.Groups = res.data
           })

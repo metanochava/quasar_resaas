@@ -51,8 +51,8 @@ export const useUserStore = createBaseStore(
 
   getters: {
     username: (state) => state.data?.username || "Guest",
-    perfil: (state) =>
-      state.data?.perfil?.url ||
+    profile: (state) =>
+      state.data?.profile?.url ||
       "https://cdn-icons-png.flaticon.com/512/149/149071.png",
     hasPermission: (state) => (perm) =>
       state.Permissions.has(String(perm).toLowerCase()),

@@ -2,7 +2,7 @@ import { createBaseStore } from '../base/base_store'
 import { HTTPAuth, HTTPClient, url } from '../boot/api'
 import { useBranchStore } from './BranchStore'
 import { useUserStore } from './UserStore'
-import { perfilSplint, tdc } from '../boot/base'
+import { profileSplint, tdc } from '../boot/base'
 import { getStorage, setStorage } from '../boot/storage'
 
 export const useEntityStore = createBaseStore(
@@ -392,7 +392,7 @@ export const useEntityStore = createBaseStore(
               return
             }
             const entitys = res.data.map(e => ({
-              label: perfilSplint(e.name),
+              label: profileSplint(e.name),
               value: e
             }))
 

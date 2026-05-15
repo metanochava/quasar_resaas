@@ -36,7 +36,7 @@
 
     <s-btn round flat>
       <q-avatar class="" size="45px" :class="$q.dark.isActive ? 'bg-white' : 'bg-white'" >
-        <img  :src="User?.perfil" >
+        <img  :src="User?.profile" >
         <q-card-actions align="center" v-if="User" flat>
           <div class="text-h6 text-gry-8 row text-center">{{User?.username}}</div>
         </q-card-actions>
@@ -46,7 +46,7 @@
             <q-card-actions class="text-center row" v-if="User">
               <div class=" col-12">
                 <q-avatar class="" size="120px"  >
-                  <img   :src="User?.perfil" >
+                  <img   :src="User?.profile" >
                 </q-avatar>
               </div>
               <div class=" text-center col-12 text-grey-9 text-h6">
@@ -91,13 +91,13 @@
                 </q-item>
               </q-expansion-item>
 
-            <s-btn dense  flat  size="" @click="branchClosed = false" color="grey" :label="tdc(perfilSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
+            <s-btn dense  flat  size="" @click="branchClosed = false" color="grey" :label="tdc(profileSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
               <q-menu fit>
                 <q-list dense   class="rounded-borders" style="min-width: 100px" >
 
                   <q-item clickable v-close-popup @click="Group.select(group)" v-ripple v-for=" group in User.Groups" :key="group.id">
                     <q-item-section>
-                      <q-item-label overline> {{ tdc(perfilSplint(group.name))}}</q-item-label>
+                      <q-item-label overline> {{ tdc(profileSplint(group.name))}}</q-item-label>
 
                     </q-item-section>
 
@@ -128,7 +128,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { perfilSplint, tdc } from '../../boot/base'
+import { profileSplint, tdc } from '../../boot/base'
 import { useUserStore } from '../../stores/UserStore'
 import { useGroupStore } from '../../stores/GroupStore'
 import { useEntityStore } from '../../stores/EntityStore'
@@ -154,7 +154,7 @@ export default defineComponent({
       entityClosed: false,
       pergunta: false,
       showRegisterEntity: false,
-      perfilSplint: perfilSplint,
+      profileSplint: profileSplint,
     }
   },
 

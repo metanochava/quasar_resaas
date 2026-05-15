@@ -3,7 +3,7 @@ import { HTTPAuth, url } from '../boot/api'
 import { getStorage, setStorage } from '../boot/storage'
 import { useUserStore} from './UserStore'
 import { useGroupStore} from './GroupStore'
-import { perfilSplint, tdc } from '../boot/base'
+import { profileSplint, tdc } from '../boot/base'
 
 
 export const useBranchStore = createBaseStore(
@@ -36,7 +36,7 @@ export const useBranchStore = createBaseStore(
               }
               const branchs = []
               res.data.forEach(element => {
-                branchs.push({ label: perfilSplint(element.name), value: element })
+                branchs.push({ label: profileSplint(element.name), value: element })
               })
               q.dialog({
                 title: tdc('Seleccione a Branch'),

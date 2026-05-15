@@ -2,7 +2,7 @@ import { createBaseStore } from '../base/base_store'
 import { HTTPAuth, url } from '../boot/api'
 import { useUserStore} from './UserStore'
 import { getStorage, setStorage } from '../boot/storage'
-import { perfilSplint, tdc } from '../boot/base'
+import { profileSplint, tdc } from '../boot/base'
 
 
 export const useGroupStore = createBaseStore(
@@ -78,7 +78,7 @@ export const useGroupStore = createBaseStore(
           }
           const groups = []
           res.data.forEach(element => {
-            groups.push({ label: perfilSplint(element.name), value: element })
+            groups.push({ label: profileSplint(element.name), value: element })
           })
           q.dialog({
             title: tdc('Seleccione o Groups'),
