@@ -5,7 +5,7 @@ import { useLoadStore } from '../stores/LoadStore';
 import { Alert } from './alerts'
 
 const apiPrefix = process.env.API_PREFIX
-const apiBaseUrl = process.env.API + '/' + apiPrefix + '/'
+const apiBaseUrl = process.env.API + '/' + apiPrefix 
 
 
 const safeParse = (value) => {
