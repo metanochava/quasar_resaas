@@ -31,6 +31,8 @@ export function createBaseStore(name, config, extend = {}) {
         loading: false,
         saving: false,
 
+
+        _schemaLoaded: false,
         fields: [],
         rows: [],
         row: null,
@@ -96,7 +98,7 @@ export function createBaseStore(name, config, extend = {}) {
 
         await this.runHook('beforeInit')
 
-        await this.loadSchema()
+        await this.loadSchemaOnce()
         await this.loadData()
 
         await this.runHook('afterInit')
@@ -120,6 +122,13 @@ export function createBaseStore(name, config, extend = {}) {
         this.config = rsp?.config || {}
 
         await this.runHook('afterSchema', this.fields)
+      },
+
+      async loadSchemaOnce() {
+        if (this._schemaLoaded) return
+
+        await this.loadSchema()
+        this._schemaLoaded = true
       },
 
       // =========================
