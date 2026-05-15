@@ -863,22 +863,22 @@ export default {
         ...this.form,
         fields: this.normalizeFields(this.form.fields)
       }
-      const {data} = await HTTPAuth.post('django_resaas/scaffolds/', payload)
+      const {data} = await HTTPAuth.post( url({ type: 'u', url: 'django_resaas/scaffolds/', params: {} }), payload)
       this.out = data.out
     },
 
     async loadApps() {
-      const {data} = await HTTPAuth.get('django_resaas/resaasapps/')
+      const {data} = await HTTPAuth.get( url({ type: 'u', url: `django_resaas/resaasapps/${app}/`, params: {} }))
       this.apps = data.apps
     },
 
     async loadModelsRelation(f){
-      const {data} = await HTTPAuth.get('django_resaas/resaasapps/'+ f.relApp)
+      const {data} = await HTTPAuth.get( url({ type: 'u', url: 'django_resaas/resaasapps/'+ f.relApp, params: {} }))
       f.models = data.models
     },
 
     async loadModelsSchema(f){
-      const {data} = await HTTPAuth.get('django_resaas/resaasapps/'+ f)
+      const {data} = await HTTPAuth.get( url({ type: 'u', url: 'django_resaas/resaasapps/'+ f, params: {} }))
       this.models = data.models
       this.accaoTeste = false
     },

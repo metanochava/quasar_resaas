@@ -107,7 +107,7 @@
 import { ref, onMounted } from 'vue'
 import { Notify, Dialog } from 'quasar'
 import { useRouter } from 'vue-router'
-import { HTTPAuth } from '../../boot/api'
+import { HTTPAuth, url } from '../../boot/api'
 import { useUserStore } from '../../stores/UserStore'
 
 // ---------------- STATE ----------------
@@ -121,7 +121,7 @@ const apps = ref([])
 // ---------------- LOAD ----------------
 async function loadApps () {
   try {
-    const { data } = await HTTPAuth.get('/api/django_resaas/resaasapps/')
+    const { data } = await HTTPAuth.get(url({ type: 'u', url: 'django_resaas/resaasapps/', params: {} }))
     apps.value = data?.apps || []
   } catch (e) {
     console.error(e)
@@ -136,7 +136,7 @@ async function createApp () {
   const appName = name.value.trim()
 
   try {
-    await HTTPAuth.post('/api/django_resaas/resaasapps/', {
+    await HTTPAuth.post(url({ type: 'u', url: 'django_resaas/resaasapps/', params: {} }), {
       name: appName
     }) 
 
@@ -169,7 +169,7 @@ async function deleteApp(app) {
   apps.value = apps.value.filter(a => a.name !== app)
 
   try {
-    await HTTPAuth.delete(`/api/django_resaas/resaasapps/${app}/`)
+    await HTTPAuth.delete(url({ type: 'u', url: `django_resaas/resaasapps/${app}/`, params: {} }))
     const User = useUserStore()
     await User.getMenus()
 
