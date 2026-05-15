@@ -125,10 +125,11 @@ export function createBaseStore(name, config, extend = {}) {
       },
 
       async loadSchemaOnce() {
-        if (this._schemaLoaded) return
+        if (!this._schemaLoaded) {
+          await this.loadSchema()
+          this._schemaLoaded = true
+        }
 
-        await this.loadSchema()
-        this._schemaLoaded = true
       },
 
       // =========================
