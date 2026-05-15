@@ -69,7 +69,7 @@ export const useUserStore = createBaseStore(
 
   actions: {
     async getMenus () {
-      await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + this.data.id + '/menus/', params: {} }))
+      await HTTPAuth.get(url({ type: 'u', url: 'django_resaas/users/' + this.data.id + '/menus/', params: {} }))
         .then(res => {
           this.AllMenus = res.data
           this.Menus = this.AllMenus
@@ -115,7 +115,7 @@ export const useUserStore = createBaseStore(
       this.loading = true
       this.loginMsg  = ''
       this.access = ''
-      const rsp = await HTTPClient.post(url({type: "u", url: "api/login/", params: {}}), data )
+      const rsp = await HTTPClient.post(url({type: "u", url: "login/", params: {}}), data )
       .then(async res => {
         this.loading = false
         this.data = res.data
@@ -142,7 +142,7 @@ export const useUserStore = createBaseStore(
     },
 
     async me() {
-      const rsp = await HTTPAuth.get(url({type: "u", url: "api/me", params: {}}) )
+      const rsp = await HTTPAuth.get(url({type: "u", url: "me", params: {}}) )
 
       this.data = rsp.data
       const Language = useLanguageStore()
@@ -154,7 +154,7 @@ export const useUserStore = createBaseStore(
 
     async refreshToken() {
       const data = {refresh: this.refresh }
-      const rsp = await HTTPAuth.post(url({type: "u", url: "api/refresh_token/", params: {}}), data )
+      const rsp = await HTTPAuth.post(url({type: "u", url: "refresh_token/", params: {}}), data )
       this.access = rsp.data.access
       setStorage('l', 'access', this.access,  365)
       return rsp
@@ -162,13 +162,13 @@ export const useUserStore = createBaseStore(
 
     async change_password_email(email, antiga, nova) {
       const data = { email: email, password: antiga, passwordNova: nova }
-      const rsp = await HTTPAuth.post(url({type: "u", url: "api/change_password_email/", params: {}}), data )
+      const rsp = await HTTPAuth.post(url({type: "u", url: "change_password_email/", params: {}}), data )
       return rsp
     },
 
     async change_password_numero(mobile, otp, nova) {
       const data = { mobile: mobile, otp: otp, password: nova }
-      const rsp = await HTTPAuth.post(url({type: "u", url: "api/change_password_email/", params: {}}), data )
+      const rsp = await HTTPAuth.post(url({type: "u", url: "change_password_email/", params: {}}), data )
       return rsp
     },
 
@@ -220,7 +220,7 @@ export const useUserStore = createBaseStore(
         return
       }
 
-      const rsp = await HTTPAuth.post(url({type: "u", url: "api/logout/", params: {}}), {refresh: this.refresh} )
+      const rsp = await HTTPAuth.post(url({type: "u", url: "logout/", params: {}}), {refresh: this.refresh} )
       .then(res => {
         this.data = null
         this.refresh = null

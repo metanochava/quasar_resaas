@@ -1,16 +1,16 @@
 <template>
   <q-page class="q-pa-sm ">
     <!-- FORM -->
+    <div v-if="Branch.loading" class="flex flex-center q-pa-lg">
+      <q-spinner size="40px" color="primary" />
+    </div>
     <FormTwo
-      v-if="ready"
-      :store="Entity"
+      v-else
+      :store="Branch"
       :ignore-fields="ignoreFields"
       @saved="onSaved"
     />
 
-    <div v-if="!ready" class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
-    </div>
   </q-page>
 </template>
 
@@ -18,14 +18,14 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntityStore } from '../../stores/EntityStore'
+import { useBranchStore } from '../../stores/BranchStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const Entity = useEntityStore()
+const Branch = useBranchStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
@@ -50,18 +50,18 @@ async function load(id) {
 
   if (!id) {
 
-    Entity.resetForm?.()
+    Branch.resetForm?.()
     return
   }
 
 
   // 🔥 evita chamadas duplicadas com comparação segura
-  if (String(Entity.row?.id) === String(id)) {
-    Entity.form = Entity.row 
+  if (String(Branch.row?.id) === String(id)) {
+    Branch.form = Branch.row 
     return
   }
 
-  Entity.row =  await Entity.getById(id)
+  Branch.row =  await Branch.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -69,7 +69,7 @@ async function init() {
   try {
     ready.value = false
 
-    await Entity.init()
+    await Branch.init()
 
     const id = route.params.id
     await load(id)

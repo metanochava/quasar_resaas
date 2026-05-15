@@ -2,7 +2,7 @@
   <q-page class="q-pa-md">
 
     <!-- LOADING -->
-    <div v-if="loading" class="flex flex-center q-pa-lg">
+    <div v-if="store.loading" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
     </div>
 

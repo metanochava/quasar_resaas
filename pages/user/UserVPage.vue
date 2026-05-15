@@ -1,9 +1,12 @@
 <template>
   <div class="q-pa-sm">
     <!-- FORM -->
+    <div v-if="User.loading" class="flex flex-center q-pa-lg">
+      <q-spinner size="40px" color="primary" />
+    </div>
     <FormTwo
-      v-if="ready"
-      :store="Entity"
+      v-else
+      :store="User"
       :ignore-fields="[
         'id',
         'created_at',
@@ -15,11 +18,6 @@
 
       @saved="onSaved"
     />
-
-
-    <div v-if="!ready" class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
-    </div>
   </div>
 </template>
 
@@ -27,14 +25,14 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntityStore } from '../../stores/EntityStore'
+import { useUserStore } from '../../stores/UserStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const Entity = useEntityStore()
+const User = useUserStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
@@ -52,18 +50,18 @@ async function load(id) {
 
   if (!id) {
 
-    Entity.resetForm?.()
+    User.resetForm?.()
     return
   }
 
 
   // 🔥 evita chamadas duplicadas com comparação segura
-  if (String(Entity.row?.id) === String(id)) {
-    Entity.form = Entity.row 
+  if (String(User.row?.id) === String(id)) {
+    User.form = User.row 
     return
   }
 
-  Entity.row =  await Entity.getById(id)
+  User.row =  await User.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -71,7 +69,7 @@ async function init() {
   try {
     ready.value = false
 
-    await Entity.init()
+    await User.init()
 
     const id = route.params.id
     await load(id)

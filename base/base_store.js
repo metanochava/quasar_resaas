@@ -6,7 +6,7 @@ export function createBaseStore(name, config, extend = {}) {
 
   // 🔥 CONFIG IMUTÁVEL (NUNCA MUDA)
   const BASE_CONFIG = Object.freeze({
-    url: 'api/' + config.app + '/' + config.model.toLowerCase() + 's',
+    url: '' + config.app + '/' + config.model.toLowerCase() + 's',
     app: config.app,
     model: config.model
   })
@@ -29,6 +29,7 @@ export function createBaseStore(name, config, extend = {}) {
         model: BASE_CONFIG.model,
 
         loading: false,
+        saving: false,
 
         fields: [],
         rows: [],
@@ -228,7 +229,7 @@ export function createBaseStore(name, config, extend = {}) {
 
         await this.runHook('beforeUpdate', this.form)
 
-        this.loading = true
+        this.saving = true
 
         try {
           const { data } = await HTTPAuth.put(
@@ -247,7 +248,7 @@ export function createBaseStore(name, config, extend = {}) {
           return data
 
         } finally {
-          this.loading = false
+          this.saving = false
         }
       },
 
@@ -262,7 +263,7 @@ export function createBaseStore(name, config, extend = {}) {
 
         await this.runHook('beforeDelete', id)
 
-        this.loading = true
+        this.saving = true
 
         try {
           await HTTPAuth.delete(
@@ -276,7 +277,7 @@ export function createBaseStore(name, config, extend = {}) {
           await this.runHook('afterDelete', id)
 
         } finally {
-          this.loading = false
+          this.saving = false
         }
       },
 

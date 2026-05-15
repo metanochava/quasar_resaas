@@ -4,7 +4,9 @@ import {useUserStore } from '../stores/UserStore'
 import { useLoadStore } from '../stores/LoadStore';
 import { Alert } from './alerts'
 
-const apiBaseUrl = process.env.API
+const apiPrefix = process.env.API_PREFIX
+const apiBaseUrl = process.env.API + '/' + apiPrefix + '/'
+
 
 const safeParse = (value) => {
   try {

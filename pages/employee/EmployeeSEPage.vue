@@ -4,34 +4,33 @@
 
 
       <q-dialog v-model="openGroups" persistent full-height full-width>
-        <GroupManager  :entityId="Entity.form?.id" />
+        <GroupManager  :entityId="Employee.form?.id" />
       </q-dialog>
 
     <!-- FORM -->
+    <div v-if="Employee.loading" class="flex flex-center q-pa-lg">
+      <q-spinner size="40px" color="primary" />
+    </div>
     <FormTwo
-      v-if="ready"
-      :store="Entity"
+      v-else
+      :store="Employee"
       :can-do="canDo"
       :ignore-fields="ignoreFields"
       @saved="onSaved"
     >
 
-      <template #right v-if="Entity.form?.id">
+      <template #right v-if="Employee.form?.id">
           <s-card class="q-pa-0 q-gutter-sm " flat>
             <s-btn @click="openGroups = !openGroups" label="Groups" color="primary" class="full-width" />
           </s-card>
         </template>
 
-        <template #footer v-if="Entity.form?.id">
+        <template #footer v-if="Employee.form?.id">
           
         </template>
 
     </FormTwo>
  
-
-    <div v-if="!ready" class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
-    </div>
   </q-page>
 </template>
 
@@ -39,19 +38,19 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntityStore } from '../../stores/EntityStore'
+import { useEmployeeStore } from '../../stores/EmployeeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 
 
-import GroupManager from '../group/GroupManagerEntity.vue'
+import GroupManager from '../group/GroupManagerEmployee.vue'
 
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const Entity = useEntityStore()
+const Employee = useEmployeeStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
@@ -76,17 +75,17 @@ async function load(id) {
 
   if (!id) {
 
-    Entity.resetForm?.()
+    Employee.resetForm?.()
     return
   }
 
   // 🔥 evita chamadas duplicadas com comparação segura
-  if (String(Entity.row?.id) === String(id)) {
-    Entity.form = Entity.row 
+  if (String(Employee.row?.id) === String(id)) {
+    Employee.form = Employee.row 
     return
   }
 
-  Entity.row =  await Entity.getById(id)
+  Employee.row =  await Employee.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -94,7 +93,7 @@ async function init() {
   try {
     ready.value = false
 
-    await Entity.init()
+    await Employee.init()
 
     const id = route.params.id
     await load(id)

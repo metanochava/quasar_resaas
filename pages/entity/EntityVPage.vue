@@ -1,17 +1,15 @@
 <template>
   <div class="q-pa-sm">
     <!-- FORM -->
+    <div v-if="Entity.loading" class="flex flex-center q-pa-lg">
+      <q-spinner size="40px" color="primary" />
+    </div>
     <FormTwo
-      v-if="ready"
+      v-else
       :store="Entity"
       :ignore-fields="ignoreFields"
       @saved="onSaved"
     />
-
-
-    <div v-if="!ready" class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
-    </div>
   </div>
 </template>
 

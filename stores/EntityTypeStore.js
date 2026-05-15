@@ -99,11 +99,11 @@ export const useEntityTypeStore = createBaseStore(
           const [all, selected] = await Promise.all([
             HTTPClient.get(url({
               type: 'u',
-              url: 'api/django_resaas/apps/'
+              url: 'django_resaas/apps/'
             })),
             HTTPClient.get(url({
               type: 'u',
-              url: `api/django_resaas/entitytypes/${id}/apps/`
+              url: `django_resaas/entitytypes/${id}/apps/`
             }))
           ])
 
@@ -129,7 +129,7 @@ export const useEntityTypeStore = createBaseStore(
         await HTTPClient.post(
           url({
             type: 'u',
-            url: `api/django_resaas/entitytypes/${id}/${endpoint}/`
+            url: `django_resaas/entitytypes/${id}/${endpoint}/`
           }),
           { id: app.id }
         )
@@ -154,8 +154,8 @@ export const useEntityTypeStore = createBaseStore(
           this.models.loadingModels = true
 
           const [all, selected] = await Promise.all([
-            HTTPClient.get(url({ type: 'u', url: 'api/django_resaas/models', params: {"entitytype" : this.row?.id} })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/entitytypes/${id}/models` }))
+            HTTPClient.get(url({ type: 'u', url: 'django_resaas/models', params: {"entitytype" : this.row?.id} })),
+            HTTPClient.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/models` }))
           ])
 
           this.models.models = all.data || []
@@ -206,7 +206,7 @@ export const useEntityTypeStore = createBaseStore(
 
           await HTTPClient.post(url({
             type: 'u',
-            url: `api/django_resaas/entitytypes/${id}/syncModels/`
+            url: `django_resaas/entitytypes/${id}/syncModels/`
           }), {
             ids: this.models.selected.map(i => i.id)
           })
@@ -232,11 +232,11 @@ export const useEntityTypeStore = createBaseStore(
           const [all, selected] = await Promise.all([
             HTTPClient.get(url({
               type: 'u',
-              url: 'api/auth/groups/'
+              url: 'auth/groups/'
             })),
             HTTPClient.get(url({
               type: 'u',
-              url: `api/django_resaas/entitytypes/${id}/groups/`
+              url: `django_resaas/entitytypes/${id}/groups/`
             }))
           ])
 
@@ -274,7 +274,7 @@ export const useEntityTypeStore = createBaseStore(
           await HTTPClient.post(
             url({
               type: 'u',
-              url: `api/django_resaas/entitytypes/${id}/${endpoint}/`
+              url: `django_resaas/entitytypes/${id}/${endpoint}/`
             }),
             { group: group.id }
           )
@@ -305,7 +305,7 @@ export const useEntityTypeStore = createBaseStore(
           const res = await HTTPClient.post(
             url({
               type: 'u',
-              url: `api/django_resaas/entitytypes/${id}/createGroup/`
+              url: `django_resaas/entitytypes/${id}/createGroup/`
             }),
             { name: cleanName }
           )
@@ -333,7 +333,7 @@ export const useEntityTypeStore = createBaseStore(
       async getEntityTypes() {
         try {
           const { data } = await HTTPClient.get(
-            url({ type: "u", url: "api/django_resaas/entitytypes" })
+            url({ type: "u", url: "django_resaas/entitytypes" })
           )
 
           this.rows = data || []
@@ -354,10 +354,10 @@ export const useEntityTypeStore = createBaseStore(
           if (!getStorage('l', 'userEntityType')) return
 
           const [theme, layout, typography, animation] = await Promise.all([
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/entitytypes/${id}/themeGet/` })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/entitytypes/${id}/layoutSettingsGet/` })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/entitytypes/${id}/typographyGet/` })),
-            HTTPClient.get(url({ type: 'u', url: `api/django_resaas/entitytypes/${id}/animationSettingsGet/` }))
+            HTTPClient.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/themeGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/layoutSettingsGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/typographyGet/` })),
+            HTTPClient.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/animationSettingsGet/` }))
           ])
 
           this.Theme = theme.data || {}

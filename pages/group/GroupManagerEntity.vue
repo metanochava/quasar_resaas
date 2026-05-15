@@ -221,7 +221,7 @@ async function openPermissions(group) {
   await Group.getById(group.id)
  console.log(Entity)
   const { data } = await HTTPAuth.get(
-    url({ type: 'u', url: 'api/django_resaas/entitytypes/'+ Entity.form.entity_type.id + '/permissions' })
+    url({ type: 'u', url: 'django_resaas/entitytypes/'+ Entity.form.entity_type.id + '/permissions' })
   )
 
   permissions.value = data || []

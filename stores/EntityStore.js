@@ -62,7 +62,7 @@ export const useEntityStore = createBaseStore(
       async getSettings() {
         const User = useUserStore()
         try {
-          const { data } = await HTTPClient.get(url({ type: "u", url: "api/site" }))
+          const { data } = await HTTPClient.get(url({ type: "u", url: "site" }))
 
           this.Theme = data.theme || {}
           this.LayoutSettings = data.layout_settings || {}
@@ -96,11 +96,11 @@ export const useEntityStore = createBaseStore(
                 const [all, selected] = await Promise.all([
                   HTTPClient.get(url({
                     type: 'u',
-                    url: `api/django_resaas/entitytypes/${this.row?.entity_type?.id}/groups/`
+                    url: `django_resaas/entitytypes/${this.row?.entity_type?.id}/groups/`
                   })),
                   HTTPClient.get(url({
                     type: 'u',
-                    url: `api/django_resaas/entitys/${id}/groups/`
+                    url: `django_resaas/entitys/${id}/groups/`
                   }))
                 ])
       
@@ -139,7 +139,7 @@ export const useEntityStore = createBaseStore(
                 await HTTPClient.post(
                   url({
                     type: 'u',
-                    url: `api/django_resaas/entitys/${id}/${endpoint}/`
+                    url: `django_resaas/entitys/${id}/${endpoint}/`
                   }),
                   { group: group.id }
                 )
@@ -170,7 +170,7 @@ export const useEntityStore = createBaseStore(
                 const res = await HTTPClient.post(
                   url({
                     type: 'u',
-                    url: `api/django_resaas/entitys/${id}/createGroup/`
+                    url: `django_resaas/entitys/${id}/createGroup/`
                   }),
                   { name: cleanName }
                 )
@@ -202,7 +202,7 @@ export const useEntityStore = createBaseStore(
           if (!id) return
 
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `api/django_resaas/entitys/${id}/models` })
+            url({ type: 'u', url: `django_resaas/entitys/${id}/models` })
           )
 
           this.Modelos = data || []
@@ -226,7 +226,7 @@ export const useEntityStore = createBaseStore(
           if (!id) return
 
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `api/django_resaas/entitys/${id}/apps/` })
+            url({ type: 'u', url: `django_resaas/entitys/${id}/apps/` })
           )
 
           this.Apps = data || []
@@ -252,10 +252,10 @@ export const useEntityStore = createBaseStore(
           if (!id) return
 
           const [theme, layout, typography, animation] = await Promise.all([
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/themeGet/` })),
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/layoutSettingsGet/` })),
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/typographyGet/` })),
-            HTTPAuth.get(url({ type: 'u', url: `api/django_resaas/entitys/${id}/animationSettingsGet/` }))
+            HTTPAuth.get(url({ type: 'u', url: `django_resaas/entitys/${id}/themeGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `django_resaas/entitys/${id}/layoutSettingsGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `django_resaas/entitys/${id}/typographyGet/` })),
+            HTTPAuth.get(url({ type: 'u', url: `django_resaas/entitys/${id}/animationSettingsGet/` }))
           ])
 
           this.Theme = theme.data || {}
@@ -294,7 +294,7 @@ export const useEntityStore = createBaseStore(
 
         try {
           const { data } = await HTTPAuth.get(
-            url({ type: 'u', url: `api/django_resaas/users/${userId}/userEntitys/` })
+            url({ type: 'u', url: `django_resaas/users/${userId}/userEntitys/` })
           )
 
           this.userEntitys = data || []
@@ -331,7 +331,7 @@ export const useEntityStore = createBaseStore(
         if (!User.Entity?.id) return
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/resaasapps/` })
+          url({ type: 'u', url: `django_resaas/entitys/${User.Entity.id}/resaasapps/` })
         )
 
         this.Apps = data || []
@@ -342,7 +342,7 @@ export const useEntityStore = createBaseStore(
         if (!User.Entity?.id) return
 
         const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `api/django_resaas/entitys/${User.Entity.id}/models` })
+          url({ type: 'u', url: `django_resaas/entitys/${User.Entity.id}/models` })
         )
 
         this.Modelos = data || []
@@ -375,7 +375,7 @@ export const useEntityStore = createBaseStore(
           const res = await HTTPAuth.get(
             url({
               type: 'u',
-              url: `api/django_resaas/users/${UserId}/userEntitys/`,
+              url: `django_resaas/users/${UserId}/userEntitys/`,
               params: {}
             })
           )

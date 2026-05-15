@@ -817,7 +817,7 @@ export default {
         fields: this.normalizeFields(this.form.fields),
         actions: this.form.actions,
       }
-      const { data } = await HTTPAuth.post('api/django_resaas/scaffolds/preview/', payload)
+      const { data } = await HTTPAuth.post('django_resaas/scaffolds/preview/', payload)
 
       this.preview = data.data || data || {
         model:'',
@@ -831,7 +831,7 @@ export default {
       const payload = {
         app: this.form.app,
       }
-      const { data } = await HTTPAuth.post('api/django_resaas/scaffolds/migrate/', payload)
+      const { data } = await HTTPAuth.post('django_resaas/scaffolds/migrate/', payload)
       this.out = data.out 
     },
 
@@ -842,7 +842,7 @@ export default {
         model: this.form.model,
         actions: this.form.actions,
       }
-      const { data } = await HTTPAuth.post('api/django_resaas/scaffolds/permissions/', payload)
+      const { data } = await HTTPAuth.post('django_resaas/scaffolds/permissions/', payload)
       this.out = data.out 
     },
 
@@ -863,22 +863,22 @@ export default {
         ...this.form,
         fields: this.normalizeFields(this.form.fields)
       }
-      const {data} = await HTTPAuth.post('api/django_resaas/scaffolds/', payload)
+      const {data} = await HTTPAuth.post('django_resaas/scaffolds/', payload)
       this.out = data.out
     },
 
     async loadApps() {
-      const {data} = await HTTPAuth.get('api/django_resaas/resaasapps/')
+      const {data} = await HTTPAuth.get('django_resaas/resaasapps/')
       this.apps = data.apps
     },
 
     async loadModelsRelation(f){
-      const {data} = await HTTPAuth.get('api/django_resaas/resaasapps/'+ f.relApp)
+      const {data} = await HTTPAuth.get('django_resaas/resaasapps/'+ f.relApp)
       f.models = data.models
     },
 
     async loadModelsSchema(f){
-      const {data} = await HTTPAuth.get('api/django_resaas/resaasapps/'+ f)
+      const {data} = await HTTPAuth.get('django_resaas/resaasapps/'+ f)
       this.models = data.models
       this.accaoTeste = false
     },

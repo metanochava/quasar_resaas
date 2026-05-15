@@ -1,8 +1,11 @@
 <template>
   <q-page class="q-pa-sm">
     <!-- FORM -->
+    <div v-if="Permission.loading" class="flex flex-center q-pa-lg">
+      <q-spinner size="40px" color="primary" />
+    </div>
     <FormTwo
-      v-if="ready"
+      v-else
       :store="Permission"
 
       :ignore-fields="ignoreFields"

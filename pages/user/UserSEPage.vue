@@ -1,18 +1,15 @@
 <template>
   <q-page class="q-pa-sm">
     <!-- FORM -->
-    <FormTwo
-      v-if="ready"
-      :store="User"
-
-      :ignore-fields="ignoreFields"
-
-      @saved="onSaved"
-    />
-    
-    <div v-if="!ready" class="flex flex-center q-pa-lg">
+    <div v-if="User.loading" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
     </div>
+    <FormTwo
+      v-else
+      :store="User"
+      :ignore-fields="ignoreFields"
+      @saved="onSaved"
+    />
   </q-page >
 </template>
 

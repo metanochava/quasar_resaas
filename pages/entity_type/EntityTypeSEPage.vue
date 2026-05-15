@@ -17,8 +17,11 @@
 
     <div class="col overflow-hidden">
 
+      <div v-if="EntityType.loading" class="flex flex-center q-pa-lg">
+        <q-spinner size="40px" color="primary" />
+      </div>
       <FormTwo
-        v-if="ready"
+        v-else
         class="full-height"
         :store="EntityType" 
         :ignore-fields="ignoreFields"
@@ -46,10 +49,6 @@
 
       </FormTwo>
 
-    </div>
-
-    <div v-if="!ready" class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
     </div>
 
   </q-page>

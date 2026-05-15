@@ -235,7 +235,7 @@ export default defineComponent({
     async getEntityApps () {
       if (getStorage('l', 'userEntity') !== null) {
         try {
-          await HTTPAuth.get(url({ type: 'u', url: 'api/entitys/' + this.User?.Entity.id + '/resaasapps/', params: {} }))
+          await HTTPAuth.get(url({ type: 'u', url: 'entitys/' + this.User?.Entity.id + '/resaasapps/', params: {} }))
             .then(res => {
               setStorage('l', 'entityApps', JSON.stringify(res.data))
 

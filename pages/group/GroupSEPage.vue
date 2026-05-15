@@ -2,8 +2,11 @@
   <q-page class="q-pa-sm">
 
     <!-- FORM -->
+    <div v-if="Group.loading" class="flex flex-center q-pa-lg">
+      <q-spinner size="40px" color="primary" />
+    </div>
     <FormTwo
-      v-if="ready"
+      v-else
       :store="Group"
       :ignore-fields="ignoreFields"
       @saved="onSaved"
@@ -27,10 +30,6 @@
       </template>
 
     </FormTwo>
-
-    <div v-if="!ready" class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
-    </div>
 
   </q-page>
 </template>
@@ -92,7 +91,7 @@ async function init() {
 
     // 🔥 PRIMEIRO: buscar permissões
     const { data: all } = await HTTPAuth.get(
-      url({ type: 'u', url: 'api/auth/permissions/' })
+      url({ type: 'u', url: 'auth/permissions/' })
     )
 
     permissions.value = all || []

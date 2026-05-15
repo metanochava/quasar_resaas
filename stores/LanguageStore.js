@@ -28,7 +28,7 @@ export const useLanguageStore = createBaseStore(
         const res = await HTTPClient.get(
           url({
             type: "u",
-            url: `api/django_resaas/languages/${language?.id}/translations`,
+            url: `django_resaas/languages/${language?.id}/translations`,
             params: {}
           })
         )
@@ -58,7 +58,7 @@ export const useLanguageStore = createBaseStore(
     },
 
     async get() {
-      await HTTPClient.get(url({type: "u", url: "api/django_resaas/languages", params: {}}) )
+      await HTTPClient.get(url({type: "u", url: "django_resaas/languages", params: {}}) )
       .then(res => {
         this.rows = res.data.results || res.data
         this.current = this.rows[0]

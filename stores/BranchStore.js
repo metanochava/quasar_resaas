@@ -22,7 +22,7 @@ export const useBranchStore = createBaseStore(
 
       async getUserBranchs_ (q) {
         const User = useUserStore()
-        await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + User.data?.id + '/userBranchs/', params: { } }))
+        await HTTPAuth.get(url({ type: 'u', url: 'django_resaas/users/' + User.data?.id + '/userBranchs/', params: { } }))
           .then(async res => {
             setStorage('l', 'userBranchs', JSON.stringify(res.data))
 
@@ -78,7 +78,7 @@ export const useBranchStore = createBaseStore(
       async getUserBranchs() {
         const User = useUserStore()
         if (getStorage('l', 'userEntity') !== null) {
-          const rsp = await HTTPAuth.get(url({ type: 'u', url: 'api/django_resaas/users/' + User.data?.id + '/userBranchs/', params: { } }))
+          const rsp = await HTTPAuth.get(url({ type: 'u', url: 'django_resaas/users/' + User.data?.id + '/userBranchs/', params: { } }))
             .then(res => {
               this.row = {}
               setStorage('l', 'userBranch', JSON.stringify({}))

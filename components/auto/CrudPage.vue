@@ -88,7 +88,7 @@ const models = ref([])
 // carregar módulos
 async function loadApps() {
   const { data } = await HTTPAuth.get(
-    url({ type: 'u', url: 'api/django_resaas/resaasapps/', params: {} })
+    url({ type: 'u', url: 'django_resaas/resaasapps/', params: {} })
   )
   apps.value = data.apps
 }
@@ -100,7 +100,7 @@ async function loadModelsRelation() {
   const { data } = await HTTPAuth.get(
     url({
       type: 'u',
-      url: 'api/django_resaas/resaasapps/' + app.value,
+      url: 'django_resaas/resaasapps/' + app.value,
       params: {}
     })
   )
