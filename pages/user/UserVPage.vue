@@ -3,12 +3,7 @@
     <!-- FORM -->
     <FormTwo
       v-if="ready"
-      :schema="Entity.fields"
-      :app="Entity.app"
-      :model="Entity.model"
-      :config="Entity.config"
-      :actions="Entity.actions"
-      :can-do="canDo"
+      :store="Entity"
       :ignore-fields="[
         'id',
         'created_at',
@@ -17,7 +12,7 @@
         'updated_by',
         'deleted_at'
       ]"
-      :data="Entity.form"
+
       @saved="onSaved"
     />
 

@@ -3,14 +3,10 @@
     <!-- FORM -->
     <FormTwo
       v-if="ready"
-      :schema="User.fields"
-      :app="User.app"
-      :model="User.model"
-      :config="User.config"
-      :actions="User.actions"
-      :can-do="canDo"
+      :store="User"
+
       :ignore-fields="ignoreFields"
-      :data="User.form"
+
       @saved="onSaved"
     />
     

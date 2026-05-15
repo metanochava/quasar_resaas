@@ -3,14 +3,10 @@
     <!-- FORM -->
     <FormTwo
       v-if="ready"
-      :schema="Permission.fields"
-      :app="Permission.app"
-      :model="Permission.model"
-      :config="Permission.config"
-      :actions="Permission.actions"
-      :can-do="canDo"
+      :store="Permission"
+
       :ignore-fields="ignoreFields"
-      :data="Permission.form"
+
       @saved="onSaved"
     />
 

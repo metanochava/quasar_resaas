@@ -10,14 +10,9 @@
     <!-- FORM -->
     <FormTwo
       v-if="ready"
-      :schema="Entity.fields"
-      :app="Entity.app"
-      :model="Entity.model"
-      :config="Entity.config"
-      :actions="Entity.actions"
+      :store="Entity"
       :can-do="canDo"
       :ignore-fields="ignoreFields"
-      :data="Entity.form"
       @saved="onSaved"
     >
 

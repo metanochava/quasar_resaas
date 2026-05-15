@@ -8,10 +8,13 @@ const router = useRouter()
 const slots = useSlots()
 
 const props = defineProps({
+  store: { type: Object, default: null },
   schema: { type: Array, default: () => [] },
   app: { type: String, required: true },
   model: { type: String, required: true },
   data: { type: Object, default: null },
+
+  externalSave: { type: Boolean, default: false },
 
   canDo: { type: Function, default: null },
   ignoreFields: { type: Array, default: () => [] },
@@ -20,6 +23,8 @@ const props = defineProps({
   leftCol: { type: String, default: 'col-3' },
   centerCol: { type: String, default: 'col' },
   rightCol: { type: String, default: 'col-4' }
+
+
 })
 
 const formRef = ref(null)
@@ -49,7 +54,11 @@ const centerClass = computed(() => {
 })
 
 function save() {
-  formRef.value?.save()
+  if (props.externalSave) {
+    emit('save') // BaseFormPage controla
+  } else {
+    formRef.value?.save() // modo standalone
+  }
 }
 
 function goBack() {
@@ -65,8 +74,8 @@ function goBack() {
 
       <div class="text-h5 text-weight-bold">
         {{ isEdit
-          ? tdc('Editar') + ' ' + tdc(model)
-          : tdc('Novo') + ' ' + tdc(model)
+          ? tdc('Editar') + ' ' + tdc(store.model || model)
+          : tdc('Novo') + ' ' + tdc(store.model || model)
         }}
       </div>
 
@@ -117,11 +126,11 @@ function goBack() {
           <Form
             v-else
             ref="formRef"
-            :schema="schema"
-            :app="app"
-            :model="model"
-            :data="data"
-            :can-do="canDo"
+            :schema="store.fields || schema"
+            :app="store.app || app"
+            :model="store.model || model"
+            :data="store.form || data"
+            :can-do="User.can"
             :ignore-fields="ignoreFields"
             @saved="goBack"
           />

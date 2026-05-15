@@ -3,14 +3,8 @@
     <!-- FORM -->
     <FormTwo
       v-if="ready"
-      :schema="Group.fields"
-      :app="Group.app"
-      :model="Group.model"
-      :config="Group.config"
-      :actions="Group.actions"
-      :can-do="canDo"
+      :store="Group"
       :ignore-fields="ignoreFields"
-      :data="Group.form"
       @saved="onSaved"
     />
 

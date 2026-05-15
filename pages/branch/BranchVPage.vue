@@ -3,14 +3,8 @@
     <!-- FORM -->
     <FormTwo
       v-if="ready"
-      :schema="Entity.fields"
-      :app="Entity.app"
-      :model="Entity.model"
-      :config="Entity.config"
-      :actions="Entity.actions"
-      :can-do="canDo"
+      :schema="Entity"
       :ignore-fields="ignoreFields"
-      :data="Entity.form"
       @saved="onSaved"
     />
 
