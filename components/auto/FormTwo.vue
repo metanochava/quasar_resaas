@@ -3,9 +3,12 @@ import { ref, computed, useSlots } from 'vue'
 import { useRouter } from 'vue-router'
 import { tdc } from '../../boot/base'
 import Form from '../engine/FormComponent.vue'
+import { useUserStore } from '../../stores/UserStore'
 
 const router = useRouter()
 const slots = useSlots()
+
+cont User = useUserStore()
 
 const props = defineProps({
   store: { type: Object, default: null },
