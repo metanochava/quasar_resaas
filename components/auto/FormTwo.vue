@@ -102,8 +102,8 @@ function goBack() {
         @click="save"
       />
 
-      <q-separator />
     </q-card-actions>
+    <q-separator v-if="!hasHeader" />
 
 
 
@@ -151,9 +151,10 @@ function goBack() {
     
 
     <!-- ================= FOOTER FIXO ================= -->
+    <q-separator v-if="!hasFooter" />
     
     <q-card-actions v-if="!hasFooter" align="right" class="q-pa-md">
-      <q-separator />
+      
 
       <s-btn
         flat
