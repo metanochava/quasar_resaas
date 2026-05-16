@@ -24,7 +24,7 @@ const props = defineProps({
 
 const formRef = ref(null)
 
-const isEdit = computed(() => !!props.data?.id)
+const isEdit = computed(() => !!props.store.form?.id)
 
 // 🔥 DETECTAR SLOTS
 const hasHeader = computed(() => !!slots.header)
@@ -69,7 +69,7 @@ function goBack() {
     </div>
     <q-card-actions v-if="!hasHeader"  align="right" class="q-pa-md">
 
-      <div class="text-h5 text-weight-bold">
+      <div class="text-h5 text-weight-bold ">
         {{ isEdit
           ? tdc('Editar') + ' ' + tdc(store.model)
           : tdc('Novo') + ' ' + tdc(store.model )
@@ -85,12 +85,20 @@ function goBack() {
         @click="goBack"
       />
 
-      <s-btn
-        color="primary"
-        icon="save"
-        :label="tdc('Salvar')"
-        :loading="store.saving"
+      <s-btn v-if="User.can('change_' + store.model.toLowercase()) && isEdit"
+        color="secondary"
         unelevated
+        icon="save"
+        :loading="store.saving"
+        :label="tdc('Edit')"
+        @click="save"
+      />
+      <s-btn v-if="User.can('add_' + store.model.toLowercase()) && isEdit"
+        color="primary"
+        unelevated
+        icon="save"
+        :loading="store.saving"
+        :label="tdc('Save')"
         @click="save"
       />
 
@@ -121,11 +129,7 @@ function goBack() {
           <Form
             v-else
             ref="formRef"
-            :schema="store.fields "
-            :app="store.app "
-            :model="store.model"
-            :data="store.form "
-            :can-do="User.can"
+            :store="store"
             :ignore-fields="ignoreFields"
             @saved="goBack"
           />
@@ -147,9 +151,7 @@ function goBack() {
     
 
     <!-- ================= FOOTER FIXO ================= -->
-    <div v-if="hasFooter" class="col-12">
-      <slot name="footer" />
-    </div>
+    
     <q-card-actions v-if="!hasFooter" align="right" class="q-pa-md">
       <q-separator />
 
@@ -160,16 +162,27 @@ function goBack() {
         @click="goBack"
       />
 
-      <s-btn
-        color="primary"
-        icon="save"
-        :label="tdc('Salvar')"
-        :loading="store.saving"
-        unelevated
-        @click="save"
-      />
+      <s-btn v-if="User.can('change_' + store.model.toLowercase()) && isEdit"
+          color="secondary"
+          unelevated
+          icon="save"
+          :loading="store.saving"
+          :label="tdc('Edit')"
+          @click="save"
+        />
+        <s-btn v-if="User.can('add_' + store.model.toLowercase()) && isEdit"
+          color="primary"
+          unelevated
+          icon="save"
+          :loading="store.saving"
+          :label="tdc('Save')"
+          @click="save"
+        />
 
     </q-card-actions>
+    <div v-if="hasFooter" class="col-12">
+      <slot name="footer" />
+    </div>
 
   </s-card>
 </template>

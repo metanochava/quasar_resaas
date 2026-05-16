@@ -5,11 +5,8 @@ import { HTTPAuth, url } from '../../boot/api'
 
 // ---------------- PROPS ----------------
 const props = defineProps({
-  schema: { type: Array, default: () => [] },
-  data: { type: Object, default: null },
-  app: { type: String, required: true },
-  model: { type: String, required: true },
-  ignoreFields: { type: Array, default: () => [] }
+  store: { default: () => [] },
+  ignoreFields: {  default: () => [] }
 })
 
 const emit = defineEmits(['saved'])
@@ -19,7 +16,7 @@ const form = ref({})
 const saving = ref(false)
 const uploadProgress = ref(0)
 
-const ignoreSet = computed(() => new Set(props.ignoreFields || []))
+const ignoreSet = computed(() => new Set(props.store.ignoreFields || []))
 
 // 🔥 ocultar campos tipo id
 function isHiddenField(f) {
@@ -28,7 +25,7 @@ function isHiddenField(f) {
 
 // ---------------- FIELD GROUPS ----------------
 const generalFields = computed(() =>
-  props.schema.filter(f =>
+  props.store.fields.filter(f =>
     !ignoreSet.value.has(f.name) &&
     !isHiddenField(f) &&
     !f.ui?.isRelation &&
@@ -38,7 +35,7 @@ const generalFields = computed(() =>
 )
 
 const relationFields = computed(() =>
-  props.schema.filter(f =>
+  props.store.fields.filter(f =>
     !ignoreSet.value.has(f.name) &&
     !isHiddenField(f) &&
     f.ui?.isRelation
@@ -46,7 +43,7 @@ const relationFields = computed(() =>
 )
 
 const fileFields = computed(() =>
-  props.schema.filter(f =>
+  props.store.fields.filter(f =>
     !ignoreSet.value.has(f.name) &&
     !isHiddenField(f) &&
     (f.ui?.isFile || f.ui?.isImage)
@@ -54,7 +51,7 @@ const fileFields = computed(() =>
 )
 
 // ---------------- WATCH ----------------
-watch(() => props.data, v => {
+watch(() => props.store.form, v => {
   form.value = v ? { ...v } : {}
 }, { immediate: true })
 
@@ -213,7 +210,7 @@ async function save() {
   uploadProgress.value = 0
 
   try {
-    const api = `${props.app}/${props.model.toLowerCase()}s/`
+    const api = `${props.store.app}/${props.store.model.toLowerCase()}s/`
     const { data, config } = buildPayload()
 
     if (form.value.id) {

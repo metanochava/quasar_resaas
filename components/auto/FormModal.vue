@@ -2,14 +2,15 @@
 import { ref, computed } from 'vue'
 import { tdc } from '../../boot/base'
 import Form from '../engine/FormComponent.vue'
+import { useUserStore }  from '../../stores/UserStore'
+
+
+
+const User =useUserStore()
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
-  schema: { type: Array, default: () => [] },
-  app: { type: String, required: true },
-  model: { type: String, required: true },
-  data: { type: Object, default: null },
-  canDo: { type: Function, default: null },
+  store: { default: () => [] },
   ignoreFields: { type: Array, default: () => [] }
 })
 
@@ -24,7 +25,7 @@ const formRef = ref(null)
 const saving = ref(false)
 const uploadProgress = ref(0)
 
-const isEdit = computed(() => !!props.data?.id)
+const isEdit = computed(() => !!props.store.form?.id)
 
 function close() {
   open.value = false
@@ -43,14 +44,11 @@ function save() {
       <div class="dialog-header">
 
         <!-- LEFT -->
-        <div>
-          <div class="text-h6 text-weight-bold">
-            {{ isEdit
-              ? tdc('Editar') + ' ' + tdc(model)
-              : tdc('Novo') + ' ' + tdc(model)
-            }}
-          </div>
-
+        <div class="text-h5 text-weight-bold ">
+          {{ isEdit
+            ? tdc('Editar') + ' ' + tdc(store.model)
+            : tdc('Novo') + ' ' + tdc(store.model )
+          }}
         </div>
 
         <q-space />
@@ -73,18 +71,14 @@ function save() {
       <!-- 🔥 BODY -->
       <q-card-section class="scroll col dialog-body">
 
-        <div v-if="!schema || !schema.length" class="flex flex-center q-pa-lg">
+        <div v-if="!store?.fields || !store?.fields?.length" class="flex flex-center q-pa-lg">
           <q-spinner size="30px" color="primary" />
         </div>
 
         <div v-else>
           <Form
             ref="formRef"
-            :schema="schema"
-            :app="app"
-            :model="model"
-            :data="data"
-            :can-do="canDo"
+            :store="store"
             :ignore-fields="ignoreFields"
             @saved="() => { emit('saved'); close() }"
           />
@@ -112,12 +106,20 @@ function save() {
           @click="close"
         />
 
-        <q-btn
+        <s-btn v-if="User.can('change_' + store.model.toLowercase()) && isEdit"
+          color="secondary"
+          unelevated
+          icon="save"
+          :loading="store.saving"
+          :label="tdc('Edit')"
+          @click="save"
+        />
+        <s-btn v-if="User.can('add_' + store.model.toLowercase()) && isEdit"
           color="primary"
           unelevated
           icon="save"
-          :loading="saving"
-          :label="tdc('Salvar')"
+          :loading="store.saving"
+          :label="tdc('Save')"
           @click="save"
         />
 
