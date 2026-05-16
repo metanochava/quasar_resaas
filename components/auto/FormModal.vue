@@ -106,23 +106,22 @@ function save() {
           @click="close"
         />
 
-        <s-btn v-if="User.can('change_' + (store.model || '').toLowerCase())" v-show="!isEdit"
-        color="secondary"
-        unelevated
-        icon="save"
-        :loading="store.saving"
-        :label="tdc('Edit')"
-        @click="save"
-      />
-      <s-btn v-if="User.can('add_' + (store.model || '').toLowerCase()) " v-show="isEdit"
-        color="primary"
-        unelevated
-        icon="save"
-        :loading="store.saving"
-        :label="tdc('Save')"
-        @click="save"
-      />
-      
+        <s-btn v-if="User.can('change_' + (store.model || '').toLowerCase())" v-show="isEdit"
+          color="secondary"
+          unelevated
+          icon="save"
+          :loading="store.saving"
+          :label="tdc('Edit')"
+          @click="save"
+        />
+        <s-btn v-if="User.can('add_' + (store.model || '').toLowerCase()) " v-show="!isEdit"
+          color="primary"
+          unelevated
+          icon="save"
+          :loading="store.saving"
+          :label="tdc('Save')"
+          @click="save"
+        />
 
       </q-card-actions>
 

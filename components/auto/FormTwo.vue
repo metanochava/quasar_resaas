@@ -85,7 +85,7 @@ function goBack() {
         @click="goBack"
       />
 
-      <s-btn v-if="User.can('change_' + (store.model || '').toLowerCase()) && isEdit"
+      <s-btn v-if="User.can('change_' + (store.model || '').toLowerCase())" v-show="isEdit"
         color="secondary"
         unelevated
         icon="save"
@@ -93,7 +93,7 @@ function goBack() {
         :label="tdc('Edit')"
         @click="save"
       />
-      <s-btn v-if="User.can('add_' + (store.model || '').toLowerCase()) && isEdit"
+      <s-btn v-if="User.can('add_' + (store.model || '').toLowerCase()) " v-show="!isEdit"
         color="primary"
         unelevated
         icon="save"
@@ -162,22 +162,22 @@ function goBack() {
         @click="goBack"
       />
 
-      <s-btn v-if="User.can('change_' + (store.model || '').toLowerCase()) && isEdit"
-          color="secondary"
-          unelevated
-          icon="save"
-          :loading="store.saving"
-          :label="tdc('Edit')"
-          @click="save"
-        />
-        <s-btn v-if="User.can('add_' + (store.model || '').toLowerCase()) && isEdit"
-          color="primary"
-          unelevated
-          icon="save"
-          :loading="store.saving"
-          :label="tdc('Save')"
-          @click="save"
-        />
+      <s-btn v-if="User.can('change_' + (store.model || '').toLowerCase())" v-show="isEdit"
+        color="secondary"
+        unelevated
+        icon="save"
+        :loading="store.saving"
+        :label="tdc('Edit')"
+        @click="save"
+      />
+      <s-btn v-if="User.can('add_' + (store.model || '').toLowerCase()) " v-show="!isEdit"
+        color="primary"
+        unelevated
+        icon="save"
+        :loading="store.saving"
+        :label="tdc('Save')"
+        @click="save"
+      />
 
     </q-card-actions>
     <div v-if="hasFooter" class="col-12">
