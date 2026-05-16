@@ -109,7 +109,7 @@ function save() {
         <s-btn v-if="User.can('change_' + (store.model || '').toLowerCase())" v-show="isEdit"
           color="secondary"
           unelevated
-          icon="save"
+          icon="edit"
           :loading="store.saving"
           :label="tdc('Edit')"
           @click="save"
