@@ -94,9 +94,10 @@ function goBack() {
         @click="save"
       />
 
+      <q-separator />
     </q-card-actions>
 
-    <q-separator v-if="hasHeader" />
+
 
     <!-- ================= BODY (SCROLL AQUI) ================= -->
     <q-card-section class="col scroll">
@@ -149,7 +150,7 @@ function goBack() {
     <div v-if="hasFooter" class="col-12">
       <slot name="footer" />
     </div>
-    <q-card-actions v-if="hasFooter" align="right" class="q-pa-md">
+    <q-card-actions v-if="!hasFooter" align="right" class="q-pa-md">
       <q-separator />
 
       <s-btn
