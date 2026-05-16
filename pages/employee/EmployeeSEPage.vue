@@ -4,7 +4,7 @@
 
 
       <q-dialog v-model="openGroups" persistent full-height full-width>
-        <GroupManager  :entityId="Employee.form?.id" />
+        
       </q-dialog>
 
     <!-- FORM -->
@@ -42,8 +42,6 @@ import { useEmployeeStore } from '../../stores/EmployeeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 
-
-import GroupManager from '../group/GroupManagerEmployee.vue'
 
 
 // ---------------- ROUTE ----------------
