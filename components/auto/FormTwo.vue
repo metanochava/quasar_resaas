@@ -12,7 +12,6 @@ const User = useUserStore()
 
 const props = defineProps({
   store: { type: Object, default: null },
-  
   ignoreFields: { type: Array, default: () => [] },
 
   // 🔥 layout configurável
