@@ -14,6 +14,7 @@
       :columns="columns"
       :schema="schema"
       :actions="actions"
+      :can-do="User.can"
       :loading="loading"
       :pagination="pagination"
       :ignoreFields="ignoreFields"
@@ -38,8 +39,13 @@
 
     <FormModal
       v-model="showForm"
-      :store="store"
+      :schema="schema"
+      :app="app"
+      :model="model"
+      :data="selectedRow"
+      :can-do="User.can"
       :ignoreFields="ignoreFields"
+
       @saved="onSaved"
     />
 
@@ -68,8 +74,8 @@ import { useUserStore } from 'quasar_resaas'
 const User =useUserStore()
 
 
-// --- props ---
 const props = defineProps({
+  store: { required: true },
   app: { type: String, required: true },
   model: { type: String, required: true },
   route: { type: [String, Object], default: null },
@@ -89,17 +95,6 @@ const selectedRow = ref(null)
 
 const showPdf = ref(false)
 const pdfUrl = ref(null)
-
-import { reactive } from 'vue'
-
-const store = reactive({
-  fields: [],
-  saving: false,
-  app: null,
-  model: null,
-  data: null
-})
-
 
 const pagination = ref({
   page: 1,
@@ -133,11 +128,11 @@ const columns = computed(() => {
 
 // --- INIT ---
 async function init() {
-  if (!props.app || !props.model) return
+  if (!props.store) return
 
   const data = await buildFormFromSchema({
-    app: props.app,
-    model: props.model,
+    app: props.store.app,
+    model: props.store.model,
     schemaPath: 'fields',
   })
 
@@ -145,9 +140,6 @@ async function init() {
   actions.value = data.actions
   config.value = data.config
 
-  store.fields = data.schema
-  store.app= props.app
-  store.model= props.model
 
 
   await loadData()
@@ -172,7 +164,7 @@ async function loadData(token = null) {
     const { data } = await HTTPAuth.get(
       url({
         type: 'u',
-        url: `${props.app}/${props.model.toLowerCase()}s/`,
+        url: `${props.store.app}/${props.store.model.toLowerCase()}s/`,
         params
       })
     )
@@ -198,13 +190,11 @@ function onRequest(req) {
 
 function openCreate() {
   selectedRow.value = null
-  store.form = null
   showForm.value = true
 }
 
 function openEdit(row) {
   selectedRow.value = row
-  store.form =row
   showForm.value = true
 }
 
@@ -212,7 +202,7 @@ function openEdit(row) {
 async function openPdf(row) {
   const res = await HTTPAuthBlob.get(url({
     type: 'u',
-    url: `${props.app}/${props.model.toLowerCase()}s/${row.id}/pdf/`
+    url: `${props.store.app}/${props.store.model.toLowerCase()}s/${row.id}/pdf/`
   }))
 
   const blob = new Blob([res.data], { type: 'application/pdf' })
@@ -225,7 +215,7 @@ async function openPdf(row) {
 async function onDelete(row) {
   await HTTPAuth.delete(url({
     type: 'u',
-    url: `${props.app}/${props.model.toLowerCase()}s/${row.id}/`
+    url: `${props.store.app}/${props.store.model.toLowerCase()}s/${row.id}/`
   }))
   await loadData()
 }
@@ -233,7 +223,7 @@ async function onDelete(row) {
 async function onHardDelete(row) {
   await HTTPAuth.delete(url({
     type: 'u',
-    url: `${props.app}/${props.model.toLowerCase()}s/${row.id}/hard_delete/`
+    url: `${props.store.app}/${props.store.model.toLowerCase()}s/${row.id}/hard_delete/`
   }))
   await loadData()
 }
@@ -241,7 +231,7 @@ async function onHardDelete(row) {
 async function onRestore(row) {
   await HTTPAuth.post(url({
     type: 'u',
-    url: `${props.app}/${props.model.toLowerCase()}s/${row.id}/restore/`
+    url: `${props.store.app}/${props.store.model.toLowerCase()}s/${row.id}/restore/`
   }), {})
   await loadData()
 }
@@ -276,7 +266,7 @@ function onApplyFilter(payload) {
 // --- INLINE PATCH ---
 async function onInlinePatch({ id, field, value }) {
   await HTTPAuth.patch(
-    url({ type: 'u', url: `${props.app}/${props.model.toLowerCase()}s/${id}/` }),
+    url({ type: 'u', url: `${props.store.app}/${props.store.model.toLowerCase()}s/${id}/` }),
     { [field]: value }
   )
   await loadData()
@@ -284,7 +274,7 @@ async function onInlinePatch({ id, field, value }) {
 
 // --- ACTION ---
 async function onRunAction({ action, row }) {
-  if (action?.permission && !User.can(action.permission)) return
+  if (action?.permission && !canDo(action.permission)) return
 
   const actionUrl = action.url?.startsWith('http')
     ? action.url
@@ -334,7 +324,7 @@ const onSearch = debounce(async (val) => {
 
 // --- WATCH ---
 watch(
-  () => props.model,
+  () => props.store.model,
   async (model) => {
     if (!model) return
     await init()

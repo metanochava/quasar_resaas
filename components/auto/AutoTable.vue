@@ -5,6 +5,9 @@ import { tdc } from '../../boot/base'
 import { useRouter } from 'vue-router'
 
 import { useActionStore } from '../../stores/ActionStore'
+import { useUserStore } from 'quasar_resaas'
+
+const User =useUserStore()
 
 const actionStore = useActionStore()
 
@@ -80,7 +83,6 @@ const props = defineProps({
   pagination: { type: Object, required: true },
 
   actions: { type: Array, default: () => [] },
-  canDo: { type: Function, default: () => true },
 
   config: { type: [Object], default: {} },
   ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
@@ -412,7 +414,7 @@ async function executeAction() {
               icon="add"
               color="primary"
               @click="emit('create')"
-              v-show="canDo('add_' + model.toLowerCase())"
+              v-show="User.can('add_' + model.toLowerCase())"
             />
 
 
@@ -421,7 +423,7 @@ async function executeAction() {
               icon="open_in_new"
               color="secondary"
               :to="{ name: props.config?.routes?.add }"
-              v-show="canDo('add_' + model.toLowerCase()) && props.config?.routes?.add"
+              v-show="User.can('add_' + model.toLowerCase()) && props.config?.routes?.add"
             />
           </q-btn-group>
         </div>
@@ -447,7 +449,7 @@ async function executeAction() {
 
               <!-- PDF -->
               <q-item
-                v-if="canDo('pdf_'+model.toLowerCase()) && !isDeleted(slotRow.row)"
+                v-if="User.can('pdf_'+model.toLowerCase()) && !isDeleted(slotRow.row)"
                 clickable
                 @click="emit('pdf', slotRow.row)"
               >
@@ -469,7 +471,7 @@ async function executeAction() {
 
               <!-- EDIT -->
               <q-item
-                v-if="canDo('change_'+model.toLowerCase()) && !isDeleted(slotRow.row)"
+                v-if="User.can('change_'+model.toLowerCase()) && !isDeleted(slotRow.row)"
                 clickable
                 
               >
@@ -506,7 +508,7 @@ async function executeAction() {
               
 
               <!-- DELETE -->
-              <q-item v-if="canDo('delete_'+model.toLowerCase()) && !isDeleted(slotRow.row)" clickable @click="confirmAction('delete', slotRow.row)">
+              <q-item v-if="User.can('delete_'+model.toLowerCase()) && !isDeleted(slotRow.row)" clickable @click="confirmAction('delete', slotRow.row)">
                 <q-item-section avatar>
                   <q-icon 
                     :name="actionStore.getAction('delete').icon"
@@ -524,7 +526,7 @@ async function executeAction() {
               </q-item>
 
               <!-- HARD DELETE -->
-              <q-item  v-if="canDo('hard_delete_'+model.toLowerCase()) && isDeleted(slotRow.row)" clickable @click="confirmAction('hard_delete', slotRow.row)">
+              <q-item  v-if="User.can('hard_delete_'+model.toLowerCase()) && isDeleted(slotRow.row)" clickable @click="confirmAction('hard_delete', slotRow.row)">
                 <q-item-section avatar>
                   <q-icon name="delete_forever" color="red" />
                 </q-item-section>
@@ -536,7 +538,7 @@ async function executeAction() {
 
               <!-- RESTORE -->
               <q-item
-                v-if="canDo('restore_'+model.toLowerCase()) && isDeleted(slotRow.row)"
+                v-if="User.can('restore_'+model.toLowerCase()) && isDeleted(slotRow.row)"
                 clickable
                  @click="emit('restore', slotRow.row)"
               >
@@ -557,7 +559,7 @@ async function executeAction() {
                 v-for="a in singularActions"
                 :key="a.url"
                 clickable
-                :disable="a.permission && !canDo(a.method + '_' + a.permission + '_' + a.model.toLowerCase())"
+                :disable="a.permission && !User.can(a.method + '_' + a.permission + '_' + a.model.toLowerCase())"
                 @click="runAction(a, props.row)"
               >
                 <q-item-section avatar v-if="a.icon">
