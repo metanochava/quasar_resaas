@@ -111,7 +111,7 @@ function save() {
           @click="close"
         />
 
-        <s-btn v-if="User.can('change_' + store.model.toLowercase()) && isEdit"
+        <s-btn v-if="User.can('change_' + (store.model || '').toLowerCase()) && isEdit"
           color="secondary"
           unelevated
           icon="save"
@@ -119,7 +119,7 @@ function save() {
           :label="tdc('Edit')"
           @click="save"
         />
-        <s-btn v-if="User.can('add_' + store.model.toLowercase()) && isEdit"
+        <s-btn v-if="User.can('add_' + (store.model || '').toLowerCase()) && isEdit"
           color="primary"
           unelevated
           icon="save"
