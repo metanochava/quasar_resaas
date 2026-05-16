@@ -23,9 +23,9 @@
 import { tdc } from '../boot/base'
 import { useRoute } from 'vue-router'
 
-const route = useRoute()
-const route = route.params.route
-const id = route.params.id
+const route_ = useRoute()
+const route = route_.params.route
+const id = route_.params.id
 </script>>
 
 <style scoped>
