@@ -12,14 +12,7 @@ const User = useUserStore()
 
 const props = defineProps({
   store: { type: Object, default: null },
-  schema: { type: Array, default: () => [] },
-  app: { type: String, required: true },
-  model: { type: String, required: true },
-  data: { type: Object, default: null },
-
-  externalSave: { type: Boolean, default: false },
-
-  canDo: { type: Function, default: null },
+  
   ignoreFields: { type: Array, default: () => [] },
 
   // 🔥 layout configurável
@@ -31,7 +24,6 @@ const props = defineProps({
 })
 
 const formRef = ref(null)
-const saving = ref(false)
 
 const isEdit = computed(() => !!props.data?.id)
 
@@ -73,12 +65,15 @@ function goBack() {
   <s-card class="dialog-card column no-wrap">
 
     <!-- ================= HEADER FIXO ================= -->
-    <q-card-actions align="right" class="q-pa-md">
+    <div v-if="hasHeader" class="col-12">
+      <slot name="header" />
+    </div>
+    <q-card-actions v-if="!hasHeader"  align="right" class="q-pa-md">
 
       <div class="text-h5 text-weight-bold">
         {{ isEdit
-          ? tdc('Editar') + ' ' + tdc(store.model || model)
-          : tdc('Novo') + ' ' + tdc(store.model || model)
+          ? tdc('Editar') + ' ' + tdc(store.model)
+          : tdc('Novo') + ' ' + tdc(store.model )
         }}
       </div>
 
@@ -95,14 +90,14 @@ function goBack() {
         color="primary"
         icon="save"
         :label="tdc('Salvar')"
-        :loading="saving"
+        :loading="store.saving"
         unelevated
         @click="save"
       />
 
     </q-card-actions>
 
-    <q-separator />
+    <q-separator v-if="hasHeader" />
 
     <!-- ================= BODY (SCROLL AQUI) ================= -->
     <q-card-section class="col scroll">
@@ -110,9 +105,6 @@ function goBack() {
       <div class="row q-col-gutter-xs">
 
         <!-- HEADER SLOT (fica fixo dentro do scroll topo) -->
-        <div v-if="hasHeader" class="col-12">
-          <slot name="header" />
-        </div>
 
         <!-- LEFT -->
         <div v-if="hasLeft" :class="[leftClass]">
@@ -129,10 +121,10 @@ function goBack() {
           <Form
             v-else
             ref="formRef"
-            :schema="store.fields || schema"
-            :app="store.app || app"
-            :model="store.model || model"
-            :data="store.form || data"
+            :schema="store.fields "
+            :app="store.app "
+            :model="store.model"
+            :data="store.form "
             :can-do="User.can"
             :ignore-fields="ignoreFields"
             @saved="goBack"
@@ -146,18 +138,20 @@ function goBack() {
         </div>
 
         <!-- FOOTER SLOT (fica no fim do scroll) -->
-        <div v-if="hasFooter" class="col-12">
-          <slot name="footer" />
-        </div>
+        
 
       </div>
 
     </q-card-section>
 
-    <q-separator />
+    
 
     <!-- ================= FOOTER FIXO ================= -->
-    <q-card-actions align="right" class="q-pa-md">
+    <div v-if="hasFooter" class="col-12">
+      <slot name="footer" />
+    </div>
+    <q-card-actions v-if="hasFooter" align="right" class="q-pa-md">
+      <q-separator />
 
       <s-btn
         flat
@@ -170,7 +164,7 @@ function goBack() {
         color="primary"
         icon="save"
         :label="tdc('Salvar')"
-        :loading="saving"
+        :loading="store.saving"
         unelevated
         @click="save"
       />
