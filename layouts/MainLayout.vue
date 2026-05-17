@@ -69,14 +69,14 @@
     <!-- -------------------- LEFT DRAWER -------------------- -->
     <q-drawer v-model="User.LeftTop" side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas'">
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
-         <RightMenu />
+        <LeftMenu />
       </q-scroll-area>
     </q-drawer>
 
     <!-- -------------------- RIGHT DRAWER -------------------- -->
     <q-drawer v-model="User.RightTop" side="right" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas'">
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
-        <LeftMenu />
+        <RightMenu />
       </q-scroll-area>
     </q-drawer>
 

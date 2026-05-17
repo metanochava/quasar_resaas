@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-top: 2px;">
+  <div style="margin-top: 12px;">
     <search-menu :size="'300'" />
     <s-card
       square
