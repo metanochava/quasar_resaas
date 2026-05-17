@@ -1,6 +1,6 @@
 <template>
   <div style="margin-top: 5px;">
-    <search-menu :size="'300'" class="fixed-top header-fixed"/>
+    <search-menu :size="'300'" class="search-fixed"/>
     <s-card
       square
       flat
@@ -33,6 +33,14 @@
     </s-card>
   </div>
 </template>
+
+<style >
+  .search-fixed {
+    position: fixed;
+    top: 220px;   /* abaixo do header */
+    z-index: 9999;
+  }
+</style>
 
 <script >
 
