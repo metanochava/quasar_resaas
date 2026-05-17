@@ -1,3 +1,9 @@
+
+<template>
+  Right Menu
+  <component v-if="component" :is="component" />
+</template>
+
 <script>
 import { defineComponent, computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -21,7 +27,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<template>
-  <component v-if="component" :is="component" />
-</template>

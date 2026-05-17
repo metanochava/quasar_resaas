@@ -1,6 +1,6 @@
 
 <template>
-  <q-layout >
+
     <s-card  square flat :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-sm  header-fixed' : 'bg-saas text-white   q-pa-sm fixed-top header-fixed' ">
       <div :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary' ">
         <div class="text-center text-h6">
@@ -44,7 +44,6 @@
 
     <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white fixed-top' : 'bg-primary text-white  fixed-top'" style="margin-top:127px" ></LeftMenuSegundo>
 
-  </q-layout>
 </template>
 <script >
 
