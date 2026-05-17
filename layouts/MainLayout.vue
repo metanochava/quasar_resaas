@@ -67,14 +67,14 @@
     </q-header>
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
-    <q-drawer v-model="User.LeftTop"  show-if-above side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ''">
+    <q-drawer v-model="User.LeftTop"  show-if-above side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas'">
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <LeftMenu />
       </q-scroll-area>
     </q-drawer>
 
     <!-- -------------------- RIGHT DRAWER -------------------- -->
-    <q-drawer v-model="User.RightTop" side="right" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ''">
+    <q-drawer v-model="User.RightTop" side="right" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas'">
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <RightMenu />
       </q-scroll-area>
@@ -82,7 +82,7 @@
 
     <!-- -------------------- PAGE CONTAINER -------------------- -->
 
-    <q-page-container class="page-container full-height" :class="$q.dark.isActive ? 'bg-dark-saas text-white' : ''">
+    <q-page-container class="page-container full-height" :class="$q.dark.isActive ? 'bg-dark-saas text-white' : 'bg-saas'">
 
       <router-view v-slot="{ Component }">
 

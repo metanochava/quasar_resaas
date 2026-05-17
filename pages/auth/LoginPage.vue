@@ -1,5 +1,5 @@
 <template>
-  <s-card class="q-pa-md text-center bg-saas" >
+  <s-card :class="$q.dark.isActive ? 'bg-dark text-white q-pa-md text-center' : 'bg-saas q-pa-md text-center'" >
     <FormLogin />
   </s-card>
 </template>
