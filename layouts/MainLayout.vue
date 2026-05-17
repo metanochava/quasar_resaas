@@ -67,15 +67,14 @@
     </q-header>
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
-    <q-drawer
-      v-model="User.LeftTop" show-if-above  side="left" bordered class="q-pr-0" :width="300"  >
+    <q-drawer v-model="User.LeftTop"  side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'" >
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <LeftMenu />
       </q-scroll-area>
     </q-drawer>
 
     <!-- -------------------- RIGHT DRAWER -------------------- -->
-    <q-drawer v-model="User.RightTop" side="right" bordered :width="300">
+    <q-drawer v-model="User.RightTop" side="right" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'">
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <RightMenu />
       </q-scroll-area>
