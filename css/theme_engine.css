@@ -88,3 +88,13 @@
   z-index: 1;
 }
 
+
+body {
+
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.04) 2px, transparent 2px),
+    radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.03) 2px, transparent 2px);
+
+  background-size: 120px 120px, 160px 160px;
+  opacity: 0.6;
+}
