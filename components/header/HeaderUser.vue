@@ -4,8 +4,6 @@
     <q-dialog
         v-model="showRegisterEntity"
         persistent
-        :maximized="maximizedToggle"
-        full-height
       >
       <RegisterEntity />
     </q-dialog>
@@ -193,9 +191,6 @@ export default defineComponent({
   },
 
   methods: {
-    maximizedToggle () {
-      this.maximized = !this.maximized
-    },
 
     startSessionWatcher () {
       setInterval(async () => {
