@@ -37,7 +37,6 @@
 <style >
   .search-fixed {
     position: fixed;
-    top: 150px;   /* abaixo do header */
     z-index: 9;
   }
 </style>
