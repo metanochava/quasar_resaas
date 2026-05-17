@@ -1,12 +1,12 @@
 <template>
   <div >
-    <search-menu :size="'300'" class="search-fixed"/>
+    <search-menu :size="'300'" class="search-fixed" style="padding: 0px; margin-bottom: 30px;"/>
     <s-card
       square
       flat
       v-for="App in User.Menus"
       :key="App"
-      style="padding: 0px; margin-top: 30px;"
+      style="padding: 0px; "
       :class="
           $q.dark.isActive
             ? ' col-xs-12 col-md-12 col-lg-12 q-bt-md'
