@@ -67,7 +67,7 @@
     </q-header>
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
-    <q-drawer v-model="User.LeftTop"  side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'" >
+    <q-drawer v-model="User.LeftTop" show-if-above  side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'" >
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <LeftMenu />
       </q-scroll-area>
@@ -83,20 +83,9 @@
     <!-- -------------------- PAGE CONTAINER -------------------- -->
 
     <q-page-container class="page-container full-height">
-
-      <router-view v-slot="{ Component }">
-
-        <transition
-          v-if="ps.animation?.enable_animations"
-          :name="ps.animation?.page_transition?.valeu || 'fade'"
-          mode="out-in"
-        >
-          <component :is="Component" class="page-content"/>
-        </transition>
-
-        <component v-else :is="Component" class="page-content"/>
-
-      </router-view>
+      <q-page-container class="page-container full-height">
+        <router-view class="page-content" />
+      </q-page-container>
     </q-page-container>
 
 
