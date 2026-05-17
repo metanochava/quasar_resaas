@@ -10,7 +10,7 @@
       :class="
           $q.dark.isActive
             ? ' col-xs-12 col-md-12 col-lg-12 q-bt-md'
-            : 'bg-saas-premium bg-left-menu-premium  text-primary  col-xs-12 col-md-12 col-lg-12 q-bt-md'"
+            : ' text-primary  col-xs-12 col-md-12 col-lg-12 q-bt-md'"
     >
       <q-expansion-item
         group="menu"
