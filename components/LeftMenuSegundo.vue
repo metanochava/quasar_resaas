@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12" style="margin-top: 2px;">
+  <div >
     <search-menu :size="'300'" />
     <s-card
       square
@@ -37,11 +37,6 @@
   </div>
 </template>
 
-
-
-<style scoped>
-  
-</style>
 <script >
 
 

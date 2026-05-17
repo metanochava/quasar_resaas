@@ -20,7 +20,7 @@
         </s-btn>
       </div>
       
-      <q-list  >
+  
         <q-item clickable replace v-ripple  exact
           :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
           exact-active-class=""  >
@@ -38,7 +38,7 @@
           </s-btn>
           </q-item-section>
         </q-item>
-      </q-list>
+
     </s-card>
  
 <div v-for="i in 40" :key="i">
