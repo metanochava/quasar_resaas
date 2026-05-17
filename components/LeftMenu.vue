@@ -42,7 +42,7 @@
 
     </s-card>
 
-  <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white  '" style="margin-top:165px" ></LeftMenuSegundo>
+  <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white  '" style="margin-top:150px" ></LeftMenuSegundo>
 
 </template>
 <script >
