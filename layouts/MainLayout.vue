@@ -89,7 +89,7 @@
 </div>
 
       <router-view v-slot="{ Component }">
-        <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle"></q-scroll-area>
+        <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
           <transition
             v-if="ps.animation?.enable_animations"
             :name="ps.animation?.page_transition?.value || 'fade'"
