@@ -120,8 +120,9 @@
 
         </q-menu>
       </q-avatar>
-      <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'" v-if="User">{{User?.username }} </q-tooltip>
-      <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'" v-else>{{tdc('Hóspede')}}</q-tooltip>
+      <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary'" v-if="User">{{User?.username }} </q-tooltip>
+      <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary'" v-else>{{tdc('Hóspede')}}</q-tooltip>
+          
     </s-btn>
   </div>
 </template>
