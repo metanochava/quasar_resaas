@@ -82,7 +82,7 @@
 
     <!-- -------------------- PAGE CONTAINER -------------------- -->
 
-    <q-page-container class="page-container full-height">
+    <q-page-container class="page-container full-height" style="background: transparent;">
 
       <router-view v-slot="{ Component }">
 
