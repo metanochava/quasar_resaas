@@ -6,7 +6,7 @@
       flat
       v-for="App in User.Menus"
       :key="App"
-      style="padding: 0px"
+      style="padding: 0px; margin-top: 30px;"
       :class="
           $q.dark.isActive
             ? ' col-xs-12 col-md-12 col-lg-12 q-bt-md'
