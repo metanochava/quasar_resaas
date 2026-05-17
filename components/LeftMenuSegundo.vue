@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-top: 5px;">
+  <div >
     <search-menu :size="'300'" class="search-fixed"/>
     <s-card
       square
@@ -37,7 +37,7 @@
 <style >
   .search-fixed {
     position: fixed;
-    top: 220px;   /* abaixo do header */
+    top: 160px;   /* abaixo do header */
     z-index: 9999;
   }
 </style>
