@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf" class="bg-saas">
+  <q-layout view="hHh lpR fFf" >
     <!-- -------------------- DIALOGS -------------------- -->
     <q-dialog v-model="permissoes" persistent>
       <!-- <UserPermissoes /> -->
