@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf">
+  <q-layout view="hHh lpR fFf"  :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'">
     <!-- -------------------- DIALOGS -------------------- -->
     <q-dialog v-model="permissoes" persistent>
       <!-- <UserPermissoes /> -->
@@ -68,14 +68,14 @@
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
     <q-drawer
-      v-model="User.LeftTop" show-if-above  side="right" bordered class="q-pr-0" :width="300"  >
+      v-model="User.LeftTop" show-if-above  side="left" bordered class="q-pr-0" :width="300"  >
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <LeftMenu />
       </q-scroll-area>
     </q-drawer>
 
     <!-- -------------------- RIGHT DRAWER -------------------- -->
-    <q-drawer v-model="User.RightTop" side="left" bordered :width="300">
+    <q-drawer v-model="User.RightTop" side="right" bordered :width="300">
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <RightMenu />
       </q-scroll-area>
@@ -89,9 +89,8 @@
 
         <transition
           v-if="ps.animation?.enable_animations"
-          :name="ps.animation?.page_transition || 'fade'"
+          :name="ps.animation?.page_transition?.valeu || 'fade'"
           mode="out-in"
-          :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'"
         >
           <component :is="Component" class="page-content"/>
         </transition>
