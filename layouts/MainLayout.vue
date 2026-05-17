@@ -83,9 +83,7 @@
     <!-- -------------------- PAGE CONTAINER -------------------- -->
 
     <q-page-container class="page-container full-height">
-      <q-page-container class="page-container full-height">
-        <router-view class="page-content" />
-      </q-page-container>
+      <router-view class="page-content" />
     </q-page-container>
 
 
