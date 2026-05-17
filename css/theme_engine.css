@@ -88,9 +88,17 @@
   z-index: 1;
 }
 
-.bg-saas {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4ecf3 100%);
-  overflow: hidden;
+
+body ::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(circle at 10% 10%, rgba(0, 123, 255, 0.15), transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(0, 200, 150, 0.12), transparent 40%);
+
+  pointer-events: none;
 }
 body {
 
