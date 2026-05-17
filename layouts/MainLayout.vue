@@ -91,10 +91,10 @@
           :name="ps.animation?.page_transition?.value || 'fade'"
           mode="out-in"
         >
-          <component :is="Component" class="page-content"/>
+          <component :is="Component" />
         </transition>
 
-        <component v-else :is="Component" class="page-content"/>
+        <component v-else :is="Component" />
 
       </router-view>
     </q-page-container>
