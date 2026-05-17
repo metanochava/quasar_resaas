@@ -18,7 +18,7 @@
         :class="
           $q.dark.isActive
             ? 'bg-dark-saas text-subtitle1'
-            : 'bg-transparent text-subtitle1 text-primary'
+            : 'bg-saas text-subtitle1 text-primary'
         "
         :icon="App.icon"
         dense
