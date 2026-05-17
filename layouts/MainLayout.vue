@@ -1,5 +1,9 @@
 <template>
-  <q-layout view="hHh lpR fFf">
+  <q-layout view="hHh lpR fFf" 
+    :class="[
+      $q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'
+    ]"
+  >
     <!-- -------------------- DIALOGS -------------------- -->
     <q-dialog v-model="permissoes" persistent>
       <!-- <UserPermissoes /> -->
@@ -95,9 +99,9 @@
 
         <transition
           v-if="ps.animation?.enable_animations"
-          :name="ps.animation?.page_transition || 'fade'"
+          :name="ps.animation?.page_transition?.value || 'fade'"
           mode="out-in"
-          :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'"
+          
         >
           <component :is="Component" class="page-content"/>
         </transition>

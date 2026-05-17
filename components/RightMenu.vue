@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import { useMenuStore } from './../stores/MenuStore'
 
 export default defineComponent({
-  name: 'RightMenu',
+  name: 'RightMenuResaas',
 
   setup() {
     const route = useRoute()
