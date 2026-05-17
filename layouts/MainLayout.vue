@@ -1,9 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf" 
-    :class="[
-      $q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'
-    ]"
-  >
+  <q-layout view="hHh lpR fFf" >
     <!-- -------------------- DIALOGS -------------------- -->
     <q-dialog v-model="permissoes" persistent>
       <!-- <UserPermissoes /> -->
