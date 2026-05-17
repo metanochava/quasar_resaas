@@ -1,7 +1,6 @@
 
 <template>
-
-    <s-card  square flat :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-sm  header-fixed' : 'bg-saas text-white   q-pa-sm fixed-top header-fixed' ">
+    <s-card  square flat :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-0  header-fixed' : 'bg-saas text-white   q-pa-0 fixed-top header-fixed' ">
       <div :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary' ">
         <div class="text-center text-h6">
           {{ User?.username }}
@@ -41,6 +40,10 @@
         </q-item>
       </q-list>
     </s-card>
+ 
+<div v-for="i in 40" :key="i">
+    Right Menu <br><br><br>
+</div>
 
     <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white fixed-top' : 'bg-primary text-white  fixed-top'" style="margin-top:127px" ></LeftMenuSegundo>
 
