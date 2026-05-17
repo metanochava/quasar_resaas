@@ -67,14 +67,7 @@
     </q-header>
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
-    <q-drawer
-      v-model="User.LeftTop"
-      show-if-above
-      side="left"
-      bordered
-      class="q-pr-0"
-      :width="300"
-    >
+    <q-drawer v-model="User.LeftTop"  side="left" bordered :width="300"  >
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <LeftMenu />
       </q-scroll-area>
@@ -83,7 +76,7 @@
     <!-- -------------------- RIGHT DRAWER -------------------- -->
     <q-drawer v-model="User.RightTop" side="right" bordered :width="300">
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
-        {{ ps.animation?.page_transition.value  }}
+        {{ ps.animation?.page_transition?.value  }}
         <RightMenu />
       </q-scroll-area>
     </q-drawer>
@@ -96,7 +89,7 @@
 
         <transition
           v-if="ps.animation?.enable_animations"
-          :name="ps.animation?.page_transition.value || 'fade'"
+          :name="ps.animation?.page_transition?.value || 'fade'"
           mode="out-in"
           
         >
