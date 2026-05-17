@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div style="margin-top: 2px;">
     <search-menu :size="'300'" />
     <s-card
       square
@@ -30,9 +30,6 @@
           <SubMenu :Dados="App.submenu" />
         <q-separator />
       </q-expansion-item>
-          <q-page-scroller position="bottom-right" :scroll-offset="50" :offset="[18, -10]">
-      <s-btn icon="keyboard_arrow_up" color="primary"  />
-    </q-page-scroller>
     </s-card>
   </div>
 </template>

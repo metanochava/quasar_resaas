@@ -67,7 +67,7 @@
     </q-header>
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
-    <q-drawer v-model="User.LeftTop"  show-if-above side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas'">
+    <q-drawer v-model="User.LeftTop" side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas'">
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <LeftMenu />
       </q-scroll-area>
