@@ -82,26 +82,25 @@
 
     <!-- -------------------- PAGE CONTAINER -------------------- -->
 
-    <q-page-container class="page-container full-height" :class="$q.dark.isActive ? 'bg-dark-saas text-white' : 'bg-saas'">
-      <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
-      <div v-for="i in 70" :key="i">
-    Right Menu <br><br><br>
-</div>
+   <q-page-container
+      class="page-container full-height"
+      :class="$q.dark.isActive ? 'bg-dark-saas text-white' : 'bg-saas'"
+    >
 
       <router-view v-slot="{ Component }">
-        
-          <transition
-            v-if="ps.animation?.enable_animations"
-            :name="ps.animation?.page_transition?.value || 'fade'"
-            mode="out-in"
-          >
-            <component :is="Component" />
-          </transition>
 
-          <component v-else :is="Component" />
+        <transition
+          v-if="ps.animation?.enable_animations"
+          :name="ps.animation?.page_transition?.value || 'fade'"
+          mode="out-in"
+        >
+          <component :is="Component" />
+        </transition>
+
+        <component v-else :is="Component" />
 
       </router-view>
-      </q-scroll-area>
+
     </q-page-container>
 
 
