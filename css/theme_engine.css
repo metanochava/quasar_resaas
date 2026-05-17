@@ -49,14 +49,14 @@
     background-color: #121212 !important;
 }
   /* 🔥 Fundo SaaS premium (light mode) */
-body {
+.bg-saas {
   position: relative;
   background: linear-gradient(135deg, #f5f7fa 0%, #e4ecf3 100%);
   overflow: hidden;
 }
 
 /* 🔥 camada decorativa suave */
-body::before {
+.bg-saas::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -70,7 +70,7 @@ body::before {
 }
 
 /* 🔥 glow moderno (efeito SaaS) */
-body::after {
+.bg-saas::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -83,7 +83,7 @@ body::after {
 }
 
 /* 🔥 garante que conteúdo fique acima */
-body > * {
+.bg-saas > * {
   position: relative;
   z-index: 1;
 }
