@@ -89,17 +89,17 @@
 </div>
 
       <router-view v-slot="{ Component }">
+        <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle"></q-scroll-area>
+          <transition
+            v-if="ps.animation?.enable_animations"
+            :name="ps.animation?.page_transition?.value || 'fade'"
+            mode="out-in"
+          >
+            <component :is="Component" />
+          </transition>
 
-        <transition
-          v-if="ps.animation?.enable_animations"
-          :name="ps.animation?.page_transition?.value || 'fade'"
-          mode="out-in"
-        >
-          <component :is="Component" />
-        </transition>
-
-        <component v-else :is="Component" />
-
+          <component v-else :is="Component" />
+        </q-scroll-area>
       </router-view>
     </q-page-container>
 

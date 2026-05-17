@@ -7,7 +7,8 @@ export const thumbStyle = {
   borderRadius: '8px',
   backgroundColor: 'var(--q-primary)',
   width: '8px',
-  opacity: 0.75
+  opacity: 0.75,
+  zIndex: 9999 // 🔥 aqui
 }
 
 export const barStyle = {
@@ -19,7 +20,8 @@ export const barStyle = {
   marginTop: '-3px',
   marginBottom: '-3px',
   paddingTop: '3px',
-  paddingBottom: '3px'
+  paddingBottom: '3px',
+   zIndex: 9998 // 🔥 aqui
 }
 
 export const pegaDominio = function () {
