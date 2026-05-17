@@ -88,7 +88,10 @@
   z-index: 1;
 }
 
-
+.bg-saas {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4ecf3 100%);
+  overflow: hidden;
+}
 body {
 
   background-image:
@@ -96,5 +99,4 @@ body {
     radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.03) 2px, transparent 2px);
 
   background-size: 120px 120px, 160px 160px;
-  opacity: 0.6;
 }
