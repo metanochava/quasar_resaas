@@ -1,24 +1,26 @@
 
 <template>
   <q-layout >
-    <s-card  square
-        :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-sm  header-fixed' : ' text-white   q-pa-sm fixed-top header-fixed' "
-        flat
-      >
-      <div class="text-center text-h6">{{ User?.username }}</div>
-      <s-btn
-        flat dense
-        :label="User.Group?.name"
-        class="full-width"
-      >
-        <q-menu fit>
-          <q-list dense>
-            <q-item v-for="group in User.Groups" :key="group.id" clickable @click="User.selectGroup(group)">
-              <q-item-section>{{ group.name }}</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </s-btn>
+    <s-card  square flat :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-sm  header-fixed' : 'bg-saas text-white   q-pa-sm fixed-top header-fixed' ">
+      <div :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary' ">
+        <div class="text-center text-h6">
+          {{ User?.username }}
+        </div>
+        <s-btn
+          flat dense
+          :label="User.Group?.name"
+          class="full-width"
+        >
+          <q-menu fit>
+            <q-list dense>
+              <q-item v-for="group in User.Groups" :key="group.id" clickable @click="User.selectGroup(group)">
+                <q-item-section>{{ group.name }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </s-btn>
+      </div>
+      
       <q-list  >
         <q-item clickable replace v-ripple  exact
           :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
