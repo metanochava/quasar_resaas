@@ -1,6 +1,9 @@
 
 <template>
-  Right Menu
+  <div v-for="i in 100" :key="i">
+    Right Menu <br>
+  </div>
+  Right Menu <br>
   <component v-if="component" :is="component" />
 </template>
 
