@@ -45,16 +45,18 @@
  to{opacity:1}
 }
 
-
+.bg-dark-saas {
+    background-color: #121212 !important;
+}
   /* 🔥 Fundo SaaS premium (light mode) */
-.bg-saas-premium {
+.bg-saas {
   position: relative;
   background: linear-gradient(135deg, #f5f7fa 0%, #e4ecf3 100%);
   overflow: hidden;
 }
 
 /* 🔥 camada decorativa suave */
-.bg-saas-premium::before {
+.bg-saas::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -68,7 +70,7 @@
 }
 
 /* 🔥 glow moderno (efeito SaaS) */
-.bg-saas-premium::after {
+.bg-saas::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -81,7 +83,7 @@
 }
 
 /* 🔥 garante que conteúdo fique acima */
-.bg-saas-premium > * {
+.bg-saas > * {
   position: relative;
   z-index: 1;
 }

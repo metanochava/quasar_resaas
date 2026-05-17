@@ -11,15 +11,14 @@
       </q-toolbar>
     </q-header>
 
-    <q-page-container class="">
+    <q-page-container :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas'">
       <router-view />
-
     </q-page-container>
 
     <Rodape />
 
     <q-page-scroller position="bottom-right" :scroll-offset="50" :offset="[18, -10]">
-      <s-btn icon="keyboard_arrow_up" color="primary" round />
+      <s-btn icon="keyboard_arrow_up" color="primary"  />
     </q-page-scroller>
   </q-layout>
 </template>

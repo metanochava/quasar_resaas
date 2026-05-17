@@ -10,14 +10,14 @@
       :class="
           $q.dark.isActive
             ? ' col-xs-12 col-md-12 col-lg-12 q-bt-md'
-            : 'bg-saas-premium   text-primary  col-xs-12 col-md-12 col-lg-12 q-bt-md'"
+            : 'bg-saas   text-primary  col-xs-12 col-md-12 col-lg-12 q-bt-md'"
     >
       <q-expansion-item
         group="menu"
         default-opened
         :class="
           $q.dark.isActive
-            ? 'bg-dark-custom text-subtitle1'
+            ? 'bg-dark-saas text-subtitle1'
             : 'bg-transparent text-subtitle1 text-primary'
         "
         :icon="App.icon"
@@ -30,6 +30,9 @@
           <SubMenu :Dados="App.submenu" />
         <q-separator />
       </q-expansion-item>
+          <q-page-scroller position="bottom-right" :scroll-offset="50" :offset="[18, -10]">
+      <s-btn icon="keyboard_arrow_up" color="primary"  />
+    </q-page-scroller>
     </s-card>
   </div>
 </template>
@@ -37,9 +40,7 @@
 
 
 <style scoped>
-  .bg-dark-custom {
-    background-color: #121212 !important;
-  }
+  
 </style>
 <script >
 
