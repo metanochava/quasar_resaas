@@ -1,6 +1,7 @@
 <template>
   <div >
     <search-menu :size="'300'" class="search-fixed" style="padding: 0px; margin-bottom: 30px;"/>
+    <div style="height:30px;"></div>
     <s-card
       square
       flat
