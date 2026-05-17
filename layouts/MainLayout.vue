@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf" >
+  <q-layout view="hHh lpR fFf" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas-premium'">
     <!-- -------------------- DIALOGS -------------------- -->
     <q-dialog v-model="permissoes" persistent>
       <!-- <UserPermissoes /> -->
@@ -83,6 +83,7 @@
     <!-- -------------------- RIGHT DRAWER -------------------- -->
     <q-drawer v-model="User.RightTop" side="right" bordered :width="300">
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
+        {{ ps.animation?.page_transition.value  }}
         <RightMenu />
       </q-scroll-area>
     </q-drawer>
@@ -95,7 +96,7 @@
 
         <transition
           v-if="ps.animation?.enable_animations"
-          :name="ps.animation?.page_transition?.value || 'fade'"
+          :name="ps.animation?.page_transition.value || 'fade'"
           mode="out-in"
           
         >
