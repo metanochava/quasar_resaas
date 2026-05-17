@@ -41,13 +41,9 @@
         </q-item>
 
     </s-card>
- 
 
+  <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white  '" style="margin-top:132px" ></LeftMenuSegundo>
 
-  <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white  '" style="margin-top:127px" ></LeftMenuSegundo>
-<div v-for="i in 40" :key="i">
-    Right Menu <br><br><br>
-</div>
 </template>
 <script >
 
