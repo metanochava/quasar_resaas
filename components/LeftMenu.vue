@@ -1,6 +1,6 @@
 
 <template>
-    <!-- <s-card  square flat :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-0  header-fixed' : 'bg-saas text-white   q-pa-0 fixed-top header-fixed' ">
+    <s-card  square flat :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-0  header-fixed' : 'bg-saas text-white   q-pa-0 fixed-top header-fixed' ">
       <div :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary' ">
         <div class="text-center text-h6 q-pt-lg">
 
@@ -40,13 +40,13 @@
           </q-item-section>
         </q-item>
 
-    </s-card> -->
+    </s-card>
  
 <div v-for="i in 40" :key="i">
     Right Menu <br><br><br>
 </div>
 
-    <!-- <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white  '" style="margin-top:127px" ></LeftMenuSegundo> -->
+  <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white  '" style="margin-top:127px" ></LeftMenuSegundo>
 
 </template>
 <script >
