@@ -1,5 +1,5 @@
 <template>
-  <s-card class="q-pa-md text-center" >
+  <s-card class="q-pa-md text-center bg-saas" >
     <FormLogin />
   </s-card>
 </template>

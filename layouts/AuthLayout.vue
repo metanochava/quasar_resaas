@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf" class="bg-saas">
+  <q-layout view="hHh lpR fFf" >
     <q-header bordered :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
       <q-toolbar class="no-wrap q-px-md">
         <HeaderBrand />
