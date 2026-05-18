@@ -1,31 +1,11 @@
 
 <template>
-  <component v-if="component" :is="component" />
-  <div v-else class="text-center text-h6 q-pa-sm">
-    .
-  </div>
+  <RightMenuSegundo  />
+  
 </template>
 
-<script>
-import { defineComponent, computed } from 'vue'
-import { useRoute } from 'vue-router'
-import { useMenuStore } from './../stores/MenuStore'
+<script setup>
 
-export default defineComponent({
-  name: 'RightMenuResaas',
+import RightMenuSegundo from './RightMenuSegundo.vue'
 
-  setup() {
-    const route = useRoute()
-    const menu = useMenuStore()
-
-    // 🔥 AUTO INIT (sem app precisar fazer nada)
-    menu.init()
-
-    const component = computed(() => {
-      return menu.rightMenus?.[route.name] || null
-    })
-
-    return { component }
-  }
-})
 </script>
