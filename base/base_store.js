@@ -73,6 +73,68 @@ export function createBaseStore(name, config, extend = {}) {
     // =========================
     actions: {
 
+      // =========================
+      // 🔍 SEARCH
+      // =========================
+      setSearch(search) {
+        this.search = search
+      },
+
+      clearSearch() {
+        this.search = ''
+      },
+
+      // =========================
+      // 🎯 FILTERS
+      // =========================
+      setFilters(filters = {}) {
+        this.filters = { ...filters }
+      },
+
+      updateFilter(key, value) {
+        this.filters = {
+          ...this.filters,
+          [key]: value
+        }
+      },
+
+      removeFilter(key) {
+        const newFilters = { ...this.filters }
+        delete newFilters[key]
+        this.filters = newFilters
+      },
+
+      clearFilters() {
+        this.filters = {}
+      },
+
+      // =========================
+      // 📄 PAGINATION
+      // =========================
+      setPage(page) {
+        this.pagination.page = page
+      },
+
+      setRowsPerPage(rows) {
+        this.pagination.rowsPerPage = rows
+      },
+
+      setPagination(pagination = {}) {
+        this.pagination = {
+          ...this.pagination,
+          ...pagination
+        }
+      },
+
+      resetPagination() {
+        this.pagination = {
+          page: 1,
+          rowsPerPage: 10,
+          rowsNumber: 0
+        }
+      },
+
+
       // 🔥 GUARDA DE SEGURANÇA GLOBAL
       assertConfig() {
         if (!this._config.app || !this._config.model) {
