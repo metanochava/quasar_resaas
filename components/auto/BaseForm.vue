@@ -67,7 +67,7 @@ const router = useRouter()
 
 const store = props.store
 
-// 🔥 estado
+// 🔥 state
 const loading = ref(true)
 const saving = ref(false)
 const errors = ref(null)

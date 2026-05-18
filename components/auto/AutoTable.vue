@@ -192,11 +192,11 @@ function isEditable(name) {
 
 // 🔥 TOGGLE ESTADO (NOVO)
 function toggleEstado(row) {
-  const newValue = row.estado.value == 1 ? 0 : 1
+  const newValue = row.state.value == 1 ? 0 : 1
 
   emit('inline-patch', {
     id: row.id,
-    field: 'estado',
+    field: 'state',
     value: newValue
   })
 }
@@ -622,15 +622,15 @@ async function executeAction() {
         </template>
 
         <!-- 🔥 ESTADO -->
-        <template v-else-if="props.col.name === 'estado'">
+        <template v-else-if="props.col.name === 'state'">
           <s-btn
             dense
             size="sm"
-            :color="props.row.estado.value == 1 ? 'positive' : 'negative'"
-            :label="props.row.estado.value == 1 ? tdc('Activo') : tdc('Inactivo')"
+            :color="props.row.state.value == 1 ? 'positive' : 'negative'"
+            :label="props.row.state.value == 1 ? tdc('Activo') : tdc('Inactivo')"
             @click="() => toggleEstado(props.row)"
           >
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.estado == 1 ? 'Desativar' : 'Activar') }}</q-tooltip>
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.state == 1 ? 'Desativar' : 'Activar') }}</q-tooltip>
           </s-btn>
         </template>
 

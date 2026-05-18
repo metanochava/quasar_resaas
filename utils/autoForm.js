@@ -1,4 +1,4 @@
-import { tdc, HTTPAuth, url, guessLabelKey } from './../index'
+import { tdc, HTTPAuth, url } from './../index'
 
 const __relationCache = new Map()
 

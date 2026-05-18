@@ -86,7 +86,7 @@ await store.remove(id)
 
 ```js
 await store.setSearch('Maria')
-await store.setFilters({ estado: true })
+await store.setFilters({ state: true })
 ```
 
 ---
@@ -166,7 +166,7 @@ export const usePacienteStore = createBaseStore(
 
 ```js
 getters: {
-  ativo: (state) => state.linha?.estado === true
+  ativo: (state) => state.linha?.state === true
 }
 ```
 

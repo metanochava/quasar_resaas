@@ -225,16 +225,11 @@ function matchCase(original, transformed) {
   // Se original começa com Maiúscula, capitaliza
   if (original[0] === original[0].toUpperCase()) {
     return transformed[0].toUpperCase() + transformed.slice(1)
-  }
+  }sh
+  
   return transformed
 }
 
-export function guessLabelKey(obj) {
-  // tenta achar um campo “humano” pra label
-  const candidates = ['label','name', 'name', 'titulo', 'title', 'descricao', 'description', 'username', 'email']
-  for (const k of candidates) if (obj && obj[k]) return k
-  return 'id'
-}
 
 export function resolveRoute(item, add) {
   if (!item) return null
@@ -272,7 +267,7 @@ function normalizeTheme(theme = {}) {
     'created_at',
     'updated_at',
     'deleted_at',
-    'estado',
+    'state',
     'name',
     'created_by',
     'updated_by'

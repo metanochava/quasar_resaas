@@ -78,7 +78,7 @@ import { tdc } from '../../boot/base'
 const User = useUserStore()
 const route = useRoute()
 
-// estado
+// state
 const app = ref('')
 const model = ref('')
 
