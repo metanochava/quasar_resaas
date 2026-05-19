@@ -72,11 +72,11 @@
     </q-item>
   </s-card>
     
-  <search-menu :size="'270'" class="search-fixed q-ml-sm" style=" margin-bottom:0px;"/>
+  <search-menu :size="'270'" class="search-fixed" style=" margin-bottom:0px;"/>
 
 
-  <q-scroll-area class="" :thumb-style="thumbStyle" :bar-style="barStyle">
-    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:50px" />
+  <q-scroll-area  style="height: calc(100vh - 120px)" class="" :thumb-style="thumbStyle" :bar-style="barStyle">
+    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:0px" />
   </q-scroll-area>
 </template>
 <script >
