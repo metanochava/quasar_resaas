@@ -27,6 +27,7 @@
       flat
       dense
       :label="User.Group?.name"
+      class="col"
     >
 
       <q-menu fit>
