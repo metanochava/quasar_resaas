@@ -6,6 +6,21 @@
             <q-icon  name="home" />
           </q-item-section>
           <!-- <q-item-section class="text-body1" @click="$router.push({ name: 'home'})" >{{ tdc('Casa') }}</q-item-section> -->
+          
+          <s-btn
+            flat dense
+            :label="User.Group?.name"
+            class="full-width"
+          >
+            <q-menu fit>
+              <q-list dense>
+                <q-item v-for="group in User.Groups" :key="group.id" clickable @click="User.selectGroup(group)">
+                  <q-item-section>{{ group.name }}</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </s-btn>
+          
           <q-item-section side>
             <s-btn
             round dense flat

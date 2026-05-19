@@ -5,6 +5,15 @@
       <div class="text-center text-h6 q-pt-lg">
         {{ User?.username }}
       </div>
+    </div>
+    
+    <q-item clickable replace v-ripple  exact
+      :class="$q.dark.isActive ? 'bg-dar text-white' : 'bg-transparent text-white'"
+      exact-active-class=""  >
+      <q-item-section avatar @click="$router.push({ name: 'home'})">
+        <q-icon  name="home" />
+      </q-item-section>
+
       <s-btn
         flat dense
         :label="User.Group?.name"
@@ -18,15 +27,7 @@
           </q-list>
         </q-menu>
       </s-btn>
-    </div>
-    
-    <q-item clickable replace v-ripple  exact
-      :class="$q.dark.isActive ? 'bg-dar text-white' : 'bg-transparent text-white'"
-      exact-active-class=""  >
-      <q-item-section avatar @click="$router.push({ name: 'home'})">
-        <q-icon  name="home" />
-      </q-item-section>
-      <!-- <q-item-section class="text-h6" @click="$router.push({ name: 'home'})">{{ tdc('Casa') }}</q-item-section> -->
+      
       <q-item-section side >
         <s-btn
         round dense flat
