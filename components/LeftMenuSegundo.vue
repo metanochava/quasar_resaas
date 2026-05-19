@@ -5,7 +5,7 @@
   :thumb-style="thumbStyle"
   :bar-style="barStyle"
   style="
-    height: calc(500vh - 50px);
+    /* height: calc(500vh - 50px); */
     overflow-x:hidden;
   "
   >
@@ -14,7 +14,7 @@
       v-for="App in User.Menus"
       :key="App"
 
-      class="full-width"
+
 
       :class="
         $q.dark.isActive
