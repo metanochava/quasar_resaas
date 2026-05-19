@@ -72,7 +72,7 @@
     </q-item>
   </s-card>
     
-  <search-menu :size="'270'" class="search-fixed" style="padding: 0px; margin-bottom:0px;"/>
+  <search-menu :size="'270'" class="search-fixed q-ml-sm" style=" margin-bottom:0px;"/>
 
 
   <q-scroll-area class="" :thumb-style="thumbStyle" :bar-style="barStyle">
