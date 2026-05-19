@@ -70,16 +70,10 @@
       </div>
 
     </q-item>
-
-    <div class="text-white" >
-      <div class="text-center text-h6 q-pt-lg">
-        {{ User?.username }}
-      </div>
-    </div>
   </s-card>
 
   <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
-    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:137px" />
+    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:90px" />
   </q-scroll-area>
 </template>
 <script >
