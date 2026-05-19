@@ -1,34 +1,28 @@
 <template>
   <div >
   
-    <s-card
-      square
-      flat
+
+    <q-expansion-item
       v-for="App in User.Menus"
+      group="menu"
+      default-opened
       :key="App"
-      style="padding: 0px; "
-      
+      :class="
+        $q.dark.isActive
+          ? 'bg-dark-saas text-subtitle1'
+          : 'bg-saass text-subtitle1 text-primary'
+      "
+      :icon="App.icon"
+      dense
+      :label="(tdc(App.menu))"
+      :header-class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
+      :expand-icon-class="$q.dark.isActive ? 'text-white' : 'text-white'"
     >
-      <q-expansion-item
-        group="menu"
-        default-opened
-        :class="
-          $q.dark.isActive
-            ? 'bg-dark-saas text-subtitle1'
-            : 'bg-saass text-subtitle1 text-primary'
-        "
-        :icon="App.icon"
-        dense
-        :label="(tdc(App.menu))"
-        :header-class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
-        :expand-icon-class="$q.dark.isActive ? 'text-white' : 'text-white'"
-      >
-        <q-separator />
-          <SubMenu :Dados="App.submenu" />
-          <SubMenu :Dados="App.submenu" />
-        <q-separator />
-      </q-expansion-item>
-    </s-card>
+      <q-separator />
+        <SubMenu :Dados="App.submenu" />
+      <q-separator />
+    </q-expansion-item>
+
   </div>
 </template>
 
