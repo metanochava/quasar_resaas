@@ -70,10 +70,12 @@
       </div>
 
     </q-item>
-    <search-menu :size="'250'" class="search-fixed" style="padding: 0px; margin-bottom:0px;"/>
   </s-card>
+    
+  <search-menu :size="'270'" class="search-fixed" style="padding: 0px; margin-bottom:0px;"/>
 
-  <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
+
+  <q-scroll-area class="" :thumb-style="thumbStyle" :bar-style="barStyle">
     <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:50px" />
   </q-scroll-area>
 </template>
