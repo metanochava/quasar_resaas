@@ -2,7 +2,7 @@
   <div>
     <input
       v-model="User.search"
-      :style="'height: 30px; line-height: 30px; width: '+size+'px; padding: 0 8px;'"
+      :style="'height: 30px; line-height: 30px; width: '+size+'; padding: 0 8px;'"
       @input="filterMenus(User.search)"
       :placeholder="tdc('Procurar')"
     />
@@ -20,7 +20,7 @@ export default defineComponent({
   props: {
     size: {
       type: String,
-      default: '300'
+      default: '100%'
     }
   },
 

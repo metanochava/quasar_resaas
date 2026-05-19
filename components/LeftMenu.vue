@@ -70,13 +70,13 @@
       </div>
 
     </q-item>
-  <search-menu :size="'285'" class="q-ml-sm" style=" margin-top:4px;"/>
+  <search-menu size="100%" class="q-ml-s" style=" margin-top:3px;"/>
   </s-card>
     
 
 
 
-    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:100px" />
+  <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:100px" />
 
 </template>
 <script >

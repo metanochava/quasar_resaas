@@ -69,7 +69,7 @@
     </q-header>
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
-    <q-drawer v-model="User.LeftTop" side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary bg-saass'">
+    <q-drawer v-model="User.LeftTop" side="left"  :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary bg-saass'">
       <q-bar class="full-height q-pa-0">
         <!-- <q-scroll-area class="" :thumb-style="thumbStyle" :bar-style="barStyle"> -->
           <LeftMenu />
@@ -86,7 +86,7 @@
       </q-scroll-area>
     </q-drawer> -->
 
-    <q-drawer v-model="User.RightTop" side="right" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
+    <q-drawer v-model="User.RightTop" side="right"  :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
       <q-bar class="full-height q-pa-0">
         <q-scroll-area class="fit q-pa-0" :thumb-style="thumbStyle" :bar-style="barStyle">
           <RightMenu />
