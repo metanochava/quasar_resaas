@@ -9,8 +9,8 @@
       :key="App"
       :class="
         $q.dark.isActive
-          ? 'bg-dark-saas text-subtitle1'
-          : 'bg-saass text-subtitle1 text-primary'
+          ? 'bg-dark-saas text-subtitle1 col-12'
+          : 'bg-saass text-subtitle1  col-12 text-primary'
       "
       :icon="App.icon"
       dense
