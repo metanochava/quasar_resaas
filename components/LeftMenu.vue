@@ -70,16 +70,18 @@
       </div>
 
     </q-item>
+    <search-menu :size="'250'" class="search-fixed" style="padding: 0px; margin-bottom:0px;"/>
   </s-card>
 
   <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
-    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:90px" />
+    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:50px" />
   </q-scroll-area>
 </template>
 <script >
 
 import LeftMenuSegundo from './LeftMenuSegundo.vue'
 import { barStyle, thumbStyle } from '../boot/app'
+import SearchMenu from './SearchMenu.vue'
 
 import { defineComponent } from 'vue'
 import { tdc } from '../boot/base'
@@ -87,7 +89,8 @@ import { useUserStore } from '../stores/UserStore'
 
 export default defineComponent({
   components: {
-    LeftMenuSegundo
+    LeftMenuSegundo,
+    SearchMenu
   },
   setup () {
     const User = useUserStore()

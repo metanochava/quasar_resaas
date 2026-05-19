@@ -1,16 +1,13 @@
 <template>
   <div >
-    <search-menu :size="'250'" class="search-fixed" style="padding: 0px; margin-bottom: 20px;"/>
+  
     <s-card
       square
       flat
       v-for="App in User.Menus"
       :key="App"
       style="padding: 0px; "
-      :class="
-          $q.dark.isActive
-            ? ' col-xs-12 col-md-12 col-lg-12 q-bt-md'
-            : 'bg-saass   text-primary  col-xs-12 col-md-12 col-lg-12 q-bt-md'"
+      
     >
       <q-expansion-item
         group="menu"
@@ -49,7 +46,6 @@ import { defineComponent } from 'vue'
 import { tdc, toPlural} from '../boot/base'
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
-import SearchMenu from './SearchMenu.vue'
 import SubMenu from './SubMenu.vue'
 
 
@@ -57,7 +53,6 @@ export default defineComponent({
   name: 'LeftMenuSegundo',
 
   components: {
-    SearchMenu,
     SubMenu
   },
   setup () {
