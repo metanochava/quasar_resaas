@@ -39,7 +39,7 @@
       </q-item>
   </s-card>
 
-  <q-scroll-area class="fit " :thumb-style="thumbStyle" :bar-style="barStyle">
+  <q-scroll-area class="" :thumb-style="thumbStyle" :bar-style="barStyle">
     <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white  '" style="margin-top:137px" />
   </q-scroll-area>
 </template>
