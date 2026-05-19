@@ -70,14 +70,14 @@
       </div>
 
     </q-item>
-  <search-menu :size="'290'" class="q-ml-sm" style=" margin-bottom:4px;"/>
+  <search-menu :size="'285'" class="q-ml-sm" style=" margin-top:4px;"/>
   </s-card>
     
 
 
-  <q-scroll-area  style="height: 600px;" class="" :thumb-style="thumbStyle" :bar-style="barStyle">
-    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:0px" />
-  </q-scroll-area>
+
+    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:100px" />
+
 </template>
 <script >
 
