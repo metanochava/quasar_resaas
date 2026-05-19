@@ -28,6 +28,7 @@
       >
         <q-separator />
           <SubMenu :Dados="App.submenu" />
+          <SubMenu :Dados="App.submenu" />
         <q-separator />
       </q-expansion-item>
     </s-card>

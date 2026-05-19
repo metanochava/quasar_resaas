@@ -1,14 +1,8 @@
 
 <template>
   <s-card  square flat :class="$q.dark.isActive ? 'bg-dark  fixed-top  q-pa-0  header-fixed' : 'bg-transparent  q-pa-0 fixed-top header-fixed' ">
-    <div class="text-white" >
-      <div class="text-center text-h6 q-pt-lg">
-        {{ User?.username }}
-      </div>
-    </div>
-    
     <q-item
-      class="row items-center justify-between full-width bg-transparent"
+      class="row items-center justify-between full-width "
       :class="$q.dark.isActive
         ? 'bg-dark text-white'
         : 'bg-primary text-white'"
@@ -76,10 +70,16 @@
       </div>
 
     </q-item>
+
+    <div class="text-white" >
+      <div class="text-center text-h6 q-pt-lg">
+        {{ User?.username }}
+      </div>
+    </div>
   </s-card>
 
   <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
-    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white  '" style="margin-top:137px" />
+    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:137px" />
   </q-scroll-area>
 </template>
 <script >

@@ -1,7 +1,7 @@
 <template>
     <div class="q-pa-sm  items-center text-body1 " style="margin-left: 30px; width:300px;">
       <q-item
-        class="row items-center justify-between full-width bg-transparent"
+        class="row items-center justify-between full-width "
         :class="$q.dark.isActive
           ? 'bg-dark text-white'
           : 'bg-primary text-white'"
