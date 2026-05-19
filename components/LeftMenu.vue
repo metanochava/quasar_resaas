@@ -1,6 +1,6 @@
 
 <template>
-    <s-card  square flat :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-0  header-fixed' : 'bg-saas text-white   q-pa-0 fixed-top header-fixed' ">
+    <s-card  square flat :class="$q.dark.isActive ? 'bg-dark text-white fixed-top  q-pa-0  header-fixed' : 'bg-saass text-white   q-pa-0 fixed-top header-fixed' ">
       <div :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary' ">
         <div class="text-center text-h6 q-pt-lg">
 

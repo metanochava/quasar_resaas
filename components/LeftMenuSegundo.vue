@@ -11,7 +11,7 @@
       :class="
           $q.dark.isActive
             ? ' col-xs-12 col-md-12 col-lg-12 q-bt-md'
-            : 'bg-saas   text-primary  col-xs-12 col-md-12 col-lg-12 q-bt-md'"
+            : 'bg-saass   text-primary  col-xs-12 col-md-12 col-lg-12 q-bt-md'"
     >
       <q-expansion-item
         group="menu"
@@ -19,7 +19,7 @@
         :class="
           $q.dark.isActive
             ? 'bg-dark-saas text-subtitle1'
-            : 'bg-saas text-subtitle1 text-primary'
+            : 'bg-saass text-subtitle1 text-primary'
         "
         :icon="App.icon"
         dense

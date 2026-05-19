@@ -11,7 +11,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-page-container :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas'">
+    <q-page-container :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saass'">
       <router-view />
     </q-page-container>
 
