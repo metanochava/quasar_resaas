@@ -1,5 +1,5 @@
 <template>
-    <div class="q-pa-sm  items-center text-body1" style="width:300px;">
+    <div class="q-pa-sm q-ml-md  items-center text-body1" style="width:300px;">
       <q-item
   class="row items-center justify-between full-width"
   :class="$q.dark.isActive
@@ -21,13 +21,13 @@
   </div>
 
   <!-- 🔥 CENTRO -->
-  <div class="row items-center">
+  <div class=" col row items-center">
 
     <s-btn
       flat
       dense
       :label="User.Group?.name"
-      class="col"
+      class="full-width"
     >
 
       <q-menu fit>
