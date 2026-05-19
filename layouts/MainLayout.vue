@@ -71,9 +71,9 @@
     <!-- -------------------- LEFT DRAWER -------------------- -->
     <q-drawer v-model="User.LeftTop" side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary bg-saass'">
       <q-bar class="full-height q-pa-0">
-
+        <!-- <q-scroll-area class="" :thumb-style="thumbStyle" :bar-style="barStyle"> -->
           <LeftMenu />
-
+        <!-- </q-scroll-area> -->
       </q-bar>
     </q-drawer>
 

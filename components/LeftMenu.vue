@@ -26,7 +26,7 @@
       <q-item-section avatar @click="$router.push({ name: 'home'})">
         <q-icon  name="home" />
       </q-item-section>
-      <q-item-section class="text-h6" @click="$router.push({ name: 'home'})">{{ tdc('Casa') }}</q-item-section>
+      <!-- <q-item-section class="text-h6" @click="$router.push({ name: 'home'})">{{ tdc('Casa') }}</q-item-section> -->
       <q-item-section side >
         <s-btn
         round dense flat
