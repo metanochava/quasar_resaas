@@ -32,13 +32,6 @@
   </div>
 </template>
 
-<style >
-  .search-fixed {
-    position: fixed;
-    z-index: 9;
-  }
-</style>
-
 <script >
 
 

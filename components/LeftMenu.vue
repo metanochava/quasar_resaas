@@ -70,6 +70,8 @@
       </div>
 
     </q-item>
+  <search-menu :size="'270'" class="search-fixed" style=" margin-bottom:0px;"/>
+<br>
   </s-card>
     
   <search-menu :size="'270'" class="search-fixed" style=" margin-bottom:0px;"/>
@@ -125,7 +127,11 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
+<style >
+.search-fixed {
+    position: fixed;
+    z-index: 9;
+  }
 .header-fixed {
   position: fixed;
   top: 0;
