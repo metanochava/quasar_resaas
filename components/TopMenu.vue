@@ -1,8 +1,8 @@
 <template>
     <div class="q-pa-sm  items-center text-body1" style="width:300px;">
       <div class="q-ml-md cursor-pointer non-selectable" >
-        <q-item clickable dense replace v-ripple  :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"  >
-          <q-item-section avatar @click="$router.push({ name: 'home'})" >
+        <q-item  dense replace v-ripple  :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"  >
+          <q-item-section  @click="$router.push({ name: 'home'})" >
             <q-icon  name="home" />
           </q-item-section>
           <!-- <q-item-section class="text-body1" @click="$router.push({ name: 'home'})" >{{ tdc('Casa') }}</q-item-section> -->
@@ -20,15 +20,15 @@
               </q-list>
             </q-menu>
           </s-btn>
-          
+
           <q-item-section side>
             <s-btn
-            round dense flat
-            :icon="'settings'" :class="$q.dark.isActive ? 'text-white' : 'text-white'"
-            @click="User.toggleSettings()"
-          >
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc('Configurações') }}</q-tooltip>
-          </s-btn>
+              round dense flat
+              :icon="'settings'" :class="$q.dark.isActive ? 'text-white' : 'text-white'"
+              @click="User.toggleSettings()"
+            >
+              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc('Configurações') }}</q-tooltip>
+            </s-btn>
           </q-item-section>
         </q-item>
       </div>
