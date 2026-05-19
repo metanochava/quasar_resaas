@@ -88,7 +88,7 @@
 
     <q-drawer v-model="User.RightTop" side="right" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
       <q-bar class="full-height q-pa-0">
-        <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
+        <q-scroll-area class="fit q-pa-0" :thumb-style="thumbStyle" :bar-style="barStyle">
           <RightMenu />
         </q-scroll-area>
       </q-bar>
