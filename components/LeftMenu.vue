@@ -7,37 +7,75 @@
       </div>
     </div>
     
-    <q-item clickable replace v-ripple  exact
-      :class="$q.dark.isActive ? 'bg-dar text-white' : 'bg-transparent text-white'"
-      exact-active-class=""  >
-      <q-item-section avatar @click="$router.push({ name: 'home'})">
-        <q-icon  name="home" />
-      </q-item-section>
+    <q-item
+      class="row items-center justify-between full-width"
+      :class="$q.dark.isActive
+        ? 'bg-dark text-white'
+        : 'bg-primary text-white'"
+    >
 
-      <s-btn
-        flat dense
-        :label="User.Group?.name"
-        class="full-width"
-      >
-        <q-menu fit>
-          <q-list dense>
-            <q-item v-for="group in User.Groups" :key="group.id" clickable @click="User.selectGroup(group)">
-              <q-item-section>{{ group.name }}</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </s-btn>
-      
-      <q-item-section side >
+      <!-- 🔥 ESQUERDA -->
+      <div class="row items-center">
+
         <s-btn
-        round dense flat
-        :icon="'settings'" :class="$q.dark.isActive ? 'text-white' : 'text-white'"
-        @click="User.toggleSettings()"
-      >
-      <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc('Configurações') }}</q-tooltip>
-      </s-btn>
-      </q-item-section>
-      </q-item>
+          flat
+          round
+          dense
+          icon="home"
+          @click="$router.push({ name: 'home' })"
+        />
+
+      </div>
+
+      <!-- 🔥 CENTRO -->
+      <div class=" col row items-center">
+
+        <s-btn
+          flat
+          dense
+          :label="User.Group?.name"
+          class="full-width"
+        >
+
+          <q-menu fit>
+
+            <q-list dense>
+
+              <q-item
+                v-for="group in User.Groups"
+                :key="group.id"
+                clickable
+                @click="User.selectGroup(group)"
+              >
+                <q-item-section>
+                  {{ group.name }}
+                </q-item-section>
+
+              </q-item>
+
+            </q-list>
+
+          </q-menu>
+
+        </s-btn>
+
+      </div>
+
+      <!-- 🔥 DIREITA -->
+      <div class="row items-center">
+
+        <s-btn
+          round
+          dense
+          flat
+          icon="settings"
+          class="text-white"
+          @click="User.toggleSettings()"
+        />
+
+      </div>
+
+    </q-item>
   </s-card>
 
   <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">

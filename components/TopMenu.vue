@@ -1,74 +1,74 @@
 <template>
-    <div class="q-pa-sm q-ml-md  items-center text-body1" style="width:300px;">
+    <div class="q-pa-sm q-ml-m items-center text-body1" style="width:300px;">
       <q-item
-  class="row items-center justify-between full-width"
-  :class="$q.dark.isActive
-    ? 'bg-dark text-white'
-    : 'bg-primary text-white'"
->
+        class="row items-center justify-between full-width"
+        :class="$q.dark.isActive
+          ? 'bg-dark text-white'
+          : 'bg-primary text-white'"
+      >
 
-  <!-- 🔥 ESQUERDA -->
-  <div class="row items-center">
+        <!-- 🔥 ESQUERDA -->
+        <div class="row items-center">
 
-    <s-btn
-      flat
-      round
-      dense
-      icon="home"
-      @click="$router.push({ name: 'home' })"
-    />
+          <s-btn
+            flat
+            round
+            dense
+            icon="home"
+            @click="$router.push({ name: 'home' })"
+          />
 
-  </div>
+        </div>
 
-  <!-- 🔥 CENTRO -->
-  <div class=" col row items-center">
+        <!-- 🔥 CENTRO -->
+        <div class=" col row items-center">
 
-    <s-btn
-      flat
-      dense
-      :label="User.Group?.name"
-      class="full-width"
-    >
-
-      <q-menu fit>
-
-        <q-list dense>
-
-          <q-item
-            v-for="group in User.Groups"
-            :key="group.id"
-            clickable
-            @click="User.selectGroup(group)"
+          <s-btn
+            flat
+            dense
+            :label="User.Group?.name"
+            class="full-width"
           >
-            <q-item-section>
-              {{ group.name }}
-            </q-item-section>
 
-          </q-item>
+            <q-menu fit>
 
-        </q-list>
+              <q-list dense>
 
-      </q-menu>
+                <q-item
+                  v-for="group in User.Groups"
+                  :key="group.id"
+                  clickable
+                  @click="User.selectGroup(group)"
+                >
+                  <q-item-section>
+                    {{ group.name }}
+                  </q-item-section>
 
-    </s-btn>
+                </q-item>
 
-  </div>
+              </q-list>
 
-  <!-- 🔥 DIREITA -->
-  <div class="row items-center">
+            </q-menu>
 
-    <s-btn
-      round
-      dense
-      flat
-      icon="settings"
-      class="text-white"
-      @click="User.toggleSettings()"
-    />
+          </s-btn>
 
-  </div>
+        </div>
 
-</q-item>
+        <!-- 🔥 DIREITA -->
+        <div class="row items-center">
+
+          <s-btn
+            round
+            dense
+            flat
+            icon="settings"
+            class="text-white"
+            @click="User.toggleSettings()"
+          />
+
+        </div>
+
+      </q-item>
     </div>
 
     <TopMenuSegundo ></TopMenuSegundo>
