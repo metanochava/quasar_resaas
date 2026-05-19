@@ -1,7 +1,7 @@
 
 <template>
   <s-card  square flat :class="$q.dark.isActive ? 'bg-dark  fixed-top  q-pa-0  header-fixed' : 'bg-transparent  q-pa-0 fixed-top header-fixed' ">
-    <div>
+    <div class="text-white" >
       <div class="text-center text-h6 q-pt-lg">
         {{ User?.username }}
       </div>

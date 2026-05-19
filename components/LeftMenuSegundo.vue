@@ -8,10 +8,7 @@
       v-for="App in User.Menus"
       :key="App"
       style="padding: 0px; "
-      :class="
-          $q.dark.isActive
-            ? ' col-xs-12 col-md-12 col-lg-12 q-bt-md'
-            : 'bg-saass   text-primary  col-xs-12 col-md-12 col-lg-12 q-bt-md'"
+      :class="[ $q.dark.isActive ? '' : 'bg-saass text-primary ', 'col-xs-12 col-md-12 col-lg-12 q-bt-md']"
     >
       <q-expansion-item
         group="menu"
