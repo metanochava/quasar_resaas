@@ -8,7 +8,7 @@
     </div>
     
     <q-item
-      class="row items-center justify-between full-width"
+      class="row items-center justify-between full-width bg-transparent"
       :class="$q.dark.isActive
         ? 'bg-dark text-white'
         : 'bg-primary text-white'"
