@@ -21,7 +21,7 @@
     </div>
     
     <q-item clickable replace v-ripple  exact
-      :class="$q.dark.isActive ? 'bg-dar text-white' : 'bg-primar text-white'"
+      :class="$q.dark.isActive ? 'bg-dar text-white' : 'bg-transparent text-white'"
       exact-active-class=""  >
       <q-item-section avatar @click="$router.push({ name: 'home'})">
         <q-icon  name="home" />
@@ -39,13 +39,14 @@
       </q-item>
   </s-card>
 
-  <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
+  <q-scroll-area class="fit " :thumb-style="thumbStyle" :bar-style="barStyle">
     <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white  '" style="margin-top:137px" />
   </q-scroll-area>
 </template>
 <script >
 
 import LeftMenuSegundo from './LeftMenuSegundo.vue'
+import { barStyle, thumbStyle } from '../boot/app'
 
 import { defineComponent } from 'vue'
 import { tdc } from '../boot/base'
@@ -59,6 +60,8 @@ export default defineComponent({
     const User = useUserStore()
     return {
       User,
+      barStyle,
+      thumbStyle
     }
   },
 
