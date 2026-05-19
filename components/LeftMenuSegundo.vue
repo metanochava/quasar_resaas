@@ -1,8 +1,10 @@
 <template>
-  <div >
-  
-
     <q-expansion-item
+      class="full-width"
+      style="
+
+        height:500px;
+      "
       v-for="App in User.Menus"
       group="menu"
       default-opened
@@ -22,8 +24,6 @@
         <SubMenu :Dados="App.submenu" />
       <q-separator />
     </q-expansion-item>
-
-  </div>
 </template>
 
 <script >
