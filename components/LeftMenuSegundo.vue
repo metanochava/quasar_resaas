@@ -14,12 +14,10 @@
       v-for="App in User.Menus"
       :key="App"
 
-
-
       :class="
         $q.dark.isActive
           ? 'bg-dark-saas text-subtitle1 text-white'
-          : 'bg-saas text-subtitle1 text-primary'
+          : 'text-subtitle1 text-primary'
       "
 
       :icon="App.icon"
