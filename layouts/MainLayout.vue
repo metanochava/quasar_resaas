@@ -63,8 +63,8 @@
         <!-- Menu Direito -->
         <s-btn dense flat round icon="menu" @click="User.toggleRightTop()" />
       </q-toolbar>
-      <q-bar >
-        <TopMenu v-show="!User.LeftTop && !['authwelcome','welcome'].includes($route.name)"></TopMenu>
+      <q-bar v-show="!User.LeftTop && !['authwelcome','welcome'].includes($route.name)">
+        <TopMenu ></TopMenu>
       </q-bar>
     </q-header>
 

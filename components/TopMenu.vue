@@ -1,6 +1,6 @@
 <template>
-    <div class="q-pa-sm q-pl-md  items-center text-body1">
-      <div class="q-ml-md cursor-pointer non-selectable">
+    <div class="q-pa-sm q-pl-md  items-center text-body1" style="width:220px;">
+      <div class="q-ml-md cursor-pointer non-selectable" >
         <q-item clickable dense replace v-ripple
           :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"  >
           <q-item-section avatar @click="$router.push({ name: 'home'})" >
