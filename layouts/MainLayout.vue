@@ -63,15 +63,17 @@
         <!-- Menu Direito -->
         <s-btn dense flat round icon="menu" @click="User.toggleRightTop()" />
       </q-toolbar>
-      <q-bar v-show="!User.LeftTop && !['authwelcome','welcome'].includes($route.name)">
+      <q-bar  v-show="!User.LeftTop && !['authwelcome','welcome'].includes($route.name)">
         <TopMenu ></TopMenu>
       </q-bar>
     </q-header>
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
     <q-drawer v-model="User.LeftTop" side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary bg-saass'">
-      <q-bar class="full-height">
-        <LeftMenu />
+      <q-bar class="full-height q-pa-0">
+        <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
+          <LeftMenu />
+        </q-scroll-area>
       </q-bar>
     </q-drawer>
 
@@ -85,7 +87,7 @@
     </q-drawer> -->
 
     <q-drawer v-model="User.RightTop" side="right" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
-      <q-bar class="full-height">
+      <q-bar class="full-height q-pa-0">
         <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
           <RightMenu />
         </q-scroll-area>
