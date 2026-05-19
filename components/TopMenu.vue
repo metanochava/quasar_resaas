@@ -1,7 +1,7 @@
 <template>
     <div class="q-pa-sm  items-center text-body1" style="width:300px;">
-      <div class="q-ml-m cursor-pointer non-selectable" >
-        <q-item clickable dense replace v-ripple :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"  >
+      <div class="q-ml-md cursor-pointer non-selectable" >
+        <q-item clickable dense replace v-ripple  :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"  >
           <q-item-section avatar @click="$router.push({ name: 'home'})" >
             <q-icon  name="home" />
           </q-item-section>
@@ -21,7 +21,7 @@
 
     <TopMenuSegundo ></TopMenuSegundo>
     <q-space />
-    <SearchMenu  :size="'180'" style="margin-right: 30px;"/>
+    <SearchMenu  :size="'200'" style="margin-right: 30px;"/>
 </template>
 <script >
 
