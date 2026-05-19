@@ -1,31 +1,51 @@
 <template>
-    <q-expansion-item
-      class="full-width"
-      style="
+  <q-scroll-area
 
-        height:500px;
-      "
+  class="full-width"
+  :thumb-style="thumbStyle"
+  :bar-style="barStyle"
+  style="
+    height: calc(500vh - 50px);
+    overflow-x:hidden;
+  "
+  >
+
+    <q-expansion-item
       v-for="App in User.Menus"
-      group="menu"
-      default-opened
       :key="App"
+
+      class="full-width"
+
       :class="
         $q.dark.isActive
-          ? 'bg-dark-saas text-subtitle1 col-12'
-          : 'bg-saass text-subtitle1  col-12 text-primary'
+          ? 'bg-dark-saas text-subtitle1 text-white'
+          : 'bg-saas text-subtitle1 text-primary'
       "
+
       :icon="App.icon"
       dense
-      :label="(tdc(App.menu))"
-      :header-class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
-      :expand-icon-class="$q.dark.isActive ? 'text-white' : 'text-white'"
-    >
-      <q-separator />
-        <SubMenu :Dados="App.submenu" />
-      <q-separator />
-    </q-expansion-item>
-</template>
 
+      :label="tdc(App.menu)"
+
+      :header-class="
+        $q.dark.isActive
+          ? 'bg-dark text-white'
+          : 'bg-primary text-white'
+      "
+
+      :expand-icon-class="'text-white'"
+    >
+
+      <q-separator />
+
+      <SubMenu :Dados="App.submenu" />
+
+      <q-separator />
+
+    </q-expansion-item>
+
+  </q-scroll-area>
+</template>
 <script >
 
 
