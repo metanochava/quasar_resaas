@@ -1,5 +1,4 @@
 <template>
-  <q-bar >
     <div class="q-pa-sm q-pl-md  items-center text-body1">
       <div class="q-ml-md cursor-pointer non-selectable">
         <q-item clickable dense replace v-ripple
@@ -24,9 +23,6 @@
     <TopMenuSegundo ></TopMenuSegundo>
     <q-space />
     <SearchMenu  :size="'180'" style="margin-right: 30px;"/>
-
-
-  </q-bar>
 </template>
 <script >
 

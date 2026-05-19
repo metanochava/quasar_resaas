@@ -1,7 +1,6 @@
 
-<template>
+<template >
   <RightMenuSegundo  />
-  
 </template>
 
 <script setup>

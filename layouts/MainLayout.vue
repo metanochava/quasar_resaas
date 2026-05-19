@@ -63,21 +63,35 @@
         <!-- Menu Direito -->
         <s-btn dense flat round icon="menu" @click="User.toggleRightTop()" />
       </q-toolbar>
-      <TopMenu v-show="!User.LeftTop && !['authwelcome','welcome'].includes($route.name)"></TopMenu>
+      <q-bar >
+        <TopMenu v-show="!User.LeftTop && !['authwelcome','welcome'].includes($route.name)"></TopMenu>
+      </q-bar>
     </q-header>
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
-    <q-drawer v-model="User.LeftTop" side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saass'">
-      <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
-        <LeftMenu />
-      </q-scroll-area>
+    <q-drawer v-model="User.LeftTop" side="left" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary bg-saass'">
+      <q-bar >
+        <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
+          <LeftMenu />
+        </q-scroll-area>
+      </q-bar>
     </q-drawer>
 
+    
+
     <!-- -------------------- RIGHT DRAWER -------------------- -->
-    <q-drawer v-model="User.RightTop" side="right" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saass'">
+    <!-- <q-drawer v-model="User.RightTop" side="right" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary bg-saass'">
       <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
         <RightMenu />
       </q-scroll-area>
+    </q-drawer> -->
+
+    <q-drawer v-model="User.LeftTop" side="right" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary bg-saass'">
+      <q-bar >
+        <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
+          <RightMenu />
+        </q-scroll-area>
+      </q-bar>
     </q-drawer>
 
     <!-- -------------------- PAGE CONTAINER -------------------- -->
