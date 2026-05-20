@@ -11,7 +11,7 @@
   full-width
   -->
     <div class="q-pa-md " style="max-width: 350px">
-    <q-list padding bordered class="rounded-borders">
+    <q-list padding bordered class="rounded-borders full-width">
     <q-expansion-item
       v-for="App in User.Menus"
       :key="App"
