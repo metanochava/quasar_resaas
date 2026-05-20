@@ -70,7 +70,7 @@
 
     <TopMenuSegundo ></TopMenuSegundo>
     <q-space />
-    <SearchMenu  size="200px" style="margin-right: 30px;"/>
+    <SearchMenu  size="200px" />
 </template>
 <script >
 
