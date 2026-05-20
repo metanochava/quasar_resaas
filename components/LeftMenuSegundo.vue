@@ -7,8 +7,10 @@
       height: calc(100vh - 50px);
       overflow-x:hidden;
     "
-  > -->
-    <div class="q-pa-md" style="max-width: 350px">
+  > 
+  full-width
+  -->
+    <div class="q-pa-md " style="max-width: 350px">
     <q-list padding bordered class="rounded-borders">
     <q-expansion-item
       v-for="App in User.Menus"

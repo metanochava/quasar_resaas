@@ -69,19 +69,19 @@
 
     </q-item>
     <div class="q-px-md"  >
-    <search-menu size="100%" />
+      <search-menu size="100%" />
     </div>
   </s-card>
 
-  <q-scroll-area 
+  <!-- <q-scroll-area 
     class=" bg-grey"
     :thumb-style="thumbStyle"
     :bar-style="barStyle"
     
-  > 
+  >  -->
     <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:100px" />
 
-  </q-scroll-area>
+  <!-- </q-scroll-area> -->
 
 </template>
 <script >
