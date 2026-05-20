@@ -1,8 +1,9 @@
 
 <template>
-  <s-card style="margin-left: 0px;" square flat :class="$q.dark.isActive ? 'bg-dark  fixed-top   header-fixed' : 'bg-transparent   fixed-top header-fixed' ">
+  <s-card style="margin-left: -10px;" square flat :class="$q.dark.isActive ? 'bg-dark  fixed-top   header-fixed' : 'bg-transparent   fixed-top header-fixed' ">
     <q-item
-      class="row items-center justify-between full-width "
+      style="margin-left: -10px;"
+      class="row items-center justify-between  "
       :class="$q.dark.isActive
         ? 'bg-dark text-white'
         : 'bg-primary text-white'"
