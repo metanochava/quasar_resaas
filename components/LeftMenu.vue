@@ -74,7 +74,7 @@
   </s-card>
 
   <q-scroll-area
-
+    class="fit"
     :thumb-style="thumbStyle"
     :bar-style="barStyle"
     
