@@ -1,13 +1,5 @@
 <template>
   <q-scroll-area
-
-  class="full-width"
-  :thumb-style="thumbStyle"
-  :bar-style="barStyle"
-  style="
-    /* height: calc(500vh - 50px); */
-    overflow-x:hidden;
-  "
   >
 
     <q-expansion-item
@@ -18,6 +10,14 @@
         $q.dark.isActive
           ? 'bg-dark-saas text-subtitle1 text-white'
           : 'text-subtitle1 text-primary'
+      "
+
+      class="full-width"
+      :thumb-style="thumbStyle"
+      :bar-style="barStyle"
+      style="
+        /* height: calc(500vh - 50px); */
+        overflow-x:hidden;
       "
 
       :icon="App.icon"
