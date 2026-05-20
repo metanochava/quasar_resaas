@@ -73,8 +73,8 @@
     </div>
   </s-card>
 
-  <q-scroll-area style="width: calc(100vh + 300px)"
-    class=" grey"
+  <q-scroll-area style="height: calc(100vh - 10px)"
+    class=" bg-grey"
     :thumb-style="thumbStyle"
     :bar-style="barStyle"
     
