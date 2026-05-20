@@ -1,5 +1,5 @@
 <template>
-    <q-scroll-area
+    <!-- <q-scroll-area
 
     :thumb-style="thumbStyle"
     :bar-style="barStyle"
@@ -7,7 +7,7 @@
       height: calc(100vh - 50px);
       overflow-x:hidden;
     "
-  >
+  > -->
   <!-- <div 
     style="width: 250px; height: 500px;"
   > -->
@@ -44,7 +44,7 @@
     </q-expansion-item>
 
   <!-- </div> -->
-   </q-scroll-area>
+  <!-- </q-scroll-area> -->
 </template>
 <script >
 
