@@ -1,6 +1,6 @@
 
 <template>
-  <s-card style="margin-left: -10px;" square flat :class="$q.dark.isActive ? 'bg-dark  fixed-top   header-fixed' : 'bg-transparent   fixed-top header-fixed' ">
+  <s-card  square flat :class="$q.dark.isActive ? 'bg-dark  fixed-top   header-fixed' : 'bg-transparent   fixed-top header-fixed' ">
     <q-item
       class="row items-center justify-between  "
       :class="$q.dark.isActive
@@ -68,12 +68,12 @@
       </div>
 
     </q-item>
-    <div class="q-px-s"  >
+    <div class="q-px-md"  >
     <search-menu size="100%" />
     </div>
   </s-card>
 
-  <q-scroll-area style="height: calc(100vh - 10px)"
+  <q-scroll-area 
     class=" bg-grey"
     :thumb-style="thumbStyle"
     :bar-style="barStyle"
