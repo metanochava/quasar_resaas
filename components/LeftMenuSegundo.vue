@@ -1,7 +1,16 @@
 <template>
-  <div 
-    style="width: 250px; height: 500px;"
+    <q-scroll-area
+
+    :thumb-style="thumbStyle"
+    :bar-style="barStyle"
+    style="
+      height: calc(100vh - 50px);
+      overflow-x:hidden;
+    "
   >
+  <!-- <div 
+    style="width: 250px; height: 500px;"
+  > -->
     <q-expansion-item
       v-for="App in User.Menus"
       :key="App"
@@ -34,7 +43,8 @@
 
     </q-expansion-item>
 
-  </div>
+  <!-- </div> -->
+   </q-scroll-area>
 </template>
 <script >
 

@@ -73,18 +73,18 @@
     </div>
   </s-card>
 
-  <q-scroll-area
-    class="fit"
+  <!-- <q-scroll-area
+
     :thumb-style="thumbStyle"
     :bar-style="barStyle"
     style="
       height: calc(100vh - 50px);
       overflow-x:hidden;
     "
-  >
-  <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:100px" />
+  > -->
+    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:100px" />
 
-  </q-scroll-area>
+  <!-- </q-scroll-area> -->
     
 
 
