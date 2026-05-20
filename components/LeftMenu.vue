@@ -68,8 +68,9 @@
       </div>
 
     </q-item>
-  <search-menu size="100%" class="q-ml-s" style=" margin-top:3px;"/>
+  <search-menu size="100%"  style=" margin-top:3px;"/>
   </s-card>
+  <search-menu size="100%"  style=" margin-top:3px;"/>
     
 
 
