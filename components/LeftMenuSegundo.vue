@@ -8,9 +8,8 @@
       overflow-x:hidden;
     "
   > -->
-  <!-- <div 
-    style="width: 250px; height: 500px;"
-  > -->
+    <div class="q-pa-md" style="max-width: 350px">
+    <q-list padding bordered class="rounded-borders">
     <q-expansion-item
       v-for="App in User.Menus"
       :key="App"
@@ -43,7 +42,8 @@
 
     </q-expansion-item>
 
-  <!-- </div> -->
+  </q-list>
+  </div>
   <!-- </q-scroll-area> -->
 </template>
 <script >
