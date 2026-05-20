@@ -1,6 +1,6 @@
 
 <template>
-  <s-card style="margin-left: -30px;" square flat :class="$q.dark.isActive ? 'bg-dark  fixed-top   header-fixed' : 'bg-transparent   fixed-top header-fixed' ">
+  <s-card style="margin-left: 0px;" square flat :class="$q.dark.isActive ? 'bg-dark  fixed-top   header-fixed' : 'bg-transparent   fixed-top header-fixed' ">
     <q-item
       class="row items-center justify-between full-width "
       :class="$q.dark.isActive
