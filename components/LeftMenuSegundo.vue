@@ -1,7 +1,7 @@
 <template>
-  <q-scroll-area
+  <div 
+    style="width: 250px; height: 500px;"
   >
-
     <q-expansion-item
       v-for="App in User.Menus"
       :key="App"
@@ -34,7 +34,7 @@
 
     </q-expansion-item>
 
-  </q-scroll-area>
+  </div>
 </template>
 <script >
 

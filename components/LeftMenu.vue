@@ -72,12 +72,23 @@
     <search-menu size="100%" />
     </div>
   </s-card>
-  <search-menu size="100%"  style=" margin-top:3px;"/>
+
+  <q-scroll-area
+    class="fit"
+    :thumb-style="thumbStyle"
+    :bar-style="barStyle"
+    style="
+      height: calc(100vh - 50px);
+      overflow-x:hidden;
+    "
+  >
+  <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:100px" />
+
+  </q-scroll-area>
     
 
 
 
-  <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:100px" />
 
 </template>
 <script >
