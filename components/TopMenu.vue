@@ -6,7 +6,6 @@
           ? 'bg-dark text-white'
           : 'bg-primary text-white'"
       >
-
         <!-- 🔥 ESQUERDA -->
         <div class="row items-center">
 

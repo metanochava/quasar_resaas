@@ -23,14 +23,12 @@
 
       <!-- 🔥 CENTRO -->
       <div class=" col row items-center">
-
         <s-btn
           flat
           dense
           :label="User.Group?.name"
           class="full-width"
         >
-
           <q-menu fit>
 
             <q-list dense>
