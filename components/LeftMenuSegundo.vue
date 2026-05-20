@@ -12,14 +12,6 @@
           : 'text-subtitle1 text-primary'
       "
 
-      class="full-width"
-      :thumb-style="thumbStyle"
-      :bar-style="barStyle"
-      style="
-        /* height: calc(500vh - 50px); */
-        overflow-x:hidden;
-      "
-
       :icon="App.icon"
       dense
 
