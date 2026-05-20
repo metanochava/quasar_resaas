@@ -1,5 +1,5 @@
 <template>
-    <div class="q-pa-sm  items-center text-body1 " style="margin-left: 10px; width:290px;">
+    <div class="q-pa-sm  items-center text-body1 " style="margin-left: 20px; width:290px;">
       <q-item
         class="row items-center justify-between full-width "
         :class="$q.dark.isActive
