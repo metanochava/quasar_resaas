@@ -68,7 +68,7 @@
       </div>
 
     </q-item>
-    <div class="q-px-md"  >
+    <div class="q-pa-md"  >
       <search-menu size="100%" />
     </div>
   </s-card>
