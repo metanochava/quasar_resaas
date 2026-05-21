@@ -1,52 +1,50 @@
 <template>
-    <!-- <q-scroll-area
 
-    :thumb-style="thumbStyle"
-    :bar-style="barStyle"
-    style="
-      height: calc(100vh - 50px);
-      overflow-x:hidden;
-    "
-  > 
-  full-width
-  -->
-  <div class="bg-grey  full-height" style="width: 300px; margin-top: 40px;">
-    <q-list padding bordered class="rounded-borders full-width">
-      <q-expansion-item
-        v-for="App in User.Menus"
-        :key="App"
+  <div class="bg-grey  full-height" style="width: 300px; margin-top: 70px;">
+    <q-scroll-area
+      class="fit"
+      :thumb-style="thumbStyle"
+      :bar-style="barStyle"
+    > 
 
-        :class="
-          $q.dark.isActive
-            ? 'bg-dark-saas text-subtitle1 text-white'
-            : 'text-subtitle1 text-primary'
-        "
+  
+      <q-list bordered class="rounded-borders full-width">
+        <q-expansion-item
+          v-for="App in User.Menus"
+          :key="App"
 
-        :icon="App.icon"
-        dense
+          :class="
+            $q.dark.isActive
+              ? 'bg-dark-saas text-subtitle1 text-white'
+              : 'text-subtitle1 text-primary'
+          "
 
-        :label="tdc(App.menu)"
+          :icon="App.icon"
+          dense
 
-        :header-class="
-          $q.dark.isActive
-            ? 'bg-dark text-white'
-            : 'bg-primary text-white'
-        "
+          :label="tdc(App.menu)"
 
-        :expand-icon-class="'text-white'"
-      >
+          :header-class="
+            $q.dark.isActive
+              ? 'bg-dark text-white'
+              : 'bg-primary text-white'
+          "
 
-        <q-separator />
+          :expand-icon-class="'text-white'"
+        >
 
-        <SubMenu :Dados="App.submenu" />
+          <q-separator />
 
-        <q-separator />
+          <SubMenu :Dados="App.submenu" />
 
-      </q-expansion-item>
+          <q-separator />
 
-    </q-list>
+        </q-expansion-item>
+
+      </q-list>
+    </q-scroll-area>
+
   </div>
-  <!-- </q-scroll-area> -->
 </template>
 <script >
 
