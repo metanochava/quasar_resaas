@@ -10,41 +10,41 @@
   > 
   full-width
   -->
-    <div class="q-pa-md bg-grey  full-height" style="width: 300px">
+  <div class="bg-grey  full-height" style="width: 300px; margin-top: 40px;">
     <q-list padding bordered class="rounded-borders full-width">
-    <q-expansion-item
-      v-for="App in User.Menus"
-      :key="App"
+      <q-expansion-item
+        v-for="App in User.Menus"
+        :key="App"
 
-      :class="
-        $q.dark.isActive
-          ? 'bg-dark-saas text-subtitle1 text-white'
-          : 'text-subtitle1 text-primary'
-      "
+        :class="
+          $q.dark.isActive
+            ? 'bg-dark-saas text-subtitle1 text-white'
+            : 'text-subtitle1 text-primary'
+        "
 
-      :icon="App.icon"
-      dense
+        :icon="App.icon"
+        dense
 
-      :label="tdc(App.menu)"
+        :label="tdc(App.menu)"
 
-      :header-class="
-        $q.dark.isActive
-          ? 'bg-dark text-white'
-          : 'bg-primary text-white'
-      "
+        :header-class="
+          $q.dark.isActive
+            ? 'bg-dark text-white'
+            : 'bg-primary text-white'
+        "
 
-      :expand-icon-class="'text-white'"
-    >
+        :expand-icon-class="'text-white'"
+      >
 
-      <q-separator />
+        <q-separator />
 
-      <SubMenu :Dados="App.submenu" />
+        <SubMenu :Dados="App.submenu" />
 
-      <q-separator />
+        <q-separator />
 
-    </q-expansion-item>
+      </q-expansion-item>
 
-  </q-list>
+    </q-list>
   </div>
   <!-- </q-scroll-area> -->
 </template>
