@@ -4,9 +4,10 @@
       class="fit"
       :thumb-style="thumbStyle"
       :bar-style="barStyle"
+       style="height: calc(100vh - 190px);"
     > 
 
-      <q-list bordered class="rounded-borders" style="width: 280px; ">
+      <q-list class="rounded-borders" style="width: 280px; ">
         <q-expansion-item
           v-for="App in User.Menus"
           :key="App"
