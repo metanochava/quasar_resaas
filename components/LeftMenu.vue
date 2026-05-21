@@ -1,7 +1,7 @@
 
 <template>
   <s-card  square flat :class="$q.dark.isActive ? 'bg-dark  fixed-top   header-fixed' : 'bg-transparent   fixed-top header-fixed' ">
-    <q-item style="margin-right: -24px;"
+    <q-item style="margin-right: -22px;"
       class="row items-center justify-between  "
       :class="$q.dark.isActive
         ? 'bg-dark text-white'
