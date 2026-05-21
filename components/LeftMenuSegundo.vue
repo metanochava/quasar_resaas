@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-grey" style="width: 300px; margin-top: 100px;  margin-left: -2px;  height: calc(100vh - 190px);">
+  <div class="bg-grey" style="width: 300px; margin-top: 100px;  margin-left: -2px;  height: calc(100vh - 200px);">
     <q-scroll-area
       class="fit"
       :thumb-style="thumbStyle"
