@@ -8,7 +8,6 @@
       >
         <!-- 🔥 ESQUERDA -->
         <div class="row items-center">
-
           <s-btn
             flat
             round
@@ -16,7 +15,6 @@
             icon="home"
             @click="$router.push({ name: 'home' })"
           />
-
         </div>
 
         <!-- 🔥 CENTRO -->

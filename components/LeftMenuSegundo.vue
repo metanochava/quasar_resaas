@@ -10,7 +10,7 @@
   > 
   full-width
   -->
-    <div class="q-pa-md " style="max-width: 350px">
+    <div class="q-pa-md bg-grey  full-height" style="width: 300px">
     <q-list padding bordered class="rounded-borders full-width">
     <q-expansion-item
       v-for="App in User.Menus"
