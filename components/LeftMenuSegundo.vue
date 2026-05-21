@@ -1,5 +1,4 @@
 <template>
-
   <div class="bg-grey" style="width: 300px; margin-top: 100px;  margin-left: -2px;  height: calc(100vh - 190px);">
     <q-scroll-area
       class="fit"
@@ -7,7 +6,7 @@
       :bar-style="barStyle"
     > 
 
-      <q-list bordered class="rounded-borders full-width">
+      <q-list bordered class="rounded-borders" style="width: 280px; ">
         <q-expansion-item
           v-for="App in User.Menus"
           :key="App"

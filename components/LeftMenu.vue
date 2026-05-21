@@ -1,6 +1,6 @@
 
 <template>
-  <s-card  square flat class="q-pt-sm" :class="$q.dark.isActive ? 'bg-dark  fixed-top   header-fixed' : 'bg-transparent   fixed-top header-fixed' ">
+  <s-card  square flat :class="$q.dark.isActive ? 'bg-dark  fixed-top   header-fixed' : 'bg-transparent   fixed-top header-fixed' ">
     <q-item 
       class="row items-center justify-between  "
       :class="$q.dark.isActive
@@ -73,15 +73,7 @@
     </div>
   </s-card>
 
-  <!-- <q-scroll-area 
-    class=" bg-grey"
-    :thumb-style="thumbStyle"
-    :bar-style="barStyle"
-    
-  >  -->
     <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:100px" />
-
-  <!-- </q-scroll-area> -->
 
 </template>
 <script >
