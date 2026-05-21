@@ -1,13 +1,12 @@
 <template>
 
-  <div class="bg-grey  full-height" style="width: 300px; margin-top: 70px;">
+  <div class="bg-grey" style="width: 300px; margin-top: 140px;  margin-left: -5px;  height: calc(100vh - 220px);">
     <q-scroll-area
       class="fit"
       :thumb-style="thumbStyle"
       :bar-style="barStyle"
     > 
 
-  
       <q-list bordered class="rounded-borders full-width">
         <q-expansion-item
           v-for="App in User.Menus"
@@ -49,7 +48,7 @@
 <script >
 
 
-import { defineComponent } from 'vue'
+import { defineComponent, h } from 'vue'
 import { tdc, toPlural} from '../boot/base'
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
