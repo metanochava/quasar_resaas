@@ -10,7 +10,6 @@
   >
 
     <q-scroll-area
-      class="fit"
       :thumb-style="thumbStyle"
       :bar-style="barStyle"
       style="
@@ -20,17 +19,17 @@
     >
 
       <q-list
-        class="rounded-borders"
+        class=""
         style="
           width: 290;
-          overflow-x: hidden;
+
         "
       >
 
         <q-expansion-item
           v-for="App in User.Menus"
           :key="App"
-          class="full-width"
+          class=""
 
           :class="
             $q.dark.isActive
