@@ -29,7 +29,7 @@
         <q-expansion-item
           v-for="App in User.Menus"
           :key="App"
-          class=""
+          class=" q-expansion-item"
 
           :class="
             $q.dark.isActive
@@ -68,6 +68,7 @@ import { tdc, toPlural} from '../boot/base'
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import SubMenu from './SubMenu.vue'
+import { barStyle, thumbStyle } from '../boot/app'
 
 
 export default defineComponent({
@@ -83,7 +84,9 @@ export default defineComponent({
       EntityType,
       User,
       tdc,
-      toPlural
+      toPlural,
+      barStyle,
+      thumbStyle
     }
   },
   data () {
