@@ -53,17 +53,11 @@
         >
 
           <q-separator />
-
           <SubMenu :Dados="App.submenu" />
-
           <q-separator />
-
         </q-expansion-item>
-
       </q-list>
-
     </q-scroll-area>
-
   </div>
 </template>
 
