@@ -22,7 +22,7 @@
       <q-list
         class="rounded-borders"
         style="
-          width: 100%;
+          width: 290;
           overflow-x: hidden;
         "
       >
