@@ -67,6 +67,52 @@
   </div>
 </template>
 
+
+<script >
+
+import { defineComponent, h } from 'vue'
+import { tdc, toPlural} from '../boot/base'
+import { useUserStore } from '../stores/UserStore'
+import { useEntityTypeStore } from '../stores/EntityTypeStore'
+import SubMenu from './SubMenu.vue'
+
+
+export default defineComponent({
+  name: 'LeftMenuSegundo',
+
+  components: {
+    SubMenu
+  },
+  setup () {
+    const EntityType = useEntityTypeStore()
+    const  User = useUserStore()
+    return {
+      EntityType,
+      User,
+      tdc,
+      toPlural
+    }
+  },
+  data () {
+    return {
+
+    }
+  },
+  computed: {
+
+  },
+  watch: {
+
+  },
+  mounted () {
+
+  },
+  methods: {
+
+  }
+})
+</script>
+
 <style >
 .q-expansion-item,
 .q-item,
