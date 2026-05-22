@@ -1,13 +1,13 @@
 <template>
-  <div class="bg-grey" style="width: 300px; margin-top: 100px;  margin-left: -2px;  height: calc(100vh - 200px);">
+  <div class="bg-grey" style="width: 300px; margin-top: 100px;  margin-left: -2px;  height: calc(100vh - 205px);">
     <q-scroll-area
       class="fit"
       :thumb-style="thumbStyle"
       :bar-style="barStyle"
-       style="height: calc(100vh - 190px);"
+       style="height: calc(100vh - 205px);"
     > 
 
-      <q-list class="rounded-borders" style="width: 280px; ">
+      <q-list class="rounded-borders" style="width: 290px; ">
         <q-expansion-item
           v-for="App in User.Menus"
           :key="App"
