@@ -73,7 +73,7 @@
     </div>
   </s-card>
 
-    <LeftMenuSegundo :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primar text-white  '" style="margin-top:100px" />
+    <LeftMenuSegundo  style="margin-top:95px" />
 
 </template>
 <script >

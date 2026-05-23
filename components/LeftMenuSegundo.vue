@@ -1,6 +1,7 @@
 <template>
   <div
     class="overflow-hidden q-pa-0"
+    :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-transparent text-white  '"
     style="
       width: 300px;
       margin-top: 94px;
