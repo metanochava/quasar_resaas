@@ -17,7 +17,7 @@
       <q-item-section 
         style="
         display: block;
-        max-width: clac(100vw - 100px);
+        max-width: clac(100vw - 200px);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;"
@@ -30,7 +30,7 @@
 
       <!-- ADD BUTTON -->
       <q-item-section side v-if="item.add_route">
-        <s-btn dense flat icon="add" :to="resolveRoute(item, 1)" />
+        <s-btn dense flat icon="add" :to="resolveRoute(item, 1)" color="primary" />
       </q-item-section>
 
       <!-- Arrow if has submenu -->
