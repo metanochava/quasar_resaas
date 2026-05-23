@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-grey overflow-hidden"
+    class="overflow-hidden"
     style="
       width: 300px;
       margin-top: 100px;
