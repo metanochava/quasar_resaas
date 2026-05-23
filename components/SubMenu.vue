@@ -17,11 +17,14 @@
       <q-item-section 
         style="
         display: block;
-        max-width: 155px;
+        max-width: 145px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;"
       >
+        <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">
+          {{ tdc('Receita')}}
+        </q-tooltip>
         {{ toPlural(tdc(item.menu)) }}
       </q-item-section>
 
@@ -78,4 +81,8 @@ export default defineComponent({
   white-space: nowrap;
 }
 
+  .text-14 {
+    font-weight: bold;
+    font-size: 16px;
+  }
 </style>
