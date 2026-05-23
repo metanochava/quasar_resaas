@@ -17,7 +17,7 @@
       <q-item-section 
         style="
         display: block;
-        max-width: clac(100vw - 200px);
+        max-width: 146;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;"
