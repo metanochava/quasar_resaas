@@ -1,6 +1,6 @@
 <template>
   <div
-    class="overflow-hidden"
+    class="overflow-hidden q-pa-0"
     style="
       width: 300px;
       margin-top: 94px;
@@ -19,7 +19,7 @@
     >
 
       <q-list
-        class=""
+        class=" q-pa-0"
         style="
           width: 290;
 
@@ -29,12 +29,12 @@
         <q-expansion-item
           v-for="App in User.Menus"
           :key="App"
-          class=" q-expansion-item"
+          class=" q-expansion-item q-pa-0"
 
           :class="
             $q.dark.isActive
               ? 'bg-dark-saas text-subtitle1 text-white'
-              : 'text-subtitle1 text-primary'
+              : 'text-subtitle1 text-white'
           "
 
           :icon="App.icon"

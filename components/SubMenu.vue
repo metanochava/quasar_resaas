@@ -23,7 +23,7 @@
         text-overflow: ellipsis;"
       >
         <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">
-          {{ tdc('Receita')}}
+          {{ toPlural(tdc(item.menu)) }}
         </q-tooltip>
         {{ toPlural(tdc(item.menu)) }}
       </q-item-section>
