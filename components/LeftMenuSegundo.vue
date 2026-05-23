@@ -108,14 +108,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style >
-.q-expansion-item,
-.q-item,
-.q-item__label {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-</style>

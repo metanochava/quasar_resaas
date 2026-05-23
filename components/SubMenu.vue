@@ -1,6 +1,7 @@
 <template>
   <q-list dense>
     <q-item
+      class="q-item"
       v-for="item in Dados"
       :key="item.menu"
       clickable
@@ -13,7 +14,7 @@
       </q-item-section>
 
       <!-- Title -->
-      <q-item-section>
+      <q-item-section class="q-item__label">
         {{ toPlural(tdc(item.menu)) }}
       </q-item-section>
 
@@ -57,3 +58,16 @@ export default defineComponent({
   }
 })
 </script>
+
+
+
+<style >
+.q-expansion-item,
+.q-item,
+.q-item__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>
