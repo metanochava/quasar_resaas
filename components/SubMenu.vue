@@ -14,9 +14,10 @@
       </q-item-section>
 
       <!-- Title -->
-      <q-item-section style="
+      <q-item-section 
+        style="
         display: block;
-        max-width: 100%;
+        max-width: 200px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;"
@@ -76,3 +77,5 @@ export default defineComponent({
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+</style>
