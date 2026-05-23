@@ -3,7 +3,7 @@
     class="overflow-hidden"
     style="
       width: 300px;
-      margin-top: 100px;
+      margin-top: 94px;
       margin-left: -2px;
       height: calc(100vh - 205px);
     "
