@@ -7,6 +7,8 @@
       title="Document"
     />
 
+    
+
     <AutoTable
       :app="app"
       :model="model"
@@ -208,7 +210,7 @@ function openEdit(row) {
   showForm.value = true
 }
 
-
+ 
 async function openPdf(row) {
   const res = await HTTPAuthBlob.get(url({
     type: 'u',

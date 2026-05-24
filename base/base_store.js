@@ -35,6 +35,8 @@ export function createBaseStore(name, config, extend = {}) {
         _schemaLoaded: false,
         fields: [],
         rows: [],
+        showPdf: false,
+        pdf: null,
         row: null,
         form: {},
 
@@ -359,7 +361,22 @@ export function createBaseStore(name, config, extend = {}) {
           this.saving = false
         }
       },
-
+      
+      async getPdf(id) {
+        if(id){
+          const res = await HTTPAuthBlob.get(url({ type: 'u', url: `${this.safeUrl}/${id}/pdf` }))
+          const blob = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+          this.pdf = blob
+          this.showPdf = true
+        }else{
+          const res = await HTTPAuthBlob.get(url({ type: 'u', url: `${this.safeUrl}/${this.row.id}/pdf` }))
+          const blob = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+          this.pdf = blob
+          this.showPdf = true
+          return  blob
+        }    
+      },
+      
       // =========================
       // SAVE
       // =========================
