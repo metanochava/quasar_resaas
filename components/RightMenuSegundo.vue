@@ -2,7 +2,6 @@
 <template>
   <component v-if="component" :is="component" />
   <div v-else class="text-center text-h6 q-pa-sm">
-    .
   </div>
 </template>
 
