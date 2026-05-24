@@ -30,7 +30,7 @@
 
       <!-- ADD BUTTON -->
       <q-item-section side v-if="item.add_route">
-        <s-btn dense flat icon="add" :to="resolveRoute(item, 1)"   outlined color="white" />
+        <s-btn dense icon="add" :to="resolveRoute(item, 1)"   outlined color="white" />
       </q-item-section>
 
       <!-- Arrow if has submenu -->
