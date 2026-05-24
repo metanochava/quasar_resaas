@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { buildFormFromSchema } from './../utils/autoForm'
-import { HTTPAuth, url } from './../boot/api'
+import { HTTPAuth, url, HTTPAuthBlob } from './../boot/api'
 
 export function createBaseStore(name, config, extend = {}) {
 
