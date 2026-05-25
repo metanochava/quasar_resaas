@@ -6,43 +6,44 @@
         SEARCH
     ====================================== -->
 
-    <q-input
-      v-model="search"
-      outlined
-      dense
-      clearable
-      debounce="500"
-      label="Pesquisar pessoa"
-      @update:model-value="doSearch"
-    >
+    <div class="row no-wrap items-start">
 
-      <!-- PREPEND -->
-      <template #prepend>
+        <!-- INPUT -->
+        <q-input
+            v-model="search"
+            outlined
+            dense
+            clearable
+            debounce="500"
+            class="col"
+            label="Pesquisar pessoa"
+            @update:model-value="doSearch"
+        >
 
-        <q-icon name="search" />
+            <template #prepend>
 
-      </template>
+            <q-icon name="search" />
 
-      <!-- APPEND -->
-      <template #append>
+            </template>
 
+        </q-input>
+
+        <!-- BUTTON -->
         <q-btn
-          v-if="
+            v-if="
             search &&
             !Person.searching &&
             !Person.personsFound.length
-          "
-          flat
-          dense
-          color="primary"
-          icon="add"
-          label="Criar"
-          @click="createNew"
+            "
+            color="primary"
+            icon="add"
+            label="Criar"
+            class="q-ml-sm"
+            unelevated
+            @click="createNew"
         />
 
-      </template>
-
-    </q-input>
+    </div>
 
     <!-- =====================================
         LOADING
