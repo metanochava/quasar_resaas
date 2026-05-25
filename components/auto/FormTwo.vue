@@ -5,7 +5,6 @@ import { tdc } from '../../boot/base'
 import Form from '../engine/FormComponent.vue'
 import { useUserStore } from '../../stores/UserStore'
 
-const router = useRouter()
 const slots = useSlots()
 
 const User = useUserStore()
@@ -61,7 +60,7 @@ function goBack() {
 </script>
 
 <template>
-  <s-card class="dialog-card column no-wrap">
+  <s-card class="dialog-card column no-wrap" flat >
 
     <!-- ================= HEADER FIXO ================= -->
     <div v-if="hasHeader" class="col-12">
