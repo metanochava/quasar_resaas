@@ -50,7 +50,7 @@
 
 import { computed, watch } from 'vue'
 
-import  Form  from './../../components/auto/FormComponent.vue'
+import  Form  from '../../components/engine/FormComponent.vue'
 import  ActionForm  from '../../components/auto/ActionForm.vue'
 import { usePersonStore }  from '../../stores/PersonStore'
 
