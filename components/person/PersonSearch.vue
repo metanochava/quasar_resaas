@@ -30,11 +30,6 @@
 
         <!-- BUTTON -->
         <q-btn
-            v-if="
-            search &&
-            !Person.searching &&
-            !Person.personsFound.length
-            "
             color="primary"
             icon="add"
             label="Criar"
