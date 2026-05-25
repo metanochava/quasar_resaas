@@ -39,7 +39,8 @@ export { default as HeaderDarkMode } from './components/header/HeaderDarkMode.vu
 export { default as HeaderFullScreen } from './components/header/HeaderFullScreen.vue'
 export { default as HeaderLanguage } from './components/header/HeaderLanguage.vue'
 
-
-
-
+export { default as PersonCard } from './components/person/PersonCard.vue'
+export { default as PersonCreateDialog } from './components/person/PersonCreateDialog.vue'
+export { default as PersonSearch } from './components/person/PersonSearch.vue'
+export { default as PersonSelector } from './components/person/PersonSelector.vue'
 
