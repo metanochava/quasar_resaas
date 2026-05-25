@@ -2,7 +2,10 @@
 
   <div>
 
-    <!-- SEARCH -->
+    <!-- =====================================
+        SEARCH
+    ====================================== -->
+
     <q-input
       v-model="search"
       outlined
@@ -13,14 +16,61 @@
       @update:model-value="doSearch"
     >
 
+      <!-- PREPEND -->
       <template #prepend>
+
         <q-icon name="search" />
+
+      </template>
+
+      <!-- APPEND -->
+      <template #append>
+
+        <q-btn
+          v-if="
+            search &&
+            !Person.searching &&
+            !Person.personsFound.length
+          "
+          flat
+          dense
+          color="primary"
+          icon="add"
+          label="Criar"
+          @click="createNew"
+        />
+
       </template>
 
     </q-input>
 
-    <!-- RESULTS -->
-    <div class="q-mt-md">
+    <!-- =====================================
+        LOADING
+    ====================================== -->
+
+    <div
+      v-if="Person.searching"
+      class="flex flex-center q-pa-lg"
+    >
+
+      <q-spinner
+        color="primary"
+        size="35px"
+      />
+
+    </div>
+
+    <!-- =====================================
+        RESULTS
+    ====================================== -->
+
+    <div
+      v-if="
+        search &&
+        Person.personsFound.length
+      "
+      class="q-mt-md"
+    >
 
       <PersonCard
         v-for="person in Person.personsFound"
@@ -32,27 +82,75 @@
 
     </div>
 
-    <!-- EMPTY -->
-    <q-banner
-      v-if="search && !Person.personsFound.length"
-      rounded
-      class="bg-grey-2 q-mt-md"
+    <!-- =====================================
+        EMPTY
+    ====================================== -->
+
+    <div
+      v-if="
+        search &&
+        !Person.searching &&
+        !Person.personsFound.length
+      "
+      class="q-mt-md text-grey text-caption"
     >
 
       Nenhuma pessoa encontrada
 
-      <template #action>
+    </div>
 
-        <q-btn
-          flat
-          color="primary"
-          label="Criar Pessoa"
-          @click="createNew"
-        />
+    <!-- =====================================
+        CREATE PERSON DIALOG
+    ====================================== -->
 
-      </template>
+    <q-dialog
+      v-model="showCreateDialog"
+      persistent
+    >
 
-    </q-banner>
+      <q-card
+        style="width: 900px; max-width: 95vw;"
+        class="rounded-borders"
+      >
+
+        <!-- HEADER -->
+        <q-card-section
+          class="row items-center bg-primary text-white"
+        >
+
+          <div class="text-h6">
+
+            Criar Pessoa
+
+          </div>
+
+          <q-space />
+
+          <q-btn
+            flat
+            round
+            dense
+            icon="close"
+            v-close-popup
+          />
+
+        </q-card-section>
+
+        <!-- FORM -->
+        <q-card-section>
+
+          <FormTwo
+            :store="Person"
+            :ignore-fields="ignoreFields"
+            @submit.prevent
+            @saved="onSaved"
+          />
+
+        </q-card-section>
+
+      </q-card>
+
+    </q-dialog>
 
   </div>
 
@@ -61,21 +159,55 @@
 <script setup>
 
 import { ref } from 'vue'
-import { usePersonStore }  from '../../stores/PersonStore'
+
+import {
+  FormTwo
+} from 'quasar_resaas'
+
+import { usePersonStore } from '../../stores/PersonStore'
+
 import PersonCard from './PersonCard.vue'
+
+// ==========================================
+// EMITS
+// ==========================================
 
 const emit = defineEmits([
   'selected',
-  'create'
+  'create',
+  'saved'
 ])
+
+// ==========================================
+// STORE
+// ==========================================
 
 const Person = usePersonStore()
 
+// ==========================================
+// STATE
+// ==========================================
+
 const search = ref('')
 
-// ======================================
+const showCreateDialog = ref(false)
+
+// ==========================================
+// IGNORE
+// ==========================================
+
+const ignoreFields = [
+  'id',
+  'created_at',
+  'updated_at',
+  'created_by',
+  'updated_by',
+  'deleted_at'
+]
+
+// ==========================================
 // SEARCH
-// ======================================
+// ==========================================
 
 async function doSearch() {
 
@@ -86,25 +218,49 @@ async function doSearch() {
     return
   }
 
-  await Person.searchPersons(search.value)
+  await Person.search(search.value)
 }
 
-// ======================================
+// ==========================================
 // SELECT
-// ======================================
+// ==========================================
 
 function selectPerson(person) {
 
   emit('selected', person)
 }
 
-// ======================================
+// ==========================================
 // CREATE
-// ======================================
+// ==========================================
 
 function createNew() {
 
+  Person.resetForm?.()
+
+  Person.form = {
+    ...Person.form,
+    full_name: search.value
+  }
+
+  showCreateDialog.value = true
+
   emit('create', search.value)
+}
+
+// ==========================================
+// SAVED
+// ==========================================
+
+function onSaved(res) {
+
+  const person = res?.data || res
+
+  showCreateDialog.value = false
+
+  emit('saved', person)
+
+  emit('selected', person)
 }
 
 </script>

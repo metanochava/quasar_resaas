@@ -26,14 +26,19 @@
       </q-card-section>
 
       <!-- FORM -->
-      <q-card-section>
+      <!-- <q-card-section> -->
 
         <FormTwo
           :store="Person"
           @saved="onSaved"
         />
 
-      </q-card-section>
+      <!-- </q-card-section> -->
+
+      <ActionForm
+        :store="Paciente"
+        :buttons="['cancel', 'reset', 'edit', 'save']"
+        />
 
     </q-card>
 
@@ -45,7 +50,8 @@
 
 import { computed, watch } from 'vue'
 
-import  FormTwo  from './../../components/auto/FormTwo.vue'
+import  Form  from './../../components/auto/FormComponent.vue'
+import  ActionForm  from './../../components/auto/ActionForm.vue'
 import { usePersonStore }  from '../../stores/PersonStore'
 
 const props = defineProps({
