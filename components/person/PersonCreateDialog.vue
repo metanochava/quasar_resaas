@@ -28,7 +28,7 @@
       <!-- FORM -->
       <!-- <q-card-section> -->
 
-        <FormTwo
+        <Form
           :store="Person"
           @saved="onSaved"
         />
@@ -51,7 +51,7 @@
 import { computed, watch } from 'vue'
 
 import  Form  from './../../components/auto/FormComponent.vue'
-import  ActionForm  from './../../components/auto/ActionForm.vue'
+import  ActionForm  from '../../components/auto/ActionForm.vue'
 import { usePersonStore }  from '../../stores/PersonStore'
 
 const props = defineProps({
