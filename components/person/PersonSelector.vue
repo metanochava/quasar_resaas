@@ -118,8 +118,9 @@
 <script setup>
 
 import { ref } from 'vue'
-import { FormTwo } from 'quasar_resaas'
-import { usePersonStore } from 'src/stores/PersonStore'
+
+import  FormTwo  from './../../components/auto/FormTwo.vue'
+import { usePersonStore }  from '../../stores/PersonStore'
 
 const emit = defineEmits([
   'selected',

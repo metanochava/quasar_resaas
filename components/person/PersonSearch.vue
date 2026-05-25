@@ -61,8 +61,7 @@
 <script setup>
 
 import { ref } from 'vue'
-import { usePersonStore } from 'src/stores/PersonStore'
-
+import { usePersonStore }  from '../../stores/PersonStore'
 import PersonCard from './PersonCard.vue'
 
 const emit = defineEmits([
