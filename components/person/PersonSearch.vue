@@ -31,7 +31,8 @@
         <!-- BUTTON -->
         <q-btn
             v-if="
-            !Person.rows
+              Person.search &&
+              !Person.rows.length
             "
             color="primary"
             icon="add"
@@ -67,6 +68,7 @@
       v-if="
         Person.search &&
         Person.rows.length
+        
       "
       class="q-mt-md"
     >
