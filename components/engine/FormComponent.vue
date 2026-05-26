@@ -16,7 +16,7 @@ const form = ref({})
 const saving = ref(false)
 const uploadProgress = ref(0)
 
-const ignoreSet = computed(() => new Set(props.store.ignoreFields || []))
+const ignoreSet = computed(() => new Set(props.ignoreFields || []))
 
 // 🔥 ocultar campos tipo id
 function isHiddenField(f) {
