@@ -8,15 +8,21 @@
   >
 
     <q-card-section class="row items-center no-wrap">
-
       <!-- AVATAR -->
       <q-avatar
         size="55px"
+        v-if="person.profile"
+      >
+        <q-img  :src="person.profile.profile?.url" />
+      </q-avatar>
+      <q-avatar
+        v-else
+        color="primary"
+        text-color="white"
+        size="55x"
       >
 
-        <q-img v-if="person.profile" :src="person.profile?.url" />
-        <label v-else>{{ initials }}</label>
-        
+        {{ initials }}
 
       </q-avatar>
 
