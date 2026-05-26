@@ -212,22 +212,23 @@ async function save() {
   try {
     const api = `${props.store.app}/${props.store.model.toLowerCase()}s/`
     const { data, config } = buildPayload()
+    let dados = null
 
     if (form.value.id) {
-      await HTTPAuth.patch(
+      dados = await HTTPAuth.patch(
         url({ type: 'u', url: api + form.value.id + '/' }),
         data,
         config
       )
     } else {
-      await HTTPAuth.post(
+      dados = await HTTPAuth.post(
         url({ type: 'u', url: api }),
         data,
         config
       )
     }
 
-    emit('saved')
+    emit('saved', dados.data )
 
   } finally {
     saving.value = false

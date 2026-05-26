@@ -10,7 +10,7 @@
 
         <!-- INPUT -->
         <q-input
-            v-model="search"
+            v-model="Person.search"
             outlined
             dense
             clearable
@@ -30,6 +30,9 @@
 
         <!-- BUTTON -->
         <q-btn
+            v-if="
+            !Person.rows.length
+            "
             color="primary"
             icon="add"
             label="Criar"
@@ -135,12 +138,16 @@
         <!-- FORM -->
         <q-card-section>
 
-          <FormTwo
-            :store="Person"
-            :ignore-fields="ignoreFields"
-            @submit.prevent
-            @saved="onSaved"
-          />
+            <Form
+                :store="Person"
+                :ignore-fields="ignoreFields"
+                @saved="onSaved"
+            />
+
+            <ActionForm
+                :store="Paciente"
+                :buttons="['cancel', 'reset', 'edit', 'save']"
+            />
 
         </q-card-section>
 
@@ -156,9 +163,8 @@
 
 import { ref } from 'vue'
 
-import {
-  FormTwo
-} from 'quasar_resaas'
+import Form from '../../components/engine/FormComponent.vue'
+import ActionForm from '../../components/auto/ActionForm.vue'
 
 import { usePersonStore } from '../../stores/PersonStore'
 
@@ -214,7 +220,10 @@ async function doSearch() {
     return
   }
 
-  await Person.search(search.value)
+    Person.setSearch(search)
+
+    await Person.loadData()
+
 }
 
 // ==========================================
@@ -222,7 +231,6 @@ async function doSearch() {
 // ==========================================
 
 function selectPerson(person) {
-
   emit('selected', person)
 }
 
@@ -236,7 +244,7 @@ function createNew() {
 
   Person.form = {
     ...Person.form,
-    full_name: search.value
+    name: search.value
   }
 
   showCreateDialog.value = true
@@ -255,7 +263,6 @@ function onSaved(res) {
   showCreateDialog.value = false
 
   emit('saved', person)
-
   emit('selected', person)
 }
 

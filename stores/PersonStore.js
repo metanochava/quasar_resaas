@@ -14,9 +14,6 @@ export const usePersonStore = createBaseStore(
     state: () => ({
 
       selectedPerson: null,
-
-      personsFound: [],
-
       searchingPerson: false,
 
     }),
@@ -48,9 +45,7 @@ export const usePersonStore = createBaseStore(
 
           await this.loadData()
 
-          this.personsFound = this.rows || []
-
-          return this.personsFound
+          return this.rows || []
 
         } finally {
 
