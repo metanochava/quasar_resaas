@@ -13,7 +13,7 @@
         size="55px"
         v-if="person.profile"
       >
-        <q-img  :src="person.profile.profile?.url" />
+        <q-img  :src="person.profile?.url" />
       </q-avatar>
       <q-avatar
         v-else
