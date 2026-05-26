@@ -230,6 +230,11 @@ async function doSearch() {
 // ==========================================
 
 function selectPerson(person) {
+  Person.form = person
+   Person.form = {
+    ...Person.form,
+    name: Person.search
+  }
   emit('selected', person)
 }
 
