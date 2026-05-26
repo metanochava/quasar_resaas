@@ -66,13 +66,13 @@
     <div
       v-if="
         search &&
-        Person.personsFound.length
+        Person.rows.length
       "
       class="q-mt-md"
     >
 
       <PersonCard
-        v-for="person in Person.personsFound"
+        v-for="person in Person.rows"
         :key="person.id"
         :person="person"
         class="q-mb-sm"
@@ -89,7 +89,7 @@
       v-if="
         search &&
         !Person.searching &&
-        !Person.personsFound.length
+        !Person.rows.length
       "
       class="q-mt-md text-grey text-caption"
     >
@@ -176,8 +176,6 @@ import PersonCard from './PersonCard.vue'
 
 const emit = defineEmits([
   'selected',
-  'create',
-  'saved'
 ])
 
 // ==========================================
@@ -215,7 +213,7 @@ async function doSearch() {
 
   if (!search.value) {
 
-    Person.personsFound = []
+    Person.rows = []
 
     return
   }
@@ -249,7 +247,6 @@ function createNew() {
 
   showCreateDialog.value = true
 
-  emit('create', search.value)
 }
 
 // ==========================================
@@ -258,12 +255,12 @@ function createNew() {
 
 function onSaved(res) {
 
-  const person = res?.data || res
+    const person = res?.data || res
+    Person.row = person 
+    Person.form = person 
 
-  showCreateDialog.value = false
-
-  emit('saved', person)
-  emit('selected', person)
+    showCreateDialog.value = false
+    emit('selected', person)
 }
 
 </script>
