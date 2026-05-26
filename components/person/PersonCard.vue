@@ -11,9 +11,7 @@
 
       <!-- AVATAR -->
       <q-avatar
-        color="primary"
-        text-color="white"
-        size="50px"
+        size="55px"
       >
 
         <q-img v-if="person.profile" :src="person.profile?.url" />
@@ -26,9 +24,7 @@
       <div class="q-ml-md col">
 
         <div class="text-subtitle1 text-weight-medium">
-{{ person }}
           {{ person.full_name }}
-
         </div>
 
         <div class="text-caption text-grey">
