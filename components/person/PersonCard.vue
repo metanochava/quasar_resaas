@@ -26,7 +26,7 @@
       <div class="q-ml-md col">
 
         <div class="text-subtitle1 text-weight-medium">
-{{ person.full_name }}
+{{ person }}
           {{ person.full_name }}
 
         </div>
