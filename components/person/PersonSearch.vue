@@ -65,7 +65,7 @@
 
     <div
       v-if="
-        search &&
+        Person.search &&
         Person.rows.length
       "
       class="q-mt-md"
@@ -187,7 +187,6 @@ const Person = usePersonStore()
 // STATE
 // ==========================================
 
-const search = ref('')
 
 const showCreateDialog = ref(false)
 
@@ -239,7 +238,7 @@ function createNew() {
 
   Person.form = {
     ...Person.form,
-    name: search.value
+    name: Person.search
   }
 
   showCreateDialog.value = true
