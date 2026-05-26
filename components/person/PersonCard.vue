@@ -16,7 +16,9 @@
         size="50px"
       >
 
-        {{ initials }}
+        <q-img v-if="person.profile" src=" person.profile?.url" />
+        <label v-else>{{ initials }}</label>
+        
 
       </q-avatar>
 

@@ -5,7 +5,7 @@
     <q-card style="min-width:700px">
 
       <!-- HEADER -->
-      <q-card-section class="row items-center">
+      <q-card-section :class="[$q.dark.isActive ? 'bg-dark ' : 'bg-transparent  ', 'row items-center' ]  ">
 
         <div class="text-h6">
 

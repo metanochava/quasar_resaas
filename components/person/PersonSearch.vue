@@ -31,7 +31,7 @@
         <!-- BUTTON -->
         <q-btn
             v-if="
-            !Person.rows.length
+            !Person.rows
             "
             color="primary"
             icon="add"
@@ -200,7 +200,10 @@ const ignoreFields = [
   'updated_at',
   'created_by',
   'updated_by',
-  'deleted_at'
+  'deleted_at',
+  'entity',
+  'branch',
+  'user'
 ]
 
 // ==========================================
