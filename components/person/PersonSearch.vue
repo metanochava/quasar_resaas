@@ -48,7 +48,7 @@
     ====================================== -->
 
     <div
-      v-if="Person.searching"
+      v-if="Person.loading"
       class="flex flex-center q-pa-lg"
     >
 
@@ -87,7 +87,7 @@
 
     <div
       v-if="
-        !Person.search &&
+        Person.search &&
         !Person.rows.length
       "
       class="q-mt-md text-grey text-caption"
@@ -210,14 +210,12 @@ const ignoreFields = [
 
 async function doSearch() {
 
-  if (!search.value) {
+  if (!Person.search) {
 
     Person.rows = []
 
     return
   }
-
-    Person.setSearch(search)
 
     await Person.loadData()
 
