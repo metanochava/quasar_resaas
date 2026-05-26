@@ -16,7 +16,7 @@
         size="50px"
       >
 
-        <q-img v-if="person.profile" src=" person.profile?.url" />
+        <q-img v-if="person.profile" src="person.profile?.url" />
         <label v-else>{{ initials }}</label>
         
 
@@ -26,7 +26,7 @@
       <div class="q-ml-md col">
 
         <div class="text-subtitle1 text-weight-medium">
-
+{{ person.full_name }}
           {{ person.full_name }}
 
         </div>
