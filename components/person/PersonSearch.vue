@@ -87,8 +87,7 @@
 
     <div
       v-if="
-        search &&
-        !Person.searching &&
+        !Person.search &&
         !Person.rows.length
       "
       class="q-mt-md text-grey text-caption"
@@ -145,7 +144,7 @@
             />
 
             <ActionForm
-                :store="Paciente"
+                :store="Person"
                 :buttons="['cancel', 'reset', 'edit', 'save']"
             />
 
