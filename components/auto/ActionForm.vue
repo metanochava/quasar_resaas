@@ -4,6 +4,7 @@
     flat
     class="q-pa-sm"
   >
+  {{ store.form }}
 
     <div class="row items-center justify-between">
 

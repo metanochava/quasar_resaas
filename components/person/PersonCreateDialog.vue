@@ -36,7 +36,7 @@
       <!-- </q-card-section> -->
 
       <ActionForm
-        :store="Paciente"
+        :store="Person"
         :buttons="['cancel', 'reset', 'edit', 'save']"
         />
 
