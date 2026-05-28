@@ -6,7 +6,6 @@
   >
 
     <div class="row items-center justify-between">
-      {{ props.ref }}
       <!-- =====================================
           LEFT
       ====================================== -->
@@ -34,13 +33,13 @@
         <s-btn
           v-if="
             has('edit') &&
-            User.can('change_' + (props.ref.model || '').toLowerCase())
+            User.can('change_' + (store.model || '').toLowerCase())
           "
           v-show="isEdit"
           color="secondary"
           unelevated
           icon="edit"
-          :loading="props.ref.saving"
+          :loading="store.saving"
           :label="tdc('Edit')"
           @click="props.ref?.save?.()"
         />
@@ -49,13 +48,13 @@
         <s-btn
           v-if="
             has('delete') &&
-            User.can('delete_' + (props.ref.model || '').toLowerCase())
+            User.can('delete_' + (store.model || '').toLowerCase())
           "
           v-show="isEdit"
           color="negative"
           unelevated
           icon="delete"
-          :loading="props.ref.saving"
+          :loading="store.saving"
           :label="tdc('Delete')"
           @click="props.ref?.delete?.()"
         />
@@ -64,13 +63,13 @@
         <s-btn
           v-if="
             has('save') &&
-            User.can('add_' + (props.ref?.model || '').toLowerCase())
+            User.can('add_' + (store.model || '').toLowerCase())
           "
           v-show="!isEdit"
           color="primary"
           unelevated
           icon="save"
-          :loading="props.ref.saving"
+          :loading="store.saving"
           :label="tdc('Save')"
           @click="props.ref?.save?.()"
         />
