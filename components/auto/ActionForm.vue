@@ -4,25 +4,14 @@
     flat
     class="q-pa-sm"
   >
-  {{ store.form }}
 
     <div class="row items-center justify-between">
-
+      {{ props.formRef }}
       <!-- =====================================
           LEFT
       ====================================== -->
 
       <div class="row q-gutter-sm">
-
-        <!-- CANCEL -->
-        <s-btn
-          v-if="has('back')"
-          flat
-          color="grey-7"
-          icon="arrow_back"
-          :label="tdc('Back')"
-          @click="router.back()"
-        />
 
         <!-- RESET -->
         <s-btn
@@ -31,7 +20,7 @@
           color="grey-7"
           icon="refresh"
           :label="tdc('Reset')"
-          @click="store.resetForm?.()"
+          @click="props.formRef?.resetForm?.()"
         />
 
       </div>
@@ -54,7 +43,7 @@
           icon="edit"
           :loading="store.saving"
           :label="tdc('Edit')"
-          @click="store.save()"
+          @click="props.formRef?.save?.()"
         />
 
         <!-- DELETE -->
@@ -69,7 +58,7 @@
           icon="delete"
           :loading="store.saving"
           :label="tdc('Delete')"
-          @click="store.delete?.()"
+          @click="props.formRef?.delete?.()"
         />
 
         <!-- SAVE -->
@@ -84,7 +73,7 @@
           icon="save"
           :loading="store.saving"
           :label="tdc('Save')"
-          @click="store.save()"
+          @click="props.formRef?.save?.()"
         />
 
       </div>
@@ -126,6 +115,10 @@ const props = defineProps({
     default: null
   },
 
+  formRef: {
+    type: Object,
+    default: null
+  },
   buttons: {
     type: Array,
     default: () => [
