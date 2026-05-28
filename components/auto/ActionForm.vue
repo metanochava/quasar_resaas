@@ -6,7 +6,7 @@
   >
 
     <div class="row items-center justify-between">
-      {{ props.formRef }}
+      {{ props.ref }}
       <!-- =====================================
           LEFT
       ====================================== -->
@@ -18,9 +18,8 @@
           v-if="has('reset')"
           flat
           color="grey-7"
-          icon="refresh"
           :label="tdc('Reset')"
-          @click="props.formRef?.resetForm?.()"
+          @click="props.ref?.resetForm?.()"
         />
 
       </div>
@@ -35,45 +34,45 @@
         <s-btn
           v-if="
             has('edit') &&
-            User.can('change_' + (store.model || '').toLowerCase())
+            User.can('change_' + (props.ref.model || '').toLowerCase())
           "
           v-show="isEdit"
           color="secondary"
           unelevated
           icon="edit"
-          :loading="store.saving"
+          :loading="props.ref.saving"
           :label="tdc('Edit')"
-          @click="props.formRef?.save?.()"
+          @click="props.ref?.save?.()"
         />
 
         <!-- DELETE -->
         <s-btn
           v-if="
             has('delete') &&
-            User.can('delete_' + (store.model || '').toLowerCase())
+            User.can('delete_' + (props.ref.model || '').toLowerCase())
           "
           v-show="isEdit"
           color="negative"
           unelevated
           icon="delete"
-          :loading="store.saving"
+          :loading="props.ref.saving"
           :label="tdc('Delete')"
-          @click="props.formRef?.delete?.()"
+          @click="props.ref?.delete?.()"
         />
 
         <!-- SAVE -->
         <s-btn
           v-if="
             has('save') &&
-            User.can('add_' + (store.model || '').toLowerCase())
+            User.can('add_' + (props.ref?.model || '').toLowerCase())
           "
           v-show="!isEdit"
           color="primary"
           unelevated
           icon="save"
-          :loading="store.saving"
+          :loading="props.ref.saving"
           :label="tdc('Save')"
-          @click="props.formRef?.save?.()"
+          @click="props.ref?.save?.()"
         />
 
       </div>
@@ -115,7 +114,7 @@ const props = defineProps({
     default: null
   },
 
-  formRef: {
+  ref: {
     type: Object,
     default: null
   },
