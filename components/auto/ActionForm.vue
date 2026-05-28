@@ -4,7 +4,7 @@
     flat
     class="q-pa-sm"
   >
-  {{ store.form }}
+  {{ store?.value.form }}
 
     <div class="row items-center justify-between">
 
@@ -31,7 +31,7 @@
           color="grey-7"
           icon="refresh"
           :label="tdc('Reset')"
-          @click="store.resetForm?.()"
+          @click="store?.value.resetForm?.()"
         />
 
       </div>
@@ -46,45 +46,45 @@
         <s-btn
           v-if="
             has('edit') &&
-            User.can('change_' + (store.model || '').toLowerCase())
+            User.can('change_' + (store?.value.model || '').toLowerCase())
           "
           v-show="isEdit"
           color="secondary"
           unelevated
           icon="edit"
-          :loading="store.saving"
+          :loading="store?.value.saving"
           :label="tdc('Edit')"
-          @click="store.save()"
+          @click="store?.value.save()"
         />
 
         <!-- DELETE -->
         <s-btn
           v-if="
             has('delete') &&
-            User.can('delete_' + (store.model || '').toLowerCase())
+            User.can('delete_' + (store?.value.model || '').toLowerCase())
           "
           v-show="isEdit"
           color="negative"
           unelevated
           icon="delete"
-          :loading="store.saving"
+          :loading="store?.value.saving"
           :label="tdc('Delete')"
-          @click="store.delete?.()"
+          @click="store?.value.delete?.()"
         />
 
         <!-- SAVE -->
         <s-btn
           v-if="
             has('save') &&
-            User.can('add_' + (store.model || '').toLowerCase())
+            User.can('add_' + (store?.value.model || '').toLowerCase())
           "
           v-show="!isEdit"
           color="primary"
           unelevated
           icon="save"
-          :loading="store.saving"
+          :loading="store?.value.saving"
           :label="tdc('Save')"
-          @click="store.save()"
+          @click="store?.value.save()"
         />
 
       </div>
@@ -101,7 +101,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { tdc } from '../../boot/base'
-import { useUserStore } from '../../stores/UserStore'
+import { useUserStore } from '../../store?.values/UserStore'
 
 // ==========================================
 // ROUTER
@@ -121,7 +121,7 @@ const User = useUserStore()
 
 const props = defineProps({
 
-  store: {
+  store?.value: {
     type: Object,
     default: null
   },
@@ -145,7 +145,7 @@ const props = defineProps({
 
 const isEdit = computed(() => {
 
-  return !!props.store?.form?.id
+  return !!props.store?.value?.form?.id
 })
 
 // ==========================================
