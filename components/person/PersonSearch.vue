@@ -233,7 +233,6 @@ function selectPerson(person) {
   Person.form = person
    Person.form = {
     ...Person.form,
-    name: Person.search
   }
   emit('selected', person)
 }
@@ -248,7 +247,6 @@ function createNew() {
 
   Person.form = {
     ...Person.form,
-    name: Person.search
   }
 
   showCreateDialog.value = true

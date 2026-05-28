@@ -58,11 +58,6 @@ const props = defineProps({
 
   modelValue: Boolean,
 
-  initialName: {
-    type: String,
-    default: ''
-  }
-
 })
 
 const emit = defineEmits([
@@ -98,7 +93,6 @@ watch(
 
     Person.form = {
       ...Person.form,
-      full_name: props.initialName
     }
   }
 )
