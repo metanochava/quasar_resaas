@@ -122,7 +122,6 @@ const User = useUserStore()
 const props = defineProps({
 
   store: {
-    type: Object,
     default: null
   },
 
