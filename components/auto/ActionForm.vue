@@ -6,6 +6,7 @@
   >
 
     <div class="row items-center justify-between">
+
       <!-- =====================================
           LEFT
       ====================================== -->
@@ -18,7 +19,7 @@
           flat
           color="grey-7"
           :label="tdc('Reset')"
-          @click="props.ref?.resetForm?.()"
+          @click="props.reform?.resetForm?.()"
         />
 
       </div>
@@ -41,7 +42,7 @@
           icon="edit"
           :loading="store.saving"
           :label="tdc('Edit')"
-          @click="props.ref?.save?.()"
+          @click="props.reform?.save?.()"
         />
 
         <!-- DELETE -->
@@ -56,7 +57,7 @@
           icon="delete"
           :loading="store.saving"
           :label="tdc('Delete')"
-          @click="props.ref?.delete?.()"
+          @click="props.reform?.delete?.()"
         />
 
         <!-- SAVE -->
@@ -71,7 +72,7 @@
           icon="save"
           :loading="store.saving"
           :label="tdc('Save')"
-          @click="props.ref?.save?.()"
+          @click="props.reform?.save?.()"
         />
 
       </div>
@@ -113,7 +114,7 @@ const props = defineProps({
     default: null
   },
 
-  ref: {
+  reform: {
     type: Object,
     default: null
   },
