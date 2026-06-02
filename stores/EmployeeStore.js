@@ -8,7 +8,7 @@ import { getStorage, setStorage } from '../boot/storage'
 export const useEmployeeStore = createBaseStore(
   'employee',
   {
-    app: 'django_resaas',
+    app: 'hr',
     model: 'Employee'
   },
   {
