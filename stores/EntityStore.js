@@ -129,13 +129,13 @@ export const useEntityStore = createBaseStore(
       
             async toggleGroup(group) {
               try {
-                const id = this.row?.id
+                const id = this.row?.id 
                 if (!id) return
       
                 const exists = this.hasGroup(group.id)
                 const endpoint = exists ? 'removeGroup' : 'addGroup'
       
-                await HTTPClient.post(
+                await HTTPAuth.post(
                   url({
                     type: 'u',
                     url: `django_resaas/entitys/${id}/${endpoint}/`
