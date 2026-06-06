@@ -119,14 +119,15 @@ const props = defineProps({
 
 const User = useUserStore()
 // const Entity = useEntityStore() 
-
-
-// INIT
-onMounted(() => {
+async function init() {
+  alert(props.userId)
   User.getById(props.userId)
   User.loadGroups(props.userId)
   // Entity.loadGroups(User.Eentity.id)
-})
+}
+
+// INIT
+onMounted(init)
 </script>
 
 <style scoped>
