@@ -8,6 +8,7 @@ import { useUserStore } from '../../stores/UserStore'
 const slots = useSlots()
 
 const User = useUserStore()
+const router = useRouter()
 
 const props = defineProps({
   store: { type: Object, default: null },
