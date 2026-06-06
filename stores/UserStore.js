@@ -56,7 +56,7 @@ export const useUserStore = createBaseStore(
 
 
 
-    
+
 
     // Not loged this group .......................................
     groups: [],
@@ -99,7 +99,7 @@ export const useUserStore = createBaseStore(
         const [all, selected] = await Promise.all([
           HTTPAuth.get(url({
             type: 'u',
-            url: `django_resaas/entitys/${this.row?.entity_type?.id}/groups/`
+            url: `django_resaas/entitys/${this.Entity?.id}/groups/`
           })),
           HTTPAuth.get(url({
             type: 'u',
