@@ -166,7 +166,7 @@ export const useEntityStore = createBaseStore(
                 const cleanName = String(name || '').trim()
                 if (!cleanName) return
       
-                const res = await HTTPClient.post(
+                const res = await HTTPAuth.post(
                   url({
                     type: 'u',
                     url: `django_resaas/entitys/${id}/createGroup/`
