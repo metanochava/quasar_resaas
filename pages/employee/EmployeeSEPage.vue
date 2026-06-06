@@ -4,7 +4,7 @@
 
 
     <q-dialog v-model="openGroups" persistent full-height full-width>
-      <GroupManager  :userId="Employee.form?.user.id" />
+      <GroupManager  :userId="Employee.form?.user?.id" />
     </q-dialog>
 
     <!-- FORM -->
