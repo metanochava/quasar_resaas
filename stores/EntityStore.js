@@ -87,17 +87,17 @@ export const useEntityStore = createBaseStore(
 
             async loadGroups(EntityId) {
               try {
-                const id = EntityId || this.row?.id
+                const id = this.row?.id || EntityId  
                 if (!id) return
       
                 this.loadingGroups = true
       
                 const [all, selected] = await Promise.all([
-                  HTTPClient.get(url({
+                  HTTPAuth.get(url({
                     type: 'u',
                     url: `django_resaas/entitytypes/${this.row?.entity_type?.id}/groups/`
                   })),
-                  HTTPClient.get(url({
+                  HTTPAuth.get(url({
                     type: 'u',
                     url: `django_resaas/entitys/${id}/groups/`
                   }))
