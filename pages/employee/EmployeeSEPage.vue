@@ -40,11 +40,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEmployeeStore } from '../../stores/EmployeeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
-
-import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
 // import { useEntityStore } from '../../stores/EntityStore'
-import FormTwo from '../../components/auto/FormTwo.vue'
 import GroupManager from '../group/GroupManagerUser.vue'
 
 
