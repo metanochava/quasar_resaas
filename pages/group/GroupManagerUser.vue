@@ -9,7 +9,7 @@
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        Gestão de Grupos de {{ User?.row?.username }}
+        Gestão de Grupos de {{ User?.row?.username }} | {{ Employee.form?.person_data.ful_name}}
       </div>
 
       <q-space />
@@ -110,6 +110,9 @@
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '../../stores/UserStore'
 // import { useEntityStore } from '../../stores/EntityStore'
+
+import { useEmployeeStore } from '../../stores/EmployeeStore'
+const Employee = useEmployeeStore()
 
 
 const props = defineProps({
