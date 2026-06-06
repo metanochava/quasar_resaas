@@ -25,13 +25,6 @@
 
     <q-separator />
 
-    <!-- CREATE -->
-    <q-card-section class="q-pa-md">
-      .meta
-    </q-card-section>
-
-    <q-separator />
-
     <!-- FILTER -->
     <q-card-section class="q-pa-md">
       <q-input
@@ -130,7 +123,8 @@ const User = useUserStore()
 
 // INIT
 onMounted(() => {
-  User.loadGroups(props.entityId)
+  User.getById(props.userId)
+  User.loadGroups(props.userId)
   // Entity.loadGroups(User.Eentity.id)
 })
 </script>
