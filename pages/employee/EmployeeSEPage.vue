@@ -3,12 +3,12 @@
   <q-page class="q-pa-sm">
 
 
-      <q-dialog v-model="openGroups" persistent full-height full-width>
-        <GroupManager  :userId="User.form?.id" />
-      </q-dialog>
+    <q-dialog v-model="openGroups" persistent full-height full-width>
+      <GroupManager  :userId="User.form?.id" />
+    </q-dialog>
 
     <!-- FORM -->
-    <div v-if="Employee.loading" class="flex flex-center q-pa-lg">
+    <div v-if="Employee?.loading" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
     </div>
     <FormTwo
@@ -43,7 +43,7 @@ import FormTwo from '../../components/auto/FormTwo.vue'
 
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntityStore } from '../../stores/EntityStore'
+// import { useEntityStore } from '../../stores/EntityStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 import GroupManager from '../group/GroupManagerUser.vue'
 
@@ -51,7 +51,7 @@ import GroupManager from '../group/GroupManagerUser.vue'
 
 
 // ---------------- STORE ----------------
-const Entity = useEntityStore()
+// const Entity = useEntityStore()
 const route = useRoute()
 const Employee = useEmployeeStore()
 
