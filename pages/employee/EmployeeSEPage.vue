@@ -7,7 +7,7 @@
       {{ Employee.form?.person_data}}
       <br>
       {{ Employee.form?.person_data?.user }}
-      <GroupManager  :userId="Employee.form?.user?.id" />
+      <GroupManager  :userId="Employee.form?.person_data?.user?.id" />
     </q-dialog>
 
     <!-- FORM -->
