@@ -9,7 +9,7 @@
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        Gestão de Grupos de {{ User?.row?.username }} 
+        Gestão de Grupos de {{ Employee.form?.person_data.full_name}}
       </div>
 
       <q-space />
@@ -44,7 +44,6 @@
 
     <!-- LIST -->
     <q-card-section class="col scroll q-pa-none">
-      {{ Employee.form?.person_data}}
 
       <div v-if="User.loadingGroups" class="flex flex-center q-pa-xl">
         <q-spinner color="primary" size="42px" />
