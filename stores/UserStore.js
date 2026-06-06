@@ -71,6 +71,23 @@ export const useUserStore = createBaseStore(
     hasGroup: (state) => (id) => {
       return state.selectedGroups.some(g => g.id === id)
     },
+    filteredGroups(state) {
+      const search = (state.groupSearch || '').toLowerCase()
+
+      return state.groups.filter(group => {
+        const name = (group.name || '').toLowerCase()
+        const active = state.selectedGroups.some(g => g.id === group.id)
+
+        const matchSearch = !search || name.includes(search)
+
+        const matchFilter =
+          state.groupFilter === 'all' ||
+          (state.groupFilter === 'active' && active) ||
+          (state.groupFilter === 'inactive' && !active)
+
+        return matchSearch && matchFilter
+      })
+    },
     username: (state) => state.data?.username || "Guest",
     profile: (state) =>
       state.data?.profile?.url ||
@@ -87,6 +104,8 @@ export const useUserStore = createBaseStore(
       'typography': state.Typography,
     }),
   },
+
+
 
   actions: {
     async loadGroups(UserId) {
