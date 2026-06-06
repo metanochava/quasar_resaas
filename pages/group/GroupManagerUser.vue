@@ -9,7 +9,7 @@
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        Gestão de Grupos de {{ User.row.username }}
+        Gestão de Grupos de {{ User?.row?.username }}
       </div>
 
       <q-space />
