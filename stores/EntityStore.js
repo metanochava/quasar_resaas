@@ -30,7 +30,6 @@ export const useEntityStore = createBaseStore(
     }),
 
     getters: {
-
       hasGroup: (state) => (id) => {
         return state.selectedGroups.some(g => g.id === id)
       },
@@ -158,7 +157,7 @@ export const useEntityStore = createBaseStore(
                 console.error('toggleGroup error', e)
               }
             },
-      
+       
             async createGroup(name) {
               try {
                 const id = this.row?.id

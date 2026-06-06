@@ -46,10 +46,21 @@ export const useUserStore = createBaseStore(
     Theme: {},
     AnimationSettings: {},
     Typography: {},
-    LayoutSettings: {}
+    LayoutSettings: {},
+
+    // Not loged this group .......................................
+    groups: [],
+    selectedGroups: [],
+    loadingGroups: false,
+    groupSearch: '',
+    groupFilter: 'all' // all | active | inactive
+    // Not loged this group .......................................
   }),
 
   getters: {
+    hasGroup: (state) => (id) => {
+      return state.selectedGroups.some(g => g.id === id)
+    },
     username: (state) => state.data?.username || "Guest",
     profile: (state) =>
       state.data?.profile?.url ||
@@ -68,6 +79,79 @@ export const useUserStore = createBaseStore(
   },
 
   actions: {
+    async loadGroups(UserId) {
+      try {
+        const id = UserId || this.row?.id
+        if (!id) return
+
+        this.loadingGroups = true
+
+        const [all, selected] = await Promise.all([
+          HTTPAuth.get(url({
+            type: 'u',
+            url: `django_resaas/entitys/${this.row?.entity_type?.id}/groups/`
+          })),
+          HTTPAuth.get(url({
+            type: 'u',
+            url: `django_resaas/users/${id}/userGroups/`
+          }))
+        ])
+
+        const merged = [
+          ...(all.data || []),
+          ...(selected.data || [])
+        ]
+
+        // remover duplicados por id
+        this.groups = Object.values(
+          merged.reduce((acc, g) => {
+            acc[g.id] = g
+            return acc
+          }, {})
+        ).sort((a, b) =>
+          String(a.name || '').localeCompare(String(b.name || ''))
+        )
+
+        this.selectedGroups = selected.data || []
+
+      } catch (e) {
+        console.error('loadGroups error', e)
+      } finally {
+        this.loadingGroups = false
+      }
+    },
+
+
+    async toggleGroup(group) {
+      try {
+        const id = this.row?.id
+        if (!id) return
+
+        const exists = this.hasGroup(group.id)
+        const endpoint = exists ? 'removeGroup' : 'addGroup'
+
+        await HTTPClient.post(
+          url({
+            type: 'u',
+            url: `django_resaas/users/${id}/${endpoint}/`
+          }),
+          { group: group.id }
+        )
+
+        if (!exists) {
+          if (!this.hasGroup(group.id)) {
+            this.selectedGroups = [...this.selectedGroups, group]
+          }
+        } else {
+          this.selectedGroups = this.selectedGroups.filter(
+            g => g.id !== group.id
+          )
+        }
+
+      } catch (e) {
+        console.error('toggleGroup error', e)
+      }
+    },
     async getMenus () {
       await HTTPAuth.get(url({ type: 'u', url: 'django_resaas/users/' + this.data.id + '/menus/', params: {} }))
         .then(res => {

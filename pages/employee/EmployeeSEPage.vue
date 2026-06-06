@@ -4,7 +4,7 @@
 
 
       <q-dialog v-model="openGroups" persistent full-height full-width>
-        
+        <GroupManager  :userId="User.form?.id" />
       </q-dialog>
 
     <!-- FORM -->
@@ -41,13 +41,18 @@ import { useRoute } from 'vue-router'
 import { useEmployeeStore } from '../../stores/EmployeeStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
+import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { useEntityStore } from '../../stores/EntityStore'
+import FormTwo from '../../components/auto/FormTwo.vue'
+import GroupManager from '../group/GroupManagerUser.vue'
 
 
 
-// ---------------- ROUTE ----------------
-const route = useRoute()
 
 // ---------------- STORE ----------------
+const Entity = useEntityStore()
+const route = useRoute()
 const Employee = useEmployeeStore()
 
 // ---------------- STATE ----------------
