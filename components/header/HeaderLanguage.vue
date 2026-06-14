@@ -6,7 +6,7 @@
           v-for="language in Language.rows"
           :key="language"
           clickable
-          @click="Language?.change(language), User.setLanguage(language), alert('meta')"
+          @click="Language?.change(language), User.setLanguage(language)"
         >
           <q-item-section v-if="Language.current?.id == language.id" ><b>{{ language.name }}</b></q-item-section>
           <q-item-section v-else >{{ language.name }}</q-item-section>
@@ -31,6 +31,19 @@ export default defineComponent({
   setup () {
     const User = useUserStore()
     const Language = useLanguageStore()
+
+    watch(
+      () => Language.current,
+      (newLanguage) => {
+        if (!newLanguage) return
+
+        User.setLanguage(newLanguage)
+      },
+      {
+        deep: true,
+        immediate: true
+      }
+    )
     return {
       User,
       Language
