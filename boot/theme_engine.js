@@ -3,6 +3,7 @@ import { boot } from 'quasar/wrappers'
 import BtnComponent from './../components/engine/BtnComponent.vue'
 import CardComponent from './../components/engine/CardComponent.vue'
 import InputComponent from './../components/engine/InputComponent.vue'
+import EditorComponent from './../components/engine/EditorComponent.vue'
 import SelectComponent from './../components/engine/SelectComponent.vue'
 import DrawerComponent from './../components/engine/DrawerComponent.vue'
 import FieldComponent from './../components/engine/FieldComponent.vue'
@@ -16,6 +17,7 @@ export default boot(({ app }) => {
   app.component('s-btn', BtnComponent)
   app.component('s-card', CardComponent)
   app.component('s-input', InputComponent)
+  app.component('s-editor', EditorComponent)
   app.component('s-select', SelectComponent)
   app.component('s-drawer', DrawerComponent)
   app.component('s-field', FieldComponent)
