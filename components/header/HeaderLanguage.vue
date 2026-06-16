@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent, watch } from 'vue'
 import { useUserStore} from '../../stores/UserStore'
 import {useLanguageStore } from '../../stores/LanguageStore';
 
