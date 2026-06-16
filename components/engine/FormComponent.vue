@@ -267,7 +267,7 @@ defineExpose({
           :key="f.name"
           class="col-md-4 col-sm-6 col-xs-12"
         >
-        <pre>{{ field.component }}</pre>
+        <pre>{{ f.component }}</pre>
           <component
             :is="f.component"
             v-model="form[f.name]"
@@ -288,7 +288,7 @@ defineExpose({
           :key="f.name"
           class="col-md-4 col-sm-6 col-xs-12"
         >
-        <pre>{{ field.component }}</pre>
+        <pre>{{ f.component }}</pre>
           <component
             :is="f.component"
             v-model="form[f.name]"
@@ -320,7 +320,7 @@ defineExpose({
           </template> 
 
           <!-- INPUT -->
-           <pre>{{ field.component }}</pre>
+           <pre>{{ f.component }}</pre>
           <component
             :is=" f.component"
             v-model="form[f.name]"
