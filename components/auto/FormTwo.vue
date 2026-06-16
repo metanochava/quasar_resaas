@@ -122,6 +122,7 @@ function goBack() {
         <!-- CENTER -->
         <div :class="[centerClass]">
 
+          {{ store.fields }}
           <div v-if="hasCenter">
             <slot name="center" />
           </div>

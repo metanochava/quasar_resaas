@@ -8,21 +8,27 @@
 
 <script>
 import { defineComponent, computed } from "vue"
+import SCheckbox from "./CheckBoxComponent.vue"
+import SDate from "./DateComponent.vue"
+import SEditor from "./EditorComponent.vue"
 import SInput from "./InputComponent.vue"
+import SSwitch from "./SwitchComponent.vue"
 import SSelect from "./SelectComponent.vue"
 import SUpload from "./UploadComponent.vue"
-import SCheckbox from "./CheckBoxComponent.vue"
-import SSwitch from "./SwitchComponent.vue"
+
 
 export default defineComponent({
-  name: "s-field",
+  name: "FieldComponent",
 
   components: {
     SInput,
     SSelect,
     SUpload,
     SCheckbox,
-    SSwitch
+    SSwitch,
+    SEditor, 
+    SDate
+
   },
 
   props: {
