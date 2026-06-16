@@ -46,21 +46,7 @@ export default defineComponent({
     })
 
     const componentName = computed(() => {
-      switch (props.field.type) {
-        case "select":
-        case "relation":
-          return "s-select"
-        case "upload":
-        case "file":
-        case "image":
-          return "s-upload"
-        case "checkbox":
-          return "s-checkbox"
-        case "switch":
-          return "s-switch"
-        default:
-          return "s-input"
-      }
+      return props.field.component || "s-input"
     })
 
     const componentProps = computed(() => ({
