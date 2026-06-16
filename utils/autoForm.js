@@ -121,7 +121,7 @@ export async function buildFormFromSchema({
   for (const f of fields) {
     if (!f?.name) continue
 
-    let component = 's-input'
+    let component = ''
     const props = {
       filled: true,
       dense: true,
@@ -133,9 +133,25 @@ export async function buildFormFromSchema({
 
     // ---------- default by type ----------
     switch (f.type) {
-      // TEXT
-      case 'CharField':
+
+      // TEXTOS LONGOS
       case 'TextField':
+        component = 's-editor'
+
+        props.minHeight = '150px'
+
+        props.toolbar = [
+          ['bold', 'italic', 'underline'],
+          ['quote', 'unordered', 'ordered'],
+          ['link'],
+          ['undo', 'redo']
+        ]
+
+        break
+
+      // TEXTOS CURTOS
+      case 'CharField':
+
       case 'SlugField':
       case 'EmailField':
       case 'URLField':
@@ -183,21 +199,21 @@ export async function buildFormFromSchema({
 
       // DATE/TIME
       case 'DateField':
-        component = 's-input'
+        component = 's-date'
         props.type = 'date'
         break
       case 'DateTimeField':
-        component = 's-input'
+        component = 's-datatime'
         props.type = 'datetime-local'
         break
       case 'TimeField':
-        component = 's-input'
+        component = 's-time'
         props.type = 'time'
         break
 
       // JSON
       case 'JSONField':
-        component = 's-input'
+        component = 's-json'
         props.type = 'textarea'
         props.autogrow = true
         props.placeholder = '{ "key": "value" }'
