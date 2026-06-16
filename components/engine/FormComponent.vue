@@ -319,7 +319,7 @@ defineExpose({
           </template> 
 
           <!-- INPUT -->
-           {{ f.schema?.component  }} || {{ f.schema }}
+           {{ f.schema?.component  }} || {{ f }}
           <component
             :is=" f.component"
             v-model="form[f.name]"
