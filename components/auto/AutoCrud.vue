@@ -143,11 +143,11 @@ async function init() {
     schemaPath: 'fields',
   })
 
-  schema.value = data.schema
+  schema.value = data.fields
   actions.value = data.actions
   config.value = data.config
 
-  store.fields = data.schema
+  store.fields = data.fields
   store.app= props.app
   store.model= props.model
 

@@ -96,19 +96,29 @@ async function defaultFetchRelationOptions(relationStr, search = '') {
 export async function buildFormFromSchema({
   app,
   model,
-  fetchRelationOptions = null, // opcional: injeta a tua função
-  schemaPath = 'fields',        // 'fields' OR 'data.fields' (se o teu ok() embrulhar)
-  moneyMask = '#.##0,00',       // se usares mask monetária custom
+  fetchRelationOptions = null,
+  schemaPath = 'fields'
 } = {}) {
 
-  if (!app || !model) throw new Error('app/model required')
+  if (!app || !model) {
+    throw new Error('app/model required')
+  }
 
-  const { data } = await HTTPAuth.get(url({type:'u', url:`django_resaas/resaasapps/${app}/${model}/schema/`, params:{}}))
+  const { data } = await HTTPAuth.get(
+    url({
+      type: 'u',
+      url: `django_resaas/resaasapps/${app}/${model}/schema/`,
+      params: {}
+    })
+  )
 
-  // ✅ resolve schemaPath
-  const fields = schemaPath === 'data.fields' ? (data?.data?.fields || []) : (data?.fields || [])
-  const actions =  data?.actions || []
-  const config =  data?.config || {} 
+  const fields =
+    schemaPath === 'data.fields'
+      ? (data?.data?.fields || [])
+      : (data?.fields || [])
+
+  const actions = data?.actions || []
+  const config = data?.config || {}
 
   const out = []
 
@@ -121,176 +131,29 @@ export async function buildFormFromSchema({
   for (const f of fields) {
     if (!f?.name) continue
 
-    let component = ''
+    const label = tdc(
+      String(
+        f.label ||
+        f.verbose_name ||
+        f.name
+      )
+    )
+
     const props = {
       filled: true,
       dense: true,
-      clearable: true
+      clearable: true,
+      ...(f.props || {})
     }
 
-    // ---------- base label ----------
-    const label = tdc(String(f.label || f.verbose_name || f.name))
-
-    // ---------- default by type ----------
-    switch (f.type) {
-
-      // TEXTOS LONGOS
-      case 'TextField':
-        component = 's-editor'
-
-        props.minHeight = '150px'
-
-        props.toolbar = [
-          ['bold', 'italic', 'underline'],
-          ['quote', 'unordered', 'ordered'],
-          ['link'],
-          ['undo', 'redo']
-        ]
-
-        break
-
-      // TEXTOS CURTOS
-      case 'CharField':
-
-      case 'SlugField':
-      case 'EmailField':
-      case 'URLField':
-      case 'UUIDField':
-        component = 's-input'
-        props.type = 'text'
-        if (f.type === 'EmailField') props.type = 'email'
-        if (f.type === 'URLField') props.type = 'url'
-        if (f.type === 'TextField') {
-          props.type = 'textarea'
-          props.autogrow = true
-        }
-        if (f.max_length) props.maxlength = Number(f.max_length)
-        break
-
-      // NUMBERS
-      case 'IntegerField':
-      case 'BigIntegerField':
-      case 'SmallIntegerField':
-      case 'PositiveIntegerField':
-      case 'PositiveSmallIntegerField':
-      case 'FloatField':
-      case 'DecimalField':
-      case 'MoneyField':
-        component = 's-input'
-        props.type = 'number'
-        props.step = (f.type === 'DecimalField' || f.type === 'MoneyField' || f.type === 'FloatField') ? 'any' : '1'
-        if (f.min != null) props.min = f.min
-        if (f.max != null) props.max = f.max
-
-        // money UX
-        if (f.type === 'MoneyField') {
-          props.prefix = props.prefix || ''
-          props.inputmode = 'decimal'
-          // se tu usas s-input-mask / mask plugin:
-          // props.mask = moneyMask
-        }
-        break
-
-      // BOOLEAN
-      case 'BooleanField':
-        component = 's-switch'
-        props.clearable = false
-        break
-
-      // DATE/TIME
-      case 'DateField':
-        component = 's-date'
-        props.type = 'date'
-        break
-      case 'DateTimeField':
-        component = 's-datatime'
-        props.type = 'datetime-local'
-        break
-      case 'TimeField':
-        component = 's-time'
-        props.type = 'time'
-        break
-
-      // JSON
-      case 'JSONField':
-        component = 's-json'
-        props.type = 'textarea'
-        props.autogrow = true
-        props.placeholder = '{ "key": "value" }'
-        break
-
-      // FILE/IMAGE
-      case 'FileField':
-      case 'ImageField':
-        component = 's-upload'
-        props.clearable = true
-        props.useChips = true
-        props.maxFiles = 1
-        // preview
-        props._isFile = true
-        props._isImage = (f.type === 'ImageField')
-        break
-
-      // RELATIONS
-      case 'ForeignKey':
-      case 'OneToOneField':
-        component = 's-select'
-        props.multiple = false
-        props.emitValue = true
-        props.mapOptions = true
-        props.useInput = true
-        props.fillInput = false
-        props.inputDebounce = 0 // vamos debounciar manualmente
-        props.options = []
-        props._relation = true
-        props._relationType = f.type
-        props.relation = f.relation
-        break
-
-      case 'ManyToManyField':
-        component = 's-select'
-        props.multiple = true
-        props.emitValue = true
-        props.mapOptions = true
-        props.useInput = true
-        props.fillInput = false
-        props.inputDebounce = 0
-        props.options = []
-        props._relation = true
-        props._relationType = f.type
-        props.relation = f.relation
-        break
-
-      default:
-        component = 's-input'
-        props.type = 'text'
-    }
-
-    // ---------- choices override ----------
-    if (Array.isArray(f.choices) && f.choices.length) {
-      component = 's-select'
-      props.emitValue = true
-      props.mapOptions = true
-      props.options = f.choices.map(([v, l]) => ({
-        label: tdc(String(l)),
-        value: v
-      }))
-      // se choices, não é relation async
-      delete props._relation
-      delete props.relation
-    }
-
-    // ---------- masks by name ----------
-    const m = guessMaskByName(f.name)
-    if (m && component === 's-input') props.mask = m
-
-    // ---------- required visual ----------
     props.label = label
     props.rules = buildRulesFromSchemaField(f)
 
-    // ---------- relations lazy load ----------
-    if (props._relation && props.relation) {
-      const relationKeyBase = props.relation
+    if (f.ui?.isRelation && f.relation) {
+
+      const relationKeyBase = f.relation
+
+      props.options = props.options || []
 
       props.onFilter = async (val, update, abort) => {
         try {
@@ -298,25 +161,39 @@ export async function buildFormFromSchema({
           const cacheKey = `${relationKeyBase}::${q}`
 
           if (__relationCache.has(cacheKey)) {
-            update(() => { props.options = __relationCache.get(cacheKey) })
+            update(() => {
+              props.options = __relationCache.get(cacheKey)
+            })
             return
           }
 
-          const opts = await relFetcherDebounced(relationKeyBase, q)
+          const opts = await relFetcherDebounced(
+            relationKeyBase,
+            q
+          )
+
           __relationCache.set(cacheKey, opts)
-          update(() => { props.options = opts })
+
+          update(() => {
+            props.options = opts
+          })
+
         } catch (e) {
           abort?.()
         }
       }
 
-      // pre-load vazio
       try {
         const cacheKey = `${relationKeyBase}::`
+
         if (__relationCache.has(cacheKey)) {
           props.options = __relationCache.get(cacheKey)
         } else {
-          const opts = await relFetcher(relationKeyBase, '')
+          const opts = await relFetcher(
+            relationKeyBase,
+            ''
+          )
+
           __relationCache.set(cacheKey, opts)
           props.options = opts
         }
@@ -324,16 +201,14 @@ export async function buildFormFromSchema({
     }
 
     out.push({
-      name: f.name,
+      ...f,
+
       label,
-      type: f.type,
-      required: !!f.required,
-      help_text: f.help_text || '',
-      component,
+
+      component: f.component || 's-input',
+
       props,
 
-      // extras úteis pro renderer:
-      schema: f,
       ui: {
         isFile: isFileType(f.type),
         isImage: f.type === 'ImageField',
@@ -341,9 +216,14 @@ export async function buildFormFromSchema({
         isNumeric: isNumericType(f.type),
         isChar: isCharType(f.type),
         isRelation: isRelationType(f.type),
+        ...(f.ui || {})
       }
     })
   }
 
-  return {'schema': out, 'actions': actions, 'config': config }
+  return {
+    fields: out,
+    actions,
+    config
+  }
 }

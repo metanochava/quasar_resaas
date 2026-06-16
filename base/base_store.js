@@ -181,7 +181,7 @@ export function createBaseStore(name, config, extend = {}) {
           model: this.safeModel
         })
 
-        this.fields = rsp?.schema || []
+        this.fields = rsp?.fields || []
         this.actions = rsp?.actions || []
         this.config = rsp?.config || {}
 

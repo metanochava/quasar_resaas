@@ -849,7 +849,7 @@ export default {
     async reloadModelShema(){
       this.accaoTeste = false
       const data = await buildFormFromSchema({'app': this.form.app, 'model': this.form.model})
-      this.form.fields = data.schema
+      this.form.fields = data.fields
       this.form.fields = (this.form.fields || []).filter(f =>
         !['id', 'created_at', 'is_deleted', 'updated_at', 'state', 'created_by', 'updated_by', 'deleted_at', 'entity', 'branch'].includes(f?.name)
       )
