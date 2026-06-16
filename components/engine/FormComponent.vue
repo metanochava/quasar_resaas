@@ -267,9 +267,9 @@ defineExpose({
           :key="f.name"
           class="col-md-4 col-sm-6 col-xs-12"
         >
-        <pre>{{ f.component }} | {{ f.schema }} | {{ f.type }}</pre>
+        <pre>{{ f.component }} | {{ f.schema.component }} | {{ f.type }}</pre>
           <component
-            :is="f.component"
+            :is=" f.schema.component"
             v-model="form[f.name]"
             v-bind="f.props"
             :rules="resolveRules(f.rules)"
@@ -288,9 +288,9 @@ defineExpose({
           :key="f.name"
           class="col-md-4 col-sm-6 col-xs-12"
         >
-       <pre>{{ f.component }} | {{ f.schema }} | {{ f.type }}</pre>
+       <pre>{{ f.component }} | {{ f.schema.component }} | {{ f.type }}</pre>
           <component
-            :is="f.component"
+            :is=" f.schema.component"
             v-model="form[f.name]"
             v-bind="f.props"
             :rules="resolveRules(f.rules)"
@@ -320,9 +320,9 @@ defineExpose({
           </template> 
 
           <!-- INPUT -->
-          <pre>{{ f.component }} | {{ f.schema }} | {{ f.type }}</pre>
+          <pre>{{ f.component }} | {{ f.schema.component }} | {{ f.type }}</pre>
           <component
-            :is=" f.component"
+            :is=" f.schema.component"
             v-model="form[f.name]"
             v-bind="f.props"
             :rules="resolveRules(f.rules)"
