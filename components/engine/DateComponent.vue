@@ -13,7 +13,7 @@
     :filled="attrs.filled ?? layout.input_style === 'filled'"
     :standout="attrs.standout ?? layout.input_style === 'standout'"
     :class="['s-date', attrs.class]"
-    readonly
+    mask="DD-MM-YYYY"
   >
     <template #append>
       <q-icon
@@ -27,7 +27,7 @@
         >
           <q-date
             v-model="localValue"
-            mask="YYYY-MM-DD"
+            mask="DD-MM-YYYY"
           >
             <div class="row items-center justify-end q-pa-sm">
               <q-btn
