@@ -13,7 +13,8 @@
     :filled="attrs.filled ?? layout.input_style === 'filled'"
     :standout="attrs.standout ?? layout.input_style === 'standout'"
     :class="['s-datetime', attrs.class]"
-    mask="DD-MM-YYYY"
+    mask="####-##-##"
+    fill-mask
     
   >
     <template #append>
@@ -29,7 +30,7 @@
           <div class="bg-white">
             <q-date
               v-model="dateValue"
-              mask="DD-MM-YYYY"
+              mask="YYYY-MM-DD"
             />
 
             <q-separator />
