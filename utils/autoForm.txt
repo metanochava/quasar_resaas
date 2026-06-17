@@ -193,23 +193,11 @@ export async function buildFormFromSchema({
             relationKeyBase,
             ''
           )
+
           __relationCache.set(cacheKey, opts)
           props.options = opts
         }
       } catch {}
-    }
-
-    // ---------- choices override ----------
-    if (Array.isArray(f.choices) && f.choices.length) {
-      props.emitValue = true
-      props.mapOptions = true
-      props.options = f.choices.map(([v, l]) => ({
-        label: tdc(String(l)),
-        value: v
-      }))
-      // se choices, não é relation async
-      delete props._relation
-      delete props.relation
     }
 
     out.push({
