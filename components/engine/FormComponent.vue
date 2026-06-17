@@ -307,13 +307,13 @@ defineExpose({
             <q-img
               v-if="previewOf(f).type === 'image'"
               :src="previewOf(f).src"
-              style="max-width:120px; margin-bottom:8px"
+              style="max-width: 120px; margin-bottom: 8px"
             />
 
             <iframe
               v-else-if="previewOf(f).type === 'pdf'"
               :src="previewOf(f).src"
-              style="width:100%; height:200px; margin-bottom:8px"
+              style="width: 100%; height: 200px; margin-bottom: 8px"
             />
           </template> 
 
