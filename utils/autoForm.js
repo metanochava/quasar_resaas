@@ -46,8 +46,19 @@ function buildRulesFromSchemaField(f) {
   const label = tdc(String(f.label || f.verbose_name || f.name || 'field'))
 
   // required do backend: required = not blank
+
   if (f.required) {
-    rules.push(v => (v !== null && v !== undefined && v !== '') || `${label}: ${tdc('required')}`)
+    rules.push(v => {
+      if (v === 0) return true
+      if (v === false) return true
+      if (Array.isArray(v)) return v.length > 0 || `${label}: ${tdc('required')}`
+
+      return (
+        v !== null &&
+        v !== undefined &&
+        v !== ''
+      ) || `${label}: ${tdc('required')}`
+    })
   }
 
   // min/max length
