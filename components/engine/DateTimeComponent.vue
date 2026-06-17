@@ -13,7 +13,8 @@
     :filled="attrs.filled ?? layout.input_style === 'filled'"
     :standout="attrs.standout ?? layout.input_style === 'standout'"
     :class="['s-datetime', attrs.class]"
-    readonly
+    mask="DD-MM-YYYY"
+    
   >
     <template #append>
       <q-icon
@@ -28,7 +29,7 @@
           <div class="bg-white">
             <q-date
               v-model="dateValue"
-              mask="YYYY-MM-DD"
+              mask="DD-MM-YYYY"
             />
 
             <q-separator />
