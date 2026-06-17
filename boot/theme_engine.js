@@ -3,6 +3,9 @@ import { boot } from 'quasar/wrappers'
 import BtnComponent from './../components/engine/BtnComponent.vue'
 import CardComponent from './../components/engine/CardComponent.vue'
 import InputComponent from './../components/engine/InputComponent.vue'
+import DateComponent from './../components/engine/DateComponent.vue'
+import TimeComponent from './../components/engine/TimeComponent.vue'
+import DateTimeComponent from './../components/engine/DateTimeComponent.vue'
 import EditorComponent from './../components/engine/EditorComponent.vue'
 import SelectComponent from './../components/engine/SelectComponent.vue'
 import DrawerComponent from './../components/engine/DrawerComponent.vue'
@@ -17,6 +20,8 @@ export default boot(({ app }) => {
   app.component('s-btn', BtnComponent)
   app.component('s-card', CardComponent)
   app.component('s-input', InputComponent)
+  app.component('s-date', DateComponent)
+  app.component('s-datetime', DateTimeComponent)
   app.component('s-editor', EditorComponent)
   app.component('s-select', SelectComponent)
   app.component('s-drawer', DrawerComponent)
@@ -24,6 +29,8 @@ export default boot(({ app }) => {
   app.component('s-upload', UploadComponent)
   app.component('s-checkbox', CheckBoxComponent)
   app.component('s-switch', SwitchComponent)
+  app.component('s-time', TimeComponent)
+
 
 
 })

@@ -1,7 +1,7 @@
 <template>
   <q-input
     v-bind="inputAttrs"
-    v-model="localValue"
+    v-model="displayValue"
     :label="translatedLabel"
     :placeholder="translatedPlaceholder"
     :hint="translatedHint"
@@ -12,7 +12,7 @@
     :outlined="attrs.outlined ?? layout.input_style === 'outlined'"
     :filled="attrs.filled ?? layout.input_style === 'filled'"
     :standout="attrs.standout ?? layout.input_style === 'standout'"
-    :class="['s-date', attrs.class]"
+    :class="['s-datetime', attrs.class]"
     readonly
   >
     <template #append>
@@ -25,19 +25,30 @@
           transition-show="scale"
           transition-hide="scale"
         >
-          <q-date
-            v-model="localValue"
-            mask="YYYY-MM-DD"
-          >
-            <div class="row items-center justify-end q-pa-sm">
+          <div class="bg-white">
+            <q-date
+              v-model="dateValue"
+              mask="YYYY-MM-DD"
+            />
+
+            <q-separator />
+
+            <q-time
+              v-model="timeValue"
+              mask="HH:mm:ss"
+              format24h
+            />
+
+            <div class="row justify-end q-pa-sm">
               <q-btn
-                v-close-popup
-                label="OK"
-                color="primary"
                 flat
+                color="primary"
+                label="OK"
+                @click="applyDateTime"
+                v-close-popup
               />
             </div>
-          </q-date>
+          </div>
         </q-popup-proxy>
       </q-icon>
     </template>
@@ -52,7 +63,7 @@ import { useUserStore } from "../../stores/UserStore"
 import { tdc } from "../../boot/base"
 
 export default defineComponent({
-  name: "s-date",
+  name: "s-datetime",
   inheritAttrs: false,
 
   props: {
@@ -85,6 +96,9 @@ export default defineComponent({
 
     const localValue = ref(props.modelValue)
 
+    const dateValue = ref("")
+    const timeValue = ref("00:00:00")
+
     const hasError = ref(false)
     const firstError = ref("")
 
@@ -92,12 +106,36 @@ export default defineComponent({
       () => props.modelValue,
       v => {
         localValue.value = v
-      }
+
+        if (v) {
+          const parts = String(v).split(" ")
+
+          dateValue.value = parts[0] || ""
+          timeValue.value = parts[1] || "00:00:00"
+        }
+      },
+      { immediate: true }
     )
 
     watch(localValue, v => {
       emit("update:modelValue", v)
     })
+
+    const displayValue = computed({
+      get() {
+        return localValue.value
+      },
+      set(v) {
+        localValue.value = v
+      }
+    })
+
+    function applyDateTime() {
+      if (!dateValue.value) return
+
+      localValue.value =
+        `${dateValue.value} ${timeValue.value || "00:00:00"}`
+    }
 
     const computedRules = computed(() => {
       const rules = []
@@ -153,6 +191,10 @@ export default defineComponent({
       attrs,
       layout,
       localValue,
+      dateValue,
+      timeValue,
+      displayValue,
+      applyDateTime,
       hasError,
       firstError,
       computedRules,
@@ -166,7 +208,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.s-date {
+.s-datetime {
   width: 100%;
 }
 </style>

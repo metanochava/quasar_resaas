@@ -12,12 +12,12 @@
     :outlined="attrs.outlined ?? layout.input_style === 'outlined'"
     :filled="attrs.filled ?? layout.input_style === 'filled'"
     :standout="attrs.standout ?? layout.input_style === 'standout'"
-    :class="['s-date', attrs.class]"
+    :class="['s-time', attrs.class]"
     readonly
   >
     <template #append>
       <q-icon
-        name="event"
+        name="schedule"
         class="cursor-pointer"
       >
         <q-popup-proxy
@@ -25,9 +25,9 @@
           transition-show="scale"
           transition-hide="scale"
         >
-          <q-date
+          <q-time
             v-model="localValue"
-            mask="YYYY-MM-DD"
+            format24h
           >
             <div class="row items-center justify-end q-pa-sm">
               <q-btn
@@ -37,7 +37,7 @@
                 flat
               />
             </div>
-          </q-date>
+          </q-time>
         </q-popup-proxy>
       </q-icon>
     </template>
@@ -52,7 +52,7 @@ import { useUserStore } from "../../stores/UserStore"
 import { tdc } from "../../boot/base"
 
 export default defineComponent({
-  name: "s-date",
+  name: "s-time",
   inheritAttrs: false,
 
   props: {
@@ -84,9 +84,6 @@ export default defineComponent({
     const layout = computed(() => User.ps?.layout || {})
 
     const localValue = ref(props.modelValue)
-
-    const hasError = ref(false)
-    const firstError = ref("")
 
     watch(
       () => props.modelValue,
@@ -137,15 +134,11 @@ export default defineComponent({
         : undefined
     )
 
-    const inputAttrs = computed(() => {
-      const {
-        class: klass,
-        label,
-        placeholder,
-        hint,
-        ...rest
-      } = attrs
+    const hasError = ref(false)
+    const firstError = ref("")
 
+    const inputAttrs = computed(() => {
+      const { class: klass, ...rest } = attrs
       return rest
     })
 
@@ -153,12 +146,12 @@ export default defineComponent({
       attrs,
       layout,
       localValue,
-      hasError,
-      firstError,
       computedRules,
       translatedLabel,
       translatedPlaceholder,
       translatedHint,
+      hasError,
+      firstError,
       inputAttrs
     }
   }
@@ -166,7 +159,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.s-date {
+.s-time {
   width: 100%;
 }
 </style>
