@@ -43,7 +43,7 @@ function isRelationType(t) { return ['ForeignKey','OneToOneField','ManyToManyFie
 
 function buildRulesFromSchemaField(f) {
   const rules = []
-  const label = tdc(String(f.label || f.verbose_name || f.name || 'field'))
+  const label = tdc(String(f.verbose_name || f.label || f.name || 'field'))
 
   // required do backend: required = not blank
 

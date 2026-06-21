@@ -192,7 +192,7 @@ function isEditable(name) {
 
 // 🔥 TOGGLE ESTADO (NOVO)
 function toggleEstado(row) {
-  const newValue = row.state.value == 1 ? 0 : 1
+  const newValue = row.state.value == true ? false : true
 
   emit('inline-patch', {
     id: row.id,
@@ -626,11 +626,11 @@ async function executeAction() {
           <s-btn
             dense
             size="sm"
-            :color="props.row.state.value == 1 ? 'positive' : 'negative'"
-            :label="props.row.state.value == 1 ? tdc('Activo') : tdc('Inactivo')"
+            :color="props.row.state.value == true ? 'positive' : 'negative'"
+            :label="props.row.state.value == true ? tdc('Activo') : tdc('Inactivo')"
             @click="() => toggleEstado(props.row)"
           >
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.state == 1 ? 'Desativar' : 'Activar') }}</q-tooltip>
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.state == true ? 'Desativar' : 'Activar') }}</q-tooltip>
           </s-btn>
         </template>
 
