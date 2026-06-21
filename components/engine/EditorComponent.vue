@@ -140,55 +140,22 @@ export default defineComponent({
 
       return [
         [
-          {
-            label: tdc("Formato"),
-            icon: "format_size",
-            list: "no-icons",
-            options: [
-              "p",
-              "h1",
-              "h2",
-              "h3",
-              "h4",
-              "h5",
-              "h6",
-              "code"
-            ]
-          }
-        ],
-
-        [
           "bold",
           "italic",
           "strike",
           "underline",
-          "subscript",
-          "superscript"
         ],
-
-        [
-          "quote",
-          "unordered",
-          "ordered",
-          "outdent",
-          "indent"
-        ],
-
         [
           "left",
           "center",
           "right",
           "justify"
         ],
-
         [
           "undo",
-          "redo"
+          "redo",
+          "fullscreen"
         ],
-
-        [
-          "removeFormat"
-        ]
       ]
     })
 
