@@ -49,15 +49,39 @@ function buildRulesFromSchemaField(f) {
 
   if (f.required) {
     rules.push(v => {
-      if (v === 0) return true
-      if (v === false) return true
-      if (Array.isArray(v)) return v.length > 0 || `${label}: ${tdc('required')}`
 
-      return (
-        v !== null &&
-        v !== undefined &&
-        v !== ''
-      ) || `${label}: ${tdc('required')}`
+      // null ou undefined
+      if (v === null || v === undefined) {
+        return `${label}: ${tdc('required')}`
+      }
+
+      // arrays (ManyToMany, multiselect)
+      if (Array.isArray(v)) {
+        return (
+          v.length > 0 ||
+          `${label}: ${tdc('required')}`
+        )
+      }
+
+      // strings
+      if (typeof v === 'string') {
+        return (
+          v.trim() !== '' ||
+          `${label}: ${tdc('required')}`
+        )
+      }
+
+      // objetos (selects que devolvem {label, value})
+      if (typeof v === 'object') {
+        return (
+          Object.keys(v).length > 0 ||
+          `${label}: ${tdc('required')}`
+        )
+      }
+
+      // números (0, 1, 2, ...)
+      // booleanos (true, false)
+      return true
     })
   }
 
