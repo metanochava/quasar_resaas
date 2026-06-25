@@ -281,7 +281,7 @@ export function createBaseStore(name, config, extend = {}) {
 
         try {
           const { data } = await HTTPAuth.post(
-            url({ type: 'u', url: this.safeUrl }),
+            url({ type: 'u', url: this.safeUrl+'/' }),
             this.form
           )
 
