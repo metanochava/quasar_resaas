@@ -9,7 +9,7 @@ const slots = useSlots()
 
 const User = useUserStore()
 const router = useRouter()
-const emit = defineEmits(['saved'])
+const emit = defineEmits(['savede'])
 const props = defineProps({
   store: { type: Object, default: null },
   ignoreFields: { type: Array, default: () => [] },
@@ -47,13 +47,13 @@ const centerClass = computed(() => {
   return props.centerCol || 'col'
 })
 
-async function save() {
+async function save_() {
   if (props.externalSave) {
     emit('save')
   } else {
     const  data = await formRef.value?.save() // modo standalone
     console.log(data)
-    emit('saved', data  )
+    emit('savede', data  )
   }
 }
 
@@ -93,7 +93,7 @@ function goBack() {
         icon="edit"
         :loading="store.saving"
         :label="tdc('Edit')"
-        @click="save"
+        @click="save_"
       />
       <s-btn v-if="User.can('add_' + (store.model || '').toLowerCase()) " v-show="!isEdit"
         color="primary"
@@ -101,7 +101,7 @@ function goBack() {
         icon="save"
         :loading="store.saving"
         :label="tdc('Save')"
-        @click="save"
+        @click="save_"
       />
 
     </q-card-actions>

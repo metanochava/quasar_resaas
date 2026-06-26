@@ -382,8 +382,8 @@ export function createBaseStore(name, config, extend = {}) {
       // =========================
       async save() {
         return this.form?.id
-          ? this.update()
-          : this.create()
+          ? await this.update()
+          : await this.create()
       },
 
       // =========================
