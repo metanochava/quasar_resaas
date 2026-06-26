@@ -49,10 +49,10 @@ const centerClass = computed(() => {
 
 function save() {
   if (props.externalSave) {
-    emit('saved',  formRef.value.form, props.store.form)
+    emit('saved',  formRef.value.form, props.store.row)
   } else {
     formRef.value?.save() // modo standalone
-    emit('saved',  formRef.value.form, props.store.form)
+    emit('saved',  formRef.value.form, props.store.row)
   }
 }
 
