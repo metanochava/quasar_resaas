@@ -131,7 +131,6 @@ function goBack() {
             ref="formRef"
             :store="store"
             :ignore-fields="ignoreFields"
-            @saved="goBack"
           />
 
         </div>
@@ -148,14 +147,11 @@ function goBack() {
 
     </q-card-section>
 
-    
-
     <!-- ================= FOOTER FIXO ================= -->
     <q-separator v-if="!hasFooter" />
     
     <q-card-actions v-if="!hasFooter" align="right" class="q-pa-md">
       
-
       <s-btn
         flat
         color="grey-7"
