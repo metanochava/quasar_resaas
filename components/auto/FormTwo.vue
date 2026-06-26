@@ -9,7 +9,7 @@ const slots = useSlots()
 
 const User = useUserStore()
 const router = useRouter()
-const emit = defineEmits(['savede'])
+const emit = defineEmits(['saved'])
 const props = defineProps({
   store: { type: Object, default: null },
   ignoreFields: { type: Array, default: () => [] },
@@ -53,7 +53,7 @@ async function save_() {
   } else {
     const  data = await formRef.value?.save() // modo standalone
     console.log(data)
-    emit('savede', data  )
+    emit('saved', data  )
   }
 }
 
