@@ -47,12 +47,12 @@ const centerClass = computed(() => {
   return props.centerCol || 'col'
 })
 
-function save() {
+async function save() {
   if (props.externalSave) {
-    emit('saved',  formRef.value.row, props.store.row)
+    emit('save')
   } else {
-    formRef.value?.save() // modo standalone
-    emit('saved',  formRef.value.row, props.store.row)
+    let data = await formRef.value?.save() // modo standalone
+    emit('saved', data  )
   }
 }
 
