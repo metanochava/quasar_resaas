@@ -50,14 +50,16 @@ const centerClass = computed(() => {
 async function save() {
   if (props.externalSave) {
     emit('save')
-  } else {
-    const  data = await formRef.value?.save() // modo standalone
-    const  data1 = formRef.value?.row 
-    console.log('form', formRef.value.form)
-    console.log('row', formRef.value.row)
-    let dd = {id: 898, 'nome': data1}
-    emit('saved', dd  )
+    return
   }
+
+  const data = await formRef.value?.save()
+
+  emit('saved', {
+    data,
+    row: props.store.row,
+    form: props.store.form
+  })
 }
 
 function goBack() {

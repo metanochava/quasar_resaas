@@ -23,11 +23,6 @@ function isHiddenField(f) {
   return ['id'].includes(f.name)
 }
 
-
-
-
-
-
 // ---------------- FIELD GROUPS ----------------
 const generalFields = computed(() =>
   props.store.fields.filter(f =>
@@ -54,11 +49,6 @@ const fileFields = computed(() =>
     (f.ui?.isFile || f.ui?.isImage)
   )
 )
-
-
-
-
-
 
 
 
@@ -239,6 +229,7 @@ async function save() {
         data,
         config
       )
+      
     }
 
     emit('saved', dados.data )
