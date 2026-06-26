@@ -133,7 +133,7 @@ function goBack() {
             ref="formRef"
             :store="store"
             :ignore-fields="ignoreFields"
-            @saved="save"
+            @saved="save_"
           />
 
         </div>
