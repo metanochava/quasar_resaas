@@ -9,7 +9,7 @@ const slots = useSlots()
 
 const User = useUserStore()
 const router = useRouter()
-
+const emit = defineEmits(['saved'])
 const props = defineProps({
   store: { type: Object, default: null },
   ignoreFields: { type: Array, default: () => [] },
@@ -50,8 +50,10 @@ const centerClass = computed(() => {
 function save() {
   if (props.externalSave) {
     emit('save') // BaseFormPage controla
+    emit('saved',  formRef.value.form )
   } else {
     formRef.value?.save() // modo standalone
+    emit('saved',  formRef.value.form )
   }
 }
 
@@ -131,6 +133,7 @@ function goBack() {
             ref="formRef"
             :store="store"
             :ignore-fields="ignoreFields"
+            @saved="save"
           />
 
         </div>
@@ -146,6 +149,7 @@ function goBack() {
       </div>
 
     </q-card-section>
+
 
     <!-- ================= FOOTER FIXO ================= -->
     <q-separator v-if="!hasFooter" />
