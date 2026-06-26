@@ -51,7 +51,8 @@ async function save() {
   if (props.externalSave) {
     emit('save')
   } else {
-    let data = await formRef.value?.save() // modo standalone
+    const  data = await formRef.value?.save() // modo standalone
+    console.log(data)
     emit('saved', data  )
   }
 }
