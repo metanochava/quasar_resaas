@@ -47,13 +47,13 @@ const centerClass = computed(() => {
   return props.centerCol || 'col'
 })
 
-async function save_() {
+async function save() {
   if (props.externalSave) {
     emit('save')
   } else {
     const  data = await formRef.value?.save() // modo standalone
     console.log(data)
-    emit('saved', data  )
+    emit('save', data  )
   }
 }
 
@@ -93,7 +93,7 @@ function goBack() {
         icon="edit"
         :loading="store.saving"
         :label="tdc('Edit')"
-        @click="save_"
+        @click="save"
       />
       <s-btn v-if="User.can('add_' + (store.model || '').toLowerCase()) " v-show="!isEdit"
         color="primary"
@@ -101,7 +101,7 @@ function goBack() {
         icon="save"
         :loading="store.saving"
         :label="tdc('Save')"
-        @click="save_"
+        @click="save"
       />
 
     </q-card-actions>
@@ -133,7 +133,7 @@ function goBack() {
             ref="formRef"
             :store="store"
             :ignore-fields="ignoreFields"
-            @saved="save_"
+            @saved="save"
           />
 
         </div>
