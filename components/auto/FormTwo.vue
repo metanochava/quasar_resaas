@@ -52,8 +52,9 @@ async function save() {
     emit('save')
   } else {
     const  data = await formRef.value?.save() // modo standalone
-    console.log(data)
-    emit('saved', data  )
+    let dd = {id: 898, 'nome': "metano"}
+    console.log(data, dd )
+    emit('saved', dd  )
   }
 }
 
