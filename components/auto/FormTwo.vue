@@ -53,7 +53,7 @@ async function save() {
   } else {
     const  data = await formRef.value?.save() // modo standalone
     console.log(data)
-    emit('save', data  )
+    emit('saved', data  )
   }
 }
 
