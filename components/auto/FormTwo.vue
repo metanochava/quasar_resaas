@@ -58,7 +58,9 @@ async function save() {
   emit('saved', {
     data,
     row: props.store.row,
-    form: props.store.form
+    form: props.store.form,
+    rowr: formRef.value.row,
+    formf: formRef.value.form
   })
 }
 
