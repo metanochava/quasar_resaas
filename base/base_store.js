@@ -385,7 +385,7 @@ export function createBaseStore(name, config, extend = {}) {
           ? await this.update()
           : await this.create()
 
-          console.log("post": data)
+          console.log("post", data)
         return data
       },
 
