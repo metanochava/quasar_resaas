@@ -27,10 +27,9 @@ export default boot(({ app }) => {
   app.component('s-drawer', DrawerComponent)
   app.component('s-field', FieldComponent)
   app.component('s-upload', UploadComponent)
+  app.component('s-file', UploadComponent)
   app.component('s-checkbox', CheckBoxComponent)
   app.component('s-switch', SwitchComponent)
   app.component('s-time', TimeComponent)
-
-
 
 })
