@@ -224,7 +224,6 @@ export default defineComponent({
   },
 
   async mounted(){
-
     // 🔥 RESTORE USER + SETTINGS (teu código original)
     if(this.User){
       this.User?.loadFromStorage()
