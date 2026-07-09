@@ -581,7 +581,7 @@ async function executeAction() {
 
     <!-- 🔥 INLINE EDIT -->
     <template #body-cell="props">
-      <q-td :props="props">
+      <q-td :props="props" class="insize">
 
         <template v-if="props.col.name === 'id'">
           <s-btn
@@ -630,7 +630,7 @@ async function executeAction() {
             :label="props.row.state.value == 'Active' ? tdc('Activo') : tdc('Inactivo')"
             @click="() => toggleEstado(props.row)"
           >
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.state == 'Active' ? 'Desativar' : 'Activar') }}</q-tooltip>
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.state == 'Active' ? 'Desactivar' : 'Activar') }}</q-tooltip>
           </s-btn>
         </template>
 
@@ -653,7 +653,7 @@ async function executeAction() {
 
 
         <!-- 🔤 DEFAULT -->
-        <template v-else>
+        <template v-else >
           {{ resolveValue(props.value) }}
         </template>
       </q-td>
