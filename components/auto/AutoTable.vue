@@ -581,7 +581,7 @@ async function executeAction() {
 
     <!-- 🔥 INLINE EDIT -->
     <template #body-cell="props">
-      <q-td :props="props" class="insize">
+      <q-td :props="props" >
 
         <template v-if="props.col.name === 'id'">
           <s-btn
@@ -654,7 +654,9 @@ async function executeAction() {
 
         <!-- 🔤 DEFAULT -->
         <template v-else >
-          {{ resolveValue(props.value) }}
+          <label class="insize">
+            {{ resolveValue(props.value) }} 
+          </label>
         </template>
       </q-td>
     </template>
