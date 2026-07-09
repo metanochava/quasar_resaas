@@ -63,8 +63,11 @@ export const useUserStore = createBaseStore(
     selectedGroups: [],
     loadingGroups: false,
     groupSearch: '',
-    groupFilter: 'all' // all | active | inactive
+    groupFilter: 'all', // all | active | inactive
     // Not loged this group .......................................
+
+    defaultprofile:  "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+
   }),
 
   getters: {
@@ -90,8 +93,7 @@ export const useUserStore = createBaseStore(
     },
     username: (state) => state.data?.username || "Guest",
     profile: (state) =>
-      state.data?.profile?.url ||
-      "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+      state.data?.profile?.url || state.defaultprofile,
     hasPermission: (state) => (perm) =>
       state.Permissions.has(String(perm).toLowerCase()),
 
