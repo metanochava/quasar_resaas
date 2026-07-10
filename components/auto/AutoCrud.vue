@@ -78,7 +78,7 @@ const props = defineProps({
   model: { type: String, required: true },
   route: { type: [String, Object], default: null },
   ignoreFields: { type: Array, default: () =>  ['created_at','updated_at', 'created_by', 'updated_by'] },
-  actions: { type: Array, default: () =>  [{'action':'Marcar Consulta', 'icon':'save', 'method': 'get'}, ] },
+  extraActions: { type: Array, default: () =>  [{'action':'Marcar Consulta', 'icon':'save', 'method': 'get'}, ] },
 })
 
 // --- state ---
@@ -147,7 +147,7 @@ async function init() {
   })
 
   schema.value = data.fields
-  actions.value = [...data.actions, ...props.actions]
+  actions.value = [...data.actions, ...props.extraActions, ...[{'action':'dd', 'method':'get', 'icon':"save"}]]
   config.value = data.config
 
   store.fields = data.fields
