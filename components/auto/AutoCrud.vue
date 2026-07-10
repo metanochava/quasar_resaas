@@ -291,7 +291,7 @@ async function onInlinePatch({ id, field, value }) {
 async function onRunAction({ action, row }) {
   console.log( action, row )
   if (action.action){
-    emit('runaction', {action, row})
+    emit('runaction', action, row)
   }
   if (action?.permission && !User.can(action.permission)) return
 

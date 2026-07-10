@@ -263,7 +263,7 @@ const paginationLabel = (start, end, total) => {
 
 
 function runAction(action, row) {
-  emit('run-action', { action, row })
+  emit('run-action',  action, row )
 }
 
 async function executeAction() {
