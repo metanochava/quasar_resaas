@@ -559,7 +559,7 @@ async function executeAction() {
                 v-for="a in singularActions"
                 :key="a.url"
                 clickable
-                :disable="a.permission && !User.can(a.method + '_' + a.permission + '_' + a.model.toLowerCase())"
+                v-show="a.permission && !User.can(a.method + '_' + a.permission + '_' + a.model.toLowerCase()) && a.method"
                 @click="runAction(a, props.row)"
               >
                 <q-item-section avatar v-if="a.icon">
@@ -568,6 +568,22 @@ async function executeAction() {
 
                 <q-item-section>
                   {{ a.method + '_' + a.permission }}
+                </q-item-section>
+              </q-item>
+
+              <q-item
+                v-for="a in singularActions"
+                :key="a"
+                clickable
+                v-show="a.action"
+                @click="runAction(a, props.row)"
+              >
+                <q-item-section avatar v-if="a.icon">
+                  <q-icon :name="a.icon" :color="getMethodColor('get')" />
+                </q-item-section>
+
+                <q-item-section>
+                  {{ a.action }}
                 </q-item-section>
               </q-item>
 
