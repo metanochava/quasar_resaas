@@ -78,7 +78,7 @@ const props = defineProps({
   model: { type: String, required: true },
   route: { type: [String, Object], default: null },
   ignoreFields: { type: Array, default: () =>  ['created_at','updated_at', 'created_by', 'updated_by'] },
-  actions: { type: Array, default: () =>  ['created_at','updated_at', 'created_by', 'updated_by'] },
+  actions: { type: Array, default: () =>  [{'action':'Marcar Consulta', 'icon':'save', 'method': 'get'}, ] },
 })
 
 // --- state ---

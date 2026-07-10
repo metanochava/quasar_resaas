@@ -328,6 +328,8 @@ async function executeAction() {
     </s-card>
   </q-dialog>
 
+  {{singularActions}}
+
   <q-table
     square
     flat
@@ -559,7 +561,7 @@ async function executeAction() {
                 v-for="a in singularActions"
                 :key="a.url"
                 clickable
-                v-show="a.permission && !User.can(a.method + '_' + a.permission + '_' + a.model.toLowerCase())"
+                v-show="a.permission && !User.can(a.method + '_' + a.permission + '_' + a.model.toLowerCase()) "
                 @click="runAction(a, props.row)"
               >
                 <q-item-section avatar v-if="a.icon">
