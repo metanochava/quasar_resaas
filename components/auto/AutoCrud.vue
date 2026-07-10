@@ -57,7 +57,7 @@
 
 </template>
 <script setup>
-import { ref, computed, watch, defineEmits } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { debounce } from 'quasar'
 import AutoTable from './AutoTable.vue'
 import FormModal from './FormModal.vue'
