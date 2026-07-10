@@ -579,7 +579,7 @@ async function executeAction() {
                 @click="runAction(a, props.row)"
               >
                 <q-item-section avatar v-if="a.icon">
-                  <q-icon :name="a.icon" :color="getMethodColor('get')" />
+                  <q-icon :name="a.icon" :color="getMethodColor(a.method)" />
                 </q-item-section>
 
                 <q-item-section>
