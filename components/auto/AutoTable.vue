@@ -328,7 +328,7 @@ async function executeAction() {
     </s-card>
   </q-dialog>
 
-  {{singularActions}}
+
 
   <q-table
     square
@@ -448,6 +448,22 @@ async function executeAction() {
           <q-menu auto-close>
 
             <q-list dense style="min-width: 180px">
+
+              <q-item
+                v-for="a in singularActions"
+                :key="a"
+                clickable
+                v-show="true"
+                @click="runAction(a, props.row)"
+              >
+                <q-item-section avatar v-if="a.icon">
+                  <q-icon :name="a.icon" :color="getMethodColor(a.method)" />
+                </q-item-section>
+
+                <q-item-section>
+                  {{ a.action }}
+                </q-item-section>
+              </q-item>
 
               <!-- PDF -->
               <q-item
@@ -573,22 +589,7 @@ async function executeAction() {
                 </q-item-section>
               </q-item>
 
-              <q-item
-                v-for="a in singularActions"
-                :key="a"
-                clickable
-                v-show="true"
-                @click="runAction(a, props.row)"
-              >
-                <q-item-section avatar v-if="a.icon">
-                  <q-icon :name="a.icon" :color="getMethodColor(a.method)" />
-                </q-item-section>
-
-                <q-item-section>
-                  {{ a.action }}
-                </q-item-section>
-              </q-item>
-
+              
             </q-list>
 
           </q-menu>

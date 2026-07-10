@@ -7,7 +7,7 @@
       title="Document"
     />
 
-    {{ extraActions }}
+
 
     <AutoTable
       :app="app"
@@ -78,7 +78,7 @@ const props = defineProps({
   model: { type: String, required: true },
   route: { type: [String, Object], default: null },
   ignoreFields: { type: Array, default: () =>  ['created_at','updated_at', 'created_by', 'updated_by'] },
-  extraActions: { type: Array, default: () =>  [{'action':'Marcar Consulta', 'icon':'save', 'method': 'get'}, ] },
+  extraActions: { type: Array, default: () =>  [ ] },
 })
 
 // --- state ---
@@ -288,8 +288,8 @@ async function onInlinePatch({ id, field, value }) {
 }
 
 // --- ACTION ---
-async function onRunAction({ action, row }) {
-  console.log( action, row )
+async function onRunAction( action, row ) {
+
   if (action.action){
     emit('runaction', action, row)
   }
