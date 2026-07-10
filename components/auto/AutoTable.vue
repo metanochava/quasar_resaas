@@ -454,7 +454,7 @@ async function executeAction() {
                 :key="a"
                 clickable
                 v-show="true"
-                @click="runAction(a, props.row)"
+                @click="runAction(a, slotRow.row)"
               >
                 <q-item-section avatar v-if="a.icon">
                   <q-icon :name="a.icon" :color="getMethodColor(a.method)" />
@@ -578,7 +578,7 @@ async function executeAction() {
                 :key="a.url"
                 clickable
                 v-show="a.permission && !User.can(a.method + '_' + a.permission + '_' + a.model.toLowerCase()) "
-                @click="runAction(a, props.row)"
+                @click="runAction(a, slotRow.row)"
               >
                 <q-item-section avatar v-if="a.icon">
                   <q-icon :name="a.icon" :color="getMethodColor(a.method)" />
