@@ -57,7 +57,7 @@
 
 </template>
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, defineEmits } from 'vue'
 import { debounce } from 'quasar'
 import AutoTable from './AutoTable.vue'
 import FormModal from './FormModal.vue'
@@ -69,7 +69,9 @@ import { useUserStore } from 'quasar_resaas'
 
 const User =useUserStore()
 
-
+const emit = defineEmits([
+  'runaction'
+])
 // --- props ---
 const props = defineProps({
   app: { type: String, required: true },
@@ -287,6 +289,10 @@ async function onInlinePatch({ id, field, value }) {
 
 // --- ACTION ---
 async function onRunAction({ action, row }) {
+  console.log({ action, row })
+  if (action.action){
+    emit('runaction', action, row)
+  }
   if (action?.permission && !User.can(action.permission)) return
 
   const actionUrl = action.url?.startsWith('http')
