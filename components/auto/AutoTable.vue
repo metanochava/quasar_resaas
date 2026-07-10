@@ -129,7 +129,7 @@ const show_filter = ref(false)
 // ---------------- UI STATE ----------------
 const visibleColumns = ref([])
 const singularActions = computed(() =>
-  (props.actions || []).filter(c => c.details === true || c.details === 'true')
+  (props.actions || []).filter(c => c.details === true || c.details === 'true'  || c.action)
 )
 const geralActions = computed(() =>
   (props.actions || []).filter(c => c.details === false || c.details === 'false')

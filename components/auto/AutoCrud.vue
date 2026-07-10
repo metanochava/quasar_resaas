@@ -7,7 +7,7 @@
       title="Document"
     />
 
-    
+    {{ extraActions }}
 
     <AutoTable
       :app="app"
