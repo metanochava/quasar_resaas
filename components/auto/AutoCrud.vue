@@ -147,7 +147,7 @@ async function init() {
   })
 
   schema.value = data.fields
-  actions.value = [...data.actions, ...props.extraActions, ...[{'action':'dd', 'method':'get', 'icon':"save"}]]
+  actions.value = [...data.actions, ...props.extraActions]
   config.value = data.config
 
   store.fields = data.fields

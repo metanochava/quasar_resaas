@@ -333,7 +333,7 @@ export const useEntityTypeStore = createBaseStore(
       async getEntityTypes() {
         try {
           const { data } = await HTTPClient.get(
-            url({ type: "u", url: "django_resaas/entitytypes" })
+            url({ type: "u", url: "django_resaas/entitytypes", params: {'objects': 'alive'} })
           )
 
           this.rows = data || []
