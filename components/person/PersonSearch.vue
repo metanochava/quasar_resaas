@@ -190,10 +190,12 @@ async function doSearch(value) {
   }
 
   // Adapte ao nome da action existente no seu PersonStore
-  await Person.get({
+  await Person.loadData({
     search
   })
 }
+
+
 
 function selectPerson(person) {
   Person.row = person

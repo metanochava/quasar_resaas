@@ -31,7 +31,6 @@ export function createBaseStore(name, config, extend = {}) {
         loading: false,
         saving: false,
 
-
         _schemaLoaded: false,
         fields: [],
         rows: [],
