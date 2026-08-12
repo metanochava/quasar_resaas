@@ -1,39 +1,69 @@
 <template>
+  <!-- BOTÃO PARA ABRIR A MODAL -->
+  <s-btn
+    color="primary"
+    icon="person_search"
+    label="Pesquisar Pessoa"
+    no-caps
+    @click="openSearchDialog"
+  />
 
-    <q-dialog
-      v-model="Person.search.length"
-      persistent
+  <!-- MODAL DE PESQUISA -->
+  <q-dialog
+    v-model="showSearchDialog"
+    persistent
+  >
+    <q-card
+      style="width: 900px; max-width: 95vw"
+      class="rounded-borders"
     >
-      <q-card
-        style="width: 900px; max-width: 95vw;"
-        class="rounded-borders"
-      >
-        <q-card-section
-          class="row items-center bg-primary text-white"
-        >
-          <div class="text-h6">
-            Pessoa
-          </div>
-          <q-space />
-          <q-btn  flat round dense icon="close" v-close-popup
-          />
-        </q-card-section>
+      <q-card-section class="row items-center bg-primary text-white">
+        <div class="text-h6">
+          Pesquisar Pessoa
+        </div>
 
-        <q-card-section>
-          <q-input
-            v-model="Person.search"
-            outlined
-            dense
-            clearable
-            debounce="500"
-            class="col"
-            label="Pesquisar pessoa"
-            @update:model-value="doSearch"
-          >
-            <template #prepend>
-              <q-icon name="search" />
-            </template>
-          </q-input>
+        <q-space />
+
+        <q-btn
+          flat
+          round
+          dense
+          icon="close"
+          @click="closeSearchDialog"
+        />
+      </q-card-section>
+
+      <q-card-section>
+        <q-input
+          v-model="Person.search"
+          outlined
+          dense
+          clearable
+          debounce="500"
+          label="Pesquisar pessoa"
+          @update:model-value="doSearch"
+        >
+          <template #prepend>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+
+        <!-- LOADING -->
+        <div
+          v-if="Person.loading"
+          class="flex flex-center q-pa-lg"
+        >
+          <q-spinner
+            color="primary"
+            size="35px"
+          />
+        </div>
+
+        <!-- RESULTADOS -->
+        <div
+          v-else-if="Person.search"
+          class="q-mt-md"
+        >
           <PersonCard
             v-for="person in Person.rows"
             :key="person.id"
@@ -41,229 +71,147 @@
             class="q-mb-sm"
             @select="selectPerson"
           />
-        </q-card-section>
-      </q-card>
-    </q-dialog>
-  <div>
-    <div class="row no-wrap items-start q-px-md">
-      <q-input
-          v-model="Person.search"
-          outlined
-          dense
-          clearable
-          debounce="500"
-          class="col"
-          label="Pesquisar pessoa"
-          @update:model-value="doSearch"
-      >
-        <template #prepend>
-          <q-icon name="search" />
-        </template>
-        <template #append>
-          <q-btn
-            color="primary"
-            icon="add"
-            label="Criar"
-            class="q-ml-sm"
-            unelevated
-            @click="createNew"
-          />
-        </template>
-      </q-input>
 
-      
-      <div
-        v-if="
-          Person.search &&
-          Person.rows.length == 0
-        "
-        class="q-mt-md text-grey text-caption"
-      >
-        Nenhuma pessoa encontrada
-      </div>
-
-    </div>
-
-    <!-- =====================================
-        LOADING
-    ====================================== -->
-
-    <div
-      v-if="Person.loading"
-      class="flex flex-center q-pa-lg"
-    >
-
-      <q-spinner
-        color="primary"
-        size="35px"
-      />
-
-    </div>
-
-    <!-- =====================================
-        CREATE PERSON DIALOG
-    ====================================== -->
-
-    <q-dialog
-      v-model="showCreateDialog"
-      persistent
-    >
-
-      <q-card
-        style="width: 900px; max-width: 95vw;"
-        class="rounded-borders"
-      >
-        <q-bar
-          class="row items-center bg-primary text-white"
-        >
-
-          <div class="text-h6">
-            Criar Pessoa
+          <div
+            v-if="Person.rows.length === 0"
+            class="text-grey text-caption text-center q-pa-md"
+          >
+            Nenhuma pessoa encontrada
           </div>
+        </div>
+      </q-card-section>
 
-          <q-space />
+      <q-card-actions align="between" class="q-pa-md">
+        <q-btn
+          flat
+          color="grey"
+          label="Cancelar"
+          no-caps
+          @click="closeSearchDialog"
+        />
 
-          <q-btn
-            flat
-            round
-            dense
-            icon="close"
-            v-close-popup
-          />
+        <q-btn
+          color="primary"
+          icon="person_add"
+          label="Criar Pessoa"
+          no-caps
+          @click="openCreateDialog"
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 
-        </q-bar>
+  <!-- MODAL PARA CRIAR PESSOA -->
+  <q-dialog
+    v-model="showCreateDialog"
+    persistent
+  >
+    <q-card
+      style="width: 900px; max-width: 95vw"
+      class="rounded-borders"
+    >
+      <q-bar class="row items-center bg-primary text-white">
+        <div class="text-h6">
+          Criar Pessoa
+        </div>
 
-        <!-- FORM -->
-        <q-card-section>
+        <q-space />
 
-            <Form
-                :store="Person"
-                :ignore-fields="ignoreFields"
-                @saved="onSaved"
-            />
+        <q-btn
+          flat
+          round
+          dense
+          icon="close"
+          @click="closeCreateDialog"
+        />
+      </q-bar>
 
-            <ActionForm
-                :store="Person"
-                :buttons="['cancel', 'reset', 'edit', 'save']"
-            />
+      <q-card-section>
+        <Form
+          :store="Person"
+          :ignore-fields="ignoreFields"
+          @saved="onSaved"
+        />
 
-        </q-card-section>
-
-      </q-card>
-
-    </q-dialog>
-
-  </div>
-
+        <ActionForm
+          :store="Person"
+          :buttons="['cancel', 'reset', 'edit', 'save']"
+        />
+      </q-card-section>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup>
-
 import { ref } from 'vue'
 
-import Form from '../../components/engine/FormComponent.vue'
-import ActionForm from '../../components/auto/ActionForm.vue'
-
-import { usePersonStore } from '../../stores/PersonStore'
-
+import { Form, ActionForm } from 'quasar_resaas'
 import PersonCard from './PersonCard.vue'
-
-// ==========================================
-// EMITS
-// ==========================================
-
-const emit = defineEmits([
-  'selected',
-])
-
-// ==========================================
-// STORE
-// ==========================================
+import { usePersonStore } from './personStore'
 
 const Person = usePersonStore()
 
-
-// ==========================================
-// STATE
-// ==========================================
-
-
+const showSearchDialog = ref(false)
 const showCreateDialog = ref(false)
-const modal = ref(false)
-
-// ==========================================
-// IGNORE
-// ==========================================
 
 const ignoreFields = [
   'id',
+  'user',
+  'entity',
+  'branch',
   'created_at',
   'updated_at',
   'created_by',
   'updated_by',
-  'deleted_at',
-  'entity',
-  'branch',
-  'user'
+  'deleted_at'
 ]
 
-// ==========================================
-// SEARCH
-// ==========================================
+function openSearchDialog() {
+  Person.search = ''
+  Person.rows = []
+  showSearchDialog.value = true
+}
 
-async function doSearch() {
+function closeSearchDialog() {
+  showSearchDialog.value = false
+  Person.search = ''
+  Person.rows = []
+}
 
-  if (!Person.search) {
+async function doSearch(value) {
+  const search = value?.trim()
 
+  if (!search) {
     Person.rows = []
-
     return
   }
 
-    await Person.loadData()
-
+  // Adapte ao nome da action existente no seu PersonStore
+  await Person.get({
+    search
+  })
 }
-
-// ==========================================
-// SELECT
-// ==========================================
 
 function selectPerson(person) {
-  Person.form = person
-   Person.form = {
-    ...Person.form,
-  }
-  emit('selected', person)
+  Person.row = person
+  closeSearchDialog()
 }
 
-// ==========================================
-// CREATE
-// ==========================================
-
-function createNew() {
-
-  Person.resetForm?.()
-
-  Person.form = {
-    ...Person.form,
-  }
-
+function openCreateDialog() {
+  showSearchDialog.value = false
   showCreateDialog.value = true
 
+  Person.resetForm?.()
 }
 
-// ==========================================
-// SAVED
-// ==========================================
-
-function onSaved(res) {
-
-    const person = res?.data || res
-    Person.row = person 
-    Person.form = person 
-
-    showCreateDialog.value = false
-    emit('selected', person)
+function closeCreateDialog() {
+  showCreateDialog.value = false
 }
 
+function onSaved(person) {
+  Person.row = person
+
+  showCreateDialog.value = false
+  showSearchDialog.value = false
+}
 </script>
