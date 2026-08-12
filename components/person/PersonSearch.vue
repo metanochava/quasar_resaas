@@ -1,12 +1,15 @@
 <template>
   <!-- BOTÃO PARA ABRIR A MODAL -->
-  <s-btn
-    color="primary"
-    icon="person_search"
-    label="Pesquisar Pessoa"
-    no-caps
-    @click="openSearchDialog"
-  />
+  <div class="q-pa-sm col-12">
+    <s-btn
+      color="primary"
+      icon="person_search"
+      label="Pesquisar Pessoa"
+      no-caps
+      class="full-width"
+      @click="openSearchDialog"
+    />
+  </div>
 
   <!-- MODAL DE PESQUISA -->
   <q-dialog
@@ -17,7 +20,7 @@
       style="width: 900px; max-width: 95vw"
       class="rounded-borders"
     >
-      <q-card-section class="row items-center bg-primary text-white">
+      <q-bar>
         <div class="text-h6">
           Pesquisar Pessoa
         </div>
@@ -31,7 +34,7 @@
           icon="close"
           @click="closeSearchDialog"
         />
-      </q-card-section>
+      </q-bar>
 
       <q-card-section>
         <q-input
