@@ -20,6 +20,20 @@
         </q-card-section>
 
         <q-card-section>
+          <q-input
+            v-model="Person.search"
+            outlined
+            dense
+            clearable
+            debounce="500"
+            class="col"
+            label="Pesquisar pessoa"
+            @update:model-value="doSearch"
+          >
+            <template #prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
           <PersonCard
             v-for="person in Person.rows"
             :key="person.id"
