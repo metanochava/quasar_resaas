@@ -199,6 +199,7 @@ async function doSearch(value) {
 
 function selectPerson(person) {
   Person.row = person
+  Person.form = person
   closeSearchDialog()
 }
 
