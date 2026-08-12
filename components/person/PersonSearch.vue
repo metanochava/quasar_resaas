@@ -1,7 +1,7 @@
 <template>
 
     <q-dialog
-      v-model="Person.search"
+      v-model="Person.search.length"
       persistent
     >
       <q-card
@@ -31,7 +31,7 @@
       </q-card>
     </q-dialog>
   <div>
-    <div class="row no-wrap items-start">
+    <div class="row no-wrap items-start q-px-md">
       <q-input
           v-model="Person.search"
           outlined
@@ -45,16 +45,19 @@
         <template #prepend>
           <q-icon name="search" />
         </template>
+        <template #append>
+          <q-btn
+            color="primary"
+            icon="add"
+            label="Criar"
+            class="q-ml-sm"
+            unelevated
+            @click="createNew"
+          />
+        </template>
       </q-input>
 
-      <q-btn
-        color="primary"
-        icon="add"
-        label="Criar"
-        class="q-ml-sm"
-        unelevated
-        @click="createNew"
-      />
+      
       <div
         v-if="
           Person.search &&
@@ -96,16 +99,12 @@
         style="width: 900px; max-width: 95vw;"
         class="rounded-borders"
       >
-
-        <!-- HEADER -->
-        <q-card-section
+        <q-bar
           class="row items-center bg-primary text-white"
         >
 
           <div class="text-h6">
-
             Criar Pessoa
-
           </div>
 
           <q-space />
@@ -118,7 +117,7 @@
             v-close-popup
           />
 
-        </q-card-section>
+        </q-bar>
 
         <!-- FORM -->
         <q-card-section>
@@ -169,12 +168,14 @@ const emit = defineEmits([
 
 const Person = usePersonStore()
 
+
 // ==========================================
 // STATE
 // ==========================================
 
 
 const showCreateDialog = ref(false)
+const modal = ref(false)
 
 // ==========================================
 // IGNORE
