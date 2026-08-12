@@ -1,46 +1,69 @@
 <template>
 
-  <div>
-
-    <!-- =====================================
-        SEARCH
-    ====================================== -->
-
-    <div class="row no-wrap items-start">
-
-        <!-- INPUT -->
-        <q-input
-            v-model="Person.search"
-            outlined
-            dense
-            clearable
-            debounce="500"
-            class="col"
-            label="Pesquisar pessoa"
-            @update:model-value="doSearch"
+    <q-dialog
+      v-model="showCreateDialog"
+      persistent
+    >
+      <q-card
+        style="width: 900px; max-width: 95vw;"
+        class="rounded-borders"
+      >
+        <q-card-section
+          class="row items-center bg-primary text-white"
         >
+          <div class="text-h6">
+            Pessoa
+          </div>
+          <q-space />
+          <q-btn  flat round dense icon="close" v-close-popup
+          />
+        </q-card-section>
 
-            <template #prepend>
+        <q-card-section>
+          <PersonCard
+            v-for="person in Person.rows"
+            :key="person.id"
+            :person="person"
+            class="q-mb-sm"
+            @select="selectPerson"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+  <div>
+    <div class="row no-wrap items-start">
+      <q-input
+          v-model="Person.search"
+          outlined
+          dense
+          clearable
+          debounce="500"
+          class="col"
+          label="Pesquisar pessoa"
+          @update:model-value="doSearch"
+      >
+        <template #prepend>
+          <q-icon name="search" />
+        </template>
+      </q-input>
 
-            <q-icon name="search" />
-
-            </template>
-
-        </q-input>
-
-        <!-- BUTTON -->
-        <q-btn
-            v-if="
-              Person.search &&
-              !Person.rows.length
-            "
-            color="primary"
-            icon="add"
-            label="Criar"
-            class="q-ml-sm"
-            unelevated
-            @click="createNew"
-        />
+      <q-btn
+        color="primary"
+        icon="add"
+        label="Criar"
+        class="q-ml-sm"
+        unelevated
+        @click="createNew"
+      />
+      <div
+        v-if="
+          Person.search &&
+          Person.rows.length == 0
+        "
+        class="q-mt-md text-grey text-caption"
+      >
+        Nenhuma pessoa encontrada
+      </div>
 
     </div>
 
@@ -57,45 +80,6 @@
         color="primary"
         size="35px"
       />
-
-    </div>
-
-    <!-- =====================================
-        RESULTS
-    ====================================== -->
-
-    <div
-      v-if="
-        Person.search &&
-        Person.rows.length
-        
-      "
-      class="q-mt-md"
-    >
-
-      <PersonCard
-        v-for="person in Person.rows"
-        :key="person.id"
-        :person="person"
-        class="q-mb-sm"
-        @select="selectPerson"
-      />
-
-    </div>
-
-    <!-- =====================================
-        EMPTY
-    ====================================== -->
-
-    <div
-      v-if="
-        Person.search &&
-        !Person.rows.length
-      "
-      class="q-mt-md text-grey text-caption"
-    >
-
-      Nenhuma pessoa encontrada
 
     </div>
 
