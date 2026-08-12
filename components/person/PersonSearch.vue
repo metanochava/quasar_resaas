@@ -1,7 +1,7 @@
 <template>
 
     <q-dialog
-      v-model="showCreateDialog"
+      v-model="Person.search"
       persistent
     >
       <q-card
