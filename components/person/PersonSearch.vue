@@ -20,9 +20,9 @@
       style="width: 900px; max-width: 95vw"
       class="rounded-borders"
     >
-      <q-bar>
+      <q-bar calor="primary">
         <div class="text-h6">
-          Pesquisar Pessoa
+        {{ tdc('Pesquisar Pessoa') }}
         </div>
 
         <q-space />
@@ -154,6 +154,7 @@ import ActionForm from '../../components/auto/ActionForm.vue'
 import { usePersonStore } from '../../stores/PersonStore'
 
 import PersonCard from './PersonCard.vue'
+import { tdc } from '../../boot/base.js'
 
 const Person = usePersonStore()
 
