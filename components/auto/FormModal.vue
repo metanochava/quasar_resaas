@@ -54,7 +54,7 @@ function save() {
         <q-space />
 
         <!-- CLOSE -->
-        <q-btn
+        <s-btn
           flat
           round
           dense
@@ -62,7 +62,7 @@ function save() {
           @click="close"
         >
           <q-tooltip>{{ tdc('Fechar') }}</q-tooltip>
-        </q-btn>
+        </s-btn>
 
       </div>
 
@@ -99,7 +99,7 @@ function save() {
       <!-- 🔥 FOOTER -->
       <q-card-actions align="right" class="q-pa-md">
 
-        <q-btn
+        <s-btn
           outeline
           color="grey-7"
           :label="tdc('Cancelar')"

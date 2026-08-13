@@ -15,7 +15,7 @@
 
         <q-space />
 
-        <q-btn
+        <s-btn
           flat
           round
           dense

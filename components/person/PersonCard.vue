@@ -48,7 +48,7 @@
       </div>
 
       <!-- ACTION -->
-      <q-btn
+      <s-btn
         flat
         round
         dense

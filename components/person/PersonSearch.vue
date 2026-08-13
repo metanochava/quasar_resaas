@@ -27,7 +27,7 @@
 
         <q-space />
 
-        <q-btn
+        <s-btn
           flat
           round
           dense
@@ -85,7 +85,7 @@
       </q-card-section>
 
       <q-card-actions align="between" class="q-pa-md">
-        <q-btn
+        <s-btn
           flat
           color="grey"
           label="Cancelar"
@@ -93,7 +93,7 @@
           @click="closeSearchDialog"
         />
 
-        <q-btn
+        <s-btn
           color="primary"
           icon="person_add"
           label="Criar Pessoa"
@@ -120,7 +120,7 @@
 
         <q-space />
 
-        <q-btn
+        <s-btn
           flat
           round
           dense

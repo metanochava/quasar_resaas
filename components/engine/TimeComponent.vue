@@ -30,7 +30,7 @@
             format24h
           >
             <div class="row items-center justify-end q-pa-sm">
-              <q-btn
+              <s-btn
                 v-close-popup
                 label="OK"
                 color="primary"

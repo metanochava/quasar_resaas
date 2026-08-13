@@ -410,7 +410,7 @@ async function executeAction() {
             @keyup.enter="emit('search', search)"
           />
 
-          <q-btn-group >
+          <s-btn-group >
             <s-btn
               dense
               icon="add"
@@ -427,7 +427,7 @@ async function executeAction() {
               :to="{ name: props.config?.routes?.add }"
               v-show="User.can('add_' + model.toLowerCase()) && props.config?.routes?.add"
             />
-          </q-btn-group>
+          </s-btn-group>
         </div>
       </div>
     </template>

@@ -6,24 +6,24 @@
       <q-bar class="bg-dark">
 
         <!-- ZOOM -->
-        <q-btn flat icon="zoom_out" @click="zoomOut" />
+        <s-btn flat icon="zoom_out" @click="zoomOut" />
         <span class="q-mx-sm">{{ Math.round(scale * 100) }}%</span>
-        <q-btn flat icon="zoom_in" @click="zoomIn" />
+        <s-btn flat icon="zoom_in" @click="zoomIn" />
 
         <q-separator vertical class="q-mx-sm" />
 
         <!-- PAGINA -->
-        <q-btn flat icon="chevron_left" @click="prevPage" />
+        <s-btn flat icon="chevron_left" @click="prevPage" />
         <span class="q-mx-sm">{{ page }} / {{ totalPages }}</span>
-        <q-btn flat icon="chevron_right" @click="nextPage" />
+        <s-btn flat icon="chevron_right" @click="nextPage" />
 
         <q-space />
 
         <!-- DOWNLOAD -->
-        <q-btn flat icon="download" @click="downloadPdf" />
+        <s-btn flat icon="download" @click="downloadPdf" />
 
         <!-- CLOSE -->
-        <q-btn flat icon="close" @click="dialog = false" />
+        <s-btn flat icon="close" @click="dialog = false" />
       </q-bar>
 
       <!-- VIEW -->

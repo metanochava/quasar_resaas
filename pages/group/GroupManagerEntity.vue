@@ -12,7 +12,7 @@
             Permissões - {{ Group?.row?.name }}
           </div>
           <q-space />
-          <q-btn dense flat icon="close" v-close-popup />
+          <s-btn dense flat icon="close" v-close-popup />
         </q-bar>
         <q-separator />
       </div>
@@ -82,7 +82,7 @@
         </div>
 
         <div class="col-auto">
-          <q-btn
+          <s-btn
             color="primary"
             icon="add"
             label="Adicionar"
@@ -151,7 +151,7 @@
             <div class="row items-center q-gutter-sm">
 
               <!-- 🔥 BOTÃO MODAL -->
-              <q-btn
+              <s-btn
                 icon="security"
                 size="sm"
                 flat

@@ -12,7 +12,7 @@
         <q-space />
 
         <!-- DOWNLOAD -->
-        <q-btn
+        <s-btn
           v-if="pdfUrl"
           dense
           flat
@@ -20,10 +20,10 @@
           @click="downloadPdf"
         >
           <q-tooltip>Download</q-tooltip>
-        </q-btn>
+        </s-btn>
 
         <!-- CLOSE -->
-        <q-btn dense flat icon="close" @click="dialog = false" />
+        <s-btn dense flat icon="close" @click="dialog = false" />
       </q-bar>
 
       <!-- BODY -->

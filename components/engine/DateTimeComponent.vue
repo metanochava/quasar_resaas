@@ -42,7 +42,7 @@
             />
 
             <div class="row justify-end q-pa-sm">
-              <q-btn
+              <s-btn
                 flat
                 color="primary"
                 label="OK"
