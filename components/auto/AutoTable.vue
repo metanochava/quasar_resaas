@@ -399,18 +399,20 @@ async function executeAction() {
           <s-btn v-if="show_filter" dense flat icon="download" @click="exportCSV" />
 
           <s-btn  flat dense :icon="show_filter? 'arrow_forward' : 'arrow_back'"  @click=" show_filter = !show_filter" >
-            <q-tooltip>{{tdc('Mostar Filtros')}} </q-tooltip>
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              {{ tdc('Mostrar Filtros') }}
+            </q-tooltip>
           </s-btn>
 
           <s-input
             icon="search"
             v-model="search"
-            style="min-width:200px"
+            style="min-width:160px"
             :label="tdc('Search')"
             @keyup.enter="emit('search', search)"
           />
 
-          <s-btn-group >
+
             <s-btn
               dense
               icon="add"
@@ -419,6 +421,7 @@ async function executeAction() {
               v-show="User.can('add_' + model.toLowerCase())"
             />
 
+            &nbsp;&nbsp;
 
             <s-btn 
               dense
@@ -427,7 +430,7 @@ async function executeAction() {
               :to="{ name: props.config?.routes?.add }"
               v-show="User.can('add_' + model.toLowerCase()) && props.config?.routes?.add"
             />
-          </s-btn-group>
+
         </div>
       </div>
     </template>
