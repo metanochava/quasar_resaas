@@ -1,6 +1,6 @@
 <template>
 
-  <s-btn
+  <q-btn
     v-bind="btnAttrs"
     :label="translatedLabel"
     :dense="attrs.dense ?? layout.button_dense"
@@ -20,7 +20,7 @@
 
     <slot/>
 
-  </s-btn>
+  </q-btn>
 
 </template>
 
