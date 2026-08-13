@@ -48,7 +48,7 @@ function toggleGroup(models, checked) {
   <s-card class="column full-height">
 
     <!-- ================= HEADER FIXO ================= -->
-    <q-bar class="row items-center bg-primary text-white">
+    <q-bar class="row items-center" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
       <div class="text-h6">
         {{ tdc("Gestão de Modelos") }}
       </div>

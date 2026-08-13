@@ -1,6 +1,6 @@
 <template>
   <s-card class="theme-studio-engine">
-    <q-bar class="bg-primary text-white">
+    <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
       <div class="text-h6">🎨 Theme Studio</div>
 
       <q-space />

@@ -7,7 +7,7 @@
 
       <!-- HEADER FIXO -->
       <div class="modal-header">
-        <q-bar class="bg-primary text-white">
+        <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
           <div class="text-subtitle2">
             Permissões - {{ Group?.row?.name }}
           </div>
@@ -43,7 +43,7 @@
   <s-card class="column full-height group-manager-card">
 
     <!-- HEADER -->
-    <q-bar class="bg-primary text-white">
+    <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">

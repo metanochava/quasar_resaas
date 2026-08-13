@@ -20,7 +20,7 @@
       style="width: 900px; max-width: 95vw"
       class="rounded-borders"
     >
-      <q-bar class="bg-primary">
+      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
         <div class="text-h6">
         {{ tdc('Pesquisar Pessoa') }}
         </div>
@@ -113,7 +113,7 @@
       style="width: 900px; max-width: 95vw"
       class="rounded-borders"
     >
-      <q-bar class="row items-center bg-primary text-white">
+      <q-bar class="row items-center " :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
         <div class="text-h6">
           Criar Pessoa
         </div>

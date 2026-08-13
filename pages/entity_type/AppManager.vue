@@ -4,7 +4,7 @@
     <!-- 🔥 HEADER FIXO -->
     <div class="app-header">
 
-      <q-bar class="bg-primary text-white">
+      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
         <q-icon name="view_app" class="q-mr-sm" />
         <div class="text-subtitle1 text-weight-bold">
           {{ tdc("Gestão de Apps") }}

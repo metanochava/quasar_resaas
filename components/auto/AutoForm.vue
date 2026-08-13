@@ -147,7 +147,7 @@ async function save() {
       <!-- HEADER -->
 
       <!-- HEADER -->
-      <q-bar class="row items-center justify-between" :class="$q.dark.isActive ? 'bg-primary text-white' : 'bg-primary text-white'">
+      <q-bar class="row items-center justify-between" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
          <div class="text-h6">
           {{ form?.id ? ('Editar') : tdc('Novo') }}
         </div>

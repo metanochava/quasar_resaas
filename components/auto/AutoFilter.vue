@@ -82,7 +82,7 @@ function apply() {
     <s-card style="min-width: 720px; max-width: 92vw;">
 
       <!-- HEADER -->
-      <q-bar class="row items-center justify-between bg-primary text-white">
+      <q-bar :class="['row items-center justify-between',  $q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white']">
         <div class="text-h6">Filtros</div>
         <s-btn dense flat icon="close" @click="close" >
           <q-tooltip>Fechar</q-tooltip>

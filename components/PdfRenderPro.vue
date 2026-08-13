@@ -3,7 +3,7 @@
     <q-card class="bg-grey-10 text-white">
 
       <!-- TOOLBAR -->
-      <q-bar class="bg-dark">
+      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
 
         <!-- ZOOM -->
         <s-btn flat icon="zoom_out" @click="zoomOut" />

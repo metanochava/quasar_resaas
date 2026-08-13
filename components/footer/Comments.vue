@@ -2,7 +2,7 @@
 <template>
    <div class="">
         <s-card>
-          <q-bar :class="$q.dark.isActive ? 'bg-primary text-white' : 'bg-primary text-white'">
+          <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
             &nbsp; {{tdc('Enviar comentário ou opinião')}} 
             <q-space />
             <s-btn dense flat icon="close" v-close-popup>

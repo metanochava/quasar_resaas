@@ -4,7 +4,7 @@
     
 
       <!-- HEADER -->
-      <q-bar class="bg-primary text-white">
+      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
         <div class="text-subtitle1">
           {{ title || 'Preview PDF' }}
         </div>

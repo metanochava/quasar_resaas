@@ -15,7 +15,7 @@
 
     <q-dialog v-model="api_retorno_modal" full-width full-height>
       <s-card>
-        <q-bar class="bg-primary text-white">
+        <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
           <q-toolbar-title>
             <span class="text-weight-bold">API</span>
           </q-toolbar-title>
@@ -70,7 +70,7 @@
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
     <q-drawer v-model="User.LeftTop" side="left"  :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary bg-saass'">
-      <q-bar class="full-height q-pa-0" :class="$q.dark.isActive ? 'bg-dark text-white' : ' text-white'">
+      <q-bar class="full-height q-pa-0" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
         <LeftMenu />
       </q-bar>
     </q-drawer>
