@@ -413,23 +413,31 @@ async function executeAction() {
           />
 
 
-            <s-btn
-              dense
-              icon="add"
-              color="primary"
-              @click="emit('create')"
-              v-show="User.can('add_' + model.toLowerCase())"
-            />
+          <s-btn
+            dense
+            icon="add"
+            color="primary"
+            @click="emit('create')"
+            v-show="User.can('add_' + model.toLowerCase())"
+          >
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              {{ tdc('Padrao') }}
+            </q-tooltip>
+          </s-btn>
 
-            &nbsp;&nbsp;
+          &nbsp;
 
-            <s-btn 
-              dense
-              icon="open_in_new"
-              color="secondary"
-              :to="{ name: props.config?.routes?.add }"
-              v-show="User.can('add_' + model.toLowerCase()) && props.config?.routes?.add"
-            />
+          <s-btn 
+            dense
+            icon="open_in_new"
+            color="secondary"
+            :to="{ name: props.config?.routes?.add }"
+            v-show="User.can('add_' + model.toLowerCase()) && props.config?.routes?.add"
+          > 
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              {{ tdc('Personalizado') }}
+            </q-tooltip>
+          </s-btn>
 
         </div>
       </div>

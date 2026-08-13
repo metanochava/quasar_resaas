@@ -240,6 +240,15 @@ export function createBaseStore(name, config, extend = {}) {
       // =========================
       // GET BY ID
       // =========================
+      getRow(){
+        return this.row
+      },
+      getRows(){
+        return this.rows
+      },
+      getForm(){
+        return this.form
+      },
       async getById(id) {
         this.assertConfig()
 
