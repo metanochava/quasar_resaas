@@ -17,6 +17,7 @@
         <s-btn
           v-if="has('reset')"
           flat
+          type="reset"
           color="grey-7"
           :label="tdc('Reset')"
           @click="props.reform?.resetForm?.()"
@@ -36,6 +37,8 @@
             has('edit') &&
             User.can('change_' + (store.model || '').toLowerCase())
           "
+
+          type="submit"
           v-show="isEdit"
           color="secondary"
           unelevated
@@ -51,6 +54,7 @@
             has('delete') &&
             User.can('delete_' + (store.model || '').toLowerCase())
           "
+          
           v-show="isEdit"
           color="negative"
           unelevated
@@ -66,6 +70,7 @@
             has('save') &&
             User.can('add_' + (store.model || '').toLowerCase())
           "
+          type="submit"
           v-show="!isEdit"
           color="primary"
           unelevated
