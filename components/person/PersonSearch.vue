@@ -20,7 +20,7 @@
       style="width: 900px; max-width: 95vw"
       class="rounded-borders"
     >
-      <q-bar calor="primary">
+      <q-bar class="bg-primary">
         <div class="text-h6">
         {{ tdc('Pesquisar Pessoa') }}
         </div>
