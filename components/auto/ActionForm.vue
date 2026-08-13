@@ -8,25 +8,37 @@
     <div class="row items-center justify-between">
 
       <!-- =====================================
-          LEFT
+           LEFT
       ====================================== -->
 
       <div class="row q-gutter-sm">
+
+        <!-- CANCEL -->
+        <s-btn
+          v-if="has('cancel')"
+          flat
+          color="grey-7"
+          icon="close"
+          :label="tdc('Cancel')"
+          @click="emit('cancel')"
+        />
 
         <!-- RESET -->
         <s-btn
           v-if="has('reset')"
           flat
-          type="reset"
+          type="button"
           color="grey-7"
+          icon="restart_alt"
           :label="tdc('Reset')"
-          @click="props.reform?.resetForm?.()"
+          @click="reset"
         />
 
       </div>
 
+
       <!-- =====================================
-          RIGHT
+           RIGHT
       ====================================== -->
 
       <div class="row q-gutter-sm">
@@ -35,49 +47,59 @@
         <s-btn
           v-if="
             has('edit') &&
-            User.can('change_' + (store.model || '').toLowerCase())
+            User.can(
+              'change_' +
+              (store.model || '').toLowerCase()
+            )
           "
-
-          type="submit"
           v-show="isEdit"
+          type="button"
           color="secondary"
           unelevated
           icon="edit"
           :loading="store.saving"
           :label="tdc('Edit')"
-          @click="props.reform?.save?.()"
+          @click="emit('save')"
         />
+
 
         <!-- DELETE -->
         <s-btn
           v-if="
             has('delete') &&
-            User.can('delete_' + (store.model || '').toLowerCase())
+            User.can(
+              'delete_' +
+              (store.model || '').toLowerCase()
+            )
           "
-          
           v-show="isEdit"
+          type="button"
           color="negative"
           unelevated
           icon="delete"
           :loading="store.saving"
           :label="tdc('Delete')"
-          @click="props.reform?.delete?.()"
+          @click="deleteRecord"
         />
+
 
         <!-- SAVE -->
         <s-btn
           v-if="
             has('save') &&
-            User.can('add_' + (store.model || '').toLowerCase())
+            User.can(
+              'add_' +
+              (store.model || '').toLowerCase()
+            )
           "
-          type="submit"
           v-show="!isEdit"
+          type="button"
           color="primary"
           unelevated
           icon="save"
           :loading="store.saving"
           :label="tdc('Save')"
-          @click="props.reform?.save?.()"
+          @click="emit('save')"
         />
 
       </div>
@@ -88,41 +110,29 @@
 
 </template>
 
-<script setup>
 
+<script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-
 import { tdc } from '../../boot/base'
 import { useUserStore } from '../../stores/UserStore'
 
-// ==========================================
-// ROUTER
-// ==========================================
-
-const router = useRouter()
-
-// ==========================================
-// STORE
-// ==========================================
-
-const User = useUserStore()
-
-// ==========================================
+// =============================================
 // PROPS
-// ==========================================
+// =============================================
 
 const props = defineProps({
 
   store: {
     type: Object,
-    default: null
+    required: true
   },
 
   reform: {
     type: Object,
     default: null
   },
+
   buttons: {
     type: Array,
     default: () => [
@@ -136,26 +146,81 @@ const props = defineProps({
 
 })
 
-// ==========================================
-// COMPUTED
-// ==========================================
+
+// =============================================
+// EMITS
+// =============================================
+
+const emit = defineEmits([
+  'save',
+  'cancel',
+  'reset',
+  'delete'
+])
+
+
+// =============================================
+// STORE
+// =============================================
+
+const User = useUserStore()
+
+
+// =============================================
+// HELPERS
+// =============================================
+
+const has = (button) => {
+  return props.buttons.includes(button)
+}
+
+
+// =============================================
+// EDIT MODE
+// =============================================
 
 const isEdit = computed(() => {
 
-  return !!props.store?.form?.id
+  return !!(
+    props.store?.row?.id ||
+    props.store?.form?.id
+  )
+
 })
 
-// ==========================================
-// METHODS
-// ==========================================
 
-function has(name) {
+// =============================================
+// RESET
+// =============================================
 
-  return props.buttons.includes(name)
+const reset = () => {
+
+  props.reform?.resetForm?.()
+
+  emit('reset')
+
+}
+
+
+// =============================================
+// DELETE
+// =============================================
+
+const deleteRecord = async () => {
+
+  if (props.reform?.delete) {
+
+    await props.reform.delete()
+
+  }
+  else if (props.store?.delete) {
+
+    await props.store.delete()
+
+  }
+
+  emit('delete')
+
 }
 
 </script>
-
-<style scoped>
-
-</style>
