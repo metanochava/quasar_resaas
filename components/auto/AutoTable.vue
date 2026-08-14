@@ -358,7 +358,7 @@ async function executeAction() {
           {{ model }}
         </div>
         <!-- LEFT -->
-        <div class="row col q-gutter-sm">
+        <div class="row col-md-12 q-gutter-sm">
           <s-btn
             dense icon="add" color="primary" @click="emit('create')"
             v-show="User.can('add_' + model.toLowerCase())"
