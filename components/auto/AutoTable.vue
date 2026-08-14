@@ -355,7 +355,29 @@ async function executeAction() {
       <div class="row col-12 items-center justify-between q-mb-md">
 
         <!-- LEFT -->
-        <div class="text-h4 text-primary">{{ model }}</div>
+        <div class="text-h4 text-primary ">
+          <s-btn
+            dense icon="add" color="primary" @click="emit('create')"
+            v-show="User.can('add_' + model.toLowerCase())"
+          >
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              {{ tdc('Padrao') }}
+            </q-tooltip>
+          </s-btn>
+
+          &nbsp;
+
+          <s-btn 
+            dense icon="open_in_new"  color="secondary" :to="{ name: props.config?.routes?.add }"
+            v-show="User.can('add_' + model.toLowerCase()) && props.config?.routes?.add"
+          > 
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              {{ tdc('Personalizado') }}
+            </q-tooltip>
+          </s-btn>
+           &nbsp;
+          {{ model }}
+        </div>
 
         <!-- RIGHT -->
         <div class="row q-gutter-sm">
@@ -390,7 +412,7 @@ async function executeAction() {
             multiple
             dense
             outlined
-            style="min-width:200px"
+            style="min-width:140px"
             label="Colunas"
           />
 
@@ -405,6 +427,7 @@ async function executeAction() {
           </s-btn>
 
           <s-input
+            outlined
             icon="search"
             v-model="search"
             style="min-width:160px"
@@ -413,32 +436,7 @@ async function executeAction() {
           />
 
 
-          <s-btn
-            dense
-            icon="add"
-            color="primary"
-            @click="emit('create')"
-            v-show="User.can('add_' + model.toLowerCase())"
-          >
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-              {{ tdc('Padrao') }}
-            </q-tooltip>
-          </s-btn>
-
-          &nbsp;
-
-          <s-btn 
-            dense
-            icon="open_in_new"
-            color="secondary"
-            :to="{ name: props.config?.routes?.add }"
-            v-show="User.can('add_' + model.toLowerCase()) && props.config?.routes?.add"
-          > 
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-              {{ tdc('Personalizado') }}
-            </q-tooltip>
-          </s-btn>
-
+          
         </div>
       </div>
     </template>
