@@ -391,7 +391,7 @@ async function executeAction() {
             dense
             outlined
             @update:model-value="val => emit('objects', val)"
-            style="width:120px"
+            style="width:135px"
           />
           
 
@@ -401,7 +401,7 @@ async function executeAction() {
             dense
             outlined
             :label=density
-            style="width:120px"
+            style="width:135px"
           />
 
           <s-select
@@ -411,7 +411,7 @@ async function executeAction() {
             multiple
             dense
             outlined
-            style="width:120px"
+            style="width:135px"
             label="Colunas"
           />
 
