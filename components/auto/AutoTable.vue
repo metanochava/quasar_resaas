@@ -413,7 +413,7 @@ async function executeAction() {
             multiple
             dense
             outlined
-            style="width:130px"
+            style="width:120px"
             label="Colunas"
           />
 
@@ -436,9 +436,6 @@ async function executeAction() {
             @keyup.enter="emit('search', search)"
             dense
           />
-
-
-          
         </div>
       </div>
     </template>
