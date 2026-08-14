@@ -358,7 +358,7 @@ async function executeAction() {
           {{ model }}
         </div>
         <!-- LEFT -->
-        <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
+        <div class="row q-gutter-sm">
           <s-btn
             dense icon="add" color="primary" @click="emit('create')"
             v-show="User.can('add_' + model.toLowerCase())"
@@ -426,7 +426,7 @@ async function executeAction() {
             </q-tooltip>
           </s-btn>
 
-          <s-input
+          <q-input
             outlined
             icon="search"
             v-model="search"
@@ -435,7 +435,7 @@ async function executeAction() {
             @keyup.enter="emit('search', search)"
             dense
           />
-        </q-bar>
+        </div>
       </div>
     </template>
 
