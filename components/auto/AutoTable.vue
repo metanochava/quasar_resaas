@@ -379,7 +379,7 @@ async function executeAction() {
         </div>
 
         <!-- RIGHT -->
-        <div class=" col-md-8 row q-gutter-sm">
+        <div class=" col-md-8 row q-gutter-sm justify-right">
 
           <s-select v-if="show_filter"
             v-model="objects"
@@ -391,7 +391,7 @@ async function executeAction() {
             dense
             outlined
             @update:model-value="val => emit('objects', val)"
-            style="width:135px"
+            style="width:160px"
           />
           
 
@@ -429,7 +429,7 @@ async function executeAction() {
             outlined
             icon="search"
             v-model="search"
-            style="min-width:160px"
+            style="min-width:190px"
             :label="tdc('Search')"
             @keyup.enter="emit('search', search)"
             dense
