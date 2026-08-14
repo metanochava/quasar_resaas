@@ -352,13 +352,13 @@ async function executeAction() {
 
     <!-- 🔥 TOP BAR -->
     <template #top>
-      <div class="row col-12 items-center justify-between q-mb-md">
+      <div class="row col-12 ">
 
         <div class="col-12 text-h4  text-center text-primary ">
           {{ model }}
         </div>
         <!-- LEFT -->
-        <div class="row items-center">
+        <div class="row items-center q-gutter-sm">
           <s-btn
             dense icon="add" color="primary" @click="emit('create')"
             v-show="User.can('add_' + model.toLowerCase())"
@@ -378,7 +378,7 @@ async function executeAction() {
           </s-btn>
 
 
-          <q-separetor/>
+          <q-space />
         <!-- RIGHT -->
       
 
