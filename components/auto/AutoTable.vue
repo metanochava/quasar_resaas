@@ -358,7 +358,7 @@ async function executeAction() {
           {{ model }}
         </div>
         <!-- LEFT -->
-        <div class="row q-gutter-sm">
+        <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
           <s-btn
             dense icon="add" color="primary" @click="emit('create')"
             v-show="User.can('add_' + model.toLowerCase())"
@@ -435,7 +435,7 @@ async function executeAction() {
             @keyup.enter="emit('search', search)"
             dense
           />
-        </div>
+        </q-bar>
       </div>
     </template>
 
