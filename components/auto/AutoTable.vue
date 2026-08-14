@@ -393,6 +393,7 @@ async function executeAction() {
             dense
             outlined
             @update:model-value="val => emit('objects', val)"
+            style="width:120px"
           />
           
 
@@ -412,7 +413,7 @@ async function executeAction() {
             multiple
             dense
             outlined
-            style="min-width:140px"
+            style="width:130px"
             label="Colunas"
           />
 
@@ -433,6 +434,7 @@ async function executeAction() {
             style="min-width:160px"
             :label="tdc('Search')"
             @keyup.enter="emit('search', search)"
+            dense
           />
 
 
