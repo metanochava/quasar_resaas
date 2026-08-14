@@ -365,8 +365,6 @@ async function executeAction() {
             </q-tooltip>
           </s-btn>
 
-          &nbsp;
-
           <s-btn 
             dense icon="open_in_new"  color="secondary" :to="{ name: props.config?.routes?.add }"
             v-show="User.can('add_' + model.toLowerCase()) && props.config?.routes?.add"
