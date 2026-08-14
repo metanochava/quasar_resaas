@@ -358,7 +358,7 @@ async function executeAction() {
           {{ model }}
         </div>
         <!-- LEFT -->
-        <div class="row items-center q-gutter-sm">
+        <div class="row q-gutter-sm">
           <s-btn
             dense icon="add" color="primary" @click="emit('create')"
             v-show="User.can('add_' + model.toLowerCase())"
@@ -379,7 +379,7 @@ async function executeAction() {
 
 
           <q-space />
-        <!-- RIGHT -->
+          <!-- RIGHT -->
       
 
           <s-select v-if="show_filter"
