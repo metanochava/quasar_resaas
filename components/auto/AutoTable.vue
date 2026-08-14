@@ -430,10 +430,11 @@ async function executeAction() {
             outlined
             icon="search"
             v-model="search"
-            style="min-width:190px"
+            style="min-width:190px; margin-right: -10px;"
             :label="tdc('Search')"
             @keyup.enter="emit('search', search)"
             dense
+
           />
         </div>
       </div>
