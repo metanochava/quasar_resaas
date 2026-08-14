@@ -354,7 +354,7 @@ async function executeAction() {
     <template #top>
       <div class="row col-12 ">
 
-        <div class="col-12 text-h4  text-center text-primary ">
+        <div class="col-12 text-h4   text-primary ">
           {{ model }}
         </div>
         <!-- LEFT -->
