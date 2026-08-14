@@ -354,8 +354,11 @@ async function executeAction() {
     <template #top>
       <div class="row col-12 items-center justify-between q-mb-md">
 
+        <div class="col-12 text-h4 text-primary ">
+          {{ model }}
+        </div>
         <!-- LEFT -->
-        <div class="text-h4 text-primary ">
+        <div class="row col-md-4 q-gutter-sm">
           <s-btn
             dense icon="add" color="primary" @click="emit('create')"
             v-show="User.can('add_' + model.toLowerCase())"
@@ -373,15 +376,12 @@ async function executeAction() {
               {{ tdc('Personalizado') }}
             </q-tooltip>
           </s-btn>
-           &nbsp;
-          {{ model }}
         </div>
 
         <!-- RIGHT -->
-        <div class="row q-gutter-sm">
+        <div class=" col-md-8 row q-gutter-sm">
 
-          <s-select
-            v-if="show_filter"
+          <s-select v-if="show_filter"
             v-model="objects"
             :options="objectsOptions"
             option-label="label"
