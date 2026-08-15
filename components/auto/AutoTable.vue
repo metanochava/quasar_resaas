@@ -657,7 +657,7 @@ async function executeAction() {
                   {{ a.action }}
                 </q-item-section>
                 <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-                  {{ tdc( a.tooltip) }}
+                  {{ tdc( a?.tooltip) }}
                 </q-tooltip>
               </q-item>
 
