@@ -486,9 +486,7 @@ async function executeAction() {
           <s-btn
             v-if="show_filter"
             dense
-            outline
             icon="view_column"
-            :label="tdc('Colunas')"
           >
             <q-tooltip
               :class="$q.dark.isActive
