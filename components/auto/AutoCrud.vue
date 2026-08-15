@@ -131,9 +131,9 @@ const columns = computed(() => {
 
 
   const columns = [ 
-    {  name: '__actions',label: 'Acções', field: '__lactions', sortable: false, align: 'right',  },
+    {  name: '__actions',label: 'Acções', field: '__lactions', sortable: false, align: 'left',  },
     ...base, 
-    { name: '__actions', label: 'Acções', field: '__ractions', sortable: false , align: 'right',  }
+    { name: '__actions', label: 'Acções', field: '__ractions', sortable: false , align: 'left',  }
   ]
     
   return columns
