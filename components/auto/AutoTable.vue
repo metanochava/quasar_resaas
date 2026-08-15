@@ -134,12 +134,25 @@ const singularActions = computed(() =>
 const geralActions = computed(() =>
   (props.actions || []).filter(c => c.details === false || c.details === 'false')
 )
-const density = ref('')
-const objects = ref('Activos')
+
+const objects = ref('alive')
+
 const objectsOptions = [
-  { label: 'Activos', value: 'alive' },
-  { label: 'Eliminados', value: 'deleted' },
-  { label: 'Todos', value: 'all' }
+  {
+    label: 'Activos',
+    value: 'alive',
+    icon: 'check_circle'
+  },
+  {
+    label: 'Eliminados',
+    value: 'deleted',
+    icon: 'delete'
+  },
+  {
+    label: 'Todos',
+    value: 'all',
+    icon: 'list'
+  }
 ]
 
 // ---------------- COMPUTED ----------------
@@ -339,7 +352,7 @@ async function executeAction() {
     :loading="loading"
     :pagination="localPagination"
     :visible-columns="effectiveColumns"
-    :dense="density === 'normal'"
+    dense
     row-key="id"
     :row-class="rowClass"
 
@@ -381,6 +394,18 @@ async function executeAction() {
           <q-space />
           <!-- RIGHT -->
       
+          <q-btn-toggle
+            v-if="show_filter"
+            v-model="objects"
+            no-caps
+            unelevated
+            toggle-color="primary"
+            color="grey-3"
+            text-color="grey-8"
+            :options="objectsOptions"
+            @update:model-value="val => emit('objects', val)"
+          />
+
 
           <s-select v-if="show_filter"
             v-model="objects"
@@ -393,16 +418,6 @@ async function executeAction() {
             outlined
             @update:model-value="val => emit('objects', val)"
             style="width:160px"
-          />
-          
-
-          <s-select v-if="show_filter"
-            v-model="density"
-            :options="['dense','normal']"
-            dense
-            outlined
-            :label=density
-            style="width:135px"
           />
 
           <s-select
