@@ -160,10 +160,53 @@ const filteredColumns = computed(() =>
   props.columns.filter(c => !ignoreSet.value.has(c.name))
 )
 
-const allColumns = computed(() => filteredColumns.value.map(c => c.name))
-const effectiveColumns = computed(() =>
-  visibleColumns.value.length ? visibleColumns.value : allColumns.value
+
+const allColumns = computed(() =>
+  filteredColumns.value.map(column => column.name)
 )
+
+const effectiveColumns = computed(() =>
+  visibleColumns.value.length
+    ? visibleColumns.value
+    : allColumns.value
+)
+
+const allSelected = computed(() =>
+  allColumns.value.length > 0 &&
+  allColumns.value.every(
+    column => visibleColumns.value.includes(column)
+  )
+)
+
+const toggleColumn = (column) => {
+
+  if (visibleColumns.value.includes(column)) {
+
+    visibleColumns.value =
+      visibleColumns.value.filter(
+        item => item !== column
+      )
+
+  } else {
+
+    visibleColumns.value = [
+      ...visibleColumns.value,
+      column
+    ]
+
+  }
+}
+
+const toggleAllColumns = () => {
+
+  if (allSelected.value) {
+    visibleColumns.value = []
+  } else {
+    visibleColumns.value = [
+      ...allColumns.value
+    ]
+  }
+}
 
 function isDeleted(x) {
   // isDeleted({ deleted_at: '2026-01-01' }) // true
@@ -451,6 +494,75 @@ async function executeAction() {
             style="width:135px"
             label="Colunas"
           />
+
+          <s-btn
+            v-if="show_filter"
+            dense
+            outline
+            icon="view_column"
+            :label="tdc('Colunas')"
+          >
+            <q-tooltip
+              :class="$q.dark.isActive
+                ? 'bg-dark text-white'
+                : 'bg-primary text-white'"
+            >
+              {{ tdc('Seleccionar colunas visíveis') }}
+            </q-tooltip>
+
+            <q-menu>
+              <q-list
+                dense
+                style="min-width: 200px"
+              >
+                <!-- HEADER -->
+                <q-item-label header>
+                  {{ tdc('Colunas visíveis') }}
+                </q-item-label>
+
+                <q-separator />
+
+                <!-- TODAS -->
+                <q-item
+                  clickable
+                  @click="toggleAllColumns"
+                >
+                  <q-item-section avatar>
+                    <q-checkbox
+                      :model-value="allSelected"
+                      @update:model-value="toggleAllColumns"
+                    />
+                  </q-item-section>
+
+                  <q-item-section>
+                    {{ tdc('Todas') }}
+                  </q-item-section>
+                </q-item>
+
+                <q-separator />
+
+                <!-- COLUNAS -->
+                <q-item
+                  v-for="column in filteredColumns"
+                  :key="column.name"
+                  clickable
+                  @click="toggleColumn(column.name)"
+                >
+                  <q-item-section avatar>
+                    <q-checkbox
+                      :model-value="visibleColumns.includes(column.name)"
+                      @update:model-value="toggleColumn(column.name)"
+                    />
+                  </q-item-section>
+
+                  <q-item-section>
+                    {{ tdc(column.label || column.name) }}
+                  </q-item-section>
+                </q-item>
+
+              </q-list>
+            </q-menu>
+          </s-btn>
 
           <s-btn v-if="show_filter" dense flat icon="filter_list" @click="emit('filter')" />
           <s-btn v-if="show_filter" dense flat icon="refresh" @click="emit('refresh')" />
