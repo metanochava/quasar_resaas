@@ -585,6 +585,22 @@ async function executeAction() {
 
 
 
+
+    <!-- CABEÇALHOS -->
+    <template #header-cell="props">
+      <q-th
+        :props="props"
+        :class="{
+          'text-left': props.col.field === '__lactions',
+          'text-right': props.col.field === '__ractions'
+        }"
+      >
+        {{ tdc(props.col.label) }}
+      </q-th>
+    </template>
+
+
+
     <!-- 🔥 ACTIONS -->
     <template #body-cell-__actions="slotRow">
       <q-td :props="slotRow">
