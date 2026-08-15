@@ -588,7 +588,7 @@ async function executeAction() {
     <!-- 🔥 ACTIONS -->
     <template #body-cell-__actions="slotRow">
       <q-td :props="slotRow">
-{{ slotRow }}
+{{ slotRow.row.field }}
         <s-btn
           dense
           flat
