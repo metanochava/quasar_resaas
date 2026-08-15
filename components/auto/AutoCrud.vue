@@ -130,13 +130,10 @@ const columns = computed(() => {
   }))
 
   const columns = [ 
-    {  name: '__actions',label: 'Acções', field: '__lactions', sortable: false, align: 'left', },
+    {  name: '__actions',label: 'Acções', field: '__lactions', sortable: false, align: 'left',  headerClasses: 'text-left' },
     ...base, 
-    { name: '__actions', label: 'Acções', field: '__ractions', sortable: false , align: 'right',  }
+    { name: '__actions', label: 'Acções', field: '__ractions', sortable: false , align: 'right',  headerClasses: 'text-right' }
   ]
-
-  columns[0].headerClasses = 'text-left'
-  columns[0].align = 'left'
     
   return columns
 })
