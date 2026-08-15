@@ -1,51 +1,51 @@
 <template>
   <q-dialog v-model="dialog" full-width full-height>
     <s-card
-  class="column no-wrap"
-  style="height: 100vh;"
->
-
-  <!-- HEADER FIXO -->
-  <q-bar
-    class="pdf-header"
-    :class="$q.dark.isActive
-      ? 'bg-dark text-white'
-      : 'bg-primary text-white'"
-  >
-    <div class="text-subtitle1">
-      {{ title || 'Preview PDF' }}
-    </div>
-
-    <q-space />
-
-    <!-- DOWNLOAD -->
-    <s-btn
-      v-if="pdfUrl"
-      dense
-      flat
-      icon="download"
-      @click="downloadPdf"
+      class="column no-wrap"
+      style="height: 100vh;"
     >
-      <q-tooltip>Download</q-tooltip>
-    </s-btn>
 
-    <!-- CLOSE -->
-    <s-btn dense flat icon="close" @click="dialog = false" />
-  </q-bar>
+      <!-- HEADER FIXO -->
+      <q-bar v-show="top"
+        class="pdf-header"
+        :class="$q.dark.isActive
+          ? 'bg-dark text-white'
+          : 'bg-primary text-white'"
+      >
+        <div class="text-subtitle1">
+          {{ title || 'Preview PDF' }}
+        </div>
 
-  <!-- BODY -->
-  <q-card-section
-    class="col q-pa-none"
-    style="min-height: 0;"
-  >
-    <iframe
-      v-if="pdfUrl"
-      :src="pdfUrl"
-      class="pdf-frame"
-    />
-  </q-card-section>
+        <q-space />
 
-</s-card>
+        <!-- DOWNLOAD -->
+        <s-btn
+          v-if="pdfUrl"
+          dense
+          flat
+          icon="download"
+          @click="downloadPdf"
+        >
+          <q-tooltip>Download</q-tooltip>
+        </s-btn>
+
+        <!-- CLOSE -->
+        <s-btn dense flat icon="close" @click="dialog = false" />
+      </q-bar>
+
+      <!-- BODY -->
+      <q-card-section
+        class="col q-pa-none"
+        style="min-height: 0;"
+      >
+        <iframe
+          v-if="pdfUrl"
+          :src="pdfUrl"
+          class="pdf-frame"
+        />
+      </q-card-section>
+
+    </s-card>
   </q-dialog>
 </template>
 
@@ -56,7 +56,8 @@ import { computed, watch } from 'vue'
 const props = defineProps({
   modelValue: Boolean,
   src: String, // URL ou Blob
-  title: String
+  title: String,
+  top: Boolean
 })
 
 // emit

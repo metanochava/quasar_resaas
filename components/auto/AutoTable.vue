@@ -102,6 +102,7 @@ const emit = defineEmits([
   'request',
   'create',
   'pdf',
+  'pdfList',
   'edit',
   'delete',
   'filter',
@@ -274,18 +275,6 @@ function onRequest(e) {
   emit('request', e)
 }
 
-// ---------------- EXPORT CSV ----------------
-function exportCSV() {
-  const cols = filteredColumns.value.filter(c => c.name !== '__actions')
-
-  const header = cols.map(c => `"${c.label}"`).join(',')
-
-  const body = props.rows.map(r =>
-    cols.map(c => `"${String(r[c.field] ?? '').replace(/"/g, '""')}"`).join(',')
-  ).join('\n')
-
-  exportFile('export.csv', `${header}\n${body}`)
-}
 
 watch(
   () => props.columns,
@@ -554,7 +543,7 @@ async function executeAction() {
           </s-btn>
 
           <s-btn v-if="show_filter" dense flat icon="refresh" @click="emit('refresh')" />
-          <s-btn v-if="show_filter" dense flat icon="download" @click="exportCSV" />
+          <s-btn v-if="show_filter" dense flat icon="download" @click="emit('pdfList')" />
 
           <s-btn  flat dense :icon="show_filter? 'arrow_forward' : 'arrow_back'"  @click=" show_filter = !show_filter" >
             <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
@@ -600,6 +589,19 @@ async function executeAction() {
     <template #body-cell-__actions="slotRow">
       <q-td :props="slotRow">
 
+        <s-btn
+          dense
+          flat
+          icon="more_vert"
+          v-for="a in singularActions"
+          :key="a"
+          v-show="User.can(a.role.toLowerCase()) && !a.asMenu && !isDeleted(slotRow.row)"
+          @click="runAction(a, slotRow.row)"
+          :color="getMethodColor(a.method)"
+        >
+      
+        </s-btn>
+
         <!-- BOTÃO 3 PONTOS -->
         <s-btn
           dense
@@ -615,7 +617,7 @@ async function executeAction() {
                 v-for="a in singularActions"
                 :key="a"
                 clickable
-                v-show="true"
+                v-show="User.can(a.role.toLowerCase()) && a.asMenu && !isDeleted(slotRow.row)"
                 @click="runAction(a, slotRow.row)"
               >
                 <q-item-section avatar v-if="a.icon">
@@ -739,7 +741,7 @@ async function executeAction() {
                 v-for="a in singularActions"
                 :key="a.url"
                 clickable
-                v-show="a.permission && !User.can(a.method + '_' + a.permission + '_' + a.model.toLowerCase()) "
+                v-show="a.permission && !User.can(a.method + '_' + a.permission + '_' + a.model.toLowerCase()) && !isDeleted(slotRow.row)"
                 @click="runAction(a, slotRow.row)"
               >
                 <q-item-section avatar v-if="a.icon">

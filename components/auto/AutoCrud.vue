@@ -5,6 +5,7 @@
       v-model="showPdf"
       :src="pdfUrl"
       title="Document"
+      :top="false"
     />
 
 
@@ -24,6 +25,7 @@
       @request="onRequest"
       @create="openCreate"
       @pdf="openPdf"
+      @pdfList="openPdfList"
       @edit="openEdit"
       @delete="onDelete"
       @filter="showFilter = true"
@@ -218,6 +220,18 @@ async function openPdf(row) {
   const res = await HTTPAuthBlob.get(url({
     type: 'u',
     url: `${props.app}/${props.model.toLowerCase()}s/${row.id}/pdf/`
+  }))
+
+  const blob = new Blob([res.data], { type: 'application/pdf' })
+  pdfUrl.value = URL.createObjectURL(blob)
+
+  showPdf.value = true
+}
+
+async function openPdfList() {
+  const res = await HTTPAuthBlob.get(url({
+    type: 'u',
+    url: `${props.app}/${props.model.toLowerCase()}s/pdflist/`
   }))
 
   const blob = new Blob([res.data], { type: 'application/pdf' })
