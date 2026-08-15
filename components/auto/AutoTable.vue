@@ -586,15 +586,15 @@ async function executeAction() {
 
 
     <!-- 🔥 ACTIONS -->
-    <template #body-cell-__lactions="slotRow">
+    <template #body-cell-__actions="slotRow">
       <q-td :props="slotRow">
-{{ slotRow.row }}
+        {{ slotRow.col.field }}
         <s-btn
           dense
           flat
           v-for="a in singularActions"
           :key="a"
-          v-show="User.can(a.role.toLowerCase()) && ['l', 'b'].includes(a.position) && !isDeleted(slotRow.row)"
+          v-show="User.can(a.role.toLowerCase()) && ['l', 'b'].includes(a.position) && !isDeleted(slotRow.row) && slotRow.col.field =='__lactions'"
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
           :icon="a.icon"
@@ -618,7 +618,7 @@ async function executeAction() {
                 v-for="a in singularActions"
                 :key="a"
                 clickable
-                v-show="User.can(a.role.toLowerCase()) && a.asMenu && !isDeleted(slotRow.row)"
+                v-show="User.can(a.role.toLowerCase()) && !a.position && !isDeleted(slotRow.row)"
                 @click="runAction(a, slotRow.row)"
               >
                 <q-item-section avatar v-if="a.icon">
@@ -765,7 +765,7 @@ async function executeAction() {
           flat
           v-for="a in singularActions"
           :key="a"
-          v-show="User.can(a.role.toLowerCase()) && ['r', 'b'].includes(a.position) && !isDeleted(slotRow.row)"
+          v-show="User.can(a.role.toLowerCase()) && ['r', 'b'].includes(a.position) && !isDeleted(slotRow.row) && slotRow.col.field =='__ractions'"
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
           :icon="a.icon"
