@@ -625,7 +625,7 @@ async function executeAction() {
           :icon="a.icon"
 
         >
-          <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+          <q-tooltip  v-show="a.tooltip" :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
             {{ tdc(a.tooltip) }}
           </q-tooltip>
         </s-btn>
@@ -656,8 +656,8 @@ async function executeAction() {
                 <q-item-section>
                   {{ a.action }}
                 </q-item-section>
-                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-                  {{ tdc( a?.tooltip) }}
+                <q-tooltip v-show="a.tooltip" :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+                  {{ tdc( a.tooltip) }}
                 </q-tooltip>
               </q-item>
 
@@ -807,7 +807,7 @@ async function executeAction() {
           :icon="a.icon"
 
         >
-          <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+          <q-tooltip v-show="a.tooltip" :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
             {{ tdc( a.tooltip) }}
           </q-tooltip>
         </s-btn>
