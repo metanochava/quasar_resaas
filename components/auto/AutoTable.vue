@@ -354,7 +354,7 @@ async function executeAction() {
     <template #top>
       <div class="row col-12 ">
 
-        <div class="col-12 text-h4   text-primary ">
+        <div class="col-12 text-h4   text-primary " >
           {{ model }}
         </div>
         <!-- LEFT -->
@@ -428,14 +428,28 @@ async function executeAction() {
 
           <q-input
             outlined
-            icon="search"
             v-model="search"
-            style="min-width:190px; margin-right: -10px;"
+            style="min-width: 190px;"
             :label="tdc('Search')"
             @keyup.enter="emit('search', search)"
             dense
+          >
+            <!-- Ícone de pesquisa -->
+            <template #prepend>
+              <q-icon name="search" />
+            </template>
 
-          />
+            <!-- Filtro -->
+            <template #append>
+              <s-btn
+                dense
+                flat
+                round
+                icon="filter_list"
+                @click="emit('filter')"
+              />
+            </template>
+          </q-input>
         </div>
       </div>
     </template>
