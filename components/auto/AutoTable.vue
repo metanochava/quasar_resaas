@@ -422,7 +422,7 @@ async function executeAction() {
 
           <s-btn  flat dense :icon="show_filter? 'arrow_forward' : 'arrow_back'"  @click=" show_filter = !show_filter" >
             <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-              {{ tdc('Mostrar Filtros') }}
+              {{ tdc('Mostrar mais opcoes') }}
             </q-tooltip>
           </s-btn>
 
@@ -447,7 +447,11 @@ async function executeAction() {
                 round
                 icon="filter_list"
                 @click="emit('filter')"
-              />
+              >
+                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+                  {{ tdc('Mostrar Filtros') }}
+                </q-tooltip>
+              </s-btn>
             </template>
           </q-input>
         </div>
