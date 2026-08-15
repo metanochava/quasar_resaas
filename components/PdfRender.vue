@@ -1,41 +1,51 @@
 <template>
   <q-dialog v-model="dialog" full-width full-height>
-    <s-card class="bg-black">
-    
+    <s-card
+  class="column no-wrap"
+  style="height: 100vh;"
+>
 
-      <!-- HEADER -->
-      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
-        <div class="text-subtitle1">
-          {{ title || 'Preview PDF' }}
-        </div>
+  <!-- HEADER FIXO -->
+  <q-bar
+    class="pdf-header"
+    :class="$q.dark.isActive
+      ? 'bg-dark text-white'
+      : 'bg-primary text-white'"
+  >
+    <div class="text-subtitle1">
+      {{ title || 'Preview PDF' }}
+    </div>
 
-        <q-space />
+    <q-space />
 
-        <!-- DOWNLOAD -->
-        <s-btn
-          v-if="pdfUrl"
-          dense
-          flat
-          icon="download"
-          @click="downloadPdf"
-        >
-          <q-tooltip>Download</q-tooltip>
-        </s-btn>
+    <!-- DOWNLOAD -->
+    <s-btn
+      v-if="pdfUrl"
+      dense
+      flat
+      icon="download"
+      @click="downloadPdf"
+    >
+      <q-tooltip>Download</q-tooltip>
+    </s-btn>
 
-        <!-- CLOSE -->
-        <s-btn dense flat icon="close" @click="dialog = false" />
-      </q-bar>
+    <!-- CLOSE -->
+    <s-btn dense flat icon="close" @click="dialog = false" />
+  </q-bar>
 
-      <!-- BODY -->
-      <q-card-section class="q-pa-none" style="height: 100vh;">
-        <iframe
-          v-if="pdfUrl"
-          :src="pdfUrl"
-          style="width: 100%; height: 100%; border: none;"
-        />
-      </q-card-section>
+  <!-- BODY -->
+  <q-card-section
+    class="col q-pa-none"
+    style="min-height: 0;"
+  >
+    <iframe
+      v-if="pdfUrl"
+      :src="pdfUrl"
+      class="pdf-frame"
+    />
+  </q-card-section>
 
-    </s-card>
+</s-card>
   </q-dialog>
 </template>
 
@@ -80,5 +90,18 @@ watch(() => props.modelValue, (val) => {
 /* opcional: scroll suave */
 iframe {
   background: #1e1e1e;
+}
+
+.pdf-header {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+.pdf-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
 }
 </style>
