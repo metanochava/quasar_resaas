@@ -404,7 +404,7 @@ async function executeAction() {
         </div>
 
         <!-- LEFT -->
-        <div class="row q-gutter-sm">
+        <div class=" col-md-12 q-gutter-sm">
           <s-btn
             dense icon="add" color="primary" @click="emit('create')"
             v-show="User.can('add_' + model.toLowerCase())"
