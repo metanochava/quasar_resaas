@@ -591,8 +591,8 @@ async function executeAction() {
       <q-th
         :props="props"
         :class="{
-          'text-left': props.col.field === '__lactions',
-          'text-right': props.col.field === '__ractions'
+          'text-left text-secondary': props.col.field === '__lactions',
+          'text-right text-secondary': props.col.field === '__ractions'
         }"
       >
         {{ tdc(props.col.label) }}
@@ -624,6 +624,7 @@ async function executeAction() {
           dense
           outline
           icon="more_vert"
+          color="secondary"
         >
           <q-menu auto-close>
 
