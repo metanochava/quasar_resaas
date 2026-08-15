@@ -402,10 +402,9 @@ async function executeAction() {
         <div class="col-12 text-h4   text-primary " >
           {{ model }}
         </div>
-        <hr class="q-my-md" />
-        <hr class="q-my-sm bg-grey-4" />
+
         <!-- LEFT -->
-        <div class="row col-md-12 q-gutter-sm">
+        <div class="row q-gutter-sm">
           <s-btn
             dense icon="add" color="primary" @click="emit('create')"
             v-show="User.can('add_' + model.toLowerCase())"
