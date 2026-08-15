@@ -586,7 +586,7 @@ async function executeAction() {
 
 
     <!-- 🔥 ACTIONS -->
-    <template #body-cell-__actions="slotRow">
+    <template #body-cell-__lactions="slotRow">
       <q-td :props="slotRow">
 {{ slotRow.row }}
         <s-btn
@@ -594,7 +594,7 @@ async function executeAction() {
           flat
           v-for="a in singularActions"
           :key="a"
-          v-show="User.can(a.role.toLowerCase()) && (a.position=='l' || a.position=='b') && !isDeleted(slotRow.row)"
+          v-show="User.can(a.role.toLowerCase()) && ['l', 'b'].includes(a.position) && !isDeleted(slotRow.row)"
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
           :icon="a.icon"
@@ -765,7 +765,7 @@ async function executeAction() {
           flat
           v-for="a in singularActions"
           :key="a"
-          v-show="User.can(a.role.toLowerCase()) && (a.position=='r' || a.position=='b') && !isDeleted(slotRow.row)"
+          v-show="User.can(a.role.toLowerCase()) && ['r', 'b'].includes(a.position) && !isDeleted(slotRow.row)"
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
           :icon="a.icon"
