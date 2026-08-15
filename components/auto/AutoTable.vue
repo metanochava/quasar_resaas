@@ -592,12 +592,13 @@ async function executeAction() {
         <s-btn
           dense
           flat
-          icon="more_vert"
           v-for="a in singularActions"
           :key="a"
           v-show="User.can(a.role.toLowerCase()) && !a.asMenu && !isDeleted(slotRow.row)"
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
+          :icon="a.icon"
+
         >
       
         </s-btn>
