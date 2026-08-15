@@ -588,18 +588,19 @@ async function executeAction() {
     <!-- 🔥 ACTIONS -->
     <template #body-cell-__actions="slotRow">
       <q-td :props="slotRow">
+        
         <s-btn
           dense
           flat
           v-for="a in singularActions"
           :key="a"
-          v-show="User.can(a.role.toLowerCase()) && ['l', 'b'].includes(a.position) && !isDeleted(slotRow.row) && slotRow.col.field =='__lactions'"
+          v-show="User.can(a.role.toLowerCase()) && ['r', 'b'].includes(a.position) && !isDeleted(slotRow.row) && slotRow.col.field =='__ractions'"
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
           :icon="a.icon"
 
         />
-      
+
         
 
         <!-- BOTÃO 3 PONTOS -->
@@ -764,12 +765,13 @@ async function executeAction() {
           flat
           v-for="a in singularActions"
           :key="a"
-          v-show="User.can(a.role.toLowerCase()) && ['r', 'b'].includes(a.position) && !isDeleted(slotRow.row) && slotRow.col.field =='__ractions'"
+          v-show="User.can(a.role.toLowerCase()) && ['l', 'b'].includes(a.position) && !isDeleted(slotRow.row) && slotRow.col.field =='__lactions'"
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
           :icon="a.icon"
 
         />
+
 
       </q-td>
     </template>
