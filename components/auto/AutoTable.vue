@@ -486,6 +486,7 @@ async function executeAction() {
           <s-btn
             v-if="show_filter"
             dense
+            flat
             icon="view_column"
           >
             <q-tooltip
@@ -562,7 +563,7 @@ async function executeAction() {
           <q-input
             outlined
             v-model="search"
-            style="min-width: 190px;"
+            style="min-width: 190px; margin-right:-12px;"
             :label="tdc('Search')"
             @keyup.enter="emit('search', search)"
             dense
