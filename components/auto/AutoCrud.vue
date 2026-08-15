@@ -129,12 +129,14 @@ const columns = computed(() => {
     align: 'left',
   }))
 
-
   const columns = [ 
-    {  name: '__actions',label: 'Acções', field: '__lactions', sortable: false, align: 'left',  },
+    {  name: '__actions',label: 'Acções', field: '__lactions', sortable: false, align: 'left', },
     ...base, 
     { name: '__actions', label: 'Acções', field: '__ractions', sortable: false , align: 'right',  }
   ]
+
+  cols[0].headerClasses = 'text-left'
+  cols[0].align = 'left'
     
   return columns
 })
