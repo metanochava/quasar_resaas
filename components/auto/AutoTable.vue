@@ -483,18 +483,6 @@ async function executeAction() {
             </template>
           </q-btn-toggle>
 
-
-          <s-select
-            v-if="show_filter"
-            v-model="visibleColumns"
-            :options="allColumns"
-            multiple
-            dense
-            outlined
-            style="width:135px"
-            label="Colunas"
-          />
-
           <s-btn
             v-if="show_filter"
             dense
@@ -564,7 +552,6 @@ async function executeAction() {
             </q-menu>
           </s-btn>
 
-          <s-btn v-if="show_filter" dense flat icon="filter_list" @click="emit('filter')" />
           <s-btn v-if="show_filter" dense flat icon="refresh" @click="emit('refresh')" />
           <s-btn v-if="show_filter" dense flat icon="download" @click="exportCSV" />
 
