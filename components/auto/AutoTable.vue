@@ -139,17 +139,17 @@ const objects = ref('alive')
 
 const objectsOptions = [
   {
-    label: 'Activos',
+    label: '',
     value: 'alive',
     icon: 'check_circle'
   },
   {
-    label: 'Eliminados',
+    label: '',
     value: 'deleted',
     icon: 'delete'
   },
   {
-    label: 'Todos',
+    label: '',
     value: 'all',
     icon: 'list'
   }
@@ -395,6 +395,7 @@ async function executeAction() {
           <!-- RIGHT -->
       
           <q-btn-toggle
+            dense
             v-if="show_filter"
             v-model="objects"
             no-caps
@@ -404,21 +405,41 @@ async function executeAction() {
             text-color="grey-8"
             :options="objectsOptions"
             @update:model-value="val => emit('objects', val)"
-          />
+          >
+            <!-- ACTIVOS -->
+            <template #alive>
+              <q-tooltip
+                :class="$q.dark.isActive
+                  ? 'bg-dark text-white'
+                  : 'bg-primary text-white'"
+              >
+                {{ tdc('Mostrar activos') }}
+              </q-tooltip>
+            </template>
 
+            <!-- ELIMINADOS -->
+            <template #deleted>
+              <q-tooltip
+                :class="$q.dark.isActive
+                  ? 'bg-dark text-white'
+                  : 'bg-primary text-white'"
+              >
+                {{ tdc('Mostrar eliminados') }}
+              </q-tooltip>
+            </template>
 
-          <s-select v-if="show_filter"
-            v-model="objects"
-            :options="objectsOptions"
-            option-label="label"
-            option-value="value"
-            emit-value
-            map-options
-            dense
-            outlined
-            @update:model-value="val => emit('objects', val)"
-            style="width:160px"
-          />
+            <!-- TODOS -->
+            <template #all>
+              <q-tooltip
+                :class="$q.dark.isActive
+                  ? 'bg-dark text-white'
+                  : 'bg-primary text-white'"
+              >
+                {{ tdc('Mostrar todos') }}
+              </q-tooltip>
+            </template>
+          </q-btn-toggle>
+
 
           <s-select
             v-if="show_filter"
