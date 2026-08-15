@@ -588,20 +588,20 @@ async function executeAction() {
     <!-- 🔥 ACTIONS -->
     <template #body-cell-__actions="slotRow">
       <q-td :props="slotRow">
-
+{{ slotRow }}
         <s-btn
           dense
           flat
           v-for="a in singularActions"
           :key="a"
-          v-show="User.can(a.role.toLowerCase()) && !a.asMenu && !isDeleted(slotRow.row)"
+          v-show="User.can(a.role.toLowerCase()) && (a.position=='l' || a.position=='b') && !isDeleted(slotRow.row)"
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
           :icon="a.icon"
 
-        >
+        />
       
-        </s-btn>
+        
 
         <!-- BOTÃO 3 PONTOS -->
         <s-btn
@@ -760,6 +760,18 @@ async function executeAction() {
           </q-menu>
         </s-btn>
 
+        <s-btn
+          dense
+          flat
+          v-for="a in singularActions"
+          :key="a"
+          v-show="User.can(a.role.toLowerCase()) && (a.position=='r' || a.position=='b') && !isDeleted(slotRow.row)"
+          @click="runAction(a, slotRow.row)"
+          :color="getMethodColor(a.method)"
+          :icon="a.icon"
+
+        />
+
       </q-td>
     </template>
 
@@ -818,7 +830,7 @@ async function executeAction() {
           </s-btn>
         </template>
 
-        <template v-else-if="props.col.name !== '__actions' && isEditable(props.col.name)">
+        <template v-else-if="(props.col.name !== '__actions' || props.col.name !== '__actions') && isEditable(props.col.name)">
           <q-popup-edit
             :model-value="props.value"
             auto-save
