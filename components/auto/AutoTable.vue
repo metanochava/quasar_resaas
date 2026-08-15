@@ -542,8 +542,16 @@ async function executeAction() {
             </q-menu>
           </s-btn>
 
-          <s-btn v-if="show_filter" dense flat icon="refresh" @click="emit('refresh')" />
-          <s-btn v-if="show_filter" dense flat icon="download" @click="emit('pdfList')" />
+          <s-btn v-if="show_filter" dense flat icon="refresh" @click="emit('refresh')" >
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              {{ tdc('Reload data') }}
+            </q-tooltip>
+          </s-btn>
+          <s-btn v-if="show_filter" dense flat icon="download" @click="emit('pdfList')" >
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              {{ tdc('Lista de dados em pdf') }}
+            </q-tooltip>
+          </s-btn>
 
           <s-btn  flat dense :icon="show_filter? 'arrow_forward' : 'arrow_back'"  @click=" show_filter = !show_filter" >
             <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
@@ -616,7 +624,11 @@ async function executeAction() {
           :color="getMethodColor(a.method)"
           :icon="a.icon"
 
-        />
+        >
+          <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+            {{ tdc(a.tooltip) }}
+          </q-tooltip>
+        </s-btn>
         
 
         <!-- BOTÃO 3 PONTOS -->
@@ -663,7 +675,7 @@ async function executeAction() {
                   {{ tdc(actionStore.getAction('pdf').label) }}
                 </q-item-section>
 
-                <q-tooltip>
+                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
                   {{ tdc(actionStore.getAction('pdf').label) }}
                 </q-tooltip>
               </q-item>
@@ -698,9 +710,7 @@ async function executeAction() {
                   />
                 </q-item-section>
 
-                
-
-                <q-tooltip>
+                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
                   {{ tdc(actionStore.getAction('edit').label) }}
                 </q-tooltip>
               </q-item>
@@ -719,7 +729,7 @@ async function executeAction() {
                   {{ tdc(actionStore.getAction('delete').label) }}
                 </q-item-section>
 
-                <q-tooltip>
+                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
                   {{ tdc(actionStore.getAction('delete').label) }}
                 </q-tooltip>
               </q-item>
@@ -730,7 +740,7 @@ async function executeAction() {
                   <q-icon name="delete_forever" color="red" />
                 </q-item-section>
                 <q-item-section>{{ tdc('Eliminar Permanentemente') }}</q-item-section>
-                <q-tooltip>
+                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
                   {{ tdc('Eliminar Permanentemente') }}
                 </q-tooltip>
               </q-item>
@@ -745,7 +755,7 @@ async function executeAction() {
                   <q-icon name="restore" color="green" />
                 </q-item-section>
                 <q-item-section>{{ tdc('Restaurar') }}</q-item-section>
-                <q-tooltip>
+                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
                   {{ tdc('Restaurar') }}
                 </q-tooltip>
               </q-item>
@@ -768,12 +778,19 @@ async function executeAction() {
                 <q-item-section>
                   {{ a.method + '_' + a.permission }}
                 </q-item-section>
+
+                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+                  {{ tdc( a.method + '_' + a.permission ) }}
+                </q-tooltip>
+
               </q-item>
-
-              
             </q-list>
-
           </q-menu>
+
+          <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+            {{ tdc('Padrao') }}
+          </q-tooltip>
+
         </s-btn>
 
         <s-btn
@@ -786,7 +803,11 @@ async function executeAction() {
           :color="getMethodColor(a.method)"
           :icon="a.icon"
 
-        />
+        >
+          <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+            {{ tdc( a.tooltip) }}
+          </q-tooltip>
+        </s-btn>
 
 
       </q-td>
