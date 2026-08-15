@@ -135,8 +135,8 @@ const columns = computed(() => {
     { name: '__actions', label: 'Acções', field: '__ractions', sortable: false , align: 'right',  }
   ]
 
-  cols[0].headerClasses = 'text-left'
-  cols[0].align = 'left'
+  columns[0].headerClasses = 'text-left'
+  columns[0].align = 'left'
     
   return columns
 })
