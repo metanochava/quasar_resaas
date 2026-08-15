@@ -606,8 +606,7 @@ async function executeAction() {
         <!-- BOTÃO 3 PONTOS -->
         <s-btn
           dense
-          flat
-          round
+          outline
           icon="more_vert"
         >
           <q-menu auto-close>
