@@ -656,6 +656,9 @@ async function executeAction() {
                 <q-item-section>
                   {{ a.action }}
                 </q-item-section>
+                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+                  {{ tdc( a.tooltip) }}
+                </q-tooltip>
               </q-item>
 
               <!-- PDF -->
@@ -788,7 +791,7 @@ async function executeAction() {
           </q-menu>
 
           <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-            {{ tdc('Padrao') }}
+            {{ tdc('Clica para ver pais opções') }}
           </q-tooltip>
 
         </s-btn>
