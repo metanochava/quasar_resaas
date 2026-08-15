@@ -554,7 +554,7 @@ async function executeAction() {
           <q-input
             outlined
             v-model="search"
-            style="min-width: 190px; margin-right:-12px;"
+            style="min-width: 190px; margin-right:-2px;"
             :label="tdc('Search')"
             @keyup.enter="emit('search', search)"
             dense
