@@ -413,6 +413,8 @@ async function executeAction() {
         <div class="col-12 text-h4   text-primary " >
           {{ model }}
         </div>
+
+        <q-separator class="q-my-sm bg-grey-4" />
         <!-- LEFT -->
         <div class="row col-md-12 q-gutter-sm">
           <s-btn
