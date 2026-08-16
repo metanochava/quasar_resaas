@@ -77,7 +77,7 @@ const props = defineProps({
   model:  { type: String, default:'' },
   rows: { type: Array, default: () => [] },
   columns: { type: Array, default: () => [] },
-  schema: { type: Array, default: () => [] },
+  fields: { type: Array, default: () => [] },
 
   loading: { type: Boolean, default: false },
   pagination: { type: Object, required: true },
@@ -241,7 +241,7 @@ function rowClass(props) {
 // ---------------- INLINE EDIT ----------------
 function isEditable(name) {
   if (ignoreSet.value.has(name)) return false
-  const f = props.schema.find(x => x.name === name)
+  const f = props.fields.find(x => x.name === name)
   if (!f) return false
   if (f.ui?.isFile || f.ui?.isImage || f.ui?.isRelation) return false
   return true
@@ -424,6 +424,12 @@ async function executeAction() {
             </q-tooltip>
           </s-btn>
 
+          <s-btn  dense flat icon="download" @click="emit('pdfList')" >
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              {{ tdc('Baixar lista de dados em pdf') }}
+            </q-tooltip>
+          </s-btn>
+
 
           <q-space />
           <!-- RIGHT -->
@@ -547,12 +553,7 @@ async function executeAction() {
               {{ tdc('Reload data') }}
             </q-tooltip>
           </s-btn>
-          <s-btn v-if="show_filter" dense flat icon="download" @click="emit('pdfList')" >
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-              {{ tdc('Lista de dados em pdf') }}
-            </q-tooltip>
-          </s-btn>
-
+          
           <s-btn  flat dense :icon="show_filter? 'arrow_forward' : 'arrow_back'"  @click=" show_filter = !show_filter" >
             <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
               {{ tdc('Mostrar mais opcoes') }}

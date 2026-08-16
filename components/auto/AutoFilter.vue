@@ -4,8 +4,8 @@ import { ref, computed, watch } from 'vue'
 // ---------------- PROPS ----------------
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
-  schema: { type: Array, default: () => [] },
-  ignoreFields: { type: Array, default: () => ['id','created_at','updated_at','created_by','updated_by'] }
+  fields: { type: Array, default: () => [] },
+  ignoreFields: { type: Array, default: () => [] }
 })
 
 // ---------------- EMITS ----------------
@@ -33,7 +33,7 @@ const activeCount = computed(() =>
 
 // ---------------- COMPUTED ----------------
 const basicFields = computed(() =>
-  props.schema
+  props.fields
     .filter(f => {
       if (ignoreSet.value.has(f.name)) return false // 🔥 AQUI
       if (f.ui?.isFile || f.ui?.isImage) return false
@@ -45,7 +45,7 @@ const basicFields = computed(() =>
 )
 
 const advancedFields = computed(() =>
-  props.schema.filter(f =>
+  props.fields.filter(f =>
     !ignoreSet.value.has(f.name) && // 🔥 AQUI
     !(f.ui?.isFile || f.ui?.isImage) &&
     !basicFields.value.find(b => b.name === f.name)
@@ -92,7 +92,7 @@ function apply() {
       <q-separator />
 
       <!-- BODY -->
-      <q-card-section v-if="!schema.length">
+      <q-card-section v-if="!fields.length">
         <q-spinner />
       </q-card-section>
 

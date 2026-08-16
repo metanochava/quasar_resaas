@@ -15,7 +15,7 @@
       :model="model"
       :rows="rows"
       :columns="columns"
-      :schema="schema"
+      :fields="fields"
       :actions="actions"
       :loading="loading"
       :pagination="pagination"
@@ -51,8 +51,8 @@
 
     <AutoFilter
       v-model="showFilter"
-      :schema="schema"
-      :ignoreFields="ignoreFields"
+      :fields="fields"
+      :ignoreFields="ignoreFieldsFilter"
 
       @apply="onApplyFilter"
     />
@@ -78,13 +78,15 @@ const emit = defineEmits([
 const props = defineProps({
   app: { type: String, required: true },
   model: { type: String, required: true },
+
   route: { type: [String, Object], default: null },
   ignoreFields: { type: Array, default: () =>  ['created_at','updated_at', 'created_by', 'updated_by'] },
+  ignoreFieldsFilter: { type: Array, default: () =>  ['created_at','updated_at', 'created_by', 'updated_by'] },
   extraActions: { type: Array, default: () =>  [ ] },
 })
 
 // --- state ---
-const schema = ref([])
+const fields = ref([])
 const actions = ref([])
 const config = ref({})
 const rows = ref([])
@@ -121,7 +123,7 @@ const filters = ref({})
 // --- computed columns ---
 const columns = computed(() => {
 
-  const base = schema.value.map(f => ({
+  const base = fields.value.map(f => ({
     name: f.name,
     label: f.label,
     field: f.name,
@@ -147,10 +149,10 @@ async function init() {
   const data = await buildFormFromSchema({
     app: props.app,
     model: props.model,
-    schemaPath: 'fields',
+    fieldsPath: 'fields',
   })
 
-  schema.value = data.fields
+  fields.value = data.fields
   actions.value = [...data.actions, ...props.extraActions]
   config.value = data.config
 
