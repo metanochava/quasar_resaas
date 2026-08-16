@@ -61,7 +61,7 @@ function clear() {
   filters.value = {}
 }
 
-function apply() {
+function applyl() {
   const payload = Object.fromEntries(
     Object.entries(filters.value).filter(([_, v]) =>
       v !== null && v !== undefined && v !== ''
@@ -74,6 +74,34 @@ function apply() {
   })
 
   localModel.value = false
+}
+
+function apply() {
+  const data = {}
+
+  Object.entries(filters).forEach(([field, value]) => {
+
+    // Se for um objecto e tiver ID
+    if (
+      value !== null &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      value.id !== undefined
+    ) {
+      data[field] = value.id
+    }
+
+    // Valor normal
+    else {
+      data[field] = value
+    }
+
+  })
+
+  emit('apply', {
+    ...data,
+    __resetPage: true
+  })
 }
 </script>
 
