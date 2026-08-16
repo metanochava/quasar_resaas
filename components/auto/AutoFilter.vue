@@ -61,11 +61,63 @@ function clear() {
   filters.value = {}
 }
 
-function applyl() {
+// function apply() {
+//   const payload = Object.fromEntries(
+//     Object.entries(filters.value).filter(([_, v]) =>
+//       v !== null && v !== undefined && v !== ''
+//     )
+//   )
+
+//   emit('apply', {
+//     ...payload,
+//     __resetPage: true
+//   })
+
+//   localModel.value = false
+// }
+
+
+function apply() {
+
   const payload = Object.fromEntries(
-    Object.entries(filters.value).filter(([_, v]) =>
-      v !== null && v !== undefined && v !== ''
-    )
+    Object.entries(filters.value)
+
+      // Remove valores vazios
+      .filter(([_, v]) =>
+        v !== null &&
+        v !== undefined &&
+        v !== ''
+      )
+
+      // Se for objecto, envia apenas o ID
+      .map(([key, value]) => {
+
+        // Array de objectos
+        if (Array.isArray(value)) {
+          return [
+            key,
+            value.map(item =>
+              typeof item === 'object' && item !== null
+                ? item.id ?? item
+                : item
+            )
+          ]
+        }
+
+        // Objecto
+        if (
+          typeof value === 'object' &&
+          value !== null
+        ) {
+          return [
+            key,
+            value.id ?? value
+          ]
+        }
+
+        // Valor normal
+        return [key, value]
+      })
   )
 
   emit('apply', {
@@ -76,33 +128,7 @@ function applyl() {
   localModel.value = false
 }
 
-function apply() {
-  const data = {}
 
-  Object.entries(filters).forEach(([field, value]) => {
-
-    // Se for um objecto e tiver ID
-    if (
-      value !== null &&
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      value.id !== undefined
-    ) {
-      data[field] = value.id
-    }
-
-    // Valor normal
-    else {
-      data[field] = value
-    }
-
-  })
-
-  emit('apply', {
-    ...data,
-    __resetPage: true
-  })
-}
 </script>
 
 <template>
