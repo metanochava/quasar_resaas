@@ -76,7 +76,6 @@ function clear() {
 //   localModel.value = false
 // }
 
-
 function apply() {
 
   const payload = Object.fromEntries(
@@ -89,19 +88,22 @@ function apply() {
         v !== ''
       )
 
-      // Se for objecto, envia apenas o ID
       .map(([key, value]) => {
 
-        // Array de objectos
-        console.log(key, value, 'dentro')
+        // Array
         if (Array.isArray(value)) {
           return [
             key,
-            value.map(item =>
-              typeof item === 'object' && item !== null
-                ? item.id ?? item
-                : item
-            )
+            value.map(item => {
+              if (
+                typeof item === 'object' &&
+                item !== null
+              ) {
+                return item.id ?? item.value ?? item
+              }
+
+              return item
+            })
           ]
         }
 
@@ -112,7 +114,7 @@ function apply() {
         ) {
           return [
             key,
-            value.id ?? value
+            value.id ?? value.value ?? value
           ]
         }
 
@@ -120,8 +122,6 @@ function apply() {
         return [key, value]
       })
   )
-
-  console.log(Object, payload, )
 
   emit('apply', {
     ...payload,
