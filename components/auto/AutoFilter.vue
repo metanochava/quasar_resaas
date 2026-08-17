@@ -93,6 +93,7 @@ function apply() {
       .map(([key, value]) => {
 
         // Array de objectos
+        console.log(key, value, 'dentro')
         if (Array.isArray(value)) {
           return [
             key,
@@ -119,6 +120,8 @@ function apply() {
         return [key, value]
       })
   )
+
+  console.log(Object, payload, )
 
   emit('apply', {
     ...payload,
