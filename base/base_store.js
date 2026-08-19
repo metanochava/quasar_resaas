@@ -384,6 +384,15 @@ export function createBaseStore(name, config, extend = {}) {
           return  blob
         }    
       },
+
+      async getPdfList() {
+
+        const res = await HTTPAuthBlob.get(url({ type: 'u', url: `${this.safeUrl}/pdflist` }))
+        const blob = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+        this.pdf = blob
+        this.showPdf = true
+
+      },
       
       // =========================
       // SAVE

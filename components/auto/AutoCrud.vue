@@ -8,8 +8,6 @@
       :top="false"
     />
 
-
-
     <AutoTable
       :app="app"
       :model="model"

@@ -569,12 +569,12 @@ async function executeAction() {
             dense
           >
             <!-- Ícone de pesquisa -->
-            <template #prepend>
-              <q-icon name="search" />
+            <template #append>
+              <q-icon name="search"  @click="emit('search', search)"/>
             </template>
 
             <!-- Filtro -->
-            <template #append>
+            <template #prepend>
               <s-btn
                 dense
                 flat

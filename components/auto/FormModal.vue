@@ -40,9 +40,7 @@ function save() {
   <q-dialog v-model="open" persistent >
     <s-card class="dialog-card column no-wrap">
 
-      <!-- 🔥 HEADER PREMIUM -->
-      <div class="dialog-header">
-
+      <q-bar class="row items-center justify-between" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
         <!-- LEFT -->
         <div class="text-h5 text-weight-bold ">
           {{ isEdit
@@ -53,7 +51,6 @@ function save() {
 
         <q-space />
 
-        <!-- CLOSE -->
         <s-btn
           flat
           round
@@ -63,8 +60,9 @@ function save() {
         >
           <q-tooltip>{{ tdc('Fechar') }}</q-tooltip>
         </s-btn>
+      </q-bar>
 
-      </div>
+      
 
       <q-separator />
 
