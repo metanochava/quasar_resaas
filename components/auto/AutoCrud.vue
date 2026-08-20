@@ -357,7 +357,7 @@ const onSearch = debounce(async (val) => {
 
   filters.value = {
     ...filters.value,
-    search: clean || undefined
+    search: clean
   }
 
   pagination.value.page = 1
