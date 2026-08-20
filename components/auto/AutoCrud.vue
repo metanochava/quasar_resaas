@@ -231,9 +231,18 @@ async function openPdf(row) {
 }
 
 async function openPdfList() {
+  const params = {
+    page: pagination.value.page,
+    page_size: pagination.value.rowsPerPage,
+    ordering: pagination.value.sortBy
+      ? `${pagination.value.descending ? '-' : ''}${pagination.value.sortBy}`
+      : undefined,
+    ...filters.value,
+  }
   const res = await HTTPAuthBlob.get(url({
     type: 'u',
-    url: `${props.app}/${props.model.toLowerCase()}s/pdflist/`
+    url: `${props.app}/${props.model.toLowerCase()}s/pdflist/`,
+    params
   }))
 
   const blob = new Blob([res.data], { type: 'application/pdf' })

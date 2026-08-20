@@ -371,6 +371,7 @@ export function createBaseStore(name, config, extend = {}) {
       },
       
       async getPdf(id) {
+        
         if(id){
           const res = await HTTPAuthBlob.get(url({ type: 'u', url: `${this.safeUrl}/${id}/pdf` }))
           const blob = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
@@ -387,7 +388,16 @@ export function createBaseStore(name, config, extend = {}) {
 
       async getPdfList() {
 
-        const res = await HTTPAuthBlob.get(url({ type: 'u', url: `${this.safeUrl}/pdflist` }))
+        const res = await HTTPAuthBlob.get(url({ type: 'u',
+          url: `${this.safeUrl}/pdflist` , params: {
+                page: this.pagination.page,
+                page_size: this.pagination.rowsPerPage,
+                search: this.search,
+                ...this.filters,
+                ...params
+              }
+          }
+        ))
         const blob = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
         this.pdf = blob
         this.showPdf = true
