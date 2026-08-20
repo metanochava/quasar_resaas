@@ -257,7 +257,7 @@ export const useUserStore = createBaseStore(
     },
 
     async me() {
-      const rsp = await HTTPAuth.get(url({type: "u", url: "me", params: {}}) )
+      const rsp = await HTTPAuth.get(url({type: "u", url: "me/", params: {}}) )
 
       this.data = rsp.data
       const Language = useLanguageStore()
