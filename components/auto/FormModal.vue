@@ -125,7 +125,7 @@ function save() {
 
 
         <ActionForm
-          :store="Person"
+          :store="store"
           :buttons="['cancel', 'reset', 'edit', 'delete', 'save']"
         />
 
