@@ -11,7 +11,7 @@
            LEFT
       ====================================== -->
 
-      <div class="row q-gutter-sm">
+      <div class="col-md-2 justify-left">
         <!-- DELETE -->
         <s-btn
           v-if="
@@ -38,7 +38,7 @@
            RIGHT
       ====================================== -->
 
-      <div class="row q-gutter-sm bg-grey-2">
+      <div class="col-md-10 q-gutter-sm justify-right">
 
         <!-- CANCEL -->
 

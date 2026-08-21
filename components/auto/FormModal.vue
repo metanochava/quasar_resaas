@@ -96,9 +96,9 @@ function save() {
       <q-separator />
 
       <!-- 🔥 FOOTER -->
-      <q-card-actions align="right" class="q-pa-md">
+      <!-- <q-card-actions align="right" class="q-pa-md">
 
-        <!-- <s-btn
+        <s-btn
           outeline
           color="grey-7"
           :label="tdc('Cancelar')"
@@ -120,13 +120,13 @@ function save() {
           :loading="store.saving"
           :label="tdc('Save')"
           @click="save"
-        /> -->
+        /> 
 
 
 
         
 
-      </q-card-actions>
+      </q-card-actions> -->
 
       <ActionForm
           :store="store"

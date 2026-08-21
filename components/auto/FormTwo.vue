@@ -161,10 +161,10 @@ function goBack() {
 
     <!-- ================= FOOTER FIXO ================= -->
     <q-separator v-if="!hasFooter" />
-    
-    <q-card-actions v-if="!hasFooter" align="right" class="q-pa-md">
+ 
+    <!-- <q-card-actions  align="right" class="q-pa-md">
       
-      <!-- <s-btn
+      <s-btn
         flat
         color="grey-7"
         :label="tdc('Cancelar')"
@@ -186,24 +186,26 @@ function goBack() {
         :loading="store.saving"
         :label="tdc('Save')"
         @click="save"
-      /> -->
+      /> 
 
 
-      <ActionForm
-          :store="store"
-          :buttons="['cancel', 'reset', 'edit', 'delete', 'save']"
-
-          @cancel="goBack"
-          @reset="onReset"
-          @edit="save"
-          @delete="onDelete"
-          @save="save"
-        />
+      
 
 
         
 
-    </q-card-actions>
+    </q-card-actions> -->
+
+    <ActionForm v-if="!hasFooter"
+      :store="store"
+      :buttons="['cancel', 'reset', 'edit', 'delete', 'save']"
+
+      @cancel="goBack"
+      @reset="onReset"
+      @edit="save"
+      @delete="onDelete"
+      @save="save"
+    />
     <div v-if="hasFooter" class="col-12">
       <slot name="footer" />
     </div>
