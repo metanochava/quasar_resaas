@@ -55,7 +55,7 @@
           v-if="has('reset')"
           flat
           type="reset"
-          color="grey-3"
+          color="grey"
           :label="tdc('Reset')"
           @click="reset"
         />
