@@ -19,6 +19,16 @@
       v-model:pagination="pagination"
       :ignoreFields="ignoreFields"
       :config = "config"
+      :rows-per-page-options="[
+        5,
+        10,
+        20,
+        50,
+        100,
+        200,
+        500,
+        { label: tdc('Todos'), value: 0 }
+      ]"
 
       @request="onRequest"
       @create="openCreate"
@@ -65,7 +75,7 @@ import AutoFilter from './AutoFilter.vue'
 import PdfRender from './../PdfRender.vue'
 import { HTTPAuth, HTTPAuthBlob, url } from '../../boot/api'
 import { buildFormFromSchema } from '../../utils/autoForm'
-import { useUserStore } from 'quasar_resaas'
+import { useUserStore, tdc} from 'quasar_resaas'
 
 const User =useUserStore()
 
