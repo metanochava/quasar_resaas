@@ -51,11 +51,11 @@ export default defineComponent({
 
 
 const $q = useQuasar()
-          $q.lang.table.allRows = tdc('Todos')
-  $q.lang.table.noData = tdc('Sem dados')
-  $q.lang.table.loading = tdc('A carregar...')
-  $q.lang.table.recordsPerPage = tdc('Registos por página:')
-  console.log('lingua')
+    $q.lang.table.allRows = tdc('Todos')
+    $q.lang.table.noData = tdc('Sem dados')
+    $q.lang.table.loading = tdc('A carregar...')
+    $q.lang.table.recordsPerPage = tdc('Registos por página:')
+    console.log('lingua')
       },
       {
         deep: true,
