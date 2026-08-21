@@ -41,6 +41,7 @@ export default defineComponent({
   setup () {
     const User = useUserStore()
     const Language = useLanguageStore()
+    const $q = useQuasar()
 
     watch(
       () => Language.current,
@@ -50,7 +51,7 @@ export default defineComponent({
         User.setLanguage(newLanguage)
 
 
-const $q = useQuasar()
+
     $q.lang.table.allRows = tdc('Todos')
     $q.lang.table.noData = tdc('Sem dados')
     $q.lang.table.loading = tdc('A carregar...')
