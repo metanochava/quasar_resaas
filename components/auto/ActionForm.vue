@@ -12,6 +12,24 @@
       ====================================== -->
 
       <div class="row q-gutter-sm">
+        <!-- DELETE -->
+        <s-btn
+          v-if="
+            has('delete') &&
+            User.can(
+              'delete_' +
+              (store.model || '').toLowerCase()
+            )
+          "
+          v-show="isEdit"
+          type="button"
+          color="negative"
+          unelevated
+          icon="delete"
+          :loading="store.saving"
+          :label="tdc('Delete')"
+          @click="deleteRecord"
+        />
 
         <!-- CANCEL -->
         <s-btn
@@ -59,27 +77,7 @@
           :label="tdc('Edit')"
           @click="emit('save')"
         />
-
-
-        <!-- DELETE -->
-        <s-btn
-          v-if="
-            has('delete') &&
-            User.can(
-              'delete_' +
-              (store.model || '').toLowerCase()
-            )
-          "
-          v-show="isEdit"
-          type="button"
-          color="negative"
-          unelevated
-          icon="delete"
-          :loading="store.saving"
-          :label="tdc('Delete')"
-          @click="deleteRecord"
-        />
-
+        
 
         <!-- SAVE -->
         <s-btn
