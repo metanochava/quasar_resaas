@@ -27,8 +27,8 @@ import {useLanguageStore } from '../../stores/LanguageStore';
 
 
 import { useQuasar } from 'quasar'
-import { tdc } from '../..';
-tdc
+import { tdc } from '../../boot/base'
+
 
 const $q = useQuasar()
 
