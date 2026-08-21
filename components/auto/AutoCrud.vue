@@ -20,6 +20,7 @@
       :ignoreFields="ignoreFields"
       :config = "config"
       :rows-per-page-options="[
+        2,
         5,
         10,
         20,

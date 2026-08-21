@@ -913,6 +913,23 @@ async function executeAction() {
       </q-td>
     </template>
 
+
+    <!-- <template #pagination="scope">
+
+      <q-pagination
+        v-model="scope.pagination.page"
+        :max="scope.pagesNumber"
+
+        color="primary"
+        active-color="primary"
+        active-text-color="white"
+
+        direction-links
+        boundary-links
+      />
+
+    </template> -->
+
   </q-table>
 </template>
 
