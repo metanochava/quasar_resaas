@@ -164,7 +164,7 @@ function goBack() {
     
     <q-card-actions v-if="!hasFooter" align="right" class="q-pa-md">
       
-      <s-btn
+      <!-- <s-btn
         flat
         color="grey-7"
         :label="tdc('Cancelar')"
@@ -186,15 +186,22 @@ function goBack() {
         :loading="store.saving"
         :label="tdc('Save')"
         @click="save"
-      />
+      /> -->
 
 
-
-
-        <ActionForm
+      <ActionForm
           :store="store"
           :buttons="['cancel', 'reset', 'edit', 'delete', 'save']"
+
+          @cancel="goBack"
+          @reset="onReset"
+          @edit="save"
+          @delete="onDelete"
+          @save="save"
         />
+
+
+        
 
     </q-card-actions>
     <div v-if="hasFooter" class="col-12">

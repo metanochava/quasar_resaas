@@ -98,7 +98,7 @@ function save() {
       <!-- 🔥 FOOTER -->
       <q-card-actions align="right" class="q-pa-md">
 
-        <s-btn
+        <!-- <s-btn
           outeline
           color="grey-7"
           :label="tdc('Cancelar')"
@@ -120,16 +120,24 @@ function save() {
           :loading="store.saving"
           :label="tdc('Save')"
           @click="save"
-        />
+        /> -->
 
 
 
-        <ActionForm
-          :store="store"
-          :buttons="['cancel', 'reset', 'edit', 'delete', 'save']"
-        />
+        
 
       </q-card-actions>
+
+      <ActionForm
+          :store="store"
+          :buttons="['cancel', 'reset', 'edit', 'delete', 'save']"
+
+          @cancel="close"
+          @reset="onReset"
+          @edit="save"
+          @delete="onDelete"
+          @save="save"
+        />
 
     </s-card>
   </q-dialog>

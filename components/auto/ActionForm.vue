@@ -45,7 +45,7 @@
         <s-btn
           v-if="has('cancel')"
           flat
-          color="grey-7"
+          color="grey"
           :label="tdc('Cancel')"
           @click="emit('cancel')"
         />
@@ -54,8 +54,8 @@
         <s-btn
           v-if="has('reset')"
           flat
-          type="button"
-          color="grey-7"
+          type="reset"
+          color="grey-3"
           :label="tdc('Reset')"
           @click="reset"
         />
@@ -70,7 +70,7 @@
             )
           "
           v-show="isEdit"
-          type="button"
+          type="submit"
           color="secondary"
           unelevated
           icon="edit"
@@ -90,7 +90,7 @@
             )
           "
           v-show="!isEdit"
-          type="button"
+          type="submit"
           color="primary"
           unelevated
           icon="save"
@@ -204,7 +204,7 @@ const reset = () => {
 // =============================================
 
 const deleteRecord = async () => {
-
+  const obj = props.store?.form
   if (props.reform?.delete) {
 
     await props.reform.delete()
@@ -216,7 +216,7 @@ const deleteRecord = async () => {
 
   }
 
-  emit('delete')
+  emit('delete', obj)
 
 }
 
