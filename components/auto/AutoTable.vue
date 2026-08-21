@@ -413,8 +413,7 @@ async function executeAction() {
       0
     ]"
 
-    :no-data-label="tdc('Sem dados')"
-    :rows-per-page-label="tdc('Registos por página')"
+
     :pagination-label="paginationLabel"
   >
 
