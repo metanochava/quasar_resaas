@@ -26,17 +26,21 @@ import {useLanguageStore } from '../../stores/LanguageStore';
 
 
 
-import { useQuasar } from 'quasar'
+import { useQuasar, Quasar} from 'quasar'
 import { tdc } from '../../boot/base'
 
 
-const $q = useQuasar()
+
 
 function updateQuasarLanguage() {
-  $q.lang.table.allRows = tdc('Todos')
-  $q.lang.table.noData = tdc('Sem dados')
-  $q.lang.table.loading = tdc('A carregar...')
-  $q.lang.table.recordsPerPage = tdc('Registos por página:')
+
+  Quasar.lang.table.allRows =  tdc('Todos')
+
+  Quasar.lang.table.noData =  tdc('Sem dados')
+
+  Quasar.lang.table.loading =  tdc('A carregar...')
+
+  Quasar.lang.table.recordsPerPage = tdc('Registos por página:')
 }
 
 updateQuasarLanguage()
