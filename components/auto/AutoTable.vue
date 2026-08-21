@@ -220,9 +220,7 @@ const toggleAllColumns = () => {
 }
 
 function isDeleted(x) {
-  // isDeleted({ deleted_at: '2026-01-01' }) // true
-  // isDeleted({ deleted_at: null })         // false
-  // isDeleted(null)                         // false
+
   return Boolean(x && x.deleted_at)
 }
 
@@ -314,10 +312,10 @@ function getMethodColor(method) {
   }
 }
 
-// const paginationLabel = (start, end, total) => {
-//   if (!total || total === 0) return tdc('Sem dados')
-//   return `${start}-${end} ${tdc('de')} ${total}`
-// }
+const paginationLabel = (start, end, total) => {
+  if (!total || total === 0) return tdc('No data')
+  return `${start}-${end} ${tdc('of')} ${total}`
+}
 
 
 function runAction(action, row) {
@@ -413,6 +411,9 @@ async function executeAction() {
       0
     ]"
 
+    :no-data-label="tdc('Sem dados')"
+    :rows-per-page-label="tdc('Registos por página')"
+    :pagination-label="paginationLabel"
 
 
   >
@@ -925,7 +926,7 @@ async function executeAction() {
     </template>
 
 
-    <!-- <template #pagination="scope">
+    <template #pagination="scope">
 
       <q-pagination
         v-model="scope.pagination.page"
@@ -939,7 +940,7 @@ async function executeAction() {
         boundary-links
       />
 
-    </template> -->
+    </template>
 
   </q-table>
 </template>
