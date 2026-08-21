@@ -26,26 +26,12 @@ import {useLanguageStore } from '../../stores/LanguageStore';
 
 
 
-import { Quasar} from 'quasar'
+import { useQuasar } from 'quasar'
 import { tdc } from '../../boot/base'
 
 
 
 
-function updateQuasarLanguage() {
-if (!Quasar.lang) return
-
-  if (!Quasar.lang.table) {
-    Quasar.lang.table = {}
-  }
-
-  Quasar.lang.table.allRows = tdc('Todos')
-  Quasar.lang.table.noData = tdc('Sem dados')
-  Quasar.lang.table.loading = tdc('A carregar...')
-  Quasar.lang.table.recordsPerPage = tdc('Registos por página:')
-}
-
-updateQuasarLanguage()
 
 
 export default defineComponent({
@@ -62,7 +48,13 @@ export default defineComponent({
         if (!newLanguage) return
 
         User.setLanguage(newLanguage)
-        updateQuasarLanguage()
+
+
+const $q = useQuasar()
+          $q.lang.table.allRows = tdc('Todos')
+  $q.lang.table.noData = tdc('Sem dados')
+  $q.lang.table.loading = tdc('A carregar...')
+  $q.lang.table.recordsPerPage = tdc('Registos por página:')
       },
       {
         deep: true,
