@@ -5,13 +5,13 @@
     class="q-pa-sm"
   >
 
-    <div class="row items-center justify-between">
+    <div class="row col-12">
 
       <!-- =====================================
            LEFT
       ====================================== -->
 
-      <div class="col-md-2 justify-left">
+      <div class="col-md-2  col-lg-2  q-gutter-sm justify-left">
         <!-- DELETE -->
         <s-btn
           v-if="
@@ -38,7 +38,7 @@
            RIGHT
       ====================================== -->
 
-      <div class="col-md-10 q-gutter-sm justify-right">
+      <div class="col-md-10 col-lg-12  q-gutter-sm justify-right">
 
         <!-- CANCEL -->
 
