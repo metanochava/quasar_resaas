@@ -33,13 +33,15 @@ import { tdc } from '../../boot/base'
 
 
 function updateQuasarLanguage() {
+if (!Quasar.lang) return
 
-  Quasar.lang.table.allRows =  tdc('Todos')
+  if (!Quasar.lang.table) {
+    Quasar.lang.table = {}
+  }
 
-  Quasar.lang.table.noData =  tdc('Sem dados')
-
-  Quasar.lang.table.loading =  tdc('A carregar...')
-
+  Quasar.lang.table.allRows = tdc('Todos')
+  Quasar.lang.table.noData = tdc('Sem dados')
+  Quasar.lang.table.loading = tdc('A carregar...')
   Quasar.lang.table.recordsPerPage = tdc('Registos por página:')
 }
 
