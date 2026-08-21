@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { tdc } from '../../boot/base'
 import Form from '../engine/FormComponent.vue'
 import { useUserStore }  from '../../stores/UserStore'
+import ActionForm from '../../components/auto/ActionForm.vue'
 
 
 
@@ -119,6 +120,13 @@ function save() {
           :loading="store.saving"
           :label="tdc('Save')"
           @click="save"
+        />
+
+
+
+        <ActionForm
+          :store="Person"
+          :buttons="['cancel', 'reset', 'edit', 'delete', 'save']"
         />
 
       </q-card-actions>

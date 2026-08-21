@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { tdc } from '../../boot/base'
 import Form from '../engine/FormComponent.vue'
 import { useUserStore } from '../../stores/UserStore'
+import ActionForm from '../../components/auto/ActionForm.vue'
 
 const slots = useSlots()
 
@@ -186,6 +187,14 @@ function goBack() {
         :label="tdc('Save')"
         @click="save"
       />
+
+
+
+
+        <ActionForm
+          :store="Person"
+          :buttons="['cancel', 'reset', 'edit', 'delete', 'save']"
+        />
 
     </q-card-actions>
     <div v-if="hasFooter" class="col-12">

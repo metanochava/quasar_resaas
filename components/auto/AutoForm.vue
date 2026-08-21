@@ -4,6 +4,8 @@
 import { ref, watch, computed } from 'vue'
 import { tdc } from '../../boot/base'
 import { HTTPAuth, url } from '../../boot/api'
+import ActionForm from '../../components/auto/ActionForm.vue'
+        
 
 
 
@@ -211,7 +213,14 @@ async function save() {
       <q-card-actions align="right">
         <s-btn flat label="Cancelar" @click="close" />
         <s-btn color="primary" :loading="saving" label="Salvar" @click="save" />
+
+        <ActionForm
+          :store="Person"
+          :buttons="['cancel', 'reset', 'edit', 'save']"
+        />
       </q-card-actions>
+
+
 
     </s-card>
   </q-dialog>

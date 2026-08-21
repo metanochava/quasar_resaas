@@ -18,7 +18,6 @@
           v-if="has('cancel')"
           flat
           color="grey-7"
-          icon="close"
           :label="tdc('Cancel')"
           @click="emit('cancel')"
         />
@@ -29,7 +28,6 @@
           flat
           type="button"
           color="grey-7"
-          icon="restart_alt"
           :label="tdc('Reset')"
           @click="reset"
         />
@@ -41,7 +39,7 @@
            RIGHT
       ====================================== -->
 
-      <div class="row q-gutter-sm">
+      <div class="row q-gutter-sm bg-grey-2">
 
         <!-- EDIT -->
         <s-btn

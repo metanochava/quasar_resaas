@@ -37,7 +37,7 @@
 
       <ActionForm
         :store="Person"
-        :buttons="['cancel', 'reset', 'edit', 'save']"
+        :buttons="['cancel', 'reset', 'edit','delete', 'save']"
         />
 
     </q-card>
@@ -51,7 +51,7 @@
 import { computed, watch } from 'vue'
 
 import  Form  from '../../components/engine/FormComponent.vue'
-import  ActionForm  from '../../components/auto/ActionForm.vue'
+import  ActionForm  from '../../components/auto/.vue'
 import { usePersonStore }  from '../../stores/PersonStore'
 
 const props = defineProps({
