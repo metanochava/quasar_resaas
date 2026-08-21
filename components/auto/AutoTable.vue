@@ -314,10 +314,10 @@ function getMethodColor(method) {
   }
 }
 
-const paginationLabel = (start, end, total) => {
-  if (!total || total === 0) return tdc('Sem dados')
-  return `${start}-${end} ${tdc('de')} ${total}`
-}
+// const paginationLabel = (start, end, total) => {
+//   if (!total || total === 0) return tdc('Sem dados')
+//   return `${start}-${end} ${tdc('de')} ${total}`
+// }
 
 
 function runAction(action, row) {
@@ -414,7 +414,7 @@ async function executeAction() {
     ]"
 
 
-    :pagination-label="paginationLabel"
+
   >
 
     <!-- 🔥 TOP BAR -->
