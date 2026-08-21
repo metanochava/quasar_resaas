@@ -410,7 +410,7 @@ async function executeAction() {
       100,
       200,
       500,
-      { label: tdc('Todos'), value: 0 }
+      0
     ]"
 
     :no-data-label="tdc('Sem dados')"
