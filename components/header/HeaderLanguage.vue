@@ -45,10 +45,10 @@ export default defineComponent({
 
     watch(
       () => Language.current,
-      (newLanguage) => {
+      async (newLanguage) => {
         if (!newLanguage) return
 
-        User.setLanguage(newLanguage)
+        await User.setLanguage(language)
 
         // ==========================================
         // QTABLE
