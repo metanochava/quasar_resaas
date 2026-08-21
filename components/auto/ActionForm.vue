@@ -5,14 +5,14 @@
     class="q-pa-sm"
   >
 
-    <div class="row col-12">
+    <div class="row col-12 items-center">
 
       <!-- =====================================
-           LEFT
+          LEFT
       ====================================== -->
 
-      <div class="col-md-2  col-lg-2  q-gutter-sm justify-left">
-        <!-- DELETE -->
+      <div class="col-2 row justify-start q-gutter-sm">
+
         <s-btn
           v-if="
             has('delete') &&
@@ -29,19 +29,18 @@
           :loading="store.saving"
           :label="tdc('Delete')"
           @click="deleteRecord"
-        />        
+        />
 
       </div>
 
 
       <!-- =====================================
-           RIGHT
+          RIGHT
       ====================================== -->
 
-      <div class="col-md-10 col-lg-12  q-gutter-sm justify-right">
+      <div class="col-10 row justify-end q-gutter-sm">
 
         <!-- CANCEL -->
-
         <s-btn
           v-if="has('cancel')"
           flat
@@ -78,7 +77,6 @@
           :label="tdc('Edit')"
           @click="emit('save')"
         />
-        
 
         <!-- SAVE -->
         <s-btn
