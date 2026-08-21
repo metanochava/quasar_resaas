@@ -285,6 +285,32 @@ function onRequest(e) {
 }
 
 
+function onPageChange(page) {
+
+  localPagination.value = {
+    ...localPagination.value,
+    page
+  }
+
+  const request = {
+    pagination: {
+      ...localPagination.value
+    }
+  }
+
+  emit(
+    'update:pagination',
+    {
+      ...localPagination.value
+    }
+  )
+
+  emit(
+    'request',
+    request
+  )
+}
+
 
 
 watch(
@@ -414,6 +440,7 @@ async function executeAction() {
     :no-data-label="tdc('No data')"
     :rows-per-page-label="tdc('Records per page:')"
     :pagination-label="paginationLabel"
+    :loading-label="tdc('Loading...')"
 
 
   >
@@ -938,6 +965,8 @@ async function executeAction() {
 
         direction-links
         boundary-links
+
+        @update:model-value="onPageChange"
       />
 
     </template>
