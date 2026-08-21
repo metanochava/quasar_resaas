@@ -26,7 +26,7 @@ import {useLanguageStore } from '../../stores/LanguageStore';
 
 
 
-import { useQuasar, Quasar} from 'quasar'
+import { Quasar} from 'quasar'
 import { tdc } from '../../boot/base'
 
 
