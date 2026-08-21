@@ -958,7 +958,7 @@ async function executeAction() {
       <q-pagination
         v-model="scope.pagination.page"
         :max="scope.pagesNumber"
-        :max-pages="7"
+        :max-pages="5"
 
         color="primary"
         active-color="primary"

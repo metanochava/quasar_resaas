@@ -29,9 +29,19 @@
           :loading="store.saving"
           :label="tdc('Delete')"
           @click="deleteRecord"
-        />
+        />        
+
+      </div>
+
+
+      <!-- =====================================
+           RIGHT
+      ====================================== -->
+
+      <div class="row q-gutter-sm bg-grey-2">
 
         <!-- CANCEL -->
+
         <s-btn
           v-if="has('cancel')"
           flat
@@ -49,15 +59,6 @@
           :label="tdc('Reset')"
           @click="reset"
         />
-
-      </div>
-
-
-      <!-- =====================================
-           RIGHT
-      ====================================== -->
-
-      <div class="row q-gutter-sm bg-grey-2">
 
         <!-- EDIT -->
         <s-btn
