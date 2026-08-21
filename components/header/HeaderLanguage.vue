@@ -24,6 +24,24 @@ import { defineComponent, watch } from 'vue'
 import { useUserStore} from '../../stores/UserStore'
 import {useLanguageStore } from '../../stores/LanguageStore';
 
+
+
+import { useQuasar } from 'quasar'
+import { tdc } from '../..';
+tdc
+
+const $q = useQuasar()
+
+function updateQuasarLanguage() {
+  $q.lang.table.allRows = tdc('Todos')
+  $q.lang.table.noData = tdc('Sem dados')
+  $q.lang.table.loading = tdc('A carregar...')
+  $q.lang.table.recordsPerPage = tdc('Registos por página:')
+}
+
+updateQuasarLanguage()
+
+
 export default defineComponent({
   components: {
 
@@ -38,6 +56,7 @@ export default defineComponent({
         if (!newLanguage) return
 
         User.setLanguage(newLanguage)
+        updateQuasarLanguage()
       },
       {
         deep: true,
