@@ -16,7 +16,7 @@
       :fields="fields"
       :actions="actions"
       :loading="loading"
-      :pagination="pagination"
+      v-model:pagination="pagination"
       :ignoreFields="ignoreFields"
       :config = "config"
 
@@ -200,8 +200,13 @@ async function loadData(token = null) {
 }
 
 // --- EVENTS ---
+
 function onRequest(req) {
-  pagination.value = req.pagination
+
+  pagination.value = {
+    ...req.pagination
+  }
+
   loadData()
 }
 

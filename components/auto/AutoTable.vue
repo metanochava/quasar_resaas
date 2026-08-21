@@ -120,9 +120,19 @@ const emit = defineEmits([
 // ---------------- LOCAL STATE (FIX V-MODEL) ----------------
 const localPagination = ref({ ...props.pagination })
 
-watch(() => props.pagination, (val) => {
-  localPagination.value = { ...val }
-})
+watch(
+  () => props.pagination,
+  val => {
+
+    localPagination.value = {
+      ...val
+    }
+
+  },
+  {
+    deep: true
+  }
+)
 
 
 const show_filter = ref(false)
@@ -269,11 +279,14 @@ function toggleBoolean(row, name) {
 }
 
 // ---------------- REQUEST HANDLER ----------------
+
 function onRequest(e) {
-  localPagination.value = e.pagination
-  emit('update:pagination', e.pagination) // 🔥 FIX
+  localPagination.value = { ...e.pagination }
+  emit( 'update:pagination',  {  ...e.pagination  } )
   emit('request', e)
 }
+
+
 
 
 watch(
@@ -373,8 +386,6 @@ async function executeAction() {
     </s-card>
   </q-dialog>
 
-
-
   <q-table
     square
     
@@ -382,7 +393,7 @@ async function executeAction() {
     :rows="rows"
     :columns="filteredColumns"
     :loading="loading"
-    :pagination="localPagination"
+    v-model:pagination="localPagination"
     :visible-columns="effectiveColumns"
     dense
     row-key="id"
@@ -424,7 +435,10 @@ async function executeAction() {
             </q-tooltip>
           </s-btn>
 
-          <s-btn  dense flat icon="download" @click="emit('pdfList')" >
+          <s-btn 
+            dense flat icon="download" @click="emit('pdfList')" 
+            v-show="User.can('pdf_list_' + model.toLowerCase()) && props.config?.routes?.add"
+          >
             <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
               {{ tdc('Baixar lista de dados em pdf') }}
             </q-tooltip>
