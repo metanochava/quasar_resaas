@@ -18,7 +18,7 @@
           {{
             isHardDelete
               ? tdc('Delete permanently?')
-              : tdc('Confirm deletion?')
+              : tdc('Confirm?')
           }}
         </div>
 
@@ -34,11 +34,11 @@
 
         <b v-if="row">
 
-          {{ row?.value || row?.id }}
+          {{  row[props.id] || row?.value || row?.id }}
 
           <br />
 
-          {{ row?.name || row?.label }}
+          {{ row[props.label] || row?.name || row?.label || '' }}
 
         </b>
 
@@ -90,16 +90,29 @@ const props = defineProps({
 
   modelValue: {
     type: Boolean,
-    default: false
+    default: false,
+    required: true
   },
 
   type: {
     type: String,
-    default: 'delete'
+    default: 'delete',
+    required: true
   },
 
   row: {
     type: Object,
+    default: null,
+    required: true
+  },
+
+  label: {
+    type: String,
+    default: null
+  },
+
+  id: {
+    type: String,
     default: null
   }
 

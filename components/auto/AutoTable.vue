@@ -349,21 +349,6 @@ function runAction(action, row) {
   emit('run-action',  action, row )
 }
 
-// async function executeAction() {
-//   if (!selectedRow.value?.id) return
-
-//   if (actionType.value === 'delete') {
-//     emit('delete', selectedRow.value)
-//   }
-
-//   if (actionType.value === 'hard_delete') {
-//     emit('hard_delete', selectedRow.value)
-//   }
-
-//   showConfirm.value = false
-//   selectedRow.value = null
-//   actionType.value = null
-// }
 
 
 async function executeAction({ type, row }) {
@@ -391,7 +376,10 @@ async function executeAction({ type, row }) {
     v-model="showConfirm"
     :type="actionType"
     :row="selectedRow"
+    id="nid"
+    label="person"
     @confirm="executeAction"
+
   />
 
   <!-- <q-dialog v-model="showConfirm">
