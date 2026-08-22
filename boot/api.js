@@ -8,7 +8,7 @@ const apiPrefix = process.env.API_PREFIX
 const apiBaseUrl = process.env.API + '/' + apiPrefix 
 
 
-const safeParse = (value) => {
+export const safeParse = (value) => {
   try {
     return value ? JSON.parse(value) : null
   } catch {
