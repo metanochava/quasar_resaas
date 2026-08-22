@@ -59,10 +59,12 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { debounce } from 'quasar'
+import { reactive } from 'vue'
+import { tdc } from '../../services/translation'
 
 import { HTTPAuth, HTTPAuthBlob, url } from '../../services/api'
 import { buildFormFromSchema } from '../../utils/autoForm'
-import { useUserStore} from 'quasar_resaas'
+import { useUserStore } from '../../stores/UserStore'
 
 const User =useUserStore()
 
@@ -94,7 +96,7 @@ const selectedRow = ref(null)
 const showPdf = ref(false)
 const pdfUrl = ref(null)
 
-import { reactive } from 'vue'
+
 
 const store = reactive({
   fields: [],
@@ -127,9 +129,9 @@ const columns = computed(() => {
   }))
 
   const columns = [ 
-    {  name: '__actions',label: 'Acções', field: '__lactions', sortable: false, align: 'left',  headerClasses: 'text-left' },
+    {  name: '__actions',label: tdc('Actions') ,  field: '__lactions', sortable: false, align: 'left',  headerClasses: 'text-left' },
     ...base, 
-    { name: '__actions', label: 'Acções', field: '__ractions', sortable: false , align: 'right',  headerClasses: 'text-right ' }
+    { name: '__actions', label: tdc('Actions'), field: '__ractions', sortable: false , align: 'right',  headerClasses: 'text-right ' }
   ]
     
   return columns
