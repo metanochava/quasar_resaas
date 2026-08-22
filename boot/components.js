@@ -120,6 +120,7 @@ export default boot(({ app }) => {
   app.component('s-form-two', FormTwo)
   app.component('s-form-modal', FormModal)
 
+  app.component('s-auto-filter', AutoFilter)
   app.component('s-action-form', ActionForm)
 
   app.component('s-auto-table', AutoTable)
