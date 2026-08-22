@@ -12,7 +12,7 @@
 
         <q-card-section class="text-subtitle1" dense>
           <div class="row items-center  sticky-header">
-            <div class="text-h5"> ⚡ Scaffold Command Wizard</div>
+            <div class="text-h5"> ⚡ {{tdc(' Scaffold Command Wizard')}}</div>
             <q-space/>
             <s-btn flat icon="visibility" label="Preview" @click="generatePreview" />
             <s-btn color="primary" icon="save" label="Create / Update" @click="submit" />
@@ -484,9 +484,16 @@
 
 <script>
 
-import { ref, computed, watch, onMounted } from 'vue'
-import { HTTPAuth, tdc, useUserStore , AlertError, buildFormFromSchema } from './../../index'
+
+
 import ModelAction from './ModelAction.vue';
+import { HTTPAuth } from '../../boot/api.js';
+import { tdc } from '../../boot/base.js';
+import { useUserStore } from '../../stores/UserStore.js';
+import { AlertError } from '../../boot/alerts.js';
+import { buildFormFromSchema } from '../../utils/autoForm.js';
+
+
 
 
 export default {
@@ -500,7 +507,8 @@ export default {
   setup () {
     const User = useUserStore()
     return {
-      User
+      User,
+      tdc
     }
   },
 
