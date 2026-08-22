@@ -1,4 +1,4 @@
-export const RESAAS_STORE_IMPORTS = [
+ const RESAAS_STORE_IMPORTS = [
   'useUserStore',
   'useEntityStore',
   'useEntityTypeStore',
@@ -7,7 +7,7 @@ export const RESAAS_STORE_IMPORTS = [
   'usePersonStore'
 ]
 
-export const RESAAS_API_IMPORTS = [
+ const RESAAS_API_IMPORTS = [
   'HTTPAuth',
   'HTTPAuthBlob',
   'HTTPClient',
@@ -17,15 +17,17 @@ export const RESAAS_API_IMPORTS = [
 
 ]
 
-export const RESAAS_UTIL_IMPORTS = [
+const RESAAS_UTIL_IMPORTS = [
   'tdc',
   'buildFormFromSchema',
   'createBaseStore',
   'safeParse'
 ]
 
-export const RESAAS_AUTO_IMPORTS = [
+const RESAAS_AUTO_IMPORTS = [
   ...RESAAS_STORE_IMPORTS,
   ...RESAAS_API_IMPORTS,
   ...RESAAS_UTIL_IMPORTS
 ]
+
+module.exports = RESAAS_AUTO_IMPORTS
