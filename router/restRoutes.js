@@ -7,7 +7,7 @@ import { employeeRoutes } from '../pages/employee/employeeRoute'
 import { groupRoutes } from '../pages/group/groupRoute'
 import { branchRoutes } from '../pages/branch/branchRoute'
 import { permissionRoutes } from '../pages/permission/permissionRoute'
-import { tdc } from '../services/translation.js'
+import { tdc } from '../services/translation'
 
 
 export let restRoutes = [

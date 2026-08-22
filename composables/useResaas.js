@@ -7,7 +7,6 @@ import {
   HTTPClientBlob,
   wsApi,
   url,
-  safeParse
 } from '../services/api'
 
 
@@ -44,6 +43,7 @@ import {
 import {
   buildFormFromSchema
 } from '../utils/autoForm'
+import { safeParse } from '../utils/json'
 
 
 export function useResaas() {
