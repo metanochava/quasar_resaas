@@ -6,7 +6,7 @@ import { HTTPAuth,  HTTPAuthBlob,  HTTPClient, HTTPClientBlob,  wsApi,  url,  sa
    WEBSOCKET URL
 ====================================================== */
 
-export const wsApi = apiBaseUrl.replace('http', 'ws').replace('https', 'ws')
+
 
 import { useUserStore } from '../stores/UserStore'
 export * from '../stores/UserStore'
