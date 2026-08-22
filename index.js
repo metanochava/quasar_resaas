@@ -29,6 +29,14 @@ export * from './stores/BranchStore.js'
 export * from './stores/MenuStore.js'
 export * from './stores/PersonStore.js'
 
+export * from './stores/ActionStore.js'
+export * from './stores/AlertStore.js'
+export * from './stores/EmployeeStore.js'
+export * from './stores/GroupStore.js'
+export * from './stores/LanguageStore.js'
+export * from './stores/LoadStore.js'
+export * from './stores/PermissionStore.js'
+
 
 // =========================================================
 // BASE
