@@ -1,48 +1,49 @@
 import { tdc } from '../boot/base'
 
-import { HTTPAuth,  HTTPAuthBlob,  HTTPClient, HTTPClientBlob,  wsApi,  url,  safeParse } from '../boot/api'
-
-/* ======================================================
-   WEBSOCKET URL
-====================================================== */
-
-
-
-import { useUserStore } from '../stores/UserStore'
-export * from '../stores/UserStore'
-import { useEntityStore } from '../stores/EntityStore'
-export * from '../stores/EntityStore'
-import { useEntityTypeStore } from '../stores/EntityTypeStore'
-export * from '../stores/EntityTypeStore'
-import { useBranchStore } from '../stores/BranchStore'
-export *  from '../stores/BranchStore'
-import { useMenuStore } from '../stores/MenuStore'
-export * from '../stores/MenuStore'
-import { usePersonStore } from '../stores/PersonStore'
-export * from '../stores/PersonStore'
+import {
+  HTTPAuth,
+  HTTPAuthBlob,
+  HTTPClient,
+  HTTPClientBlob,
+  wsApi,
+  url,
+  safeParse
+} from '../boot/api'
 
 
+import {
+  useUserStore
+} from '../stores/UserStore'
+
+import {
+  useEntityStore
+} from '../stores/EntityStore'
+
+import {
+  useEntityTypeStore
+} from '../stores/EntityTypeStore'
+
+import {
+  useBranchStore
+} from '../stores/BranchStore'
+
+import {
+  useMenuStore
+} from '../stores/MenuStore'
+
+import {
+  usePersonStore
+} from '../stores/PersonStore'
 
 
-export { createBaseStore } from '../base/base_store'
-export * from '../base/base_store'
+import {
+  createBaseStore
+} from '../base/base_store'
 
 
-
-import { buildFormFromSchema } from '../utils/autoForm'
-export * from '../utils/autoForm'
-
-
-export * from '../boot/alerts'
-export * from '../boot/api'
-export * from '../boot/app'
-export * from '../boot/base'
-export * from '../boot/data'
-export * from '../boot/storage'
-
-
-
-
+import {
+  buildFormFromSchema
+} from '../utils/autoForm'
 
 
 export function useResaas() {
@@ -53,7 +54,7 @@ export function useResaas() {
 
   const EntityType = useEntityTypeStore()
 
-  const BranchStore = useBranchStore()
+  const Branch = useBranchStore()
 
   const Menu = useMenuStore()
 
@@ -62,30 +63,45 @@ export function useResaas() {
 
   return {
 
+    // =====================================
+    // BASE
+    // =====================================
+
+    tdc,
     safeParse,
 
-    // tradução
-    tdc,
 
+    // =====================================
     // HTTP
+    // =====================================
 
     HTTPAuth,
     HTTPAuthBlob,
+
     HTTPClient,
     HTTPClientBlob,
+
     wsApi,
     url,
 
-    // utils
+
+    // =====================================
+    // UTILS
+    // =====================================
+
     buildFormFromSchema,
 
     createBaseStore,
 
-    // stores
+
+    // =====================================
+    // STORES
+    // =====================================
+
     User,
-    BranchStore,
     Entity,
     EntityType,
+    Branch,
     Menu,
     Person,
 
