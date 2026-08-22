@@ -56,10 +56,9 @@ import {
 import {
   useQuasar
 } from 'quasar'
+import { tdc } from '../../services/translation'
 
-import {
-  tdc
-} from '../../services/base'
+
 
 
 export default defineComponent({
