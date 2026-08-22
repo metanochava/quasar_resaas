@@ -44,7 +44,7 @@ import TopMenu from './../components/TopMenu.vue'
 import PdfRender from './../components/PdfRender.vue'
 import PdfRenderPro from './../components/PdfRenderPro.vue'
 
-import HeaderBrand from './../HeaderBrand.vue'
+import HeaderBrand from './../components/header/HeaderBrand.vue'
 
 
 // =========================================================
