@@ -134,7 +134,7 @@ import { useEntityStore } from '../../stores/EntityStore'
 import { useBranchStore } from '../../stores/BranchStore'
 import RegisterEntity from './RegisterEntity.vue'
 
-import { tdc } from '../../services/translation.js'
+import { tdc } from '../../services/translation'
 import { profileSplint } from '../../utils/profile.js'
 
 export default defineComponent({

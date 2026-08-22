@@ -69,7 +69,7 @@ import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import SubMenu from './SubMenu.vue'
 import { barStyle, thumbStyle } from '../services/app'
-import { tdc, toPlural } from '../services/translation.js'
+import { tdc, toPlural } from '../services/translation'
 
 
 export default defineComponent({

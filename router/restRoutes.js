@@ -1,4 +1,4 @@
-import { tdc } from '../../services/translation.js'
+import { tdc } from '../../services/translation'
 
 import { entityRoutes } from './../pages/entity/entityRoute'
 import { entity_typeRoutes } from './../pages/entity_type/entity_typeRoute'

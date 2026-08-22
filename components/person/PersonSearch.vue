@@ -155,7 +155,7 @@ import ActionForm from '../../components/auto/ActionForm.vue'
 import { usePersonStore } from '../../stores/PersonStore'
 
 import PersonCard from './PersonCard.vue'
-import { tdc } from '../../services/translation.js'
+import { tdc } from '../../services/translation'
 
 
 const Person = usePersonStore()
