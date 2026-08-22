@@ -1,4 +1,4 @@
-export const AutoLoad = [
+export const ResaasAutoLoad = [
 
     // STORES
     'useUserStore',
