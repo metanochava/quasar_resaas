@@ -382,6 +382,14 @@ async function executeAction({ type, row }) {
 
   />
 
+  <s-confirm-delete
+    v-model="showConfirm"
+    :type="actionType"
+    :row="selectedRow"
+    id="nid"
+    label="person"
+    @confirm="executeAction"
+  />
 
 
   <q-table
