@@ -384,7 +384,6 @@ async function executeAction({ type, row }) {
 
   <q-table
     square
-    
     bordered
     :rows="rows"
     :columns="filteredColumns"
@@ -413,15 +412,17 @@ async function executeAction({ type, row }) {
     :rows-per-page-label="tdc('Records per page:')"
     :pagination-label="paginationLabel"
     :loading-label="tdc('Loading...')"
-
-
   >
 
-    <!-- 🔥 TOP BAR -->
-    <template #top>
-      <div class="row col-12 ">
+    <!-- ==========================================
+         TOP BAR
+    =========================================== -->
 
-        <div class="col-12 text-h4   text-primary " >
+    <template #top>
+
+      <div class="row col-12">
+
+        <div class="col-12 text-h4 text-primary">
           {{ model }}
         </div>
 
@@ -429,49 +430,87 @@ async function executeAction({ type, row }) {
         <div class="row col-12 items-center">
 
           <!-- =====================================
-              LEFT
+               LEFT
           ====================================== -->
 
           <div class="col-2 row justify-start q-gutter-sm">
+
+            <!-- DEFAULT CREATE -->
+
             <s-btn
-  
-              dense icon="add" color="primary" @click="emit('create')"
+              dense
+              icon="add"
+              color="primary"
+              @click="emit('create')"
               v-show="User.can('add_' + model.toLowerCase())"
             >
-              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-                {{ tdc('Padrao') }}
+              <q-tooltip
+                :class="$q.dark.isActive
+                  ? 'bg-dark text-white'
+                  : 'bg-primary text-white'"
+              >
+                {{ tdc('Default') }}
               </q-tooltip>
             </s-btn>
 
-            <s-btn 
-              dense icon="open_in_new"  color="secondary" :to="{ name: props.config?.routes?.add }"
-              v-show="User.can('add_' + model.toLowerCase()) && props.config?.routes?.add"
-            > 
-              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-                {{ tdc('Personalizado') }}
-              </q-tooltip>
-            </s-btn>
 
-            <s-btn 
-              dense flat icon="download" @click="emit('pdfList')" 
-              v-show="User.can('pdf_list_' + model.toLowerCase()) && props.config?.routes?.add"
+            <!-- CUSTOM CREATE -->
+
+            <s-btn
+              dense
+              icon="open_in_new"
+              color="secondary"
+              :to="{ name: props.config?.routes?.add }"
+              v-show="
+                User.can('add_' + model.toLowerCase()) &&
+                props.config?.routes?.add
+              "
             >
-              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-                {{ tdc('Baixar lista de dados em pdf') }}
+              <q-tooltip
+                :class="$q.dark.isActive
+                  ? 'bg-dark text-white'
+                  : 'bg-primary text-white'"
+              >
+                {{ tdc('Custom') }}
               </q-tooltip>
             </s-btn>
 
 
-            
+            <!-- DOWNLOAD PDF LIST -->
+
+            <s-btn
+              dense
+              flat
+              icon="download"
+              @click="emit('pdfList')"
+              v-show="
+                User.can('pdf_list_' + model.toLowerCase()) &&
+                props.config?.routes?.add
+              "
+            >
+              <q-tooltip
+                :class="$q.dark.isActive
+                  ? 'bg-dark text-white'
+                  : 'bg-primary text-white'"
+              >
+                {{ tdc('Download data list as PDF') }}
+              </q-tooltip>
+            </s-btn>
 
           </div>
 
 
           <!-- =====================================
-              RIGHT
+               RIGHT
           ====================================== -->
 
-          <div class="col-10 row justify-end q-gutter-sm " style="margin-right:-25px;">
+          <div
+            class="col-10 row justify-end q-gutter-sm"
+            style="margin-right:-25px;"
+          >
+
+            <!-- OBJECT FILTER -->
+
             <q-btn-toggle
               dense
               v-if="show_filter"
@@ -484,39 +523,51 @@ async function executeAction({ type, row }) {
               :options="objectsOptions"
               @update:model-value="val => emit('objects', val)"
             >
-              <!-- ACTIVOS -->
+
+              <!-- ACTIVE -->
+
               <template #alive>
                 <q-tooltip
                   :class="$q.dark.isActive
                     ? 'bg-dark text-white'
                     : 'bg-primary text-white'"
                 >
-                  {{ tdc('Mostrar activos') }}
+                  {{ tdc('Show active') }}
                 </q-tooltip>
               </template>
 
-              <!-- ELIMINADOS -->
+
+              <!-- DELETED -->
+
               <template #deleted>
                 <q-tooltip
                   :class="$q.dark.isActive
                     ? 'bg-dark text-white'
                     : 'bg-primary text-white'"
                 >
-                  {{ tdc('Mostrar eliminados') }}
+                  {{ tdc('Show deleted') }}
                 </q-tooltip>
               </template>
 
-              <!-- TODOS -->
+
+              <!-- ALL -->
+
               <template #all>
                 <q-tooltip
                   :class="$q.dark.isActive
                     ? 'bg-dark text-white'
                     : 'bg-primary text-white'"
                 >
-                  {{ tdc('Mostrar todos') }}
+                  {{ tdc('Show all') }}
                 </q-tooltip>
               </template>
+
             </q-btn-toggle>
+
+
+            <!-- =====================================
+                 VISIBLE COLUMNS
+            ====================================== -->
 
             <s-btn
               v-if="show_filter"
@@ -524,79 +575,130 @@ async function executeAction({ type, row }) {
               flat
               icon="view_column"
             >
+
               <q-tooltip
                 :class="$q.dark.isActive
                   ? 'bg-dark text-white'
                   : 'bg-primary text-white'"
               >
-                {{ tdc('Seleccionar colunas visíveis') }}
+                {{ tdc('Select visible columns') }}
               </q-tooltip>
 
+
               <q-menu>
+
                 <q-list
                   dense
                   style="min-width: 200px"
                 >
+
                   <!-- HEADER -->
+
                   <q-item-label header>
-                    {{ tdc('Colunas visíveis') }}
+                    {{ tdc('Visible columns') }}
                   </q-item-label>
 
                   <q-separator />
 
-                  <!-- TODAS -->
+
+                  <!-- ALL -->
+
                   <q-item
                     clickable
                     @click="toggleAllColumns"
                   >
+
                     <q-item-section avatar>
+
                       <q-checkbox
                         :model-value="allSelected"
                         @update:model-value="toggleAllColumns"
                       />
+
                     </q-item-section>
 
                     <q-item-section>
-                      {{ tdc('Todas') }}
+                      {{ tdc('All') }}
                     </q-item-section>
+
                   </q-item>
 
                   <q-separator />
 
-                  <!-- COLUNAS -->
+
+                  <!-- COLUMNS -->
+
                   <q-item
                     v-for="column in filteredColumns"
                     :key="column.name"
                     clickable
                     @click="toggleColumn(column.name)"
                   >
+
                     <q-item-section avatar>
+
                       <q-checkbox
                         :model-value="visibleColumns.includes(column.name)"
                         @update:model-value="toggleColumn(column.name)"
                       />
+
                     </q-item-section>
 
                     <q-item-section>
                       {{ tdc(column.label || column.name) }}
                     </q-item-section>
+
                   </q-item>
 
                 </q-list>
+
               </q-menu>
+
             </s-btn>
 
-            <s-btn v-if="show_filter" dense flat icon="refresh" @click="emit('refresh')" >
-              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+
+            <!-- RELOAD -->
+
+            <s-btn
+              v-if="show_filter"
+              dense
+              flat
+              icon="refresh"
+              @click="emit('refresh')"
+            >
+
+              <q-tooltip
+                :class="$q.dark.isActive
+                  ? 'bg-dark text-white'
+                  : 'bg-primary text-white'"
+              >
                 {{ tdc('Reload data') }}
               </q-tooltip>
+
             </s-btn>
-            
-            <s-btn  flat dense :icon="show_filter? 'arrow_forward' : 'arrow_back'"  @click=" show_filter = !show_filter" >
-              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-                {{ tdc('Mostrar mais opcoes') }}
+
+
+            <!-- MORE OPTIONS -->
+
+            <s-btn
+              flat
+              dense
+              :icon="show_filter ? 'arrow_forward' : 'arrow_back'"
+              @click="show_filter = !show_filter"
+            >
+
+              <q-tooltip
+                :class="$q.dark.isActive
+                  ? 'bg-dark text-white'
+                  : 'bg-primary text-white'"
+              >
+                {{ tdc('Show more options') }}
               </q-tooltip>
+
             </s-btn>
+
+
+            <!-- SEARCH -->
 
             <q-input
               outlined
@@ -606,13 +708,23 @@ async function executeAction({ type, row }) {
               @keyup.enter="emit('search', search)"
               dense
             >
-              <!-- Ícone de pesquisa -->
+
+              <!-- SEARCH ICON -->
+
               <template #append>
-                <q-icon name="search"  @click="emit('search', search)"/>
+
+                <q-icon
+                  name="search"
+                  @click="emit('search', search)"
+                />
+
               </template>
 
-              <!-- Filtro -->
+
+              <!-- FILTER -->
+
               <template #prepend>
+
                 <s-btn
                   dense
                   flat
@@ -620,247 +732,476 @@ async function executeAction({ type, row }) {
                   icon="filter_list"
                   @click="emit('filter')"
                 >
-                  <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-                    {{ tdc('Mostrar Filtros') }}
+
+                  <q-tooltip
+                    :class="$q.dark.isActive
+                      ? 'bg-dark text-white'
+                      : 'bg-primary text-white'"
+                  >
+                    {{ tdc('Show filters') }}
                   </q-tooltip>
+
                 </s-btn>
+
               </template>
+
             </q-input>
+
           </div>
+
         </div>
+
       </div>
+
     </template>
 
 
+    <!-- ==========================================
+         HEADERS
+    =========================================== -->
 
-
-    <!-- CABEÇALHOS -->
     <template #header-cell="props">
+
       <q-th
         :props="props"
         :class="{
-          'text-left text-secondary': props.col.field === '__lactions',
-          'text-right text-secondary': props.col.field === '__ractions'
+          'text-left text-secondary':
+            props.col.field === '__lactions',
+
+          'text-right text-secondary':
+            props.col.field === '__ractions'
         }"
       >
         {{ tdc(props.col.label) }}
       </q-th>
+
     </template>
 
 
+    <!-- ==========================================
+         ACTIONS
+    =========================================== -->
 
-    <!-- 🔥 ACTIONS -->
     <template #body-cell-__actions="slotRow">
+
       <q-td :props="slotRow">
-        
-        
+
+
+        <!-- LEFT/DYNAMIC ACTIONS -->
+
         <s-btn
           dense
           flat
           v-for="a in singularActions"
           :key="a"
-          v-show="User.can(a.role.toLowerCase()) && ['l', 'b'].includes(a.position) && !isDeleted(slotRow.row) && slotRow.col.field =='__ractions'"
+          v-show="
+            User.can(a.role.toLowerCase()) &&
+            ['l', 'b'].includes(a.position) &&
+            !isDeleted(slotRow.row) &&
+            slotRow.col.field == '__ractions'
+          "
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
           :icon="a.icon"
-
         >
-          <q-tooltip  v-show="a.tooltip" :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+
+          <q-tooltip
+            v-show="a.tooltip"
+            :class="$q.dark.isActive
+              ? 'bg-dark text-white'
+              : 'bg-primary text-white'"
+          >
             {{ tdc(a.tooltip) || '.' }}
           </q-tooltip>
-        </s-btn>
-        
 
-        <!-- BOTÃO 3 PONTOS -->
+        </s-btn>
+
+
+        <!-- =====================================
+             MORE MENU
+        ====================================== -->
+
         <s-btn
           dense
           outline
           icon="more_vert"
           color="secondary"
         >
+
           <q-menu auto-close>
 
-            <q-list dense style="min-width: 180px">
+            <q-list
+              dense
+              style="min-width: 180px"
+            >
+
+              <!-- DYNAMIC ACTIONS -->
 
               <q-item
                 v-for="a in singularActions"
                 :key="a"
                 clickable
-                v-show="User.can(a.role.toLowerCase()) && !a.position && !isDeleted(slotRow.row)"
+                v-show="
+                  User.can(a.role.toLowerCase()) &&
+                  !a.position &&
+                  !isDeleted(slotRow.row)
+                "
                 @click="runAction(a, slotRow.row)"
               >
-                <q-item-section avatar v-if="a.icon">
-                  <q-icon :name="a.icon" :color="getMethodColor(a.method)" />
+
+                <q-item-section
+                  avatar
+                  v-if="a.icon"
+                >
+
+                  <q-icon
+                    :name="a.icon"
+                    :color="getMethodColor(a.method)"
+                  />
+
                 </q-item-section>
 
                 <q-item-section>
-                  {{ a.action }}
+                  {{ tdc(a.action) }}
                 </q-item-section>
-                <q-tooltip v-show="a.tooltip" :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-                  {{ tdc( a.tooltip) || '.' }}
+
+                <q-tooltip
+                  v-show="a.tooltip"
+                  :class="$q.dark.isActive
+                    ? 'bg-dark text-white'
+                    : 'bg-primary text-white'"
+                >
+                  {{ tdc(a.tooltip) || '.' }}
                 </q-tooltip>
+
               </q-item>
 
-              <!-- PDF -->
+
+              <!-- =====================================
+                   PDF
+              ====================================== -->
+
               <q-item
-                v-if="User.can('pdf_'+model.toLowerCase()) && !isDeleted(slotRow.row)"
+                v-if="
+                  User.can('pdf_' + model.toLowerCase()) &&
+                  !isDeleted(slotRow.row)
+                "
                 clickable
                 @click="emit('pdf', slotRow.row)"
               >
+
                 <q-item-section avatar>
-                  <q-icon 
+
+                  <q-icon
                     :name="actionStore.getAction('pdf').icon"
                     :color="actionStore.getAction('pdf').color"
                   />
+
                 </q-item-section>
 
                 <q-item-section>
                   {{ tdc(actionStore.getAction('pdf').label) }}
                 </q-item-section>
 
-                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+                <q-tooltip
+                  :class="$q.dark.isActive
+                    ? 'bg-dark text-white'
+                    : 'bg-primary text-white'"
+                >
                   {{ tdc(actionStore.getAction('pdf').label) }}
                 </q-tooltip>
+
               </q-item>
 
-              <!-- EDIT -->
+
+              <!-- =====================================
+                   EDIT
+              ====================================== -->
+
               <q-item
-                v-if="User.can('change_'+model.toLowerCase()) && !isDeleted(slotRow.row)"
+                v-if="
+                  User.can('change_' + model.toLowerCase()) &&
+                  !isDeleted(slotRow.row)
+                "
                 clickable
-                
               >
-                <q-item-section avatar @click="emit('edit', slotRow.row)">
-                  <q-icon 
+
+                <q-item-section
+                  avatar
+                  @click="emit('edit', slotRow.row)"
+                >
+
+                  <q-icon
                     :name="actionStore.getAction('edit').icon"
                     :color="actionStore.getAction('edit').color"
                   />
+
                 </q-item-section>
 
-                <q-item-section @click="emit('edit', slotRow.row)">
+                <q-item-section
+                  @click="emit('edit', slotRow.row)"
+                >
                   {{ tdc(actionStore.getAction('edit').label) }}
                 </q-item-section>
 
-                <q-item-section side v-if="props.config?.routes?.change">
+
+                <q-item-section
+                  side
+                  v-if="props.config?.routes?.change"
+                >
+
                   <s-btn
                     flat
                     size="sm"
                     icon="open_in_new"
                     :to="{
                       name: props.config.routes.change,
-                      params: { id: slotRow.row?.id }
+                      params: {
+                        id: slotRow.row?.id
+                      }
                     }"
                     @click.stop
                   />
+
                 </q-item-section>
 
-                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+
+                <q-tooltip
+                  :class="$q.dark.isActive
+                    ? 'bg-dark text-white'
+                    : 'bg-primary text-white'"
+                >
                   {{ tdc(actionStore.getAction('edit').label) }}
                 </q-tooltip>
-              </q-item>
-              
 
-              <!-- DELETE -->
-              <q-item v-if="User.can('delete_'+model.toLowerCase()) && !isDeleted(slotRow.row)" clickable @click="confirmAction('delete', slotRow.row)">
+              </q-item>
+
+
+              <!-- =====================================
+                   DELETE
+              ====================================== -->
+
+              <q-item
+                v-if="
+                  User.can('delete_' + model.toLowerCase()) &&
+                  !isDeleted(slotRow.row)
+                "
+                clickable
+                @click="confirmAction('delete', slotRow.row)"
+              >
+
                 <q-item-section avatar>
-                  <q-icon 
+
+                  <q-icon
                     :name="actionStore.getAction('delete').icon"
                     :color="actionStore.getAction('delete').color"
                   />
+
                 </q-item-section>
 
                 <q-item-section>
                   {{ tdc(actionStore.getAction('delete').label) }}
                 </q-item-section>
 
-                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+                <q-tooltip
+                  :class="$q.dark.isActive
+                    ? 'bg-dark text-white'
+                    : 'bg-primary text-white'"
+                >
                   {{ tdc(actionStore.getAction('delete').label) }}
                 </q-tooltip>
+
               </q-item>
 
-              <!-- HARD DELETE -->
-              <q-item  v-if="User.can('hard_delete_'+model.toLowerCase()) && isDeleted(slotRow.row)" clickable @click="confirmAction('hard_delete', slotRow.row)">
-                <q-item-section avatar>
-                  <q-icon name="delete_forever" color="red" />
-                </q-item-section>
-                <q-item-section>{{ tdc('Eliminar Permanentemente') }}</q-item-section>
-                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-                  {{ tdc('Eliminar Permanentemente') }}
-                </q-tooltip>
-              </q-item>
 
-              <!-- RESTORE -->
+              <!-- =====================================
+                   HARD DELETE
+              ====================================== -->
+
               <q-item
-                v-if="User.can('restore_'+model.toLowerCase()) && isDeleted(slotRow.row)"
+                v-if="
+                  User.can('hard_delete_' + model.toLowerCase()) &&
+                  isDeleted(slotRow.row)
+                "
                 clickable
-                 @click="emit('restore', slotRow.row)"
+                @click="confirmAction('hard_delete', slotRow.row)"
               >
+
                 <q-item-section avatar>
-                  <q-icon name="restore" color="green" />
+                  <q-icon
+                    name="delete_forever"
+                    color="red"
+                  />
                 </q-item-section>
-                <q-item-section>{{ tdc('Restaurar') }}</q-item-section>
-                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-                  {{ tdc('Restaurar') }}
+
+                <q-item-section>
+                  {{ tdc('Delete permanently') }}
+                </q-item-section>
+
+                <q-tooltip
+                  :class="$q.dark.isActive
+                    ? 'bg-dark text-white'
+                    : 'bg-primary text-white'"
+                >
+                  {{ tdc('Delete permanently') }}
                 </q-tooltip>
+
               </q-item>
 
-              <q-separator v-if="singularActions.length" />
-              
 
-              <!-- ACTIONS DINÂMICAS -->
+              <!-- =====================================
+                   RESTORE
+              ====================================== -->
+
+              <q-item
+                v-if="
+                  User.can('restore_' + model.toLowerCase()) &&
+                  isDeleted(slotRow.row)
+                "
+                clickable
+                @click="emit('restore', slotRow.row)"
+              >
+
+                <q-item-section avatar>
+
+                  <q-icon
+                    name="restore"
+                    color="green"
+                  />
+
+                </q-item-section>
+
+                <q-item-section>
+                  {{ tdc('Restore') }}
+                </q-item-section>
+
+                <q-tooltip
+                  :class="$q.dark.isActive
+                    ? 'bg-dark text-white'
+                    : 'bg-primary text-white'"
+                >
+                  {{ tdc('Restore') }}
+                </q-tooltip>
+
+              </q-item>
+
+
+              <q-separator
+                v-if="singularActions.length"
+              />
+
+
+              <!-- =====================================
+                   DYNAMIC ACTIONS
+              ====================================== -->
+
               <q-item
                 v-for="a in singularActions"
                 :key="a.url"
                 clickable
-                v-show="a.permission && !User.can(a.method + '_' + a.permission + '_' + a.model.toLowerCase()) && !isDeleted(slotRow.row)"
+                v-show="
+                  a.permission &&
+                  !User.can(
+                    a.method +
+                    '_' +
+                    a.permission +
+                    '_' +
+                    a.model.toLowerCase()
+                  ) &&
+                  !isDeleted(slotRow.row)
+                "
                 @click="runAction(a, slotRow.row)"
               >
-                <q-item-section avatar v-if="a.icon">
-                  <q-icon :name="a.icon" :color="getMethodColor(a.method)" />
+
+                <q-item-section
+                  avatar
+                  v-if="a.icon"
+                >
+
+                  <q-icon
+                    :name="a.icon"
+                    :color="getMethodColor(a.method)"
+                  />
+
                 </q-item-section>
 
                 <q-item-section>
                   {{ a.method + '_' + a.permission }}
                 </q-item-section>
 
-                <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-                  {{ tdc( a.method + '_' + a.permission ) }}
+                <q-tooltip
+                  :class="$q.dark.isActive
+                    ? 'bg-dark text-white'
+                    : 'bg-primary text-white'"
+                >
+                  {{ tdc(a.method + '_' + a.permission) }}
                 </q-tooltip>
 
               </q-item>
+
             </q-list>
+
           </q-menu>
 
-          <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-            {{ tdc('Clica para ver pais opções') }}
+
+          <q-tooltip
+            :class="$q.dark.isActive
+              ? 'bg-dark text-white'
+              : 'bg-primary text-white'"
+          >
+            {{ tdc('Click to see more options') }}
           </q-tooltip>
 
         </s-btn>
+
+
+        <!-- RIGHT/DYNAMIC ACTIONS -->
 
         <s-btn
           dense
           flat
           v-for="a in singularActions"
           :key="a"
-          v-show="User.can(a.role.toLowerCase()) && ['r', 'b'].includes(a.position) && !isDeleted(slotRow.row) && slotRow.col.field =='__lactions'"
+          v-show="
+            User.can(a.role.toLowerCase()) &&
+            ['r', 'b'].includes(a.position) &&
+            !isDeleted(slotRow.row) &&
+            slotRow.col.field == '__lactions'
+          "
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
           :icon="a.icon"
-
         >
-          <q-tooltip v-show="a.tooltip" :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
-            {{ tdc( a.tooltip) || '.' }}
+
+          <q-tooltip
+            v-show="a.tooltip"
+            :class="$q.dark.isActive
+              ? 'bg-dark text-white'
+              : 'bg-primary text-white'"
+          >
+            {{ tdc(a.tooltip) || '.' }}
           </q-tooltip>
+
         </s-btn>
 
-
       </q-td>
+
     </template>
 
-    <!-- 🔥 INLINE EDIT -->
+
+    <!-- ==========================================
+         INLINE EDIT
+    =========================================== -->
+
     <template #body-cell="props">
-      <q-td :props="props" >
+
+      <q-td :props="props">
+
+
+        <!-- ID -->
 
         <template v-if="props.col.name === 'id'">
+
           <s-btn
             dense
             flat
@@ -868,76 +1209,181 @@ async function executeAction({ type, row }) {
             icon="visibility"
             @click="() => goToRoute(props.row.id)"
           >
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ props.row.id }}</q-tooltip>
+
+            <q-tooltip
+              :class="$q.dark.isActive
+                ? 'bg-dark text-white'
+                : 'bg-primary text-white'"
+            >
+              {{ props.row.id }}
+            </q-tooltip>
+
           </s-btn>
-          
+
         </template>
 
 
+        <!-- IMAGE -->
+
         <template v-else-if="isImage(props.value)">
+
           <img
             :src="getImageUrl(props.value)"
-            style="width:40px;height:40px;object-fit:cover;border-radius:2px; cursor:pointer"
+            style="
+              width:40px;
+              height:40px;
+              object-fit:cover;
+              border-radius:2px;
+              cursor:pointer
+            "
             @click="openPreview(getImageUrl(props.value))"
           />
 
+
           <q-dialog v-model="preview.show">
+
             <q-card>
-              <img :src="preview.url" style="max-width:100%;max-height:80vh" />
+
+              <img
+                :src="preview.url"
+                style="
+                  max-width:100%;
+                  max-height:80vh
+                "
+              />
+
             </q-card>
+
           </q-dialog>
+
         </template>
+
+
+        <!-- BOOLEAN -->
 
         <template v-else-if="isBoolean(props.value)">
+
           <s-btn
             dense
             size="sm"
-            :color="toBoolean(props.value) ? 'positive' : 'negative'"
-            :label="toBoolean(props.value) ? tdc('Sim') : tdc('Não')"
-            @click="() => toggleBoolean(props.row, props.col.name)"
-          /> 
+            :color="
+              toBoolean(props.value)
+                ? 'positive'
+                : 'negative'
+            "
+            :label="
+              toBoolean(props.value)
+                ? tdc('Yes')
+                : tdc('No')
+            "
+            @click="
+              () => toggleBoolean(
+                props.row,
+                props.col.name
+              )
+            "
+          />
+
         </template>
 
-        <!-- 🔥 ESTADO -->
+
+        <!-- STATE -->
+
         <template v-else-if="props.col.name === 'state'">
+
           <s-btn
             dense
             size="sm"
-            :color="props.row.state.value == 'Active' ? 'positive' : 'negative'"
-            :label="props.row.state.value == 'Active' ? tdc('Activo') : tdc('Inactivo')"
+            :color="
+              props.row.state.value == 'Active'
+                ? 'positive'
+                : 'negative'
+            "
+            :label="
+              props.row.state.value == 'Active'
+                ? tdc('Active')
+                : tdc('Inactive')
+            "
             @click="() => toggleEstado(props.row)"
           >
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">{{ tdc(props.row.state == 'Active' ? 'Desactivar' : 'Activar') }}</q-tooltip>
+
+            <q-tooltip
+              :class="$q.dark.isActive
+                ? 'bg-dark text-white'
+                : 'bg-primary text-white'"
+            >
+              {{
+                tdc(
+                  props.row.state.value == 'Active'
+                    ? 'Deactivate'
+                    : 'Activate'
+                )
+              }}
+            </q-tooltip>
+
           </s-btn>
+
         </template>
 
-        <template v-else-if="(props.col.name !== '__actions' || props.col.name !== '__actions') && isEditable(props.col.name)">
+
+        <!-- EDITABLE FIELD -->
+
+        <template
+          v-else-if="
+            props.col.name !== '__actions' &&
+            isEditable(props.col.name)
+          "
+        >
+
           <q-popup-edit
             :model-value="props.value"
             auto-save
             v-slot="scope"
-            @save="val => emit('inline-patch', {
-              id: props.row.id,
-              field: props.col.field,
-              value: val
-            })"
+            @save="
+              val => emit(
+                'inline-patch',
+                {
+                  id: props.row.id,
+                  field: props.col.field,
+                  value: val
+                }
+              )
+            "
           >
-            <s-input v-model="scope.value" dense autofocus />
+
+            <s-input
+              v-model="scope.value"
+              dense
+              autofocus
+            />
+
           </q-popup-edit>
 
-          <span class="cursor-pointer">{{ props.value }}</span>
+          <span class="cursor-pointer">
+            {{ props.value }}
+          </span>
+
         </template>
 
 
-        <!-- 🔤 DEFAULT -->
-        <template v-else >
+        <!-- DEFAULT -->
+
+        <template v-else>
+
           <label class="insize">
-            {{ resolveValue(props.value) }} 
+            {{ resolveValue(props.value) }}
           </label>
+
         </template>
+
       </q-td>
+
     </template>
 
+
+    <!-- ==========================================
+         PAGINATION
+    =========================================== -->
 
     <template #pagination="scope">
 
@@ -959,6 +1405,7 @@ async function executeAction({ type, row }) {
     </template>
 
   </q-table>
+
 </template>
 
 <style>
