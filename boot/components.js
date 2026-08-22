@@ -21,12 +21,15 @@ import SwitchComponent from './../components/engine/SwitchComponent.vue'
 import Form from './../components/engine/FormComponent.vue'
 
 
+
 // =========================================================
 // AUTO COMPONENTS
 // =========================================================
 
 import AutoForm from './../components/auto/AutoForm.vue'
 import FormTwo from './../components/auto/FormTwo.vue'
+import FormModal from './../components/auto/FormModal.vue'
+import AutoFilter from './../components/auto/AutoFilter.vue'
 import ActionForm from './../components/auto/ActionForm.vue'
 import AutoTable from './../components/auto/AutoTable.vue'
 import AutoCrud from './../components/auto/AutoCrud.vue'
@@ -115,6 +118,7 @@ export default boot(({ app }) => {
   app.component('s-auto-form', AutoForm)
 
   app.component('s-form-two', FormTwo)
+  app.component('s-form-modal', FormModal)
 
   app.component('s-action-form', ActionForm)
 

@@ -1,14 +1,14 @@
 
 <template>
 
-    <PdfRender
+    <s-pdf-render
       v-model="showPdf"
       :src="pdfUrl"
       title="Document"
       :top="false"
     />
 
-    <AutoTable
+    <s-auto-table
       :app="app"
       :model="model"
       :rows="rows"
@@ -38,7 +38,7 @@
     />
 
 
-    <FormModal
+    <s-form-modal
       v-model="showForm"
       :store="store"
       :ignoreFields="ignoreFields"
@@ -47,7 +47,7 @@
 
 
 
-    <AutoFilter
+    <s-auto-filter
       v-model="showFilter"
       :fields="fields"
       :ignoreFields="ignoreFieldsFilter"
@@ -59,10 +59,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { debounce } from 'quasar'
-import AutoTable from './AutoTable.vue'
-import FormModal from './FormModal.vue'
-import AutoFilter from './AutoFilter.vue'
-import PdfRender from './../PdfRender.vue'
+
 import { HTTPAuth, HTTPAuthBlob, url } from '../../boot/api'
 import { buildFormFromSchema } from '../../utils/autoForm'
 import { useUserStore} from 'quasar_resaas'
