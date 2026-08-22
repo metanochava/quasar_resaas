@@ -372,7 +372,7 @@ async function executeAction({ type, row }) {
 
 <template>
 
-  <ConfirmDeleteDialog
+  <!-- <ConfirmDeleteDialog
     v-model="showConfirm"
     :type="actionType"
     :row="selectedRow"
@@ -380,7 +380,7 @@ async function executeAction({ type, row }) {
     label="person"
     @confirm="executeAction"
 
-  />
+  /> -->
 
   <s-confirm-delete
     v-model="showConfirm"
