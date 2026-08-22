@@ -16,18 +16,20 @@ import { usePersonStore } from '../stores/PersonStore'
 
 
 
-export * from './base/base_store.js'
+
+
+export { createBaseStore } from '../base/base_store.js'
 
 
 
 
 
-export * from './boot/alerts.js'
-export * from './boot/api.js'
-export * from './boot/app.js'
-export * from './boot/base.js'
-export * from './boot/data.js'
-export * from './boot/storage.js'
+export * from '../boot/alerts'
+export * from '../boot/api'
+export * from '../boot/app'
+export * from '../boot/base'
+export * from '../boot/data'
+export * from '../boot/storage'
 
 
 
@@ -64,6 +66,8 @@ export function useResaas() {
 
     // utils
     buildFormFromSchema,
+
+    createBaseStore,
 
     // stores
     User,
