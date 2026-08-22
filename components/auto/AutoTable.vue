@@ -471,7 +471,7 @@ async function executeAction({ type, row }) {
               RIGHT
           ====================================== -->
 
-          <div class="col-10 row justify-end q-gutter-sm " style="margin-right:-10px;">
+          <div class="col-10 row justify-end q-gutter-sm " style="margin-right:-25px;">
             <q-btn-toggle
               dense
               v-if="show_filter"
