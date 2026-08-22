@@ -372,7 +372,7 @@ async function executeAction({ type, row }) {
 
 <template>
 
-  <!-- <ConfirmDeleteDialog
+  <ConfirmDeleteDialog
     v-model="showConfirm"
     :type="actionType"
     :row="selectedRow"
@@ -380,59 +380,9 @@ async function executeAction({ type, row }) {
     label="person"
     @confirm="executeAction"
 
-  /> -->
-
-  <s-confirm-delete
-    v-model="showConfirm"
-    :type="actionType"
-    :row="selectedRow"
-    id="nid"
-    label="person"
-    @confirm="executeAction"
   />
 
-  <!-- <q-dialog v-model="showConfirm">
-    <s-card style="min-width: 400px">
 
-      <q-card-section class="row items-center q-gutter-sm">
-        <q-icon
-          :name="actionType === 'hard_delete' ? 'warning' : 'help'"
-          :color="actionType === 'hard_delete' ? 'red' : 'orange'"
-          size="md"
-        />
-        <div class="text-h6">
-          {{ actionType === 'hard_delete' ? 'Eliminar permanentemente?' : 'Confirmar eliminação?' }}
-        </div>
-      </q-card-section>
-
-      <q-card-section>
-        <div>
-          {{tdc('Tens certeza que queres eliminar:')}}
-        </div>
-
-        <b>
-          {{ selectedRow?.value || selectedRow?.id }} <br/>
-          {{selectedRow?.name || selectedRow?.label }}
-        </b>
-
-        <div v-if="actionType === 'hard_delete'" class="text-red q-mt-sm">
-          ⚠️ {{ tdc('Esta ação é irreversível') }}
-        </div>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <s-btn flat dense label="Cancelar" v-close-popup />
-
-        <s-btn 
-          dense
-          :color="actionType === 'hard_delete' ? 'red' : 'orange'"
-          :label="actionType === 'hard_delete' ? 'Eliminar Permanentemente' : 'Eliminar'"
-          @click="executeAction"
-        />
-      </q-card-actions>
-
-    </s-card>
-  </q-dialog> -->
 
   <q-table
     square
