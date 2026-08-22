@@ -38,7 +38,7 @@
           RIGHT
       ====================================== -->
 
-      <div class="col-10 row justify-end q-gutter-sm q-pa-0">
+      <div class="col-10 row justify-end q-gutter-sm " style="margin-right:-10px;">
 
         <!-- CANCEL -->
         <s-btn
