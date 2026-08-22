@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.1031",
+  "version": "0.0.1032",
   "description": "Quasar rest SaaS",
   "keywords": [
     "quasar",
@@ -36,6 +36,7 @@
   },
   "exports": {
     ".": "./index.js",
-    "./auto-imports": "./auto-imports.cjs"
+    "./auto-imports": "./auto-imports.cjs",
+    "./core/*": "./core/*"
   }
 }
