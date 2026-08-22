@@ -14,7 +14,8 @@ export * from './router/authRoutes.js'
 // =========================================================
 
 export * from './composables/useResaas.js'
-export * from './composables/AutoLoad.js'
+export * from './composables/auto-imports.js'
+
 
 
 // =========================================================
