@@ -69,3 +69,7 @@ export {
 export {
   default as AuthLayout
 } from './layouts/AuthLayout.vue'
+
+export {
+  default as CrudPage
+} from './pages/CrudPage.vue'
