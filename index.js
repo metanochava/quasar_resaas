@@ -29,6 +29,7 @@ export { default as ActionForm } from './components/auto/ActionForm.vue'
 export { default as AutoTable } from './components/auto/AutoTable.vue'
 export { default as AutoCrud } from './components/auto/AutoCrud.vue'
 export { default as CrudPage } from './components/auto/CrudPage.vue'
+export { default as ConfirmDeleteDialog } from './components/auto/ConfirmDeleteDialog.vue'
 
 export { default as AllLogo } from './components/AllLogo.vue'
 export { default as TopMenu } from './components/TopMenu.vue'
@@ -43,4 +44,6 @@ export { default as HeaderLanguage } from './components/header/HeaderLanguage.vu
 export { default as PersonCard } from './components/person/PersonCard.vue'
 export { default as PersonCreateDialog } from './components/person/PersonCreateDialog.vue'
 export { default as PersonSearch } from './components/person/PersonSearch.vue'
+
+
 
