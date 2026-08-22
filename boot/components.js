@@ -89,7 +89,7 @@ export default boot(({ app }) => {
 
   app.component('s-time', TimeComponent)
 
-  app.component('s-datetime', DateTimeComponent)
+  app.component('s-date-time', DateTimeComponent)
 
   app.component('s-editor', EditorComponent)
 

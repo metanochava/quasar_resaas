@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.1025",
+  "version": "0.0.1026",
   "description": "Quasar rest SaaS",
   "keywords": [
     "quasar",
@@ -33,8 +33,5 @@
     "pdfjs-dist": "^5.6.205",
     "vue-draggable-plus": "^0.6.1",
     "vuedraggable": "^4.1.0"
-  },
-  "devDependencies": {
-    "unplugin-auto-import": "^21.1.0"
   }
 }

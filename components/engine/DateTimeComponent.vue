@@ -12,7 +12,7 @@
     :outlined="attrs.outlined ?? layout.input_style === 'outlined'"
     :filled="attrs.filled ?? layout.input_style === 'filled'"
     :standout="attrs.standout ?? layout.input_style === 'standout'"
-    :class="['s-datetime', attrs.class]"
+    :class="['s-date-time', attrs.class]"
     mask="####-##-##"
     fill-mask
     
@@ -65,7 +65,7 @@ import { useUserStore } from "../../stores/UserStore"
 import { tdc } from "../../boot/base"
 
 export default defineComponent({
-  name: "s-datetime",
+  name: "s-date-time",
   inheritAttrs: false,
 
   props: {
@@ -210,7 +210,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.s-datetime {
+.s-date-time {
   width: 100%;
 }
 </style>

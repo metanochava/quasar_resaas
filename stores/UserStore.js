@@ -307,20 +307,19 @@ export const useUserStore = createBaseStore(
       const perms = JSONSafeParse(getStorage('l', 'userPermissions'))
       this.Permissions = new Set(perms)
 
-      console.log("User Loaded")
 
     },
 
     async checkSession () {
-      console.log('checkSession')
+
       if (!this.isTokenExpired(this.access)) {
-        console.log('access valido')
+
         return
       }
       if (!this.isTokenExpired(this.refresh)) {
-        console.log('access invalido')
+
         try {
-          console.log('pedir access')
+
           await this.refreshToken()
           return
         } catch (e) {
