@@ -1,4 +1,4 @@
-import { tdc } from '../../services/translation'
+
 
 import { entityRoutes } from './../pages/entity/entityRoute'
 import { entity_typeRoutes } from './../pages/entity_type/entity_typeRoute'
@@ -7,6 +7,7 @@ import { employeeRoutes } from '../pages/employee/employeeRoute'
 import { groupRoutes } from '../pages/group/groupRoute'
 import { branchRoutes } from '../pages/branch/branchRoute'
 import { permissionRoutes } from '../pages/permission/permissionRoute'
+import { tdc } from '../services/translation.js'
 
 
 export let restRoutes = [
