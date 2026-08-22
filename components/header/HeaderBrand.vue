@@ -27,7 +27,7 @@
 
 import { defineComponent } from 'vue'
 import { useUserStore } from '../../stores/UserStore'
-import { tdc } from '../../services/base';
+import { tdc } from '../../services/translation';
 
 
 export default defineComponent({

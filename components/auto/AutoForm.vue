@@ -2,7 +2,7 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue'
-import { tdc } from '../../services/base'
+import { tdc } from '../../services/translation'
 import { HTTPAuth, url } from '../../services/api'
 import ActionForm from '../../components/auto/ActionForm.vue'
         

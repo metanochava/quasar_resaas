@@ -37,7 +37,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { tdc } from '../../services/base'
+import { tdc } from '../../services/translation'
 
 export default defineComponent({
 

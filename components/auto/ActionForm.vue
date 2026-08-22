@@ -109,8 +109,9 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { tdc } from '../../services/base'
+
 import { useUserStore } from '../../stores/UserStore'
+import { tdc } from '../../services/translation'
 
 // =============================================
 // PROPS

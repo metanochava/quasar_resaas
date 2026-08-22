@@ -10,12 +10,6 @@ export const JSONSafeParse = function (value) {
 }
 
 
-export const profileSplint = (txt) => {
-  if (!txt) return null
-  const p = txt.split('_')
-  return p[1] ?? p[0]
-}
-
 
 
 export function ascii(text, font = 'Standard') {

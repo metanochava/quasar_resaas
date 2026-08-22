@@ -127,13 +127,15 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { profileSplint, tdc } from '../../services/base'
+
 import { useUserStore } from '../../stores/UserStore'
 import { useGroupStore } from '../../stores/GroupStore'
 import { useEntityStore } from '../../stores/EntityStore'
 import { useBranchStore } from '../../stores/BranchStore'
 import RegisterEntity from './RegisterEntity.vue'
 
+import { tdc } from '../../services/translation.js'
+import { profileSplint } from '../../utils/profile.js'
 
 export default defineComponent({
   name: 'HeaderUser',

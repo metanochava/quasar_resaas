@@ -1,4 +1,5 @@
-import { tdc } from '../services/base.js'
+import { tdc } from '../../services/translation.js'
+
 import { entityRoutes } from './../pages/entity/entityRoute'
 import { entity_typeRoutes } from './../pages/entity_type/entity_typeRoute'
 import { userRoutes } from '../pages/user/userRoute'

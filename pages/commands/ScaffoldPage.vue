@@ -488,10 +488,10 @@
 
 import ModelAction from './ModelAction.vue';
 import { HTTPAuth } from '../../services/api.js';
-import { tdc } from '../../services/base.js';
 import { useUserStore } from '../../stores/UserStore.js';
 import { AlertError } from '../../boot/alerts.js';
 import { buildFormFromSchema } from '../../utils/autoForm.js';
+import { tdc } from '../../services/translation.js';
 
 
 

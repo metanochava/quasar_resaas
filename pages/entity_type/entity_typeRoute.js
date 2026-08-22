@@ -1,4 +1,4 @@
-import { tdc } from '../../services/base.js'
+import { tdc } from '../../services/translation.js'
 
 export let entity_typeRoutes = [
   {

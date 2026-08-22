@@ -83,7 +83,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { tdc } from '../../services/base'
+import { tdc } from '../../services/translation'
 
 
 const props = defineProps({

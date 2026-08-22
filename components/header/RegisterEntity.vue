@@ -123,8 +123,9 @@ import { HTTPAuth, url } from '../../services/api'
 
 import { deleteStorage, getStorage, setStorage } from '../../services/storage'
 import { useUserStore } from '../../stores/UserStore'
-import { profileSplint } from '../../utils/json'
+
 import { tdc } from '../../services/translation'
+import { profileSplint } from '../../utils/profile'
 
 
 

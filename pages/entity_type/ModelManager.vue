@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useEntityTypeStore }  from '../../stores/EntityTypeStore'
-import { tdc } from '../../services/base'
+import { tdc } from '../../services/translation'
 
 
 
