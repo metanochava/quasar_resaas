@@ -35,7 +35,7 @@
 <script>
 import { defineComponent, computed, useAttrs, ref, watch } from "vue"
 import { useUserStore } from "../../stores/UserStore"
-import { tdc } from "../../boot/base"
+import { tdc } from "../../services/base"
 
 export default defineComponent({
   name: "s-input",

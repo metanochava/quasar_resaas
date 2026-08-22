@@ -28,7 +28,7 @@
 
 import { defineComponent, computed, useAttrs, watch } from "vue"
 import { useUserStore } from "../../stores/UserStore"
-import { tdc } from "../../boot/base"
+import { tdc } from "../../services/base"
 
 export default defineComponent({
 

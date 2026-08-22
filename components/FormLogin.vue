@@ -79,10 +79,10 @@
 <script >
 
 import { defineComponent } from 'vue'
-import { tdc } from '../boot/base'
+import { tdc } from '../services/base'
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
-import { setStorage, getStorage } from '../boot/storage'
+import { setStorage, getStorage } from '../services/storage'
 import AllLogo  from './../components/AllLogo.vue'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'

@@ -2,8 +2,8 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue'
-import { tdc } from '../../boot/base'
-import { HTTPAuth, url } from '../../boot/api'
+import { tdc } from '../../services/base'
+import { HTTPAuth, url } from '../../services/api'
 import ActionForm from '../../components/auto/ActionForm.vue'
         
 

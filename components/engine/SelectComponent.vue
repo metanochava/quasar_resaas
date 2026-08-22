@@ -39,8 +39,8 @@
 <script>
 import { defineComponent, computed, useAttrs, ref, watch, onMounted } from "vue"
 import { useUserStore } from "../../stores/UserStore"
-import { tdc } from "../../boot/base"
-import { HTTPAuth } from "../../boot/api"
+import { tdc } from "../../services/base"
+import { HTTPAuth } from "../../services/api"
 
 export default defineComponent({
 

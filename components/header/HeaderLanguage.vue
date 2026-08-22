@@ -59,7 +59,7 @@ import {
 
 import {
   tdc
-} from '../../boot/base'
+} from '../../services/base'
 
 
 export default defineComponent({

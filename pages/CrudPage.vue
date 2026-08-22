@@ -67,13 +67,13 @@
 </template>
 
 <script setup>
-import { HTTPAuth, url } from '../boot/api'
+import { HTTPAuth, url } from '../services/api'
 import AutoCrud from '../components/auto/AutoCrud.vue'
 import { useUserStore } from '../stores/UserStore'
 
 import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { tdc } from '../boot/base'
+import { tdc } from '../services/base'
 
 const User = useUserStore()
 const route = useRoute()

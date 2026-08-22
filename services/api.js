@@ -2,7 +2,7 @@ import axios from 'axios'
 import { getStorage } from './storage'
 import {useUserStore } from '../stores/UserStore'
 import { useLoadStore } from '../stores/LoadStore';
-import { Alert } from './alerts'
+import { Alert } from '../boot/alerts'
 
 const apiPrefix = process.env.API_PREFIX
 const apiBaseUrl = process.env.API + '/' + apiPrefix 

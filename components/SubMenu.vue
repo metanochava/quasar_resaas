@@ -50,7 +50,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { resolveRoute, tdc, toPlural } from '../boot/base'
+import { resolveRoute, tdc, toPlural } from '../services/base'
 
 
 export default defineComponent({

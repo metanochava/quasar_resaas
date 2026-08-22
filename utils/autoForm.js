@@ -1,6 +1,6 @@
 
-import { HTTPAuth, url } from "../boot/api"
-import { tdc } from "../boot/base"
+import { HTTPAuth, url } from "../services/api"
+import { tdc } from "../services/base"
 
 
 const __relationCache = new Map()

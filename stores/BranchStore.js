@@ -1,9 +1,9 @@
 import { createBaseStore } from '../base/base_store'
-import { HTTPAuth, url } from '../boot/api'
-import { getStorage, setStorage } from '../boot/storage'
+import { HTTPAuth, url } from '../services/api'
+import { getStorage, setStorage } from '../services/storage'
 import { useUserStore} from './UserStore'
 import { useGroupStore} from './GroupStore'
-import { profileSplint, tdc } from '../boot/base'
+import { profileSplint, tdc } from '../services/base'
 
 
 export const useBranchStore = createBaseStore(

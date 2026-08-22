@@ -1,5 +1,5 @@
 import { createBaseStore } from '../base/base_store'
-import { HTTPClient, url } from '../boot/api'
+import { HTTPClient, url } from '../services/api'
 
 export const usePermissionStore = createBaseStore(
   'permission',

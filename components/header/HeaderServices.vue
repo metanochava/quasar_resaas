@@ -34,10 +34,10 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { tdc } from '../../boot/base'
+import { tdc } from '../../services/base'
 import { useUserStore } from '../../stores/UserStore'
 import { useEntityTypeStore } from '../../stores/EntityTypeStore'
-import { setStorage } from '../../boot/storage';
+import { setStorage } from '../../services/storage';
 
 
 export default defineComponent({

@@ -20,7 +20,7 @@
   </q-page>
 </template>
 <script setup>
-import { tdc } from '../boot/base'
+import { tdc } from '../services/base'
 import { useRoute } from 'vue-router'
 
 const route_ = useRoute()

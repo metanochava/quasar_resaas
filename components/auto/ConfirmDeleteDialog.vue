@@ -83,7 +83,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { tdc } from '../../boot/base'
+import { tdc } from '../../services/base'
 
 
 const props = defineProps({

@@ -15,8 +15,8 @@
 
 <script>
   import { defineComponent } from 'vue'
-  import { tdc } from '../../boot/base'
-  import { getStorage, setStorage } from '../../boot/storage'
+  import { tdc } from '../../services/base'
+  import { getStorage, setStorage } from '../../services/storage'
 
   export default defineComponent({
     name: 'HeaderDarkMode',

@@ -1,8 +1,8 @@
 
-import { getStorage, setStorage, deleteStorage } from '../boot/storage'
-import { HTTPAuth, HTTPClient, url } from '../boot/api'
+import { getStorage, setStorage, deleteStorage } from '../services/storage'
+import { HTTPAuth, HTTPClient, url } from '../services/api'
 import { useLanguageStore } from  './LanguageStore'
-import { JSONSafeParse, setSettings } from '../boot/base'
+import { JSONSafeParse, setSettings } from '../services/base'
 import { createBaseStore } from '../base/base_store'
 
 

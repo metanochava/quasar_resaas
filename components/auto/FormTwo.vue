@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, useSlots } from 'vue'
 import { useRouter } from 'vue-router'
-import { tdc } from '../../boot/base'
+import { tdc } from '../../services/base'
 import Form from '../engine/FormComponent.vue'
 import { useUserStore } from '../../stores/UserStore'
 import ActionForm from '../../components/auto/ActionForm.vue'

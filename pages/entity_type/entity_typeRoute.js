@@ -1,4 +1,4 @@
-import { tdc } from '../../boot/base'
+import { tdc } from '../../services/base.js'
 
 export let entity_typeRoutes = [
   {

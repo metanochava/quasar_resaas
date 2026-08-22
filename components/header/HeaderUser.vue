@@ -127,7 +127,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { profileSplint, tdc } from '../../boot/base'
+import { profileSplint, tdc } from '../../services/base'
 import { useUserStore } from '../../stores/UserStore'
 import { useGroupStore } from '../../stores/GroupStore'
 import { useEntityStore } from '../../stores/EntityStore'

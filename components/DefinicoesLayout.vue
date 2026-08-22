@@ -601,7 +601,7 @@
 <script>
 import { defineComponent, h } from "vue"
 import { Dark, setCssVar, QBtn, QInput, QCard, QDrawer } from "quasar"
-import { HTTPAuth, url } from "../boot/api"
+import { HTTPAuth, url } from "../services/api"
 import { useUserStore } from "../stores/UserStore"
 
 export default defineComponent({

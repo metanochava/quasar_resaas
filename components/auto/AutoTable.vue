@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { tdc } from '../../boot/base'
+import { tdc } from '../../services/base'
 import { useRouter } from 'vue-router'
 
 import { useActionStore } from '../../stores/ActionStore'

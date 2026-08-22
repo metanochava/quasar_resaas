@@ -79,11 +79,11 @@
 <script >
 
 import LeftMenuSegundo from './LeftMenuSegundo.vue'
-import { barStyle, thumbStyle } from '../boot/app'
+import { barStyle, thumbStyle } from '../services/app'
 import SearchMenu from './SearchMenu.vue'
 
 import { defineComponent } from 'vue'
-import { tdc } from '../boot/base'
+import { tdc } from '../services/base'
 import { useUserStore } from '../stores/UserStore'
 
 export default defineComponent({

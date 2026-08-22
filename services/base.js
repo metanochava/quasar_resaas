@@ -36,18 +36,7 @@ function replaceTraducao (texto = '', textDeTraducao = '') {
   )
 }
 
-// Initialize the annoying-background directive.
-export const IsEntityType = {
-  bind (el, binding, _vnode) {
-    if (el) {
-      const ite = decrypt(localStorage.getItem(('entity_type_name')) + '')
 
-      if (!(binding.value === ite)) {
-        el.style.display = 'none'
-      }
-    }
-  }
-}
 
 export const JSONSafeParse = function (value) {
   try {
@@ -68,20 +57,7 @@ export const profileSplint = (txt) => {
   const p = txt.split('_')
   return p[1] ?? p[0]
 }
-export const urlBase = (url = '') => {
-  if (url === '') {
-    return process.env.API
-  }
 
-  if (url != null) {
-    if (url[0] === '/') {
-      return process.env.API + url
-    }
-    if (url[0] === 'h') {
-      return url
-    }
-  }
-}
 
 function base64url (source) {
   const CryptoJS = require('crypto-js')
@@ -98,13 +74,6 @@ function base64url (source) {
   return encodedSource
 }
 
-
-export const pegaDominio = function () {
-  let pagelocalurl = location.href // pega endereço que esta no navegador
-  pagelocalurl = pagelocalurl.split('/') // quebra o endeço de acordo com a / (barra)
-  const dominiourl = pagelocalurl[0] + '//' + pagelocalurl[2]
-  return dominiourl // retorna a parte www.endereco.com.brs@
-}
 
 
 export const createToken = (data, secret = 'se') => {

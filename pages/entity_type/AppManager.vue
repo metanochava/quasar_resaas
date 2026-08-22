@@ -115,7 +115,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useEntityTypeStore } from '../../stores/EntityTypeStore'
-import { tdc } from '../../boot/base'
+import { tdc } from '../../services/base'
 
 const props = defineProps({
   entityTypeId: [String, Number]

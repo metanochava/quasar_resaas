@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
-import { HTTPAuth, url } from '../../boot/api'
+import { HTTPAuth, url } from '../../services/api'
 
 
 // ---------------- PROPS ----------------

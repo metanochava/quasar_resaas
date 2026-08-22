@@ -119,9 +119,9 @@
 <script>
 
 import { defineComponent } from 'vue'
-import { HTTPAuth, url } from '../../boot/api'
-import { tdc, profileSplint } from '../../boot/base'
-import { deleteStorage, getStorage, setStorage } from '../../boot/storage'
+import { HTTPAuth, url } from '../../services/api'
+import { tdc, profileSplint } from '../../services/base'
+import { deleteStorage, getStorage, setStorage } from '../../services/storage'
 import { useUserStore } from '../../stores/UserStore'
 
 export default defineComponent({

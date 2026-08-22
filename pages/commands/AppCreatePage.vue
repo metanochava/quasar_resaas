@@ -107,7 +107,7 @@
 import { ref, onMounted } from 'vue'
 import { Notify, Dialog } from 'quasar'
 import { useRouter } from 'vue-router'
-import { HTTPAuth, url } from '../../boot/api'
+import { HTTPAuth, url } from '../../services/api'
 import { useUserStore } from '../../stores/UserStore'
 
 // ---------------- STATE ----------------

@@ -1,4 +1,4 @@
-import { tdc } from '../boot/base'
+import { tdc } from '../services/base'
 
 import {
   HTTPAuth,
@@ -8,7 +8,7 @@ import {
   wsApi,
   url,
   safeParse
-} from '../boot/api'
+} from '../services/api'
 
 
 import {

@@ -1,9 +1,9 @@
 import { createBaseStore } from '../base/base_store'
-import { HTTPAuth, HTTPClient, url } from '../boot/api'
+import { HTTPAuth, HTTPClient, url } from '../services/api'
 import { useBranchStore } from './BranchStore'
 import { useUserStore } from './UserStore'
-import { profileSplint, tdc } from '../boot/base'
-import { getStorage, setStorage } from '../boot/storage'
+import { profileSplint, tdc } from '../services/base'
+import { getStorage, setStorage } from '../services/storage'
 
 export const useEntityStore = createBaseStore(
   'entity',

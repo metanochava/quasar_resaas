@@ -37,7 +37,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { tdc } from '../../boot/base'
+import { tdc } from '../../services/base'
 
 export default defineComponent({
 

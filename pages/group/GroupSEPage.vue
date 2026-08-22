@@ -40,7 +40,7 @@ import { useRoute } from 'vue-router'
 import { useGroupStore } from '../../stores/GroupStore'
 import PermissionManager from '../permission/PermissionManager.vue'
 import FormTwo from '../../components/auto/FormTwo.vue'
-import { HTTPAuth, url } from '../../boot/api'
+import { HTTPAuth, url } from '../../services/api'
 
 const Group = useGroupStore()
 const route = useRoute()

@@ -19,7 +19,7 @@
 <script >
 
 import { defineComponent } from 'vue'
-import { tdc, toPlural } from '../boot/base'
+import { tdc, toPlural } from '../services/base'
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import SubMenu from './SubMenu.vue'

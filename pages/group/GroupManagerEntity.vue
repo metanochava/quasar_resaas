@@ -195,7 +195,7 @@ import { useEntityStore } from '../../stores/EntityStore'
 import { useEntityTypeStore } from '../../stores/EntityTypeStore'
 import { useGroupStore } from '../../stores/GroupStore'
 import PermissionManager from '../permission/PermissionManager.vue'
-import { HTTPAuth, url } from '../../boot/api'
+import { HTTPAuth, url } from '../../services/api'
 
 const props = defineProps({
   entityId: [String, Number]

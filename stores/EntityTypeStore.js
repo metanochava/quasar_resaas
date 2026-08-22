@@ -1,7 +1,7 @@
 import { createBaseStore } from '../base/base_store'
-import { HTTPClient, url } from '../boot/api'
+import { HTTPClient, url } from '../services/api'
 import { useUserStore } from './UserStore'
-import { getStorage, setStorage } from '../boot/storage'
+import { getStorage, setStorage } from '../services/storage'
 
 export const useEntityTypeStore = createBaseStore(
   'entitytype',

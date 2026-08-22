@@ -60,7 +60,7 @@
 import { ref, computed, watch } from 'vue'
 import { debounce } from 'quasar'
 
-import { HTTPAuth, HTTPAuthBlob, url } from '../../boot/api'
+import { HTTPAuth, HTTPAuthBlob, url } from '../../services/api'
 import { buildFormFromSchema } from '../../utils/autoForm'
 import { useUserStore} from 'quasar_resaas'
 

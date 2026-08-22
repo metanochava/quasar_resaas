@@ -149,7 +149,7 @@ import RightMenu from '../components/RightMenu.vue'
 import Rodape from '../components/footer/MainFooter.vue'
 
 import { defineComponent } from 'vue'
-import { barStyle, thumbStyle } from '../boot/app'
+import { barStyle, thumbStyle } from '../services/app'
 import UserPermissioes from '../components/UserPermissioes.vue'
 import PagePermissoes from '../components/PagePermissoes.vue'
 import DefinicoesLayout from '../components/DefinicoesLayout.vue'
