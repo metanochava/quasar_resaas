@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { exportFile } from 'quasar'
 import { tdc } from '../../boot/base'
 import { useRouter } from 'vue-router'
 
 import { useActionStore } from '../../stores/ActionStore'
 import { useUserStore } from 'quasar_resaas'
+
+import ConfirmDeleteDialog from './ConfirmDeleteDialog.vue'
 
 const User =useUserStore()
 
@@ -348,15 +349,33 @@ function runAction(action, row) {
   emit('run-action',  action, row )
 }
 
-async function executeAction() {
-  if (!selectedRow.value?.id) return
+// async function executeAction() {
+//   if (!selectedRow.value?.id) return
 
-  if (actionType.value === 'delete') {
-    emit('delete', selectedRow.value)
+//   if (actionType.value === 'delete') {
+//     emit('delete', selectedRow.value)
+//   }
+
+//   if (actionType.value === 'hard_delete') {
+//     emit('hard_delete', selectedRow.value)
+//   }
+
+//   showConfirm.value = false
+//   selectedRow.value = null
+//   actionType.value = null
+// }
+
+
+async function executeAction({ type, row }) {
+
+  if (!row?.id) return
+
+  if (type === 'delete') {
+    emit('delete', row)
   }
 
-  if (actionType.value === 'hard_delete') {
-    emit('hard_delete', selectedRow.value)
+  if (type === 'hard_delete') {
+    emit('hard_delete', row)
   }
 
   showConfirm.value = false
@@ -368,7 +387,14 @@ async function executeAction() {
 
 <template>
 
-  <q-dialog v-model="showConfirm">
+  <ConfirmDeleteDialog
+    v-model="showConfirm"
+    :type="actionType"
+    :row="selectedRow"
+    @confirm="executeAction"
+  />
+
+  <!-- <q-dialog v-model="showConfirm">
     <s-card style="min-width: 400px">
 
       <q-card-section class="row items-center q-gutter-sm">
@@ -388,7 +414,8 @@ async function executeAction() {
         </div>
 
         <b>
-          {{ selectedRow?.name || selectedRow?.name || selectedRow?.id }}
+          {{ selectedRow?.value || selectedRow?.id }} <br/>
+          {{selectedRow?.name || selectedRow?.label }}
         </b>
 
         <div v-if="actionType === 'hard_delete'" class="text-red q-mt-sm">
@@ -408,7 +435,7 @@ async function executeAction() {
       </q-card-actions>
 
     </s-card>
-  </q-dialog>
+  </q-dialog> -->
 
   <q-table
     square
