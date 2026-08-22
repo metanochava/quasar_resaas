@@ -4,8 +4,7 @@ export * from './stores/EntityTypeStore.js'
 export * from './base/base_store.js'
 export * from './stores/MenuStore.js'
 export * from './stores/PersonStore.js'
-export * from './router/restRoutes.js'
-export * from './router/authRoutes.js'
+
 export * from './utils/autoForm.js'
 export * from './boot/alerts.js'
 export * from './boot/api.js'
@@ -14,36 +13,26 @@ export * from './boot/base.js'
 export * from './boot/data.js'
 export * from './boot/storage.js'
 
+
+
+
+
+
+
+
+
+
+
+
 import './css/theme_engine.css'
 
-export { default as ThemeEngine } from './boot/theme_engine'
+export * from './router/restRoutes.js'
+export * from './router/authRoutes.js'
 
+export { default as Components } from './boot/components.js'
+
+export * from './composables/useResaas.js'
 
 export { default as MainLayout } from './layouts/MainLayout.vue'
 export { default as AuthLayout } from './layouts/AuthLayout.vue'
-
-export { default as AutoForm } from './components/auto/AutoForm.vue'
-export { default as FormTwo } from './components/auto/FormTwo.vue'
-export { default as Form } from './components/engine/FormComponent.vue'
-export { default as ActionForm } from './components/auto/ActionForm.vue'
-export { default as AutoTable } from './components/auto/AutoTable.vue'
-export { default as AutoCrud } from './components/auto/AutoCrud.vue'
-export { default as CrudPage } from './components/auto/CrudPage.vue'
-export { default as ConfirmDeleteDialog } from './components/auto/ConfirmDeleteDialog.vue'
-
-export { default as AllLogo } from './components/AllLogo.vue'
-export { default as TopMenu } from './components/TopMenu.vue'
-export { default as PdfRender } from './components/PdfRender.vue'
-export { default as PdfRenderPro } from './components/PdfRenderPro.vue'
-
-export { default as HeaderBrand } from './components/header/HeaderBrand.vue'
-export { default as HeaderDarkMode } from './components/header/HeaderDarkMode.vue'
-export { default as HeaderFullScreen } from './components/header/HeaderFullScreen.vue'
-export { default as HeaderLanguage } from './components/header/HeaderLanguage.vue'
-
-export { default as PersonCard } from './components/person/PersonCard.vue'
-export { default as PersonCreateDialog } from './components/person/PersonCreateDialog.vue'
-export { default as PersonSearch } from './components/person/PersonSearch.vue'
-
-
 

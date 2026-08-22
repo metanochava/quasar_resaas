@@ -38,7 +38,7 @@
 
           <br />
 
-          {{ row[props.label] || row?.name || row?.label || '' }}
+          {{ row[props.label].label || row?.name || row?.label || '' }}
 
         </b>
 
