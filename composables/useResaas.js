@@ -1,4 +1,4 @@
-import { tdc } from '../services/base'
+import { tdc } from '../services/translation'
 
 import {
   HTTPAuth,

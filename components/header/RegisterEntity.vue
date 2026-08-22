@@ -120,9 +120,13 @@
 
 import { defineComponent } from 'vue'
 import { HTTPAuth, url } from '../../services/api'
-import { tdc, profileSplint } from '../../services/base'
+
 import { deleteStorage, getStorage, setStorage } from '../../services/storage'
 import { useUserStore } from '../../stores/UserStore'
+import { profileSplint } from '../../utils/json'
+import { tdc } from '../../services/translation'
+
+
 
 export default defineComponent({
   name: 'RegisterEntity',

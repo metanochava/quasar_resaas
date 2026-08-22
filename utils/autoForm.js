@@ -1,6 +1,7 @@
 
 import { HTTPAuth, url } from "../services/api"
-import { tdc } from "../services/base"
+import { tdc } from "../services/translation"
+
 
 
 const __relationCache = new Map()

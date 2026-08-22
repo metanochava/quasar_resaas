@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-  import { tdc } from '../services/base';
+  import { tdc } from '../services/translation';
   import { useUserStore } from '../stores/UserStore';
   import AllLogo from './../components/AllLogo.vue';
   const User = useUserStore()

@@ -53,7 +53,7 @@ import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { HTTPClient, url } from '../services/api'
 import { useUserStore } from './../stores/UserStore'
-import { tdc } from '../services/base'
+import { tdc } from '../services/translation'
 
 
 const User = useUserStore()

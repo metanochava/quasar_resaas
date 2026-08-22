@@ -73,7 +73,7 @@ import { useUserStore } from '../stores/UserStore'
 
 import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { tdc } from '../services/base'
+import { tdc } from '../services/translation'
 
 const User = useUserStore()
 const route = useRoute()

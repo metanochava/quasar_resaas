@@ -1,3 +1,6 @@
+import { tdc } from "./translation"
+
+
 export const ds = function (dataString = '') {
   try {
     dataString = dataString.replace('T', ' ')
@@ -20,7 +23,7 @@ export const ds = function (dataString = '') {
     d = data(dataArray[0])
   }
 
-  const l = (h !== '') ? (d + ' às ' + h) : d
+  const l = (h !== '') ? (d + ' ' +tdc('às')+ ' ' + h) : d
   if (l.includes('undefined')) {
     return ''
   }

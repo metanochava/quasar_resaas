@@ -3,18 +3,12 @@ import { getStorage } from './storage'
 import {useUserStore } from '../stores/UserStore'
 import { useLoadStore } from '../stores/LoadStore';
 import { Alert } from '../boot/alerts'
+import { safeParse } from '../utils/json';
 
 const apiPrefix = process.env.API_PREFIX
 const apiBaseUrl = process.env.API + '/' + apiPrefix 
 
 
-export const safeParse = (value) => {
-  try {
-    return value ? JSON.parse(value) : null
-  } catch {
-    return null
-  }
-}
 
 /* ======================================================
    URL BUILDER

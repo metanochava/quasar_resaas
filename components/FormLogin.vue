@@ -79,7 +79,7 @@
 <script >
 
 import { defineComponent } from 'vue'
-import { tdc } from '../services/base'
+import { tdc } from '../services/translation'
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import { setStorage, getStorage } from '../services/storage'

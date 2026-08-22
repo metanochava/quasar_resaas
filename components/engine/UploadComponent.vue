@@ -16,7 +16,7 @@
 <script>
 import { defineComponent, computed, ref, watch, useAttrs } from "vue"
 import { useUserStore } from "../../stores/UserStore"
-import { tdc } from "../../services/base"
+import { tdc } from "../../services/translation"
 
 export default defineComponent({
   name: "s-upload",
