@@ -721,7 +721,7 @@ async function executeAction({ type, row }) {
                     v-for="a in singularActions"
                     :key="a"
                     clickable
-                    v-show="  User.can(a.permission.toLowerCase()) && !a.details  && a.visible && ['t'].includes(a.position)"
+                    v-show="  User.can(a.permission.toLowerCase()) && !a.details  && a.visible && ['t','T'].includes(a.position)"
                     @click="runAction(a, [])"
                   >
 
@@ -855,7 +855,7 @@ async function executeAction({ type, row }) {
           :key="a"
           v-show="
             User.can(a.permission.toLowerCase()) && a.visible &&
-            ['l', 'b'].includes(a.position) &&
+            ['l', 'b', 'L', 'B'].includes(a.position) &&
             !isDeleted(slotRow.row) && 
             slotRow.col.field == '__ractions'
           "
@@ -1218,7 +1218,7 @@ async function executeAction({ type, row }) {
           :key="a"
           v-show="
             User.can(a.permission.toLowerCase()) && a.visible &&
-            ['r', 'b'].includes(a.position) &&
+            ['r', 'b', 'R', 'B'].includes(a.position) &&
             !isDeleted(slotRow.row) &&
             slotRow.col.field == '__lactions'
           "
