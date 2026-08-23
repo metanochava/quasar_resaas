@@ -565,6 +565,64 @@ async function executeAction({ type, row }) {
             </q-btn-toggle>
 
 
+            <s-btn
+              dense
+              outline
+              label="of"
+              icon="more_vert"
+              color="secondary"
+            >
+
+              <q-menu auto-close>
+
+                <q-list
+                  dense
+                  style="min-width: 180px"
+                >
+
+                  <!-- DYNAMIC ACTIONS -->
+
+                  <q-item
+                    v-for="a in singularActions"
+                    :key="a"
+                    clickable
+                    v-show="
+                      User.can(a.permission.toLowerCase()) &&
+                      !a.details 
+                    "
+                    @click="runAction(a, [])"
+                  >
+
+                    <q-item-section
+                      avatar
+                      v-if="a.icon"
+                    >
+
+                      <q-icon
+                        :name="a.icon"
+                        :color="getMethodColor(a.method)"
+                      />
+
+                    </q-item-section>
+
+                    <q-item-section>
+                      {{ tdc(a.action) }}
+                    </q-item-section>
+
+                    <q-tooltip
+                      v-show="a.tooltip"
+                      :class="$q.dark.isActive
+                        ? 'bg-dark text-white'
+                        : 'bg-primary text-white'"
+                    >
+                      {{ tdc(a.tooltip) || '.' }}
+                    </q-tooltip>
+
+                  </q-item> 
+                </q-list>
+              </q-menu>
+            </s-btn>
+
             <!-- =====================================
                  VISIBLE COLUMNS
             ====================================== -->
@@ -795,7 +853,7 @@ async function executeAction({ type, row }) {
           v-for="a in singularActions"
           :key="a"
           v-show="
-            User.can(a.action.toLowerCase()) &&
+            User.can(a.permission.toLowerCase()) &&
             ['l', 'b'].includes(a.position) &&
             !isDeleted(slotRow.row) &&
             slotRow.col.field == '__ractions'
@@ -842,7 +900,7 @@ async function executeAction({ type, row }) {
                 :key="a"
                 clickable
                 v-show="
-                  User.can(a.action.toLowerCase()) &&
+                  User.can(a.permission.toLowerCase()) &&
                   !a.position &&
                   !isDeleted(slotRow.row)
                 "
@@ -1101,13 +1159,7 @@ async function executeAction({ type, row }) {
                 clickable
                 v-show="
                   a.permission &&
-                  !User.can(
-                    a.method +
-                    '_' +
-                    a.permission +
-                    '_' +
-                    a.model.toLowerCase()
-                  ) &&
+                  !User.can( a.permission.toLowerCase()  ) &&
                   !isDeleted(slotRow.row)
                 "
                 @click="runAction(a, slotRow.row)"
@@ -1126,7 +1178,7 @@ async function executeAction({ type, row }) {
                 </q-item-section>
 
                 <q-item-section>
-                  {{ a.method + '_' + a.permission }}
+                  {{ a.permission }}
                 </q-item-section>
 
                 <q-tooltip
@@ -1134,7 +1186,7 @@ async function executeAction({ type, row }) {
                     ? 'bg-dark text-white'
                     : 'bg-primary text-white'"
                 >
-                  {{ tdc(a.method + '_' + a.permission) }}
+                  {{ tdc(a.permission) }}
                 </q-tooltip>
 
               </q-item>
@@ -1163,7 +1215,7 @@ async function executeAction({ type, row }) {
           v-for="a in singularActions"
           :key="a"
           v-show="
-            User.can(a.action.toLowerCase()) &&
+            User.can(a.permission.toLowerCase()) &&
             ['r', 'b'].includes(a.position) &&
             !isDeleted(slotRow.row) &&
             slotRow.col.field == '__lactions'
