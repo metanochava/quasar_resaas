@@ -719,12 +719,15 @@ async function executeAction({ type, row }) {
                     :key="a"
                     clickable
                     v-show="
-                      User.can(a.permission.toLowerCase()) &&
-                      !a.details 
+                      true
                     "
                     @click="runAction(a, [])"
                   >
+{{User.can(a.permission.toLowerCase()) &&
+                      !a.details }}
 
+                      {{User.can(a.permission.toLowerCase())}}, 
+                      {{!a.details }}
                     <q-item-section
                       avatar
                       v-if="a.icon"
