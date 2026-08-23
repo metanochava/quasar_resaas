@@ -726,7 +726,7 @@ async function executeAction({ type, row }) {
 {{User.can(a.permission.toLowerCase()) &&
                       !a.details }}
 
-                      {{User.can(a.permission.toLowerCase())}}, 
+                      {{User.can(a.permission.toLowerCase())}},  {{a.permission.toLowerCase()}}, 
                       {{!a.details }}
                     <q-item-section
                       avatar
