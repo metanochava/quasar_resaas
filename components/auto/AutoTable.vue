@@ -698,7 +698,7 @@ async function executeAction({ type, row }) {
 
             </s-btn>
 
-            <s-btn
+            <q-btn-dropdown hover aria-haspopup="menu"
               dense
               outline
               label="More Actions"
@@ -754,7 +754,7 @@ async function executeAction({ type, row }) {
                   </q-item> 
                 </q-list>
               </q-menu>
-            </s-btn>
+            </q-btn-dropdown>
 
 
 
