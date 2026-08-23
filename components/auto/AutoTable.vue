@@ -795,7 +795,7 @@ async function executeAction({ type, row }) {
           v-for="a in singularActions"
           :key="a"
           v-show="
-            User.can(a.role.toLowerCase()) &&
+            User.can(a.action.toLowerCase()) &&
             ['l', 'b'].includes(a.position) &&
             !isDeleted(slotRow.row) &&
             slotRow.col.field == '__ractions'
@@ -842,7 +842,7 @@ async function executeAction({ type, row }) {
                 :key="a"
                 clickable
                 v-show="
-                  User.can(a.role.toLowerCase()) &&
+                  User.can(a.action.toLowerCase()) &&
                   !a.position &&
                   !isDeleted(slotRow.row)
                 "
@@ -1163,7 +1163,7 @@ async function executeAction({ type, row }) {
           v-for="a in singularActions"
           :key="a"
           v-show="
-            User.can(a.role.toLowerCase()) &&
+            User.can(a.action.toLowerCase()) &&
             ['r', 'b'].includes(a.position) &&
             !isDeleted(slotRow.row) &&
             slotRow.col.field == '__lactions'
