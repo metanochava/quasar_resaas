@@ -702,7 +702,7 @@ async function executeAction({ type, row }) {
               hover aria-haspopup="menu"
               dense
               outline
-              label="Actions"
+              label="  Actions"
               color="secondary"
             >
 
@@ -721,7 +721,7 @@ async function executeAction({ type, row }) {
                     v-for="a in singularActions"
                     :key="a"
                     clickable
-                    v-show="  User.can(a.permission.toLowerCase()) && !a.details  && a.visible ['t'].includes(a.position)"
+                    v-show="  User.can(a.permission.toLowerCase()) && !a.details  && a.visible && ['t'].includes(a.position)"
                     @click="runAction(a, [])"
                   >
 
@@ -885,6 +885,7 @@ async function executeAction({ type, row }) {
           outline
           icon="more_vert"
           color="secondary"
+          v-show="singularActions.some( action =>  action.position === 't' &&  action.visible )"
         >
 
           <q-menu auto-close>
@@ -903,7 +904,7 @@ async function executeAction({ type, row }) {
                 v-show="
                   User.can(a.permission.toLowerCase()) && a.visible &&
                   !a.position &&
-                  !isDeleted(slotRow.row)
+                  !isDeleted(slotRow.row) 
                 "
                 @click="runAction(a, slotRow.row)"
               >
