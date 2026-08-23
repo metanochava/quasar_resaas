@@ -698,7 +698,8 @@ async function executeAction({ type, row }) {
 
             </s-btn>
 
-            <q-btn-dropdown hover aria-haspopup="menu"
+            <q-btn-dropdown 
+              hover aria-haspopup="menu"
               dense
               outline
               label="Actions"
@@ -708,6 +709,7 @@ async function executeAction({ type, row }) {
    
 
                 <q-list
+                  role="menu"
                   dense
                   style="min-width: 100px"
                 >
@@ -715,6 +717,7 @@ async function executeAction({ type, row }) {
                   <!-- DYNAMIC ACTIONS -->
 
                   <q-item
+                    v-close-popup
                     v-for="a in singularActions"
                     :key="a"
                     clickable
