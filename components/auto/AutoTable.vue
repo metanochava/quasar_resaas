@@ -718,16 +718,10 @@ async function executeAction({ type, row }) {
                     v-for="a in singularActions"
                     :key="a"
                     clickable
-                    v-show="
-                      true
-                    "
+                    v-show="  User.can(a.permission.toLowerCase()) && !a.details "
                     @click="runAction(a, [])"
                   >
-{{User.can(a.permission.toLowerCase()) &&
-                      !a.details }}
 
-                      {{User.can(a.permission.toLowerCase())}},  {{a.permission.toLowerCase()}}, 
-                      {{!a.details }}
                     <q-item-section
                       avatar
                       v-if="a.icon"
