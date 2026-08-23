@@ -721,7 +721,7 @@ async function executeAction({ type, row }) {
                     v-for="a in singularActions"
                     :key="a"
                     clickable
-                    v-show="  User.can(a.permission.toLowerCase()) && !a.details "
+                    v-show="  User.can(a.permission.toLowerCase()) && !a.details  && a.visible ['t'].includes(a.position)"
                     @click="runAction(a, [])"
                   >
 
@@ -854,9 +854,9 @@ async function executeAction({ type, row }) {
           v-for="a in singularActions"
           :key="a"
           v-show="
-            User.can(a.permission.toLowerCase()) &&
+            User.can(a.permission.toLowerCase()) && a.visible &&
             ['l', 'b'].includes(a.position) &&
-            !isDeleted(slotRow.row) &&
+            !isDeleted(slotRow.row) && 
             slotRow.col.field == '__ractions'
           "
           @click="runAction(a, slotRow.row)"
@@ -901,7 +901,7 @@ async function executeAction({ type, row }) {
                 :key="a"
                 clickable
                 v-show="
-                  User.can(a.permission.toLowerCase()) &&
+                  User.can(a.permission.toLowerCase()) && a.visible &&
                   !a.position &&
                   !isDeleted(slotRow.row)
                 "
@@ -1160,7 +1160,7 @@ async function executeAction({ type, row }) {
                 clickable
                 v-show="
                   a.permission &&
-                  !User.can( a.permission.toLowerCase()  ) &&
+                  !User.can( a.permission.toLowerCase()  )&& a.visible &&
                   !isDeleted(slotRow.row)
                 "
                 @click="runAction(a, slotRow.row)"
@@ -1216,7 +1216,7 @@ async function executeAction({ type, row }) {
           v-for="a in singularActions"
           :key="a"
           v-show="
-            User.can(a.permission.toLowerCase()) &&
+            User.can(a.permission.toLowerCase()) && a.visible &&
             ['r', 'b'].includes(a.position) &&
             !isDeleted(slotRow.row) &&
             slotRow.col.field == '__lactions'
