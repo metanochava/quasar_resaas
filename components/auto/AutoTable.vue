@@ -705,7 +705,7 @@ async function executeAction({ type, row }) {
               color="secondary"
             >
 
-              <q-menu auto-close>
+   
 
                 <q-list
                   dense
@@ -755,7 +755,7 @@ async function executeAction({ type, row }) {
 
                   </q-item> 
                 </q-list>
-              </q-menu>
+
             </q-btn-dropdown>
 
 
