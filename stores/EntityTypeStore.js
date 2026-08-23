@@ -1,5 +1,5 @@
 import { createBaseStore } from '../base/base_store'
-import { HTTPClient, url } from '../services/api'
+import { HTTPClient, HTTPAuth, url } from '../services/api'
 import { useUserStore } from './UserStore'
 import { getStorage, setStorage } from '../services/storage'
 
