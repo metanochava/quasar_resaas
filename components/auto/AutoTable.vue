@@ -438,7 +438,7 @@ async function executeAction({ type, row }) {
             <!-- DEFAULT CREATE -->
 
             <s-btn
-              dense
+              
               icon="add"
               color="primary"
               @click="emit('create')"
@@ -457,7 +457,7 @@ async function executeAction({ type, row }) {
             <!-- CUSTOM CREATE -->
 
             <s-btn
-              dense
+              
               icon="open_in_new"
               color="secondary"
               :to="{ name: props.config?.routes?.add }"
@@ -479,7 +479,7 @@ async function executeAction({ type, row }) {
             <!-- DOWNLOAD PDF LIST -->
 
             <s-btn
-              dense
+              
               flat
               icon="download"
               @click="emit('pdfList')"
@@ -565,64 +565,7 @@ async function executeAction({ type, row }) {
             </q-btn-toggle>
 
 
-            <s-btn
-              dense
-              outline
-              label="of"
-              icon="more_vert"
-              color="secondary"
-            >
-
-              <q-menu auto-close>
-
-                <q-list
-                  dense
-                  style="min-width: 180px"
-                >
-
-                  <!-- DYNAMIC ACTIONS -->
-
-                  <q-item
-                    v-for="a in singularActions"
-                    :key="a"
-                    clickable
-                    v-show="
-                      User.can(a.permission.toLowerCase()) &&
-                      !a.details 
-                    "
-                    @click="runAction(a, [])"
-                  >
-
-                    <q-item-section
-                      avatar
-                      v-if="a.icon"
-                    >
-
-                      <q-icon
-                        :name="a.icon"
-                        :color="getMethodColor(a.method)"
-                      />
-
-                    </q-item-section>
-
-                    <q-item-section>
-                      {{ tdc(a.action) }}
-                    </q-item-section>
-
-                    <q-tooltip
-                      v-show="a.tooltip"
-                      :class="$q.dark.isActive
-                        ? 'bg-dark text-white'
-                        : 'bg-primary text-white'"
-                    >
-                      {{ tdc(a.tooltip) || '.' }}
-                    </q-tooltip>
-
-                  </q-item> 
-                </q-list>
-              </q-menu>
-            </s-btn>
-
+            
             <!-- =====================================
                  VISIBLE COLUMNS
             ====================================== -->
@@ -754,6 +697,65 @@ async function executeAction({ type, row }) {
               </q-tooltip>
 
             </s-btn>
+
+            <s-btn
+              dense
+              outline
+              label="More Actions"
+              icon="more_vert"
+              color="secondary"
+            >
+
+              <q-menu auto-close>
+
+                <q-list
+                  dense
+                  style="min-width: 180px"
+                >
+
+                  <!-- DYNAMIC ACTIONS -->
+
+                  <q-item
+                    v-for="a in singularActions"
+                    :key="a"
+                    clickable
+                    v-show="
+                      User.can(a.permission.toLowerCase()) &&
+                      !a.details 
+                    "
+                    @click="runAction(a, [])"
+                  >
+
+                    <q-item-section
+                      avatar
+                      v-if="a.icon"
+                    >
+
+                      <q-icon
+                        :name="a.icon"
+                        :color="getMethodColor(a.method)"
+                      />
+
+                    </q-item-section>
+
+                    <q-item-section>
+                      {{ tdc(a.action) }}
+                    </q-item-section>
+
+                    <q-tooltip
+                      v-show="a.tooltip"
+                      :class="$q.dark.isActive
+                        ? 'bg-dark text-white'
+                        : 'bg-primary text-white'"
+                    >
+                      {{ tdc(a.tooltip) || '.' }}
+                    </q-tooltip>
+
+                  </q-item> 
+                </q-list>
+              </q-menu>
+            </s-btn>
+
 
 
             <!-- SEARCH -->
