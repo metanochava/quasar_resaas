@@ -701,8 +701,7 @@ async function executeAction({ type, row }) {
             <q-btn-dropdown hover aria-haspopup="menu"
               dense
               outline
-              label="More Actions"
-              icon="more_vert"
+              label="Actions"
               color="secondary"
             >
 
@@ -710,7 +709,7 @@ async function executeAction({ type, row }) {
 
                 <q-list
                   dense
-                  style="min-width: 180px"
+                  style="min-width: 100px"
                 >
 
                   <!-- DYNAMIC ACTIONS -->
