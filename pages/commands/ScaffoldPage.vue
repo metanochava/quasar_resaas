@@ -362,7 +362,7 @@
             <div class="text-h6 text-grey col-12">🔐 Extra actions of {{ form.app }}.{{form.model}}</div>
             <div class="col-12">
               <s-select
-                v-model="accao.Icon"
+                v-model="accao.icon"
                 :options="ICONS"
                 label="Icon"
                 use-input
@@ -396,21 +396,31 @@
 
             <s-select
               class="col"
-              v-model="accao.Method"
+              v-model="accao.method"
               :options="['get', 'post', 'put', 'delete']"
               label="method"
               outlined
               dense 
             />
-            <s-switch
+            <s-switch class="col" v-model="accao.details" label="Details" outlined dense />
+            <s-switch class="col" v-model="accao.visible" label="Visible" outlined dense />
+            <s-switch class="col" v-model="accao.autorequest" label="Auto request" outlined dense />
+
+            <s-select
               class="col"
-              v-model="accao.Details"
-              label="Details"
+              v-model="accao.position"
+              :options="['l','r','t','m','b']"
+              label="Position"
               outlined
-              dense 
+              dense
             />
-            <s-input class="col" dense v-model="accao.Permission" @keyup.enter="addPerm()" outlined label="Permission" placeholder="Permission"/>
-            <s-input class="col-12" dense v-model="accao.Url" @keyup.enter="addPerm()" placeholder="'(?P<model>[^/.]+)/schema'" outlined/>
+
+            <s-input class="col" dense v-model.number="accao.order" type="number" label="Order" outlined />
+            <s-input class="col-6" dense v-model="accao.action" label="Action" outlined />
+            <s-input class="col-6" dense v-model="accao.label" label="Label" outlined />
+            <s-input class="col-12" dense v-model="accao.tooltip" label="Tooltip" outlined />
+            <s-input class="col-6" dense v-model="accao.permission" @keyup.enter="addPerm" outlined label="Permission" />
+            <s-input class="col-6" dense v-model="accao.url" @keyup.enter="addPerm" outlined label="URL path" />
 
             <s-btn v-if="form.model" class=" col-12" flat icon="arrow_upward" color="success" :label="'Permissions Updade' + ' '+ form.model" @click="permissionUpdade" />
 
@@ -428,10 +438,13 @@
               removable
               @remove="form?.actions.splice(i,1)"
             >
-              {{ p.method + '_' +p.permission }}
+              {{ (p.label || p.action || p.permission) + ' [' + p.method + ']' }}
               <q-tooltip class="bg-primary text-white">
                 url = {{p.url}}<br />
-                details = {{p.details}}
+                details = {{p.details}}<br />
+                position = {{p.position}}<br />
+                visible = {{p.visible}}<br />
+                autorequest = {{p.autorequest}}
               </q-tooltip>
             </q-chip>
             
@@ -522,11 +535,18 @@ export default {
       accaoTeste: false,
 
       accao:{
-        Permission: '',
-        Icon: 'list',
-        Method: 'get',
-        Details: true,
-        Url: '',
+        action: '',
+        label: '',
+        icon: 'list',
+        tooltip: '',
+        method: 'get',
+        details: true,
+        url: '',
+        position: 'm',
+        order: 0,
+        visible: true,
+        autorequest: false,
+        permission: ''
       },
 
 
@@ -744,19 +764,46 @@ export default {
     },
 
     addPerm () {
-      if (!this.accao.Permission) return
-      if (!this.accao.Method) return
-      this.form.actions.push({'icon' :this.accao.Icon, 'method' :this.accao.Method, 'permission': this.accao.Permission.toLowerCase(),  'url' : this.accao.Url, 'details' : this.accao.Details})
-      this.accao.Permission=''
-      this.accao.Icon='list'
-      this.accao.Method=''
-      this.accao.Url=''
-      this.accao.Details=true
+      if (!this.accao.action && !this.accao.permission) return
+      if (!this.accao.method) return
+
+      const action = String(this.accao.action || this.accao.permission || '').trim().toLowerCase()
+      const permission = String(this.accao.permission || `${action}_${this.form.model || ''}`).trim().toLowerCase()
+
+      this.form.actions.push({
+        action,
+        label: this.accao.label || action.replaceAll('_', ' '),
+        icon: this.accao.icon || 'list',
+        tooltip: this.accao.tooltip || '',
+        method: this.accao.method,
+        details: Boolean(this.accao.details),
+        url: this.accao.url || action,
+        position: this.accao.position || 'm',
+        order: Number(this.accao.order || 0),
+        visible: this.accao.visible !== false,
+        autorequest: this.accao.autorequest === true,
+        permission
+      })
+
+      this.accao = {
+        action: '',
+        label: '',
+        icon: 'list',
+        tooltip: '',
+        method: 'get',
+        details: true,
+        url: '',
+        position: 'm',
+        order: 0,
+        visible: true,
+        autorequest: false,
+        permission: ''
+      }
     },
 
     accaoMetodo (p) {
       this.model_action = true
-      this.accao = p
+      this.accao = { ...p }
     },
 
     isRelation (f) {
@@ -855,13 +902,23 @@ export default {
     },
 
     async reloadModelShema(){
+      if (!this.form.app || !this.form.model) return
+
       this.accaoTeste = false
-      const data = await buildFormFromSchema({'app': this.form.app, 'model': this.form.model})
-      this.form.fields = data.fields
-      this.form.fields = (this.form.fields || []).filter(f =>
-        !['id', 'created_at', 'is_deleted', 'updated_at', 'state', 'created_by', 'updated_by', 'deleted_at', 'entity', 'branch'].includes(f?.name)
+
+      const data = await buildFormFromSchema({
+        app: this.form.app,
+        model: this.form.model
+      })
+
+      this.form.fields = (data.fields || []).filter(f =>
+        !['id','created_at','is_deleted','updated_at','state','created_by','updated_by','deleted_at','entity','branch'].includes(f?.name)
       )
-      this.form.actions =data.actions
+
+      this.form.actions = (data.actions || []).map(a => ({ ...a }))
+      this.form.crud = data.schema?.ui?.crud ?? data.config?.crud ?? this.form.crud
+      this.form.icon = data.schema?.ui?.icon ?? this.form.icon
+
       this.accaoTeste = true
     },
 
@@ -876,19 +933,34 @@ export default {
     },
 
     async loadApps() {
-      const {data} = await HTTPAuth.get( url({ type: 'u', url: `django_resaas/resaasapps/${app}/`, params: {} }))
-      this.apps = data.apps
+      const { data } = await HTTPAuth.get(
+        url({ type: 'u', url: 'django_resaas/resaasapps/', params: {} })
+      )
+      this.apps = data?.apps || []
     },
 
     async loadModelsRelation(f){
-      const {data} = await HTTPAuth.get( url({ type: 'u', url: 'django_resaas/resaasapps/'+ f.relApp, params: {} }))
-      f.models = data.models
+      if (!f?.relApp) return
+      const { data } = await HTTPAuth.get(
+        url({ type: 'u', url: `django_resaas/resaasapps/${f.relApp}/`, params: {} })
+      )
+      f.models = data?.models || []
     },
 
-    async loadModelsSchema(f){
-      const {data} = await HTTPAuth.get( url({ type: 'u', url: 'django_resaas/resaasapps/'+ f, params: {} }))
-      this.models = data.models
+    async loadModelsSchema(app){
+      this.models = []
+      this.form.model = ''
+      this.form.fields = []
+      this.form.actions = []
       this.accaoTeste = false
+
+      if (!app) return
+
+      const { data } = await HTTPAuth.get(
+        url({ type: 'u', url: `django_resaas/resaasapps/${app}/`, params: {} })
+      )
+
+      this.models = data?.models || []
     },
   }
 }

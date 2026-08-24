@@ -9,7 +9,7 @@ import { branchRoutes } from '../pages/branch/branchRoute'
 import { permissionRoutes } from '../pages/permission/permissionRoute'
 import { tdc } from '../services/translation'
 
-
+CrudP
 export let restRoutes = [
 
   { 
@@ -21,7 +21,17 @@ export let restRoutes = [
       requiresAuth: true, 
       requiredRole: 'view_scaffold'
     } 
-  },
+    },
+      { 
+      path: '/view_crud', 
+      name: 'view_crud', 
+      component: () => import('../pages/CrudPage.vue'), 
+      meta: { 
+        title: tdc('Vista de') + ' ' + tdc('Crud'), 
+        requiresAuth: true, 
+        requiredRole: 'view_crud'
+      } 
+    },
   { 
     path: '/add_app', 
     name: 'add_app', 

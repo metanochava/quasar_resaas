@@ -1,24 +1,22 @@
 <template>
   <q-page class="q-pa-lg page-container">
 
-    <!-- 🔥 HEADER -->
     <div class="q-mb-md">
       <div class="text-h5 text-weight-bold">
-        {{ tdc('Explorar Modelos') }}
+        {{ tdc('Explore Models') }}
       </div>
+
       <div class="text-subtitle2 text-grey-7">
-        {{ tdc('Selecione o módulo e o model para visualizar os dados') }}
+        {{ tdc('Select the module and model to view the data') }}
       </div>
     </div>
 
-    <!-- 🔥 FILTROS -->
     <q-card
-      v-if="!route.params.model"
+      v-if="!hasRouteModel"
       class="q-mb-md filter-card shadow-1"
     >
       <q-card-section class="row q-col-gutter-md">
 
-        <!-- MÓDULO -->
         <div class="col-12 col-md-6">
           <s-select
             v-model="app"
@@ -27,102 +25,160 @@
             option-label="name"
             emit-value
             map-options
-            :label="tdc('Módulo')"
+            :label="tdc('Module')"
             outlined
             dense
-            @update:model-value="loadModelsRelation()"
+            clearable
           />
         </div>
 
-        <!-- MODELO -->
         <div class="col-12 col-md-6">
           <s-select
             v-model="model"
             :options="models"
-            :label="tdc('Modelo')"
+            option-value="name"
+            option-label="name"
+            emit-value
+            map-options
+            :label="tdc('Model')"
             outlined
             dense
+            clearable
+            :disable="!app"
           />
         </div>
 
       </q-card-section>
     </q-card>
 
-    <!-- 🔥 CONTEÚDO -->
-    <q-card class="crud-card shadow-2">
-
+    <q-card
+      v-if="app && model"
+      class="crud-card shadow-2"
+    >
       <q-card-section>
-
         <AutoCrud
+          :key="`${app}:${model}`"
           :app="app"
           :model="model"
-          :can="User.can"
         />
-
       </q-card-section>
-
     </q-card>
+
+    <div
+      v-else-if="!hasRouteModel"
+      class="flex flex-center q-pa-xl text-grey-7"
+    >
+      {{ tdc('Select a module and model') }}
+    </div>
 
   </q-page>
 </template>
 
 <script setup>
-import { HTTPAuth, url } from '../services/api'
-import AutoCrud from '../components/auto/AutoCrud.vue'
-import { useUserStore } from '../stores/UserStore'
-
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+
+import { HTTPAuth, url } from '../services/api'
 import { tdc } from '../services/translation'
 
-const User = useUserStore()
+import AutoCrud from '../components/auto/AutoCrud.vue'
+
 const route = useRoute()
 
-// state
 const app = ref('')
 const model = ref('')
 
 const apps = ref([])
 const models = ref([])
 
-// carregar módulos
+const hasRouteModel = computed(() =>
+  Boolean(
+    route.params?.app &&
+    route.params?.model
+  )
+)
+
 async function loadApps() {
   const { data } = await HTTPAuth.get(
-    url({ type: 'u', url: 'django_resaas/resaasapps/', params: {} })
+    url({
+      type: 'u',
+      url: 'django_resaas/resaasapps/',
+      params: {}
+    })
   )
-  apps.value = data.apps
+
+  apps.value = data?.apps || []
 }
 
-// carregar models
-async function loadModelsRelation() {
+async function loadModels() {
+  models.value = []
+  model.value = ''
+
   if (!app.value) return
 
   const { data } = await HTTPAuth.get(
     url({
       type: 'u',
-      url: 'django_resaas/resaasapps/' + app.value,
+      url: `django_resaas/resaasapps/${app.value}/`,
       params: {}
     })
   )
-  models.value = data.models
+
+  models.value = data?.models || []
 }
 
-// init
+async function applyRoute() {
+  const routeApp = route.params?.app
+  const routeModel = route.params?.model
+
+  if (!routeApp || !routeModel) return
+
+  app.value = String(routeApp)
+
+  await loadModels()
+
+  model.value = String(routeModel)
+}
+
+watch(
+  app,
+  async (value, oldValue) => {
+    if (!value) {
+      models.value = []
+      model.value = ''
+      return
+    }
+
+    if (
+      hasRouteModel.value &&
+      value === route.params?.app
+    ) {
+      return
+    }
+
+    if (value !== oldValue) {
+      await loadModels()
+    }
+  }
+)
+
+watch(
+  () => [
+    route.params?.app,
+    route.params?.model
+  ],
+  async () => {
+    await applyRoute()
+  }
+)
+
 onMounted(async () => {
   await loadApps()
+
+  if (hasRouteModel.value) {
+    await applyRoute()
+  }
 })
-
-// 🔥 WATCH ROTA
-watch(
-  () => route.params,
-  (params) => {
-    if (!params?.app || !params?.model) return
-
-    app.value = params.app
-    model.value = params.model
-  },
-  { immediate: true }
-)
 </script>
 
 <style scoped>
@@ -131,15 +187,8 @@ watch(
   margin: 0 auto;
 }
 
-/* CARD FILTROS */
-.filter-card {
-  border-radius: 12px;
-  background: #fafafa;
-}
-
-/* CARD CRUD */
+.filter-card,
 .crud-card {
-  border-radius: 14px;
-  background: #fff;
+  border-radius: 12px;
 }
 </style>
