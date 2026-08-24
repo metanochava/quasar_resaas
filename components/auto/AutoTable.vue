@@ -177,7 +177,7 @@ const schemaPdf = computed(() => ({
 }))
 
 const rowsPerPageOptions = computed(() =>
-  props.schema?.pagination?.page_size_options || [2, 5, 10, 20, 50, 100, 200, 500, 0]
+  props.schema?.pagination?.page_size_options || [10, 20, 50, 100, 200, 500, 1000, 0]
 )
 
 function can(permission) {
@@ -209,6 +209,8 @@ const topActions = computed(() =>
       ['t', 'T'].includes(action.position)
   )
 )
+
+
 
 const objects = ref('alive')
 
