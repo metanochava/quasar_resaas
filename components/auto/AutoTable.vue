@@ -454,6 +454,8 @@ async function executeAction({ type, row }) {
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 
+const relationSearch = ref({})
+
 function getField(name) {
   return props.fields.find(f => f.name === name)
 }
@@ -468,8 +470,12 @@ function isRelationOrChoice(name) {
   )
 }
 
-function normalizeItems(value) {
-  if (value === null || value === undefined || value === '') return []
+function normalizeItems(value, fieldName) {
+  const field = getField(fieldName)
+
+  if (value === null || value === undefined || value === '') {
+    return []
+  }
 
   let parsed = value
 
@@ -502,23 +508,74 @@ function normalizeItems(value) {
       }
     }
 
+    const choice = field?.choices?.find(
+      ([value]) => String(value) === String(item)
+    )
+
     return {
-      label: item,
+      label: choice?.[1] ?? item,
       value: item
     }
   })
 }
 
-function compactItems(row, field) {
-  return normalizeItems(row?.[field])
+function allItems(row, field) {
+  return normalizeItems(
+    row?.[field],
+    field
+  )
 }
 
 function firstItem(row, field) {
-  return compactItems(row, field)[0]
+  return allItems(row, field)[0]
 }
 
-function remainingItems(row, field) {
-  return compactItems(row, field).slice(1)
+function remainingCount(row, field) {
+  return Math.max(
+    allItems(row, field).length - 1,
+    0
+  )
+}
+
+function searchKey(row, field) {
+  return `${row?.id || 'row'}_${field}`
+}
+
+function getRelationSearch(row, field) {
+  return relationSearch.value[
+    searchKey(row, field)
+  ] || ''
+}
+
+function setRelationSearch(row, field, value) {
+  relationSearch.value = {
+    ...relationSearch.value,
+    [searchKey(row, field)]: value || ''
+  }
+}
+
+function filteredItems(row, field) {
+  const search = getRelationSearch(
+    row,
+    field
+  )
+    .trim()
+    .toLowerCase()
+
+  const items = allItems(
+    row,
+    field
+  )
+
+  if (!search) {
+    return items
+  }
+
+  return items.filter(item =>
+    String(item.label || '')
+      .toLowerCase()
+      .includes(search)
+  )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -1669,17 +1726,22 @@ function remainingItems(row, field) {
 
         </template>
 
-        <!--  Relacoes Longas -->
-          <!-- RELATION / CHOICES -->
+        <!-- RELATION / CHOICES -->
         <template
           v-else-if="
             isRelationOrChoice(props.col.name) &&
-            compactItems(props.row, props.col.name).length
+            allItems(
+              props.row,
+              props.col.name
+            ).length
           "
         >
           <div class="row items-center no-wrap q-gutter-xs">
 
-            <span class="ellipsis">
+            <span
+              class="ellipsis"
+              style="max-width:180px"
+            >
               {{
                 tdc(
                   String(
@@ -1693,33 +1755,103 @@ function remainingItems(row, field) {
             </span>
 
             <s-btn
-              v-if="remainingItems(props.row, props.col.name).length"
+              v-if="
+                remainingCount(
+                  props.row,
+                  props.col.name
+                ) > 0
+              "
               dense
               flat
               size="sm"
               color="primary"
-              :label="`+${remainingItems(props.row, props.col.name).length}`"
+              :label="
+                `+${
+                  remainingCount(
+                    props.row,
+                    props.col.name
+                  )
+                }`
+              "
             >
               <q-menu>
-                <q-list dense style="min-width:180px;max-width:350px">
+                <q-card
+                  style="
+                    min-width:300px;
+                    max-width:420px
+                  "
+                >
+                  <q-card-section class="q-pa-sm">
 
-                  <q-item
-                    v-for="(item, index) in remainingItems(
-                      props.row,
-                      props.col.name
-                    )"
-                    :key="item.value ?? index"
+                    <q-input
+                      dense
+                      outlined
+                      clearable
+                      autofocus
+                      debounce="200"
+                      :model-value="
+                        getRelationSearch(
+                          props.row,
+                          props.col.name
+                        )
+                      "
+                      :label="tdc('Search')"
+                      @update:model-value="
+                        value =>
+                          setRelationSearch(
+                            props.row,
+                            props.col.name,
+                            value
+                          )
+                      "
+                    >
+                      <template #prepend>
+                        <q-icon name="search" />
+                      </template>
+                    </q-input>
+
+                  </q-card-section>
+
+                  <q-separator />
+
+                  <q-list
+                    dense
+                    style="
+                      max-height:300px;
+                      overflow-y:auto
+                    "
                   >
-                    <q-item-section>
-                      {{ tdc(String(item.label)) }}
-                    </q-item-section>
-                  </q-item>
+                    <q-item
+                      v-for="(item, index) in filteredItems(
+                        props.row,
+                        props.col.name
+                      )"
+                      :key="item.value ?? index"
+                    >
+                      <q-item-section>
+                        {{ tdc(String(item.label)) }}
+                      </q-item-section>
+                    </q-item>
 
-                </q-list>
+                    <q-item
+                      v-if="
+                        !filteredItems(
+                          props.row,
+                          props.col.name
+                        ).length
+                      "
+                    >
+                      <q-item-section class="text-grey text-center">
+                        {{ tdc('No results') }}
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+
+                </q-card>
               </q-menu>
 
               <q-tooltip>
-                {{ tdc('Show more') }}
+                {{ tdc('Show all') }}
               </q-tooltip>
             </s-btn>
 
