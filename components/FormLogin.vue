@@ -20,7 +20,7 @@
           <br>
           <q-form  @submit.prevent="login">
 
-            <s-input @keyup.enter="login()" clearable v-model="identifier" label="Usuario ou Celular ou Email">
+            <s-input @keyup.enter="login()" outlined :readonly="User.loading"  clearable v-model="identifier" label="Usuario ou Celular ou Email">
               <template v-slot:prepend>
                 <q-icon name="email" />
               </template>
@@ -28,8 +28,8 @@
                 <q-icon name="phone" />
               </template>
             </s-input>
-            <br/>
-            <s-input @keyup.enter="login()"  :readonly="readonly" clearable v-model="password" :type="isPwd ? 'password': 'text'" label="Senha">
+         
+            <s-input @keyup.enter="login()" outlined  :readonly="User.loading" clearable v-model="password" :type="isPwd ? 'password': 'text'" label="Senha">
 
               <template v-slot:prepend>
                 <q-icon
