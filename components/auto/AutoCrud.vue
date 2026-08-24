@@ -126,42 +126,15 @@ const modelEndpoint = computed(
     `${props.app}/${props.model.toLowerCase()}s/`
 )
 
-// const columns = computed(() => [
-//   {
-//     name: '__lactions',
-//     label: tdc('Actions'),
-//     field: '__lactions',
-//     sortable: false,
-//     align: 'left',
-//     headerClasses: 'text-left'
-//   },
-//   ...fields.value.map(field => ({
-//     name: field.name,
-//     label: field.label,
-//     field: field.name,
-//     sortable: true,
-//     align: 'left'
-//   })),
-//   {
-//     name: '__ractions',
-//     label: tdc('Actions'),
-//     field: '__ractions',
-//     sortable: false,
-//     align: 'right',
-//     headerClasses: 'text-right'
-//   }
-// ])
-
 const columns = computed(() => [
   {
-    name: '__actions',
+    name: '__lactions',
     label: tdc('Actions'),
     field: '__lactions',
     sortable: false,
     align: 'left',
     headerClasses: 'text-left'
   },
-
   ...fields.value.map(field => ({
     name: field.name,
     label: field.label,
@@ -169,9 +142,8 @@ const columns = computed(() => [
     sortable: true,
     align: 'left'
   })),
-
   {
-    name: '__actions',
+    name: '__ractions',
     label: tdc('Actions'),
     field: '__ractions',
     sortable: false,
@@ -179,6 +151,34 @@ const columns = computed(() => [
     headerClasses: 'text-right'
   }
 ])
+
+// const columns = computed(() => [
+//   {
+//     name: '__actions',
+//     label: tdc('Actions'),
+//     field: '__lactions',
+//     sortable: false,
+//     align: 'left',
+//     headerClasses: 'text-left'
+//   },
+
+//   ...fields.value.map(field => ({
+//     name: field.name,
+//     label: field.label,
+//     field: field.name,
+//     sortable: true,
+//     align: 'left'
+//   })),
+
+//   {
+//     name: '__actions',
+//     label: tdc('Actions'),
+//     field: '__ractions',
+//     sortable: false,
+//     align: 'right',
+//     headerClasses: 'text-right'
+//   }
+// ])
 
 const requestParams = computed(() => ({
   page: pagination.value.page,
