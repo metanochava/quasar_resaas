@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { tdc } from '../../services/translation'
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
