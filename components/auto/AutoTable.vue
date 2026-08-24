@@ -920,7 +920,6 @@ function filteredItems(row, field) {
             <span>
               <q-btn-dropdown 
                 hover aria-haspopup="menu"
-                dense
                 outline
                 icon="more_vert"
                 color="secondary"
