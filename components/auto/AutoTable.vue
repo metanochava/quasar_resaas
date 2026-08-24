@@ -768,6 +768,13 @@ async function executeAction({ type, row }) {
 
               v-show="topActions.length > 0"
             >
+              <q-tooltip
+                :class="$q.dark.isActive
+                  ? 'bg-dark text-white'
+                  : 'bg-primary text-white'"
+              >
+                {{ tdc('More actions') }}
+              </q-tooltip>
               <q-list
                 role="menu"
                 dense
@@ -901,363 +908,196 @@ async function executeAction({ type, row }) {
     =========================================== -->
 
     <template #body-cell-__actions="slotRow">
-
       <q-td :props="slotRow">
 
-
-        <!-- LEFT/DYNAMIC ACTIONS -->
-
-        <s-btn
-          dense
-          flat
-          v-for="a in singularActions"
-          :key="a.action || a.endpoint || a.url"
-          v-show="
-            canAction(a) &&
-            ['l',  'L', 'b', 'B'].includes(a.position) &&
-            !isDeleted(slotRow.row) && 
-            slotRow.col.field == '__lactions'
-          "
-          @click="runAction(a, slotRow.row)"
-          :color="getMethodColor(a.method)"
-          :icon="a.icon"
-        >
-
-          <q-tooltip
-            v-show="a.tooltip"
-            :class="$q.dark.isActive
-              ? 'bg-dark text-white'
-              : 'bg-primary text-white'"
+        <template v-if="slotRow.col.field === '__lactions'">
+          <s-btn
+            v-for="a in singularActions"
+            :key="a.action || a.endpoint || a.url"
+            v-show="
+              canAction(a) &&
+              ['l', 'b', 'L', 'B'].includes(a.position) &&
+              !isDeleted(slotRow.row)
+            "
+            dense
+            flat
+            :color="getMethodColor(a.method)"
+            :icon="a.icon"
+            @click="runAction(a, slotRow.row)"
           >
-            {{ tdc(a.tooltip) || '.' }}
-          </q-tooltip>
-
-        </s-btn>
-
-
-        <!-- =====================================
-             MORE MENU
-        ====================================== -->
-
-        <s-btn
-          dense
-          outline
-          icon="more_vert"
-          color="secondary"
-          
-        >
-
-          <q-menu auto-close>
-
-            <q-list
-              dense
-              style="min-width: 180px"
+            <q-tooltip
+              v-show="a.tooltip"
+              :class="$q.dark.isActive
+                ? 'bg-dark text-white'
+                : 'bg-primary text-white'"
             >
+              {{ tdc(a.tooltip) }}
+            </q-tooltip>
+          </s-btn>
+        </template>
 
-              
+        <template v-if="slotRow.col.field === '__ractions'">
 
-              <!-- =====================================
-                   PDF
-              ====================================== -->
+          <s-btn
+            dense
+            outline
+            icon="more_vert"
+            color="secondary"
+          >
+            <q-menu auto-close>
+              <q-list dense style="min-width:180px">
 
-              <q-item
-                v-if="
-                  schemaPdf.enabled &&
-                  schemaPdf.detail &&
-                  schemaUi.show_pdf &&
-                  can(schemaPdf.detail_permission) &&
-                  !isDeleted(slotRow.row)
-                "
-                clickable
-                @click="emit('pdf', slotRow.row)"
-              >
-
-                <q-item-section avatar>
-
-                  <q-icon
-                    :name="actionStore.getAction('pdf').icon"
-                    :color="actionStore.getAction('pdf').color"
-                  />
-
-                </q-item-section>
-
-                <q-item-section>
-                  {{ tdc(actionStore.getAction('pdf').label) }}
-                </q-item-section>
-
-                <q-tooltip
-                  :class="$q.dark.isActive
-                    ? 'bg-dark text-white'
-                    : 'bg-primary text-white'"
+                <q-item
+                  v-for="a in singularActions"
+                  :key="a.action || a.endpoint || a.url"
+                  v-show="
+                    canAction(a) &&
+                    ['m', 'M'].includes(a.position) &&
+                    !isDeleted(slotRow.row)
+                  "
+                  clickable
+                  @click="runAction(a, slotRow.row)"
                 >
-                  {{ tdc(actionStore.getAction('pdf').label) }}
-                </q-tooltip>
+                  <q-item-section v-if="a.icon" avatar>
+                    <q-icon
+                      :name="a.icon"
+                      :color="getMethodColor(a.method)"
+                    />
+                  </q-item-section>
 
-              </q-item>
+                  <q-item-section>
+                    {{ tdc(a.label || a.action) }}
+                  </q-item-section>
+                </q-item>
 
+                <q-item
+                  v-if="
+                    schemaPdf.enabled &&
+                    schemaPdf.detail &&
+                    schemaUi.show_pdf &&
+                    can(schemaPdf.detail_permission) &&
+                    !isDeleted(slotRow.row)
+                  "
+                  clickable
+                  @click="emit('pdf', slotRow.row)"
+                >
+                  <q-item-section avatar>
+                    <q-icon
+                      :name="actionStore.getAction('pdf').icon"
+                      :color="actionStore.getAction('pdf').color"
+                    />
+                  </q-item-section>
 
-              <!-- =====================================
-                   EDIT
-              ====================================== -->
+                  <q-item-section>
+                    {{ tdc(actionStore.getAction('pdf').label) }}
+                  </q-item-section>
+                </q-item>
 
-              <q-item
-                v-if="
-                  can(permissions.change) &&
-                  !isDeleted(slotRow.row)
-                "
-                clickable
-              >
-
-                <q-item-section
-                  avatar
+                <q-item
+                  v-if="
+                    can(permissions.change) &&
+                    !isDeleted(slotRow.row)
+                  "
+                  clickable
                   @click="emit('edit', slotRow.row)"
                 >
+                  <q-item-section avatar>
+                    <q-icon
+                      :name="actionStore.getAction('edit').icon"
+                      :color="actionStore.getAction('edit').color"
+                    />
+                  </q-item-section>
 
-                  <q-icon
-                    :name="actionStore.getAction('edit').icon"
-                    :color="actionStore.getAction('edit').color"
-                  />
+                  <q-item-section>
+                    {{ tdc(actionStore.getAction('edit').label) }}
+                  </q-item-section>
+                </q-item>
 
-                </q-item-section>
-
-                <q-item-section
-                  @click="emit('edit', slotRow.row)"
+                <q-item
+                  v-if="
+                    can(permissions.delete) &&
+                    !isDeleted(slotRow.row)
+                  "
+                  clickable
+                  @click="confirmAction('delete', slotRow.row)"
                 >
-                  {{ tdc(actionStore.getAction('edit').label) }}
-                </q-item-section>
+                  <q-item-section avatar>
+                    <q-icon
+                      :name="actionStore.getAction('delete').icon"
+                      :color="actionStore.getAction('delete').color"
+                    />
+                  </q-item-section>
 
+                  <q-item-section>
+                    {{ tdc(actionStore.getAction('delete').label) }}
+                  </q-item-section>
+                </q-item>
 
-                <q-item-section
-                  side
-                  v-if="props.config?.routes?.change"
+                <q-item
+                  v-if="
+                    can(permissions.restore) &&
+                    isDeleted(slotRow.row)
+                  "
+                  clickable
+                  @click="emit('restore', slotRow.row)"
                 >
+                  <q-item-section avatar>
+                    <q-icon name="restore" color="green" />
+                  </q-item-section>
 
-                  <s-btn
-                    flat
-                    size="sm"
-                    icon="open_in_new"
-                    :to="{
-                      name: props.config.routes.change,
-                      params: {
-                        id: slotRow.row?.id
-                      }
-                    }"
-                    @click.stop
-                  />
+                  <q-item-section>
+                    {{ tdc('Restore') }}
+                  </q-item-section>
+                </q-item>
 
-                </q-item-section>
-
-
-                <q-tooltip
-                  :class="$q.dark.isActive
-                    ? 'bg-dark text-white'
-                    : 'bg-primary text-white'"
+                <q-item
+                  v-if="
+                    can(permissions.hard_delete) &&
+                    isDeleted(slotRow.row)
+                  "
+                  clickable
+                  @click="confirmAction('hard_delete', slotRow.row)"
                 >
-                  {{ tdc(actionStore.getAction('edit').label) }}
-                </q-tooltip>
+                  <q-item-section avatar>
+                    <q-icon name="delete_forever" color="red" />
+                  </q-item-section>
 
-              </q-item>
+                  <q-item-section>
+                    {{ tdc('Delete permanently') }}
+                  </q-item-section>
+                </q-item>
 
+              </q-list>
+            </q-menu>
+          </s-btn>
 
-              <!-- =====================================
-                   DELETE
-              ====================================== -->
-
-              <q-item
-                v-if="
-                  can(permissions.delete) &&
-                  !isDeleted(slotRow.row)
-                "
-                clickable
-                @click="confirmAction('delete', slotRow.row)"
-              >
-
-                <q-item-section avatar>
-
-                  <q-icon
-                    :name="actionStore.getAction('delete').icon"
-                    :color="actionStore.getAction('delete').color"
-                  />
-
-                </q-item-section>
-
-                <q-item-section>
-                  {{ tdc(actionStore.getAction('delete').label) }}
-                </q-item-section>
-
-                <q-tooltip
-                  :class="$q.dark.isActive
-                    ? 'bg-dark text-white'
-                    : 'bg-primary text-white'"
-                >
-                  {{ tdc(actionStore.getAction('delete').label) }}
-                </q-tooltip>
-
-              </q-item>
-
-
-              <!-- =====================================
-                   HARD DELETE
-              ====================================== -->
-
-              <q-item
-                v-if="
-                  can(permissions.hard_delete) &&
-                  isDeleted(slotRow.row)
-                "
-                clickable
-                @click="confirmAction('hard_delete', slotRow.row)"
-              >
-
-                <q-item-section avatar>
-                  <q-icon
-                    name="delete_forever"
-                    color="red"
-                  />
-                </q-item-section>
-
-                <q-item-section>
-                  {{ tdc('Delete permanently') }}
-                </q-item-section>
-
-                <q-tooltip
-                  :class="$q.dark.isActive
-                    ? 'bg-dark text-white'
-                    : 'bg-primary text-white'"
-                >
-                  {{ tdc('Delete permanently') }}
-                </q-tooltip>
-
-              </q-item>
-
-
-              <!-- =====================================
-                   RESTORE
-              ====================================== -->
-
-              <q-item
-                v-if="
-                  can(permissions.restore) &&
-                  isDeleted(slotRow.row)
-                "
-                clickable
-                @click="emit('restore', slotRow.row)"
-              >
-
-                <q-item-section avatar>
-
-                  <q-icon
-                    name="restore"
-                    color="green"
-                  />
-
-                </q-item-section>
-
-                <q-item-section>
-                  {{ tdc('Restore') }}
-                </q-item-section>
-
-                <q-tooltip
-                  :class="$q.dark.isActive
-                    ? 'bg-dark text-white'
-                    : 'bg-primary text-white'"
-                >
-                  {{ tdc('Restore') }}
-                </q-tooltip>
-
-              </q-item>
-
-
-              <q-separator
-                v-if="singularActions.length"
-              />
-
-
-              <q-item
-                v-for="a in singularActions"
-                :key="a.action || a.endpoint || a.url"
-                clickable
-                v-show="
-                  canAction(a) &&
-                  ['m', 'M'].includes(a.position) &&
-                  !isDeleted(slotRow.row)
-                "
-                @click="runAction(a, slotRow.row)"
-              >
-
-                <q-item-section
-                  avatar
-                  v-if="a.icon"
-                >
-
-                  <q-icon
-                    :name="a.icon"
-                    :color="getMethodColor(a.method)"
-                  />
-
-                </q-item-section>
-
-                <q-item-section>
-                  {{ tdc(a.label || a.action) }}
-                </q-item-section>
-
-                <q-tooltip
-                  :class="$q.dark.isActive
-                    ? 'bg-dark text-white'
-                    : 'bg-primary text-white'"
-                >
-                  {{ tdc(a.tooltip || a.label || a.action) }}
-                </q-tooltip>
-
-              </q-item>
-
-            </q-list>
-
-          </q-menu>
-
-
-          <q-tooltip
-            :class="$q.dark.isActive
-              ? 'bg-dark text-white'
-              : 'bg-primary text-white'"
+          <s-btn
+            v-for="a in singularActions"
+            :key="a.action || a.endpoint || a.url"
+            v-show="
+              canAction(a) &&
+              ['r', 'b', 'R', 'B'].includes(a.position) &&
+              !isDeleted(slotRow.row)
+            "
+            dense
+            flat
+            :color="getMethodColor(a.method)"
+            :icon="a.icon"
+            @click="runAction(a, slotRow.row)"
           >
-            {{ tdc('Click to see more options') }}
-          </q-tooltip>
+            <q-tooltip
+              v-show="a.tooltip"
+              :class="$q.dark.isActive
+                ? 'bg-dark text-white'
+                : 'bg-primary text-white'"
+            >
+              {{ tdc(a.tooltip) }}
+            </q-tooltip>
+          </s-btn>
 
-        </s-btn>
-
-
-        <!-- RIGHT/DYNAMIC ACTIONS -->
-
-        <s-btn
-          dense
-          flat
-          v-for="a in singularActions"
-          :key="a.action || a.endpoint || a.url"
-          v-show="
-            canAction(a) &&
-            ['r', 'R','b', 'B'].includes(a.position) &&
-            !isDeleted(slotRow.row) &&
-            slotRow.col.field == '__ractions'
-          "
-          @click="runAction(a, slotRow.row)"
-          :color="getMethodColor(a.method)"
-          :icon="a.icon"
-        >
-
-          <q-tooltip
-            v-show="a.tooltip"
-            :class="$q.dark.isActive
-              ? 'bg-dark text-white'
-              : 'bg-primary text-white'"
-          >
-            {{ tdc(a.tooltip) || '.' }}
-          </q-tooltip>
-
-        </s-btn>
+        </template>
 
       </q-td>
-
     </template>
 
 
