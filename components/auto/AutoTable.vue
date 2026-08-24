@@ -704,6 +704,8 @@ async function executeAction({ type, row }) {
               outline
               label="  Actions"
               color="secondary"
+
+              v-show="singularActions.some( action =>  action.position === 't' )"
             >
 
    
@@ -885,7 +887,7 @@ async function executeAction({ type, row }) {
           outline
           icon="more_vert"
           color="secondary"
-          v-show="singularActions.some( action =>  action.position === 't' &&  action.visible )"
+          
         >
 
           <q-menu auto-close>

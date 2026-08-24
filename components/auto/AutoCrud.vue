@@ -67,6 +67,7 @@ import { buildFormFromSchema } from '../../utils/autoForm'
 import { useUserStore } from '../../stores/UserStore'
 
 const User =useUserStore()
+const schema = ref(null)
 
 const emit = defineEmits([
   'runaction'
@@ -140,23 +141,27 @@ const columns = computed(() => {
 
 
 // --- INIT ---
+
 async function init() {
   if (!props.app || !props.model) return
 
   const data = await buildFormFromSchema({
     app: props.app,
     model: props.model,
-    fieldsPath: 'fields',
+    fieldsPath: 'fields'
   })
 
+  schema.value = data.schema
   fields.value = data.fields
   actions.value = [...data.actions, ...props.extraActions]
   config.value = data.config
+  pagination.value.rowsPerPage = data.schema?.pagination?.page_size || 10
 
-  store.fields = data.fields
-  store.app= props.app
-  store.model= props.model
-
+  Object.assign(store, {
+    fields: data.fields,
+    app: props.app,
+    model: props.model
+  })
 
   await loadData()
 }
@@ -267,7 +272,7 @@ async function onDelete(row) {
 async function onHardDelete(row) {
   await HTTPAuth.delete(url({
     type: 'u',
-    url: `${props.app}/${props.model.toLowerCase()}s/${row.id}/hard_delete/`
+    url: `${props.app}/${props.model.toLowerCase()}/${row.id}/hard_delete/`
   }))
   await loadData()
 }

@@ -1,6 +1,7 @@
 
 import { HTTPAuth, url } from "../services/api"
 import { tdc } from "../services/translation"
+import { normalizeSchema } from './schema'
 
 
 
@@ -151,13 +152,14 @@ export async function buildFormFromSchema({
     })
   )
 
-  const fields =
-    schemaPath === 'data.fields'
-      ? (data?.data?.fields || [])
-      : (data?.fields || [])
+  const schema = normalizeSchema(data)
 
-  const actions = data?.actions || []
-  const config = data?.config || {}
+  const fields = schema.fields
+
+  const actions = schema.actions
+
+  const config = schema.config
+
 
   const out = []
 
