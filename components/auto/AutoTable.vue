@@ -705,7 +705,7 @@ async function executeAction({ type, row }) {
               label="  Actions"
               color="secondary"
 
-              v-show="singularActions.some( action =>  action.position === 't' )"
+              v-show="singularActions.some( action =>  action.position === 't' && action.visible ) "
             >
 
    
