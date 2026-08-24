@@ -460,13 +460,27 @@ function getField(name) {
   return props.fields.find(f => f.name === name)
 }
 
-function isRelationOrChoice(name) {
+
+
+function isRelationOrChoice(name, value = null) {
   const field = getField(name)
+
+  let parsed = value
+
+  if (typeof value === 'string') {
+    try {
+      parsed = JSON.parse(value)
+    } catch {}
+  }
 
   return Boolean(
     field?.ui?.isRelation ||
     field?.relation ||
-    field?.choices?.length
+    field?.type === 'ManyToManyField' ||
+    field?.type === 'ForeignKey' ||
+    field?.type === 'OneToOneField' ||
+    field?.choices?.length ||
+    Array.isArray(parsed)
   )
 }
 
@@ -1726,10 +1740,13 @@ function filteredItems(row, field) {
 
         </template>
 
-        <!-- RELATION / CHOICES -->
+        <!-- RELATION / CHOICE / MANY TO MANY -->
         <template
           v-else-if="
-            isRelationOrChoice(props.col.name) &&
+            isRelationOrChoice(
+              props.col.name,
+              props.value
+            ) &&
             allItems(
               props.row,
               props.col.name
@@ -1775,14 +1792,9 @@ function filteredItems(row, field) {
               "
             >
               <q-menu>
-                <q-card
-                  style="
-                    min-width:300px;
-                    max-width:420px
-                  "
-                >
-                  <q-card-section class="q-pa-sm">
+                <q-card style="min-width:300px;max-width:420px">
 
+                  <q-card-section class="q-pa-sm">
                     <q-input
                       dense
                       outlined
@@ -1809,17 +1821,13 @@ function filteredItems(row, field) {
                         <q-icon name="search" />
                       </template>
                     </q-input>
-
                   </q-card-section>
 
                   <q-separator />
 
                   <q-list
                     dense
-                    style="
-                      max-height:300px;
-                      overflow-y:auto
-                    "
+                    style="max-height:300px;overflow-y:auto"
                   >
                     <q-item
                       v-for="(item, index) in filteredItems(
@@ -1849,10 +1857,6 @@ function filteredItems(row, field) {
 
                 </q-card>
               </q-menu>
-
-              <q-tooltip>
-                {{ tdc('Show all') }}
-              </q-tooltip>
             </s-btn>
 
           </div>
