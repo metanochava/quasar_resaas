@@ -67,20 +67,27 @@ import { useUserStore } from '../../stores/UserStore'
 const User = useUserStore()
 const emit = defineEmits(['runaction'])
 
-const defaultIgnoreFields = () => [
-  'created_at',
-  'updated_at',
-  'created_by',
-  'updated_by'
-]
+
 
 const props = defineProps({
   app: { type: String, required: true },
   model: { type: String, required: true },
-  route: { type: [String, Object], default: null },
-  ignoreFields: { type: Array, default: defaultIgnoreFields },
-  ignoreFieldsFilter: { type: Array, default: defaultIgnoreFields },
-  extraActions: { type: Array, default: () => [] }
+  route: {
+    type: [String, Object],  default: null
+  },
+  ignoreFields: {
+    type: Array,
+    default: () => [  'created_at', 'updated_at', 'created_by', 'updated_by'  ]
+  },
+  ignoreFieldsFilter: {
+    type: Array,
+    default: () => [  'created_at', 'updated_at', 'created_by', 'updated_by'  ]
+  },
+
+  extraActions: {
+    type: Array,
+    default: () => []
+  }
 })
 
 const schema = ref(null)
