@@ -358,6 +358,10 @@ async function onRunAction(action, row) {
 
   if (action.action) emit('runaction', action, row)
 
+  if (action.autorequest !== true) {
+    return
+  }
+
   const actionUrl = resolveActionEndpoint(action, row)
   if (!actionUrl) return
 
