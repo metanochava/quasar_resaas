@@ -1,58 +1,63 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 
-// ---------------- PROPS ----------------
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
   fields: { type: Array, default: () => [] },
-  ignoreFields: { type: Array, default: () => [] }
+  ignoreFields: { type: Array, default: () => [] },
+  schema: { type: Object, default: () => ({}) }
 })
 
-// ---------------- EMITS ----------------
-const emit = defineEmits(['update:modelValue','apply'])
-
-// ---------------- FIX V-MODEL ----------------
+const emit = defineEmits(['update:modelValue', 'apply'])
 const localModel = ref(props.modelValue)
-
-watch(() => props.modelValue, v => {
-  localModel.value = v
-})
-
-watch(localModel, v => {
-  emit('update:modelValue', v)
-})
-
-// ---------------- STATE ----------------
 const filters = ref({})
+
+watch(() => props.modelValue, v => localModel.value = v)
+watch(localModel, v => emit('update:modelValue', v))
 
 const ignoreSet = computed(() => new Set(props.ignoreFields))
 
-const activeCount = computed(() =>
-  Object.values(filters.value).filter(v => v !== null && v !== '').length
+const schemaFilterFields = computed(() => {
+  const fields = props.schema?.filters?.fields
+  return Array.isArray(fields) && fields.length ? new Set(fields) : null
+})
+
+const filterEnabled = computed(() =>
+  props.schema?.filters?.enabled ?? true
 )
 
-// ---------------- COMPUTED ----------------
+const availableFields = computed(() =>
+  props.fields.filter(f => {
+    if (!filterEnabled.value) return false
+    if (ignoreSet.value.has(f.name)) return false
+    if (schemaFilterFields.value && !schemaFilterFields.value.has(f.name)) return false
+    if (f.ui?.isFile || f.ui?.isImage) return false
+    return true
+  })
+)
+
 const basicFields = computed(() =>
-  props.fields
-    .filter(f => {
-      if (ignoreSet.value.has(f.name)) return false // 🔥 AQUI
-      if (f.ui?.isFile || f.ui?.isImage) return false
-      if (f.ui?.isRelation) return true
-      if (f.ui?.isChar || f.ui?.isNumeric) return true
-      return false
-    })
+  availableFields.value
+    .filter(f =>
+      f.ui?.isRelation ||
+      f.ui?.isChar ||
+      f.ui?.isNumeric
+    )
     .slice(0, 10)
 )
 
 const advancedFields = computed(() =>
-  props.fields.filter(f =>
-    !ignoreSet.value.has(f.name) && // 🔥 AQUI
-    !(f.ui?.isFile || f.ui?.isImage) &&
-    !basicFields.value.find(b => b.name === f.name)
+  availableFields.value.filter(
+    f => !basicFields.value.some(b => b.name === f.name)
   )
 )
 
-// ---------------- ACTIONS ----------------
+const activeCount = computed(() =>
+  Object.values(filters.value).filter(
+    v => v !== null && v !== undefined && v !== ''
+  ).length
+)
+
 function close() {
   localModel.value = false
 }
@@ -61,66 +66,34 @@ function clear() {
   filters.value = {}
 }
 
-// function apply() {
-//   const payload = Object.fromEntries(
-//     Object.entries(filters.value).filter(([_, v]) =>
-//       v !== null && v !== undefined && v !== ''
-//     )
-//   )
+function normalizeValue(value) {
+  if (Array.isArray(value)) {
+    return value.map(item =>
+      typeof item === 'object' && item !== null
+        ? item.id ?? item.value ?? item
+        : item
+    )
+  }
 
-//   emit('apply', {
-//     ...payload,
-//     __resetPage: true
-//   })
+  if (typeof value === 'object' && value !== null) {
+    return value.id ?? value.value ?? value
+  }
 
-//   localModel.value = false
-// }
+  return value
+}
 
 function apply() {
-
   const payload = Object.fromEntries(
     Object.entries(filters.value)
-
-      // Remove valores vazios
-      .filter(([_, v]) =>
+      .filter(([, v]) =>
         v !== null &&
         v !== undefined &&
         v !== ''
       )
-
-      .map(([key, value]) => {
-
-        // Array
-        if (Array.isArray(value)) {
-          return [
-            key,
-            value.map(item => {
-              if (
-                typeof item === 'object' &&
-                item !== null
-              ) {
-                return item.id ?? item.value ?? item
-              }
-
-              return item
-            })
-          ]
-        }
-
-        // Objecto
-        if (
-          typeof value === 'object' &&
-          value !== null
-        ) {
-          return [
-            key,
-            value.id ?? value.value ?? value
-          ]
-        }
-
-        // Valor normal
-        return [key, value]
-      })
+      .map(([key, value]) => [
+        key,
+        normalizeValue(value)
+      ])
   )
 
   emit('apply', {
@@ -128,66 +101,61 @@ function apply() {
     __resetPage: true
   })
 
-  localModel.value = false
+  close()
 }
-
-
 </script>
 
 <template>
   <q-dialog v-model="localModel" persistent>
-    <s-card style="min-width: 720px; max-width: 92vw;">
-
-      <!-- HEADER -->
-      <q-bar :class="['row items-center justify-between',  $q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white']">
-        <div class="text-h6">Filtros</div>
-        <s-btn dense flat icon="close" @click="close" >
-          <q-tooltip>Fechar</q-tooltip>
+    <s-card style="min-width:720px;max-width:92vw">
+      <q-bar :class="['row items-center justify-between',$q.dark.isActive?'bg-dark text-white':'bg-primary text-white']">
+        <div class="text-h6">{{ tdc('Filters') }}<span v-if="activeCount"> ({{ activeCount }})</span></div>
+        <s-btn dense flat icon="close" @click="close">
+          <q-tooltip>{{ tdc('Close') }}</q-tooltip>
         </s-btn>
       </q-bar>
 
       <q-separator />
 
-      <!-- BODY -->
-      <q-card-section v-if="!fields.length">
+      <q-card-section v-if="!fields.length" class="flex flex-center">
         <q-spinner />
       </q-card-section>
 
+      <q-card-section v-else-if="!filterEnabled" class="text-center text-grey">
+        {{ tdc('Filters disabled') }}
+      </q-card-section>
+
       <q-card-section v-else class="row q-col-gutter-sm">
+        <div v-for="f in basicFields" :key="f.name" class="col-12 col-sm-6 col-md-4">
+          <component
+            :is="f.component || 's-input'"
+            v-model="filters[f.name]"
+            v-bind="f.props"
+            :label="f.label"
+            dense
+            outlined
+          />
+        </div>
 
-        <div v-for="f in basicFields" :key="f.name" class="col-4">
-              <component
-                :is="f.component"
-                v-model="filters[f.name]"
-                v-bind="f.props"
-                :label="f.label"
-                dense
-                outline
-              />
-            </div>
-
-            <div v-for="f in advancedFields" :key="f.name" class="col-4">
-              <component
-                :is=" f.component"
-                v-model="filters[f.name]"
-                v-bind="f.props"
-                :label="f.label"
-                dense
-                outlined
-              />
-            </div>
-
+        <div v-for="f in advancedFields" :key="f.name" class="col-12 col-sm-6 col-md-4">
+          <component
+            :is="f.component || 's-input'"
+            v-model="filters[f.name]"
+            v-bind="f.props"
+            :label="f.label"
+            dense
+            outlined
+          />
+        </div>
       </q-card-section>
 
       <q-separator />
 
-      <!-- ACTIONS -->
       <q-card-actions align="right">
-        <s-btn flat label="Limpar" @click="clear" />
-        <s-btn flat label="Cancelar" @click="close" />
-        <s-btn color="primary" label="Aplicar" @click="apply" />
+        <s-btn flat :label="tdc('Clear')" @click="clear" />
+        <s-btn flat :label="tdc('Cancel')" @click="close" />
+        <s-btn color="primary" :label="tdc('Apply')" :disable="!filterEnabled" @click="apply" />
       </q-card-actions>
-
     </s-card>
   </q-dialog>
 </template>

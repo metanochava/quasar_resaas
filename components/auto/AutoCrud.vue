@@ -1,161 +1,197 @@
-
 <template>
+  <s-pdf-render
+    v-model="showPdf"
+    :src="pdfUrl"
+    title="Document"
+    :top="false"
+  />
 
-    <s-pdf-render
-      v-model="showPdf"
-      :src="pdfUrl"
-      title="Document"
-      :top="false"
-    />
+  <s-auto-table
+    v-model:pagination="pagination"
+    :app="app"
+    :model="model"
+    :schema="schema"
+    :rows="rows"
+    :columns="columns"
+    :fields="fields"
+    :actions="actions"
+    :loading="loading"
+    :ignoreFields="ignoreFields"
+    :config="config"
+    @request="onRequest"
+    @create="openCreate"
+    @PDF="openPdf"
+    @pdfList="openPdfList"
+    @edit="openEdit"
+    @delete="onDelete"
+    @filter="showFilter = true"
+    @inline-patch="onInlinePatch"
+    @run-action="onRunAction"
+    @refresh="loadData"
+    @objects="onChangeObjects"
+    @hard_delete="onHardDelete"
+    @restore="onRestore"
+    @search="onSearch"
+  />
 
-    <s-auto-table
-      :app="app"
-      :model="model"
-      :rows="rows"
-      :columns="columns"
-      :fields="fields"
-      :actions="actions"
-      :loading="loading"
-      v-model:pagination="pagination"
-      :ignoreFields="ignoreFields"
-      :config = "config"
+  <s-form-modal
+    v-model="showForm"
+    :store="store"
+    :ignoreFields="ignoreFields"
+    @saved="onSaved"
+    :schema="schema"
+    @delete="onDelete"
+  />
 
-      @request="onRequest"
-      @create="openCreate"
-      @pdf="openPdf"
-      @pdfList="openPdfList"
-      @edit="openEdit"
-      @delete="onDelete"
-      @filter="showFilter = true"
-      @inline-patch="onInlinePatch"
-      @run-action="onRunAction"
-      @refresh="loadData"
-
-      @objects="onChangeObjects"
-      @hard_delete="onHardDelete"
-      @restore="onRestore"
-      @search="onSearch"
-    />
-
-
-    <s-form-modal
-      v-model="showForm"
-      :store="store"
-      :ignoreFields="ignoreFields"
-      @saved="onSaved"
-    />
-
-
-
-    <s-auto-filter
-      v-model="showFilter"
-      :fields="fields"
-      :ignoreFields="ignoreFieldsFilter"
-
-      @apply="onApplyFilter"
-    />
-
+  <s-auto-filter
+    v-model="showFilter"
+    :fields="fields"
+    :ignoreFields="ignoreFieldsFilter"
+    @apply="onApplyFilter"
+    :schema="schema"
+  />
 </template>
-<script setup>
-import { ref, computed, watch } from 'vue'
-import { debounce } from 'quasar'
-import { reactive } from 'vue'
-import { tdc } from '../../services/translation'
 
+<script setup>
+import { computed, reactive, ref, watch } from 'vue'
+import { debounce } from 'quasar'
+import { tdc } from '../../services/translation'
 import { HTTPAuth, HTTPAuthBlob, url } from '../../services/api'
 import { buildFormFromSchema } from '../../utils/autoForm'
+import {
+  resolveActionEndpoint,
+  resolvePdfDetailEndpoint
+} from '../../utils/schema'
 import { useUserStore } from '../../stores/UserStore'
 
-const User =useUserStore()
-const schema = ref(null)
+const User = useUserStore()
+const emit = defineEmits(['runaction'])
 
-const emit = defineEmits([
-  'runaction'
-])
-// --- props ---
+const defaultIgnoreFields = () => [
+  'created_at',
+  'updated_at',
+  'created_by',
+  'updated_by'
+]
+
 const props = defineProps({
   app: { type: String, required: true },
   model: { type: String, required: true },
-
   route: { type: [String, Object], default: null },
-  ignoreFields: { type: Array, default: () =>  ['created_at','updated_at', 'created_by', 'updated_by'] },
-  ignoreFieldsFilter: { type: Array, default: () =>  ['created_at','updated_at', 'created_by', 'updated_by'] },
-  extraActions: { type: Array, default: () =>  [ ] },
+  ignoreFields: { type: Array, default: defaultIgnoreFields },
+  ignoreFieldsFilter: { type: Array, default: defaultIgnoreFields },
+  extraActions: { type: Array, default: () => [] }
 })
 
-// --- state ---
+const schema = ref(null)
 const fields = ref([])
 const actions = ref([])
 const config = ref({})
 const rows = ref([])
+const filters = ref({})
 const loading = ref(false)
-
 const showForm = ref(false)
 const showFilter = ref(false)
 const selectedRow = ref(null)
-
 const showPdf = ref(false)
 const pdfUrl = ref(null)
-
-
 
 const store = reactive({
   fields: [],
   saving: false,
   app: null,
   model: null,
-  data: null
+  data: null,
+  form: null
 })
-
 
 const pagination = ref({
   page: 1,
   rowsPerPage: 10,
   rowsNumber: 0,
   sortBy: 'id',
-  descending: true,
+  descending: true
 })
 
-const filters = ref({})
+const modelEndpoint = computed(
+  () =>
+    schema.value?.model?.endpoint ||
+    `${props.app}/${props.model.toLowerCase()}s/`
+)
 
-// --- computed columns ---
-const columns = computed(() => {
-
-  const base = fields.value.map(f => ({
-    name: f.name,
-    label: f.label,
-    field: f.name,
-    sortable: true,
+const columns = computed(() => [
+  {
+    name: '__lactions',
+    label: tdc('Actions'),
+    field: '__lactions',
+    sortable: false,
     align: 'left',
-  }))
+    headerClasses: 'text-left'
+  },
+  ...fields.value.map(field => ({
+    name: field.name,
+    label: field.label,
+    field: field.name,
+    sortable: true,
+    align: 'left'
+  })),
+  {
+    name: '__ractions',
+    label: tdc('Actions'),
+    field: '__ractions',
+    sortable: false,
+    align: 'right',
+    headerClasses: 'text-right'
+  }
+])
 
-  const columns = [ 
-    {  name: '__actions',label: tdc('Actions') ,  field: '__lactions', sortable: false, align: 'left',  headerClasses: 'text-left' },
-    ...base, 
-    { name: '__actions', label: tdc('Actions'), field: '__ractions', sortable: false , align: 'right',  headerClasses: 'text-right ' }
-  ]
-    
-  return columns
-})
+const requestParams = computed(() => ({
+  page: pagination.value.page,
+  page_size: pagination.value.rowsPerPage,
+  ordering: pagination.value.sortBy
+    ? `${pagination.value.descending ? '-' : ''}${pagination.value.sortBy}`
+    : undefined,
+  ...filters.value
+}))
 
+function endpoint(value, params) {
+  return url({ type: 'u', url: value, params })
+}
 
+function hasPermission(permission) {
+  return !permission || User.can(permission)
+}
 
-// --- INIT ---
+function showPdfBlob(data) {
+  if (pdfUrl.value) URL.revokeObjectURL(pdfUrl.value)
+
+  pdfUrl.value = URL.createObjectURL(
+    new Blob([data], { type: 'application/pdf' })
+  )
+
+  showPdf.value = true
+}
 
 async function init() {
   if (!props.app || !props.model) return
 
   const data = await buildFormFromSchema({
     app: props.app,
-    model: props.model,
-    fieldsPath: 'fields'
+    model: props.model
   })
 
   schema.value = data.schema
   fields.value = data.fields
   actions.value = [...data.actions, ...props.extraActions]
   config.value = data.config
-  pagination.value.rowsPerPage = data.schema?.pagination?.page_size || 10
+
+  const ordering = data.schema?.pagination?.default_ordering || '-id'
+
+  Object.assign(pagination.value, {
+    rowsPerPage: data.schema?.pagination?.page_size || 10,
+    descending: ordering.startsWith('-'),
+    sortBy: ordering.replace(/^-/, '')
+  })
 
   Object.assign(store, {
     fields: data.fields,
@@ -166,51 +202,29 @@ async function init() {
   await loadData()
 }
 
-// --- LOAD DATA (SOURCE OF TRUTH) ---
 let lastToken = 0
 
 async function loadData(token = null) {
+  if (!schema.value) return
+
   loading.value = true
 
   try {
-    const params = {
-      page: pagination.value.page,
-      page_size: pagination.value.rowsPerPage,
-      ordering: pagination.value.sortBy
-        ? `${pagination.value.descending ? '-' : ''}${pagination.value.sortBy}`
-        : undefined,
-      ...filters.value,
-    }
-
     const { data } = await HTTPAuth.get(
-      url({
-        type: 'u',
-        url: `${props.app}/${props.model.toLowerCase()}s/`,
-        params
-      })
+      endpoint(modelEndpoint.value, requestParams.value)
     )
 
-    // 🔥 IGNORA resposta antiga
     if (token && token !== lastToken) return
 
     rows.value = data?.results || data || []
     pagination.value.rowsNumber = data?.count ?? rows.value.length
-
   } finally {
-    if (!token || token === lastToken) {
-      loading.value = false
-    }
+    if (!token || token === lastToken) loading.value = false
   }
 }
 
-// --- EVENTS ---
-
-function onRequest(req) {
-
-  pagination.value = {
-    ...req.pagination
-  }
-
+function onRequest({ pagination: value }) {
+  Object.assign(pagination.value, value)
   loadData()
 }
 
@@ -222,66 +236,69 @@ function openCreate() {
 
 function openEdit(row) {
   selectedRow.value = row
-  store.form =row
+  store.form = row
   showForm.value = true
 }
 
- 
 async function openPdf(row) {
-  const res = await HTTPAuthBlob.get(url({
-    type: 'u',
-    url: `${props.app}/${props.model.toLowerCase()}s/${row.id}/pdf/`
-  }))
+  const pdf = schema.value?.pdf
 
-  const blob = new Blob([res.data], { type: 'application/pdf' })
-  pdfUrl.value = URL.createObjectURL(blob)
+  if (
+    !pdf?.detail ||
+    !hasPermission(pdf.detail_permission)
+  ) return
 
-  showPdf.value = true
+  const pdfEndpoint = resolvePdfDetailEndpoint(schema.value, row)
+  if (!pdfEndpoint) return
+
+  const { data } = await HTTPAuthBlob.get(endpoint(pdfEndpoint))
+  showPdfBlob(data)
 }
 
 async function openPdfList() {
-  const params = {
-    page: pagination.value.page,
-    page_size: pagination.value.rowsPerPage,
-    ordering: pagination.value.sortBy
-      ? `${pagination.value.descending ? '-' : ''}${pagination.value.sortBy}`
-      : undefined,
-    ...filters.value,
-  }
-  const res = await HTTPAuthBlob.get(url({
-    type: 'u',
-    url: `${props.app}/${props.model.toLowerCase()}s/pdflist/`,
-    params
-  }))
+  const pdf = schema.value?.pdf
 
-  const blob = new Blob([res.data], { type: 'application/pdf' })
-  pdfUrl.value = URL.createObjectURL(blob)
+  if (
+    !pdf?.list ||
+    !hasPermission(pdf.list_permission) ||
+    !pdf.list_endpoint
+  ) return
 
-  showPdf.value = true
+  const { data } = await HTTPAuthBlob.get(
+    endpoint(pdf.list_endpoint, requestParams.value)
+  )
+
+  showPdfBlob(data)
 }
 
-
 async function onDelete(row) {
-  await HTTPAuth.delete(url({
-    type: 'u',
-    url: `${props.app}/${props.model.toLowerCase()}s/${row.id}/`
-  }))
+  if (!hasPermission(schema.value?.permissions?.delete)) return
+
+  await HTTPAuth.delete(
+    endpoint(`${modelEndpoint.value}${row.id}/`)
+  )
+
   await loadData()
 }
 
 async function onHardDelete(row) {
-  await HTTPAuth.delete(url({
-    type: 'u',
-    url: `${props.app}/${props.model.toLowerCase()}/${row.id}/hard_delete/`
-  }))
+  if (!hasPermission(schema.value?.permissions?.hard_delete)) return
+
+  await HTTPAuth.delete(
+    endpoint(`${modelEndpoint.value}${row.id}/hard_delete/`)
+  )
+
   await loadData()
 }
 
 async function onRestore(row) {
-  await HTTPAuth.post(url({
-    type: 'u',
-    url: `${props.app}/${props.model.toLowerCase()}s/${row.id}/restore/`
-  }), {})
+  if (!hasPermission(schema.value?.permissions?.restore)) return
+
+  await HTTPAuth.post(
+    endpoint(`${modelEndpoint.value}${row.id}/restore/`),
+    {}
+  )
+
   await loadData()
 }
 
@@ -290,97 +307,93 @@ async function onSaved() {
   await loadData()
 }
 
-// --- FILTER ---
-function clean(obj) {
-  const out = {}
-  Object.entries(obj || {}).forEach(([k, v]) => {
-    if (v !== null && v !== undefined && v !== '') {
-      out[k] = v
-    }
-  })
-  return out
+function clean(object) {
+  return Object.fromEntries(
+    Object.entries(object || {}).filter(
+      ([, value]) =>
+        value !== null &&
+        value !== undefined &&
+        value !== ''
+    )
+  )
 }
 
-function onApplyFilter(payload) {
+function onApplyFilter(payload = {}) {
+  const { __resetPage, ...realFilters } = payload
+
   filters.value = clean({
     ...filters.value,
-    ...(payload || {})
+    ...realFilters
   })
 
-  pagination.value.page = 1
+  if (__resetPage) pagination.value.page = 1
+
   showFilter.value = false
   loadData()
 }
 
-// --- INLINE PATCH ---
 async function onInlinePatch({ id, field, value }) {
+  if (!hasPermission(schema.value?.permissions?.change)) return
+
   await HTTPAuth.patch(
-    url({ type: 'u', url: `${props.app}/${props.model.toLowerCase()}s/${id}/` }),
+    endpoint(`${modelEndpoint.value}${id}/`),
     { [field]: value }
   )
+
   await loadData()
 }
 
-// --- ACTION ---
-async function onRunAction( action, row ) {
+async function onRunAction(action, row) {
+  if (!action || !hasPermission(action.permission)) return
 
-  if (action.action){
-    emit('runaction', action, row)
-  }
-  if (action?.permission && !User.can(action.permission)) return
+  if (action.action) emit('runaction', action, row)
 
-  const actionUrl = action.url?.startsWith('http')
-    ? action.url
-    : `${action.url?.replace(/^\//, '')}`
+  const actionUrl = resolveActionEndpoint(action, row)
+  if (!actionUrl) return
 
-  const method = (action.method || 'POST').toUpperCase()
+  const method = (action.method || 'POST')
+    .split(',')[0]
+    .trim()
+    .toUpperCase()
 
   if (method === 'GET') {
-    await HTTPAuth.get(url({ type: 'u', url: actionUrl, params: { id: row?.id } }))
+    await HTTPAuth.get(endpoint(actionUrl))
   } else {
     await HTTPAuth.request({
       method,
-      url: url({ type: 'u', url: actionUrl }),
-      data: row?.id ? { id: row.id } : {},
+      url: endpoint(actionUrl),
+      data: {}
     })
   }
 
   await loadData()
 }
 
-// --- OBJECT FILTER ---
-async function onChangeObjects(val) {
-  filters.value.objects = val
+async function onChangeObjects(value) {
+  filters.value.objects = value
   pagination.value.page = 1
   await loadData()
 }
 
-// --- SEARCH (FINAL VERSION 🔥) ---
-const onSearch = debounce(async (val) => {
-  const clean = (val || '').trim()
-
-  // evita chamadas iguais
-  if (filters.value.search === clean) return
+const onSearch = debounce(async value => {
+  const search = (value || '').trim()
+  if (filters.value.search === search) return
 
   const token = ++lastToken
 
   filters.value = {
     ...filters.value,
-    search: clean
+    search
   }
 
   pagination.value.page = 1
-
   await loadData(token)
-
 }, 400)
 
-// --- WATCH ---
 watch(
-  () => props.model,
-  async (model) => {
-    if (!model) return
-    await init()
+  () => [props.app, props.model],
+  ([app, model]) => {
+    if (app && model) init()
   },
   { immediate: true }
 )

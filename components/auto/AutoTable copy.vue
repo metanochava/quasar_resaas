@@ -84,9 +84,7 @@ const props = defineProps({
 
   actions: { type: Array, default: () => [] },
 
-  schema: { type: Object, default: () => ({}) },
-  config: { type: Object, default: () => ({}) },
-
+  config: { type: [Object], default: {} },
   ignoreFields: { type: Array, default: () =>  ['id', 'created_at','updated_at', 'created_by', 'updated_by'] } 
 })
 
@@ -141,73 +139,11 @@ const show_filter = ref(false)
 
 // ---------------- UI STATE ----------------
 const visibleColumns = ref([])
-
-const permissions = computed(() => ({
-  list: props.schema?.permissions?.list || `list_${props.model.toLowerCase()}`,
-  view: props.schema?.permissions?.view || `view_${props.model.toLowerCase()}`,
-  add: props.schema?.permissions?.add || `add_${props.model.toLowerCase()}`,
-  change: props.schema?.permissions?.change || `change_${props.model.toLowerCase()}`,
-  delete: props.schema?.permissions?.delete || `delete_${props.model.toLowerCase()}`,
-  restore: props.schema?.permissions?.restore || `restore_${props.model.toLowerCase()}`,
-  hard_delete: props.schema?.permissions?.hard_delete || `hard_delete_${props.model.toLowerCase()}`,
-  pdf: props.schema?.permissions?.pdf || `pdf_${props.model.toLowerCase()}`,
-  pdf_list: props.schema?.permissions?.pdf_list || `pdf_list_${props.model.toLowerCase()}`,
-  custom: props.schema?.permissions?.custom || {}
-}))
-
-const schemaUi = computed(() => ({
-  title: props.schema?.ui?.title || props.model,
-  crud: props.schema?.ui?.crud ?? props.config?.crud ?? true,
-  dense: props.schema?.ui?.dense ?? true,
-  striped: props.schema?.ui?.striped ?? true,
-  show_search: props.schema?.ui?.show_search ?? true,
-  show_filters: props.schema?.ui?.show_filters ?? true,
-  show_columns: props.schema?.ui?.show_columns ?? true,
-  show_refresh: props.schema?.ui?.show_refresh ?? true,
-  show_pdf: props.schema?.ui?.show_pdf ?? true,
-  show_pdf_list: props.schema?.ui?.show_pdf_list ?? true
-}))
-
-const schemaPdf = computed(() => ({
-  enabled: props.schema?.pdf?.enabled ?? true,
-  detail: props.schema?.pdf?.detail ?? true,
-  list: props.schema?.pdf?.list ?? true,
-  detail_permission: props.schema?.pdf?.detail_permission || permissions.value.pdf,
-  list_permission: props.schema?.pdf?.list_permission || permissions.value.pdf_list
-}))
-
-const rowsPerPageOptions = computed(() =>
-  props.schema?.pagination?.page_size_options || [2, 5, 10, 20, 50, 100, 200, 500, 0]
-)
-
-function can(permission) {
-  if (!permission) return false
-  return User.can(String(permission).toLowerCase())
-}
-
-function canAction(action) {
-  return Boolean(action?.visible) && can(action?.permission)
-}
-
 const singularActions = computed(() =>
-  (props.actions || []).filter(
-    action => action.details === true || action.details === 'true'
-  )
+  (props.actions || []).filter(c => c.details === true || c.details === 'true'  || c.action)
 )
-
 const geralActions = computed(() =>
-  (props.actions || []).filter(
-    action => action.details === false || action.details === 'false'
-  )
-)
-
-const topActions = computed(() =>
-  geralActions.value.filter(
-    action =>
-      action.visible &&
-      can(action.permission) &&
-      ['t', 'T'].includes(action.position)
-  )
+  (props.actions || []).filter(c => c.details === false || c.details === 'false')
 )
 
 const objects = ref('alive')
@@ -312,7 +248,6 @@ function rowClass(props) {
 
 // ---------------- INLINE EDIT ----------------
 function isEditable(name) {
-  if (!can(permissions.value.change)) return false
   if (ignoreSet.value.has(name)) return false
   const f = props.fields.find(x => x.name === name)
   if (!f) return false
@@ -322,7 +257,6 @@ function isEditable(name) {
 
 // 🔥 TOGGLE ESTADO (NOVO)
 function toggleEstado(row) {
-  if (!can(permissions.value.change)) return
   const newValue = row.state.value == 'Active' ? 'Inactive' : 'Active'
 
   emit('inline-patch', {
@@ -333,7 +267,6 @@ function toggleEstado(row) {
 }
 
 function toggleBoolean(row, name) {
-  if (!can(permissions.value.change)) return
   const newValue = !row[name]
 
   emit('inline-patch', {
@@ -456,13 +389,23 @@ async function executeAction({ type, row }) {
     :loading="loading"
     v-model:pagination="localPagination"
     :visible-columns="effectiveColumns"
-    :dense="schemaUi.dense"
+    dense
     row-key="id"
     :row-class="rowClass"
 
     @request="onRequest"
 
-    :rows-per-page-options="rowsPerPageOptions" 
+    :rows-per-page-options="[
+      2,
+      5,
+      10,
+      20,
+      50,
+      100,
+      200,
+      500,
+      0
+    ]"
 
     :no-data-label="tdc('No data')"
     :rows-per-page-label="tdc('Records per page:')"
@@ -479,7 +422,7 @@ async function executeAction({ type, row }) {
       <div class="row col-12">
 
         <div class="col-12 text-h4 text-primary">
-          {{ tdc(schemaUi.title) }}
+          {{ model }}
         </div>
 
 
@@ -498,7 +441,7 @@ async function executeAction({ type, row }) {
               icon="add"
               color="primary"
               @click="emit('create')"
-              v-show="schemaUi.crud && can(permissions.add)"
+              v-show="User.can('add_' + model.toLowerCase())"
             >
               <q-tooltip
                 :class="$q.dark.isActive
@@ -518,8 +461,7 @@ async function executeAction({ type, row }) {
               color="secondary"
               :to="{ name: props.config?.routes?.add }"
               v-show="
-                schemaUi.crud &&
-                can(permissions.add) &&
+                User.can('add_' + model.toLowerCase()) &&
                 props.config?.routes?.add
               "
             >
@@ -541,10 +483,8 @@ async function executeAction({ type, row }) {
               icon="download"
               @click="emit('pdfList')"
               v-show="
-                schemaPdf.enabled &&
-                schemaPdf.list &&
-                schemaUi.show_pdf_list &&
-                can(schemaPdf.list_permission)
+                User.can('pdf_list_' + model.toLowerCase()) &&
+                props.config?.routes?.add
               "
             >
               <q-tooltip
@@ -630,7 +570,7 @@ async function executeAction({ type, row }) {
             ====================================== -->
 
             <s-btn
-              v-if="show_filter && schemaUi.show_columns"
+              v-if="show_filter"
               dense
               flat
               icon="view_column"
@@ -720,7 +660,7 @@ async function executeAction({ type, row }) {
             <!-- RELOAD -->
 
             <s-btn
-              v-if="show_filter && schemaUi.show_refresh"
+              v-if="show_filter"
               dense
               flat
               icon="refresh"
@@ -764,7 +704,7 @@ async function executeAction({ type, row }) {
               label="  Actions"
               color="secondary"
 
-              v-show="topActions.length > 0"
+              v-show="singularActions.some( action =>  action.position === 't' && action.visible ) "
             >
               <q-list
                 role="menu"
@@ -776,9 +716,10 @@ async function executeAction({ type, row }) {
 
                 <q-item
                   v-close-popup
-                  v-for="a in topActions"
-                  :key="a.action || a.endpoint || a.url"
+                  v-for="a in singularActions"
+                  :key="a"
                   clickable
+                  v-show="  User.can(a.permission.toLowerCase()) && !a.details  && a.visible && ['t','T'].includes(a.position)"
                   @click="runAction(a, [])"
                 >
 
@@ -795,7 +736,7 @@ async function executeAction({ type, row }) {
                   </q-item-section>
 
                   <q-item-section>
-                    {{ tdc(a.label || a.action) }}
+                    {{ tdc(a.action) }}
                   </q-item-section>
 
                   <q-tooltip
@@ -817,7 +758,6 @@ async function executeAction({ type, row }) {
             <!-- SEARCH -->
 
             <q-input
-              v-if="schemaUi.show_search"
               outlined
               v-model="search"
               style="min-width: 190px; margin-right:-10px;"
@@ -843,7 +783,6 @@ async function executeAction({ type, row }) {
               <template #prepend>
 
                 <s-btn
-                  v-if="schemaUi.show_filters"
                   dense
                   flat
                   round
@@ -911,12 +850,12 @@ async function executeAction({ type, row }) {
           dense
           flat
           v-for="a in singularActions"
-          :key="a.action || a.endpoint || a.url"
+          :key="a"
           v-show="
-            canAction(a) &&
+            User.can(a.permission.toLowerCase()) && a.visible &&
             ['l', 'b', 'L', 'B'].includes(a.position) &&
             !isDeleted(slotRow.row) && 
-            slotRow.col.field == '__lactions'
+            slotRow.col.field == '__ractions'
           "
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
@@ -958,10 +897,10 @@ async function executeAction({ type, row }) {
 
               <q-item
                 v-for="a in singularActions"
-                :key="a.action || a.endpoint || a.url"
+                :key="a"
                 clickable
                 v-show="
-                  canAction(a) &&
+                  User.can(a.permission.toLowerCase()) && a.visible &&
                   !a.position &&
                   !isDeleted(slotRow.row) 
                 "
@@ -981,7 +920,7 @@ async function executeAction({ type, row }) {
                 </q-item-section>
 
                 <q-item-section>
-                  {{ tdc(a.label || a.action) }}
+                  {{ tdc(a.action) }}
                 </q-item-section>
 
                 <q-tooltip
@@ -1002,10 +941,7 @@ async function executeAction({ type, row }) {
 
               <q-item
                 v-if="
-                  schemaPdf.enabled &&
-                  schemaPdf.detail &&
-                  schemaUi.show_pdf &&
-                  can(schemaPdf.detail_permission) &&
+                  User.can('pdf_' + model.toLowerCase()) &&
                   !isDeleted(slotRow.row)
                 "
                 clickable
@@ -1042,7 +978,7 @@ async function executeAction({ type, row }) {
 
               <q-item
                 v-if="
-                  can(permissions.change) &&
+                  User.can('change_' + model.toLowerCase()) &&
                   !isDeleted(slotRow.row)
                 "
                 clickable
@@ -1105,7 +1041,7 @@ async function executeAction({ type, row }) {
 
               <q-item
                 v-if="
-                  can(permissions.delete) &&
+                  User.can('delete_' + model.toLowerCase()) &&
                   !isDeleted(slotRow.row)
                 "
                 clickable
@@ -1142,7 +1078,7 @@ async function executeAction({ type, row }) {
 
               <q-item
                 v-if="
-                  can(permissions.hard_delete) &&
+                  User.can('hard_delete_' + model.toLowerCase()) &&
                   isDeleted(slotRow.row)
                 "
                 clickable
@@ -1177,7 +1113,7 @@ async function executeAction({ type, row }) {
 
               <q-item
                 v-if="
-                  can(permissions.restore) &&
+                  User.can('restore_' + model.toLowerCase()) &&
                   isDeleted(slotRow.row)
                 "
                 clickable
@@ -1219,11 +1155,11 @@ async function executeAction({ type, row }) {
 
               <q-item
                 v-for="a in singularActions"
-                :key="a.action || a.endpoint || a.url"
+                :key="a.url"
                 clickable
                 v-show="
-                  canAction(a) &&
-                  !a.position &&
+                  a.permission &&
+                  !User.can( a.permission.toLowerCase()  )&& a.visible &&
                   !isDeleted(slotRow.row)
                 "
                 @click="runAction(a, slotRow.row)"
@@ -1242,7 +1178,7 @@ async function executeAction({ type, row }) {
                 </q-item-section>
 
                 <q-item-section>
-                  {{ tdc(a.label || a.action) }}
+                  {{ a.permission }}
                 </q-item-section>
 
                 <q-tooltip
@@ -1250,7 +1186,7 @@ async function executeAction({ type, row }) {
                     ? 'bg-dark text-white'
                     : 'bg-primary text-white'"
                 >
-                  {{ tdc(a.tooltip || a.label || a.action) }}
+                  {{ tdc(a.permission) }}
                 </q-tooltip>
 
               </q-item>
@@ -1277,12 +1213,12 @@ async function executeAction({ type, row }) {
           dense
           flat
           v-for="a in singularActions"
-          :key="a.action || a.endpoint || a.url"
+          :key="a"
           v-show="
-            canAction(a) &&
+            User.can(a.permission.toLowerCase()) && a.visible &&
             ['r', 'b', 'R', 'B'].includes(a.position) &&
             !isDeleted(slotRow.row) &&
-            slotRow.col.field == '__ractions'
+            slotRow.col.field == '__lactions'
           "
           @click="runAction(a, slotRow.row)"
           :color="getMethodColor(a.method)"
