@@ -763,10 +763,10 @@ async function executeAction({ type, row }) {
               hover aria-haspopup="menu"
               dense
               outline
-              label="  Actions"
+              icon="more_vert"
               color="secondary"
 
-              v-show="topActions"
+              v-show="topActions.length > 0"
             >
               <q-list
                 role="menu"
