@@ -773,9 +773,7 @@ async function executeAction({ type, row }) {
                 dense
                 style="min-width: 100px"
               >
-
-                <!-- DYNAMIC ACTIONS -->
-
+                <!-- DYNAMIC ACTIONS TOP -->
                 <q-item
                   v-close-popup
                   v-for="a in topActions"
@@ -916,7 +914,7 @@ async function executeAction({ type, row }) {
           :key="a.action || a.endpoint || a.url"
           v-show="
             canAction(a) &&
-            ['l', 'b', 'L', 'B'].includes(a.position) &&
+            ['l',  'L', 'b', 'B'].includes(a.position) &&
             !isDeleted(slotRow.row) && 
             slotRow.col.field == '__lactions'
           "
@@ -956,47 +954,7 @@ async function executeAction({ type, row }) {
               style="min-width: 180px"
             >
 
-              <!-- DYNAMIC ACTIONS -->
-
-              <q-item
-                v-for="a in singularActions"
-                :key="a.action || a.endpoint || a.url"
-                clickable
-                v-show="
-                  canAction(a) &&
-                  ['m', 'M',].includes(a.position) &&
-                  !isDeleted(slotRow.row) 
-                "
-                @click="runAction(a, slotRow.row)"
-              >
-
-                <q-item-section
-                  avatar
-                  v-if="a.icon"
-                >
-
-                  <q-icon
-                    :name="a.icon"
-                    :color="getMethodColor(a.method)"
-                  />
-
-                </q-item-section>
-
-                <q-item-section>
-                  {{ tdc(a.label || a.action) }}
-                </q-item-section>
-
-                <q-tooltip
-                  v-show="a.tooltip"
-                  :class="$q.dark.isActive
-                    ? 'bg-dark text-white'
-                    : 'bg-primary text-white'"
-                >
-                  {{ tdc(a.tooltip) || '.' }}
-                </q-tooltip>
-
-              </q-item>
-
+              
 
               <!-- =====================================
                    PDF
@@ -1215,17 +1173,13 @@ async function executeAction({ type, row }) {
               />
 
 
-              <!-- =====================================
-                   DYNAMIC ACTIONS
-              ====================================== -->
-
               <q-item
                 v-for="a in singularActions"
                 :key="a.action || a.endpoint || a.url"
                 clickable
                 v-show="
                   canAction(a) &&
-                  ['m', 'M',].includes(a.position) &&
+                  ['m', 'M'].includes(a.position) &&
                   !isDeleted(slotRow.row)
                 "
                 @click="runAction(a, slotRow.row)"
@@ -1282,7 +1236,7 @@ async function executeAction({ type, row }) {
           :key="a.action || a.endpoint || a.url"
           v-show="
             canAction(a) &&
-            ['r', 'b', 'R', 'B'].includes(a.position) &&
+            ['r', 'R','b', 'B'].includes(a.position) &&
             !isDeleted(slotRow.row) &&
             slotRow.col.field == '__ractions'
           "
