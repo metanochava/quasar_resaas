@@ -436,6 +436,94 @@ async function executeAction({ type, row }) {
   actionType.value = null
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function getField(name) {
+  return props.fields.find(f => f.name === name)
+}
+
+function isRelationOrChoice(name) {
+  const field = getField(name)
+
+  return Boolean(
+    field?.ui?.isRelation ||
+    field?.relation ||
+    field?.choices?.length
+  )
+}
+
+function normalizeItems(value) {
+  if (value === null || value === undefined || value === '') return []
+
+  let parsed = value
+
+  if (typeof value === 'string') {
+    try {
+      parsed = JSON.parse(value)
+    } catch {
+      parsed = value
+    }
+  }
+
+  if (!Array.isArray(parsed)) {
+    parsed = [parsed]
+  }
+
+  return parsed.map(item => {
+    if (item && typeof item === 'object') {
+      return {
+        label:
+          item.label ??
+          item.name ??
+          item.title ??
+          item.value ??
+          item.id ??
+          '',
+        value:
+          item.value ??
+          item.id ??
+          item.label
+      }
+    }
+
+    return {
+      label: item,
+      value: item
+    }
+  })
+}
+
+function compactItems(row, field) {
+  return normalizeItems(row?.[field])
+}
+
+function firstItem(row, field) {
+  return compactItems(row, field)[0]
+}
+
+function remainingItems(row, field) {
+  return compactItems(row, field).slice(1)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
 </script>
 
 <template>
@@ -758,16 +846,60 @@ async function executeAction({ type, row }) {
               </q-tooltip>
 
             </s-btn>
+            <span>
+              <q-btn-dropdown 
+                hover aria-haspopup="menu"
+                dense
+                outline
+                icon="more_vert"
+                color="secondary"
 
-            <q-btn-dropdown 
-              hover aria-haspopup="menu"
-              dense
-              outline
-              icon="more_vert"
-              color="secondary"
+                v-show="topActions.length > 0"
+              >
+                
+                <q-list
+                  role="menu"
+                  dense
+                  style="min-width: 100px"
+                >
+                  <!-- DYNAMIC ACTIONS TOP -->
+                  <q-item
+                    v-close-popup
+                    v-for="a in topActions"
+                    :key="a.action || a.endpoint || a.url"
+                    clickable
+                    @click="runAction(a, [])"
+                  >
 
-              v-show="topActions.length > 0"
-            >
+                    <q-item-section
+                      avatar
+                      v-if="a.icon"
+                    >
+
+                      <q-icon
+                        :name="a.icon"
+                        :color="getMethodColor(a.method)"
+                      />
+
+                    </q-item-section>
+
+                    <q-item-section>
+                      {{ tdc(a.label || a.action) }}
+                    </q-item-section>
+
+                    <q-tooltip
+                      v-show="a.tooltip"
+                      :class="$q.dark.isActive
+                        ? 'bg-dark text-white'
+                        : 'bg-primary text-white'"
+                    >
+                      {{ tdc(a.tooltip) || '.' }}
+                    </q-tooltip>
+
+                  </q-item> 
+                </q-list>
+
+              </q-btn-dropdown>
               <q-tooltip
                 :class="$q.dark.isActive
                   ? 'bg-dark text-white'
@@ -775,49 +907,8 @@ async function executeAction({ type, row }) {
               >
                 {{ tdc('More actions') }}
               </q-tooltip>
-              <q-list
-                role="menu"
-                dense
-                style="min-width: 100px"
-              >
-                <!-- DYNAMIC ACTIONS TOP -->
-                <q-item
-                  v-close-popup
-                  v-for="a in topActions"
-                  :key="a.action || a.endpoint || a.url"
-                  clickable
-                  @click="runAction(a, [])"
-                >
-
-                  <q-item-section
-                    avatar
-                    v-if="a.icon"
-                  >
-
-                    <q-icon
-                      :name="a.icon"
-                      :color="getMethodColor(a.method)"
-                    />
-
-                  </q-item-section>
-
-                  <q-item-section>
-                    {{ tdc(a.label || a.action) }}
-                  </q-item-section>
-
-                  <q-tooltip
-                    v-show="a.tooltip"
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
-                    {{ tdc(a.tooltip) || '.' }}
-                  </q-tooltip>
-
-                </q-item> 
-              </q-list>
-
-            </q-btn-dropdown>
+            </span>
+            
 
 
 
@@ -1576,6 +1667,63 @@ async function executeAction({ type, row }) {
 
           </s-btn>
 
+        </template>
+
+        <!--  Relacoes Longas -->
+          <!-- RELATION / CHOICES -->
+        <template
+          v-else-if="
+            isRelationOrChoice(props.col.name) &&
+            compactItems(props.row, props.col.name).length
+          "
+        >
+          <div class="row items-center no-wrap q-gutter-xs">
+
+            <span class="ellipsis">
+              {{
+                tdc(
+                  String(
+                    firstItem(
+                      props.row,
+                      props.col.name
+                    )?.label ?? ''
+                  )
+                )
+              }}
+            </span>
+
+            <s-btn
+              v-if="remainingItems(props.row, props.col.name).length"
+              dense
+              flat
+              size="sm"
+              color="primary"
+              :label="`+${remainingItems(props.row, props.col.name).length}`"
+            >
+              <q-menu>
+                <q-list dense style="min-width:180px;max-width:350px">
+
+                  <q-item
+                    v-for="(item, index) in remainingItems(
+                      props.row,
+                      props.col.name
+                    )"
+                    :key="item.value ?? index"
+                  >
+                    <q-item-section>
+                      {{ tdc(String(item.label)) }}
+                    </q-item-section>
+                  </q-item>
+
+                </q-list>
+              </q-menu>
+
+              <q-tooltip>
+                {{ tdc('Show more') }}
+              </q-tooltip>
+            </s-btn>
+
+          </div>
         </template>
 
 
