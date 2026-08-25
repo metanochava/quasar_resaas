@@ -9,7 +9,7 @@ import { branchRoutes } from '../pages/branch/branchRoute'
 import { permissionRoutes } from '../pages/permission/permissionRoute'
 import { tdc } from '../services/translation'
 
-CrudP
+
 export let restRoutes = [
 
   { 
