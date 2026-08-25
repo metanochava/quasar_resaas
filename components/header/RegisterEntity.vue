@@ -261,7 +261,7 @@ export default defineComponent({
       try {
         if (this.User) this.User.data = JSON.parse(storedUser)
       } catch (err) {
-        console.error('Erro ao fazer JSON.parse(user):', err)
+        console.error('Error parsing JSON.parse(user):', err)
         if (this.User) this.User.data = { id: '1', username: 'Gest' }
       }
     } else {
@@ -278,7 +278,7 @@ export default defineComponent({
         this.User.Branch = suc ? JSON.parse(suc) : null
         this.User.Group = gru ? JSON.parse(gru) : null
       } catch (err) {
-        console.error('Erro ao parsear entitys/group:', err)
+        console.error('Error parsing entitys/group:', err)
       }
 
       if (!this.User?.Group?.id) {

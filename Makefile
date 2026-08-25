@@ -4,7 +4,7 @@ push:
 	VERSION=$$(node -p "require('./package.json').version"); \
 	read -p "Mensagem do release: " m; \
 	git commit -m "release: v$$VERSION - $$m"; \
-	git push origin main --force; 
+	git push origin main;
 pushtag:
 	npm version patch --no-git-tag-version; \
 	git add .; \

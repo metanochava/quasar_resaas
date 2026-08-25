@@ -7,7 +7,7 @@ export function setPinia(piniaInstance) {
 export function getPinia() {
   if (!pinia) {
     throw new Error(
-      '[quasar_saas] Pinia não inicializado. Chame setPinia(pinia) no boot.'
+      '[quasar_saas] Pinia not initialized. Call setPinia(pinia) in boot.'
     )
   }
   return pinia

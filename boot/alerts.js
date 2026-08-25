@@ -39,7 +39,7 @@ const AlertSuccess = (data) => {
   let tipo = 'success'
   let go = false
 
-  // string direta
+  // direct string
   if (typeof data === 'string') {
     sms = data
     go = true
@@ -49,10 +49,10 @@ const AlertSuccess = (data) => {
   if (typeof data === 'object' && data !== null) {
 
     // status codes
-    if (data?.status === 201) { sms = 'Criado com sucesso!'; go = true }
-    if (data?.status === 202) { sms = 'Processado com sucesso!'; go = true }
-    if (data?.status === 203) { sms = 'Modificado com sucesso!'; go = true }
-    if (data?.status === 204) { sms = 'Apagado com sucesso!'; go = true }
+    if (data?.status === 201) { sms = 'Created successfully!'; go = true }
+    if (data?.status === 202) { sms = 'Processed successfully!'; go = true }
+    if (data?.status === 203) { sms = 'Modified successfully!'; go = true }
+    if (data?.status === 204) { sms = 'Deleted successfully!'; go = true }
 
     // backend messages
     if (data?.data?.alert_success) {
@@ -74,14 +74,14 @@ const AlertSuccess = (data) => {
    ERROR
 ========================= */
 const AlertError = (error) => {
-  let sms = 'Erro inesperado'
+  let sms = 'Unexpected error'
   let tipo = 'error'
   let go = false
 
   // axios error
   const data = error?.response || error
 
-  // string direta
+  // direct string
   if (typeof error === 'string') {
     sms = error
     go = true
@@ -90,12 +90,12 @@ const AlertError = (error) => {
   if (data?.status) {
 
     if ([400,401,403].includes(data?.status)) {
-      sms = data?.data || 'Erro de autenticação'
+      sms = data?.data || 'Authentication error'
       go = true
     }
 
     if (data?.status === 404) {
-      sms = data?.data?.detail || 'Recurso não encontrado'
+      sms = data?.data?.detail || 'Resource not found'
       go = true
     }
 
@@ -105,7 +105,7 @@ const AlertError = (error) => {
     }
 
     if (data?.status === 500) {
-      sms = 'Erro interno do servidor'
+      sms = 'Internal server error'
       go = true
     }
 

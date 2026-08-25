@@ -32,7 +32,7 @@ export const url = (payload = { type: 'u', url: '', params: {} }) => {
   urlFinal += '?format=json'
 
   Object.entries(payload?.params || {}).forEach(([k, v]) => {
-    urlFinal += `&${k}=${v}`
+    urlFinal += `&${encodeURIComponent(k)}=${encodeURIComponent(v)}`
   })
 
   return urlFinal

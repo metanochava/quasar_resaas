@@ -76,7 +76,7 @@ async function loadEntity(id) {
 
     User.Entity = data
   } catch (err) {
-    console.error('Erro ao carregar entity:', err)
+    console.error('Error loading entity:', err)
   } finally {
     loading.value = false
   }

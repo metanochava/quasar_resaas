@@ -100,7 +100,7 @@ async function init() {
     ready.value = true
 
   } catch (err) {
-    console.error('Erro ao inicializar página:', err)
+    console.error('Error initializing page:', err)
   }
 }
 

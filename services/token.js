@@ -18,7 +18,10 @@ function base64url (source) {
 
 
 
-export const createToken = (data, secret = 'se') => {
+export const createToken = (data, secret) => {
+  if (!secret) {
+    throw new Error('createToken: a secret must be provided explicitly (do not sign tokens client-side with a hardcoded secret)')
+  }
   // const base64url = require('base64url');
   const CryptoJS = require('crypto-js')
   const header = {
