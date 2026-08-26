@@ -7,6 +7,7 @@ import './css/theme_engine.css'
 
 export * from './router/restRoutes.js'
 export * from './router/authRoutes.js'
+export * from './router/docsRoutes.js'
 
 
 // =========================================================
