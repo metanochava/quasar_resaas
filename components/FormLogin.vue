@@ -1,113 +1,145 @@
-
 <template>
-  <q-page class=" row items-center justify-evenly bg-transparent" >
-      <s-card flat class="text-center bg-transparent" style="max-width: 300px">
-        <AllLogo />
-        <q-card-section class="text-left justify-evenly">
-          <s-card  v-if="User.loginMsg == 'error'" class="my-card bg-red text-white">
-            <q-card-section>
-              <div class="text-subtitle2">{{ tdc('Incorrect username or password entered') }} <br> {{ tdc('please try again') }}</div>
-            </q-card-section>
+  <div class="row items-center justify-evenly bg-transparent">
+    <s-card flat class="text-center bg-transparent login-card">
+      <AllLogo />
 
-          </s-card>
-          <s-card  v-if="User.loginMsg == 'good'" class="my-card bg-green text-white">
-            <q-card-section>
-              <div class="text-subtitle2"> {{ tdc('Login successfuly') }} <br>
-                {{ tdc('Redirect to home page') }}...</div>
-            </q-card-section>
+      <q-card-section class="text-left">
+        <s-card
+          v-if="User.loginMsg === 'error'"
+          class="bg-red text-white"
+        >
+          <q-card-section>
+            <div class="text-subtitle2">
+              {{ tdc('Incorrect username or password entered') }}
+              <br>
+              {{ tdc('please try again') }}
+            </div>
+          </q-card-section>
+        </s-card>
 
-          </s-card>
-          <br>
-          <q-form  @submit.prevent="login">
+        <s-card
+          v-if="User.loginMsg === 'good'"
+          class="bg-green text-white"
+        >
+          <q-card-section>
+            <div class="text-subtitle2">
+              {{ tdc('Login successfuly') }}
+              <br>
+              {{ tdc('Redirect to home page') }}...
+            </div>
+          </q-card-section>
+        </s-card>
 
-            <s-input @keyup.enter="login()" outlined :readonly="User.loading"  clearable v-model="identifier" label="Username or Phone or Email">
-              <template v-slot:prepend>
-                <q-icon name="email" />
-              </template>
-              <template v-slot:append>
-                <q-icon name="phone" />
-              </template>
-            </s-input>
-         
-            <s-input @keyup.enter="login()" outlined  :readonly="User.loading" clearable v-model="password" :type="isPwd ? 'password': 'text'" label="Password">
+        <q-form class="q-mt-md" @submit.prevent="login">
+          <s-input
+            v-model="identifier"
+            outlined
+            clearable
+            :readonly="User.loading"
+            label="Username or Phone or Email"
+          >
+            <template #prepend>
+              <q-icon name="email" />
+            </template>
 
-              <template v-slot:prepend>
-                <q-icon
-                  name="lock"
-                  class="cursor-pointer"
-                  @click="isPwd = !isPwd"
-                />
-              </template>
-              <template v-slot:append>
-                <q-icon
-                  :name="isPwd ? 'visibility_off' : 'visibility'"
-                  class="cursor-pointer"
-                  @click="isPwd = !isPwd"
-                />
-              </template>
-            </s-input>
-            <s-checkbox  class="text-grey-7" dense   clearable v-model="User.manterLogado"  @click="check" :label="tdc('Keep me logged in')">
-            </s-checkbox>
-          </q-form>
-        </q-card-section>
+            <template #append>
+              <q-icon name="phone" />
+            </template>
+          </s-input>
 
-        <q-card-actions class="q-px-md" >
+          <s-input
+            v-model="password"
+            outlined
+            clearable
+            :readonly="User.loading"
+            :type="isPwd ? 'password' : 'text'"
+            label="Password"
+          >
+            <template #prepend>
+              <q-icon name="lock" />
+            </template>
+
+            <template #append>
+              <q-icon
+                :name="isPwd ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="isPwd = !isPwd"
+              />
+            </template>
+          </s-input>
+
+          <s-checkbox
+            v-model="User.manterLogado"
+            dense
+            class="text-grey-7"
+            :label="tdc('Keep me logged in')"
+            @update:model-value="check"
+          />
+
           <s-btn
+            type="submit"
+            size="md"
+            color="positive"
+            dense
+            class="full-width q-mt-md"
             :readonly="User.loading"
             :disable="User.loading"
             :loading="User.loading"
-            size="md"
-            @click="login()"
-            color="positive" dense
-            class="full-width "
             :label="tdc('Login')"
           />
-          <p></p>
-        </q-card-actions>
-        <q-card-actions align="around" >
-          <s-btn flat :to="{name:'esquecerpassword'}"  size="md"  color="purple" :label="tdc('Forgot my password')" />
-          <s-btn flat :to="{name:'registarUser'}"  size="md" color="primary" class="" :label="tdc('Register')" />
-        </q-card-actions>
-      </s-card>
-  </q-page>
+        </q-form>
+      </q-card-section>
+
+      <q-card-actions align="around">
+        <s-btn
+          flat
+          size="md"
+          color="purple"
+          :to="{ name: 'esquecerpassword' }"
+          :label="tdc('Forgot my password')"
+        />
+
+        <s-btn
+          flat
+          size="md"
+          color="primary"
+          :to="{ name: 'registarUser' }"
+          :label="tdc('Register')"
+        />
+      </q-card-actions>
+    </s-card>
+  </div>
 </template>
-<style scoped>
 
-</style>
-<script >
-
+<script>
 import { defineComponent } from 'vue'
-import { tdc } from '../services/translation'
-import { useUserStore } from '../stores/UserStore'
-import { useEntityTypeStore } from '../stores/EntityTypeStore'
-import { setStorage, getStorage } from '../services/storage'
-import AllLogo  from './../components/AllLogo.vue'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
-import { loadUserSaas } from './../boot/login_boot'
 
+import AllLogo from './../components/AllLogo.vue'
+import { loadUserSaas } from './../boot/login_boot'
+import { tdc } from '../services/translation'
+import { getStorage, setStorage } from '../services/storage'
+import { useUserStore } from '../stores/UserStore'
+import { useEntityTypeStore } from '../stores/EntityTypeStore'
 
 export default defineComponent({
   name: 'FormLogin',
-  props: {
 
-  },
   components: {
     AllLogo
   },
+
   setup () {
-    const EntityType = useEntityTypeStore()
-    const  User = useUserStore()
-    const q = useQuasar()
-    const router = useRouter()
     return {
-      EntityType,
-      tdc,
-      User,
-      q,
-      router
+      EntityType: useEntityTypeStore(),
+      User: useUserStore(),
+      q: useQuasar(),
+      router: useRouter(),
+      tdc
     }
   },
+
   data () {
     return {
       user_id: null,
@@ -124,48 +156,46 @@ export default defineComponent({
       ipAddress: '0.0.0.0'
     }
   },
-  computed: {
 
-  },
   watch: {
-    'User.redirect'(val) {
-      if (val) {
-        this.router.push({ name: val })   // ✅ works now
-        this.User.redirect = '' // reset
-      }
+    'User.redirect' (value) {
+      if (!value) return
+
+      this.router.push({ name: value })
+      this.User.redirect = ''
     },
-    async 'User.isLogin'(val) {
-      if (val) {
-        await loadUserSaas(this.q)
-      }
+
+    async 'User.isLogin' (value) {
+      if (value) await loadUserSaas(this.q)
     }
   },
 
   mounted () {
-
-   if (getStorage('l', 'manterlogado') === 'true') {
-      this.User.manterLogado = true
-    } else {
-      this.User.manterLogado = false
-    }
-    // this.getGeolocation()
+    this.User.manterLogado =
+      getStorage('l', 'manterlogado') === 'true'
   },
+
   methods: {
     check () {
       setStorage('l', 'manterlogado', this.User.manterLogado)
     },
+
     getGeolocation () {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(this.setPosition, this.errorPosition)
+        navigator.geolocation.getCurrentPosition(
+          this.setPosition,
+          this.errorPosition
+        )
       } else {
         this.errorPosition()
       }
     },
+
     setPosition (position) {
-      const coords = position.coords
-      this.latitude = coords.latitude
-      this.longitude = coords.longitude
+      this.latitude = position.coords.latitude
+      this.longitude = position.coords.longitude
     },
+
     errorPosition () {
       this.q.notify({
         position: 'bottom',
@@ -178,20 +208,31 @@ export default defineComponent({
     },
 
     async login () {
+      document.activeElement?.blur()
 
       setStorage('l', 'manterlogado', this.User.manterLogado)
 
       this.correctEntityType = false
+      this.incorrectEntityType = false
 
-      await this.User.login({
-        identifier: this.identifier,
-        password: this.password,
-      }, this.q).then(res => {
+      try {
+        await this.User.login({
+          identifier: this.identifier,
+          password: this.password
+        }, this.q)
+
         this.correctEntityType = true
-      }).catch(err => {
+      } catch (error) {
         this.incorrectEntityType = true
-      })
+      }
     }
   }
 })
 </script>
+
+<style scoped>
+.login-card {
+  width: 100%;
+  max-width: 300px;
+}
+</style>
