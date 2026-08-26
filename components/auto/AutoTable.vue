@@ -2009,9 +2009,7 @@ function filteredItems(row, field) {
 
         <template v-else>
 
-          <label class="insize">
-            {{ resolveValue(props.value) }}
-          </label>
+          <label class="insize" v-html="resolveValue(props.value)"></label>
 
         </template>
 
