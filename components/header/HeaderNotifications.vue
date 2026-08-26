@@ -7,7 +7,7 @@
       {{ unreadCount }}
     </q-badge>
     <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-      {{tdc('Ver notificações')}}
+      {{tdc('View notifications')}}
     </q-tooltip>
   </s-btn>
 </template>
@@ -49,5 +49,5 @@ export default defineComponent({
 })
 </script>
 <style scoped>
-/* Estilos específicos do HeaderServices */
+/* Styles specific to HeaderServices */
 </style>

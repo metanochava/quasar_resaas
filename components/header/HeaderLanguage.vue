@@ -71,7 +71,7 @@ export default defineComponent({
 
 
     // ==========================================
-    // ACTUALIZA O IDIOMA DO QUASAR
+    // UPDATES THE QUASAR LANGUAGE
     // ==========================================
 
     function updateQuasarLanguage () {
@@ -158,7 +158,7 @@ export default defineComponent({
 
 
         // ======================================
-        // LABELS GLOBAIS
+        // GLOBAL LABELS
         // ======================================
 
         label: {
@@ -207,9 +207,9 @@ export default defineComponent({
 
 
       // ==========================================
-      // IMPORTANTE:
-      // força o Quasar a actualizar os componentes
-      // já renderizados
+      // IMPORTANT:
+      // forces Quasar to update the components
+      // already rendered
       // ==========================================
 
       $q.lang.set(currentLang)
@@ -217,7 +217,7 @@ export default defineComponent({
 
 
     // ==========================================
-    // WATCH DA LÍNGUA
+    // LANGUAGE WATCH
     // ==========================================
 
     watch(
@@ -230,18 +230,18 @@ export default defineComponent({
         }
 
 
-        // CORRECÇÃO:
-        // antes tinhas User.setLanguage(language)
-        // mas "language" não existe neste scope
+        // FIX:
+        // previously had User.setLanguage(language)
+        // but "language" doesn't exist in this scope
 
         await User.setLanguage(
           newLanguage
         )
 
 
-        // depois de mudar a língua,
-        // o tdc() já deve devolver
-        // as traduções da nova língua
+        // after changing the language,
+        // tdc() should already return
+        // the translations for the new language
 
         updateQuasarLanguage()
 

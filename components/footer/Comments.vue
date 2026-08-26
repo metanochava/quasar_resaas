@@ -3,10 +3,10 @@
    <div class="">
         <s-card>
           <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
-            &nbsp; {{tdc('Enviar comentário ou opinião')}} 
+            &nbsp; {{tdc('Send comment or feedback')}}
             <q-space />
             <s-btn dense flat icon="close" v-close-popup>
-              <q-tooltip>{{tdc('Fechar')}}</q-tooltip>
+              <q-tooltip>{{tdc('Close')}}</q-tooltip>
             </s-btn>
           </q-bar>
 
@@ -15,20 +15,20 @@
                 v-model="comment_text"
                 class=""
                 dense
-                :placeholder="tdc('Tem algum feedback? Adoraríamos ouvir; mas não compartilhe informações confidenciais. Tem perguntas? Tente ajuda ou suporte.')"
+                :placeholder="tdc('Have some feedback? We would love to hear it; but please do not share confidential information. Have questions? Try help or support.')"
                 type="textarea"
-                :rules="[ val => val && val.length > 0 || tdc('Este campo e obrigatório.')]"
+                :rules="[ val => val && val.length > 0 || tdc('This field is required.')]"
                 />
           </q-card-section>
 
           <q-card-section >
-            {{tdc('Algumas informações da conta e do sistema podem ser enviadas para a Mytech. Nós o usaremos para corrigir problemas e melhorar nossos serviços de acordo com nossa Política de Privacidade e Termos de Serviço. Podemos enviar um e-mail para mais informações ou atualizações. Vá para a Ajuda Jurídica para solicitar alterações de conteúdo por motivos legais.')}}
+            {{tdc('Some account and system information may be sent to Mytech. We will use it to fix problems and improve our services in accordance with our Privacy Policy and Terms of Service. We may send an email for more information or updates. Go to Legal Help to request content changes for legal reasons.')}}
           </q-card-section>
           <q-separator />
 
           <q-card-actions align="right">
-            <s-btn  v-close-popup   :color="$q.dark.isActive ? '' : 'dark'" >{{tdc('Cancelar')}}</s-btn>
-            <s-btn   :color="$q.dark.isActive ? 'primary' : 'primary'" type="submit" @click="comentar" > {{tdc('Enviar')}}</s-btn>
+            <s-btn  v-close-popup   :color="$q.dark.isActive ? '' : 'dark'" >{{tdc('Cancel')}}</s-btn>
+            <s-btn   :color="$q.dark.isActive ? 'primary' : 'primary'" type="submit" @click="comentar" > {{tdc('Send')}}</s-btn>
           </q-card-actions>
         </s-card>
     

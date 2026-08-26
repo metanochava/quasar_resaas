@@ -100,8 +100,8 @@ export const usePersonStore = createBaseStore(
 
       afterCreate(data) {
 
-        // 🔥 quando cria pessoa
-        // automaticamente seleciona
+        // 🔥 when a person is created
+        // automatically select it
 
         this.selectedPerson = data
 

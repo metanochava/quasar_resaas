@@ -17,7 +17,7 @@ export let restRoutes = [
     name: 'view_scaffold', 
     component: () => import('../pages/commands/ScaffoldPage.vue'), 
     meta: { 
-      title: tdc('Vista de') + ' ' + tdc('Scaffold'), 
+      title: tdc('View of') + ' ' + tdc('Scaffold'),
       requiresAuth: true, 
       requiredRole: 'view_scaffold'
     } 
@@ -27,7 +27,7 @@ export let restRoutes = [
       name: 'view_crud', 
       component: () => import('../pages/CrudPage.vue'), 
       meta: { 
-        title: tdc('Vista de') + ' ' + tdc('Crud'), 
+        title: tdc('View of') + ' ' + tdc('Crud'),
         requiresAuth: true, 
         requiredRole: 'view_crud'
       } 
@@ -37,7 +37,7 @@ export let restRoutes = [
     name: 'add_app', 
     component: () => import('../pages/commands/AppCreatePage.vue'), 
     meta: { 
-      title: tdc('Add de') + ' ' + tdc('App'), 
+      title: tdc('Add') + ' ' + tdc('App'),
       requiresAuth: true, 
       icon: 'inventory_2',
       requiredRole: 'add_app'
@@ -48,7 +48,7 @@ export let restRoutes = [
     name: 'route_inexistente', 
     component: () => import('../pages/RotaEnexistente.vue'), 
     meta: { 
-      title: tdc('Rota ') + ' ' + tdc(' inexistente'), 
+      title: tdc('Route') + ' ' + tdc('not found'),
     } 
   },
   ...entityRoutes,

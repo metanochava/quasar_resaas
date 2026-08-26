@@ -47,10 +47,10 @@ function toggleGroup(models, checked) {
 
   <s-card class="column full-height">
 
-    <!-- ================= HEADER FIXO ================= -->
+    <!-- ================= FIXED HEADER ================= -->
     <q-bar class="row items-center" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
       <div class="text-h6">
-        {{ tdc("Gestão de Modelos") }}
+        {{ tdc("Models Management") }}
       </div>
 
       <q-space />
@@ -63,10 +63,10 @@ function toggleGroup(models, checked) {
         <q-icon v-else-if="EntityType.models.status === 'error'" name="error" color="negative" />
 
         <span class="text-caption">
-          <span v-if="EntityType.models.status === 'saving'">{{ tdc('Salvando...') }}</span>
-          <span v-else-if="EntityType.models.status === 'saved'">{{ tdc('Salvo') }}</span>
-          <span v-else-if="EntityType.models.status === 'error'">{{ tdc('Erro ao salvar') }}</span>
-          <span v-else>{{ tdc('Alterações pendentes') }}</span>
+          <span v-if="EntityType.models.status === 'saving'">{{ tdc('Saving...') }}</span>
+          <span v-else-if="EntityType.models.status === 'saved'">{{ tdc('Saved') }}</span>
+          <span v-else-if="EntityType.models.status === 'error'">{{ tdc('Error saving') }}</span>
+          <span v-else>{{ tdc('Pending changes') }}</span>
         </span>
 
       </div>
@@ -78,14 +78,14 @@ function toggleGroup(models, checked) {
 
     <q-separator />
 
-    <!-- ================= SEARCH FIXO ================= -->
+    <!-- ================= FIXED SEARCH ================= -->
     <q-card-section>
       <q-input
         v-model="EntityType.models.permissionSearch"
         outlined
         dense
         clearable
-        :label="tdc('Pesquisar')"
+        :label="tdc('Search')"
         @update:model-value="EntityType.filterPermissions"
       >
         <template #prepend>
@@ -96,7 +96,7 @@ function toggleGroup(models, checked) {
 
     <q-separator />
 
-    <!-- ================= SCROLL (APENAS AQUI) ================= -->
+    <!-- ================= SCROLL (HERE ONLY) ================= -->
     <q-card-section class="col scroll">
 
       <div v-if="EntityType.models.loadingModels" class="flex flex-center q-pa-xl">
@@ -166,7 +166,7 @@ function toggleGroup(models, checked) {
                 :color="EntityType.isSelected(item.id) ? 'primary' : 'grey'"
                 outline
               >
-                {{ EntityType.isSelected(item.id) ? tdc('Ativo') : tdc('Inativo') }}
+                {{ EntityType.isSelected(item.id) ? tdc('Active') : tdc('Inactive') }}
               </q-badge>
             </q-item-section>
 

@@ -15,7 +15,7 @@ const props = defineProps({
   store: { type: Object, default: null },
   ignoreFields: { type: Array, default: () => [] },
 
-  // 🔥 layout configurável
+  // 🔥 configurable layout
   leftCol: { type: String, default: 'col-3' },
   centerCol: { type: String, default: 'col' },
   rightCol: { type: String, default: 'col-4' }
@@ -35,7 +35,7 @@ const hasFooter = computed(() => !!slots.footer)
 const hasLeft = computed(() => !!slots.left)
 const hasRight = computed(() => !!slots.right)
 
-// 🔥 CLASSES DINÂMICAS (BLINDADAS)
+// 🔥 DYNAMIC CLASSES (GUARDED)
 const leftClass = computed(() => props.leftCol || 'col-3')
 
 const rightClass = computed(() => props.rightCol || 'col-4')
@@ -81,8 +81,8 @@ function goBack() {
 
       <div class="text-h5 text-weight-bold ">
         {{ isEdit
-          ? tdc('Editar') + ' ' + tdc(store.model)
-          : tdc('Novo') + ' ' + tdc(store.model )
+          ? tdc('Edit') + ' ' + tdc(store.model)
+          : tdc('New') + ' ' + tdc(store.model )
         }}
       </div>
 
@@ -91,7 +91,7 @@ function goBack() {
       <s-btn
         flat
         color="grey-7"
-        :label="tdc('Cancelar')"
+        :label="tdc('Cancel')"
         @click="goBack"
       />
 
@@ -167,7 +167,7 @@ function goBack() {
       <s-btn
         flat
         color="grey-7"
-        :label="tdc('Cancelar')"
+        :label="tdc('Cancel')"
         @click="goBack"
       />
 

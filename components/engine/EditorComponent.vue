@@ -167,7 +167,7 @@ export default defineComponent({
       const rules = []
 
       if (props.required) {
-        rules.push(v => !!stripHtml(v).trim() || tdc("Campo obrigatório"))
+        rules.push(v => !!stripHtml(v).trim() || tdc("Required field"))
       }
 
       for (const validator of props.validators) {

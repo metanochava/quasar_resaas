@@ -328,7 +328,7 @@ export const useEntityTypeStore = createBaseStore(
       },
 
       // ===============================
-      // 📦 LISTA (mantido)
+      // 📦 LIST (kept)
       // ===============================
       async getEntityTypes() {
         try {

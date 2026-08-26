@@ -1,8 +1,8 @@
 <template>
   <div>
-    <!-- Conteúdo do HeaderServices -->
+    <!-- HeaderServices content -->
     <s-btn round dense flat  size="14px" icon="apps">
-          <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'" >{{tdc("Serviços")}}</q-tooltip>
+          <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'" >{{tdc("Services")}}</q-tooltip>
           <q-menu flat bordered square  fit :offset="[175, 5]"  >
             <s-card class="my-card"  style="min-width:270px;" >
                 <q-card-section class="text-center"   flat bordered square  >

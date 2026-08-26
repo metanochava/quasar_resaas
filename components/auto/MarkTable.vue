@@ -63,9 +63,9 @@ function toggleDense() {
 const allColNames = computed(() => props.columns.map(c => c.name))
 
 const effectiveVisibleCols = computed(() => {
-  // se user não selecionou nada, mostra tudo
+  // if the user has not selected anything, show everything
   if (!localVisibleCols.value?.length) return allColNames.value
-  // mantém só colunas existentes
+  // keep only existing columns
   const set = new Set(allColNames.value)
   return localVisibleCols.value.filter(n => set.has(n))
 })
@@ -142,7 +142,7 @@ function toggleAllOnPage(val) {
 }
 
 function emitSelection() {
-  // envia rows selecionadas desta página + keys globais
+  // send selected rows from this page + global keys
   const keys = [...selectedKeys.value]
   const selectedRows = props.rows.filter(r => selectedKeys.value.has(rowKeyOf(r)))
   emit('selection', { keys, rows: selectedRows })
@@ -290,7 +290,7 @@ const rangeText = computed(() => {
             </th>
 
             <th class="mark-th mark-th--actions">
-              <slot name="actions-head">Ações</slot>
+              <slot name="actions-head">Actions</slot>
             </th>
           </tr>
         </thead>

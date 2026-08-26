@@ -69,7 +69,7 @@
                 outlined
               >
 
-                <!-- ITEM SELECIONADO -->
+                <!-- SELECTED ITEM -->
                 <template v-slot:selected-item="scope">
                   <div class="row items-center q-gutter-sm">
                     <q-icon :name="scope.opt" />
@@ -77,7 +77,7 @@
                   </div>
                 </template>
 
-                <!-- LISTA DE OPÇÕES -->
+                <!-- OPTIONS LIST -->
                 <template v-slot:option="scope">
                   <q-item v-bind="scope.itemProps">
                     <q-item-section avatar>
@@ -151,7 +151,7 @@
                       <template v-slot:no-option>
                       <q-item>
                         <q-item-section class="text-grey">
-                        {{st('Sem resultados')}}
+                        {{st('No results')}}
                         </q-item-section>
                       </q-item>
                       </template>
@@ -212,7 +212,7 @@
                       <template v-slot:no-option>
                       <q-item>
                         <q-item-section class="text-grey">
-                        {{st('Sem resultados')}}
+                        {{st('No results')}}
                         </q-item-section>
                       </q-item>
                       </template>
@@ -274,7 +274,7 @@
                     </div>
 
                     <div v-if="f?.choices?.length === 0" class="text-grey">
-                      Nenhum choice adicionado
+                      No choice added
                     </div>
 
                     <q-list bordered v-else>
@@ -370,7 +370,7 @@
                 outlined
               >
 
-                <!-- ITEM SELECIONADO -->
+                <!-- SELECTED ITEM -->
                 <template v-slot:selected-item="scope">
                   <div class="row items-center q-gutter-sm">
                     <q-icon :name="scope.opt" />
@@ -378,7 +378,7 @@
                   </div>
                 </template>
 
-                <!-- LISTA DE OPÇÕES -->
+                <!-- OPTIONS LIST -->
                 <template v-slot:option="scope">
                   <q-item v-bind="scope.itemProps">
                     <q-item-section avatar>
@@ -755,7 +755,7 @@ export default {
         this.newChoice.label = ''
         this.newChoice.key = ''
       }else{
-        AlertError('Label, Key ou ambos estao vazios!')
+        AlertError('Label, Key, or both are empty!')
       }
     },
 
@@ -855,7 +855,7 @@ export default {
           height_field: f.height_field,
         }
 
-        // RELAÇÃO
+        // RELATION
         if (f.relApp && f.relation) {
           field.relation = `${f.relApp}.${f.relation}`
         }

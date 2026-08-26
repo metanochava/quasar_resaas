@@ -7,7 +7,7 @@ export let groupRoutes = [
     name: 'list_group',
     component: () => import('./GroupLPage.vue'),
     meta: {
-      title: tdc('Vista de') + ' ' + tdc('group'),
+      title: tdc('View of') + ' ' + tdc('group'),
       requiresAuth: true,
       icon: 'list',
       requiredRole: 'list_group',
@@ -18,7 +18,7 @@ export let groupRoutes = [
     name: 'add_group',
     component: () => import('./GroupSEPage.vue'),
     meta: {
-      title: tdc('Adicionar') + ' ' + tdc('group'),
+      title: tdc('Add') + ' ' + tdc('group'),
       requiresAuth: true,
       icon: 'add',
       requiredRole: 'add_group',
@@ -29,7 +29,7 @@ export let groupRoutes = [
     name: 'change_group',
     component: () => import('./GroupSEPage.vue'),
     meta: {
-      title: tdc('Editar') + ' ' + tdc('group'),
+      title: tdc('Edit') + ' ' + tdc('group'),
       requiresAuth: true,
       icon: 'edit',
       requiredRole: 'change_group',
@@ -40,7 +40,7 @@ export let groupRoutes = [
     name: 'view_group',
     component: () => import('./GroupVPage.vue'),
     meta: {
-      title: tdc('Visualizar') + ' ' + tdc('group'),
+      title: tdc('View') + ' ' + tdc('group'),
       requiresAuth: true,
       icon: 'visibility',
       requiredRole: 'view_group',

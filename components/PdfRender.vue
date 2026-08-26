@@ -5,7 +5,7 @@
       style="height: 100vh;"
     >
 
-      <!-- HEADER FIXO -->
+      <!-- FIXED HEADER -->
       <q-bar v-show="top"
         class="pdf-header"
         :class="$q.dark.isActive
@@ -55,7 +55,7 @@ import { computed, watch } from 'vue'
 // props
 const props = defineProps({
   modelValue: Boolean,
-  src: String, // URL ou Blob
+  src: String, // URL or Blob
   title: String,
   top: Boolean
 })
@@ -63,13 +63,13 @@ const props = defineProps({
 // emit
 const emit = defineEmits(['update:modelValue'])
 
-// ✅ v-model proxy (CORRETO)
+// ✅ v-model proxy (CORRECT)
 const dialog = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val)
 })
 
-// URL do PDF
+// PDF URL
 const pdfUrl = computed(() => props.src)
 
 // download
@@ -79,7 +79,7 @@ function downloadPdf() {
   }
 }
 
-// limpar memória (blob)
+// free memory (blob)
 watch(() => props.modelValue, (val) => {
   if (!val && props.src?.startsWith('blob:')) {
     URL.revokeObjectURL(props.src)
@@ -88,7 +88,7 @@ watch(() => props.modelValue, (val) => {
 </script>
 
 <style scoped>
-/* opcional: scroll suave */
+/* optional: smooth scroll */
 iframe {
   background: #1e1e1e;
 }

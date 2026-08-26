@@ -65,7 +65,7 @@ function getImageUrl(val) {
   }
 }
 
-// abrir preview
+// open preview
 function openPreview(url) {
   preview.value.url = url
   preview.value.show = true
@@ -255,7 +255,7 @@ function isEditable(name) {
   return true
 }
 
-// 🔥 TOGGLE ESTADO (NOVO)
+// 🔥 TOGGLE STATE (NEW)
 function toggleEstado(row) {
   const newValue = row.state.value == 'Active' ? 'Inactive' : 'Active'
 

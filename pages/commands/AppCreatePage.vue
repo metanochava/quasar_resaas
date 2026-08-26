@@ -2,7 +2,7 @@
   <q-page class="q-pa-sm">
 
     <div class="text-h5 q-mb-lg">
-      📦 Módulos
+      📦 Modules
     </div>
 
     <div class="row q-col-gutter-lg">
@@ -17,12 +17,12 @@
             <s-card bordered flat class="q-pa-lg">
 
               <div class="text-h6 q-mb-md">
-                ➕ Criar Módulo
+                ➕ Create Module
               </div>
 
               <s-input
                 v-model="name"
-                label="Name do módulo"
+                label="Module name"
                 outlined
                 @keyup.enter="createApp"
               />
@@ -31,7 +31,7 @@
                 class="q-mt-md full-width"
                 color="primary"
                 icon="add"
-                label="Criar"
+                label="Create"
                 :loading="loading"
                 @click="createApp"
               />
@@ -74,7 +74,7 @@
                     flat
                     color="primary"
                     icon="build"
-                    label="Abrir"
+                    label="Open"
                     @click="openScaffold(app.name)"
                   />
 
@@ -155,8 +155,8 @@ async function createApp () {
 // ---------------- DELETE ----------------
 function confirmDelete(app) {
   Dialog.create({
-    title: 'Confirmar',
-    message: `Tem a certeza que deseja apagar o módulo "${app}"?`,
+    title: 'Confirm',
+    message: `Are you sure you want to delete the module "${app}"?`,
     cancel: true,
     persistent: true
   }).onOk(() => deleteApp(app))
@@ -165,7 +165,7 @@ function confirmDelete(app) {
 async function deleteApp(app) {
   const old = [...apps.value]
 
-  // UI otimista
+  // optimistic UI
   apps.value = apps.value.filter(a => a.name !== app)
 
   try {

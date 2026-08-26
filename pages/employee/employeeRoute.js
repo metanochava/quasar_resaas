@@ -8,7 +8,7 @@ export let employeeRoutes = [
     name: 'list_employee',
     component: () => import('./EmployeePage.vue'),
     meta: {
-      title: tdc('Vista de') + ' ' + tdc('employee'),
+      title: tdc('View of') + ' ' + tdc('employee'),
       requiresAuth: true,
       icon: 'list',
       requiredRole: 'list_employee',
@@ -19,7 +19,7 @@ export let employeeRoutes = [
     name: 'add_employee',
     component: () => import('./EmployeeSEPage.vue'),
     meta: {
-      title: tdc('Adicionar') + ' ' + tdc('employee'),
+      title: tdc('Add') + ' ' + tdc('employee'),
       requiresAuth: true,
       icon: 'add',
       requiredRole: 'add_employee',
@@ -30,7 +30,7 @@ export let employeeRoutes = [
     name: 'change_employee',
     component: () => import('./EmployeeSEPage.vue'),
     meta: {
-      title: tdc('Editar') + ' ' + tdc('employee'),
+      title: tdc('Edit') + ' ' + tdc('employee'),
       requiresAuth: true,
       icon: 'edit',
       requiredRole: 'change_employee',
@@ -41,7 +41,7 @@ export let employeeRoutes = [
     name: 'view_employee',
     component: () => import('./EmployeeVPage.vue'),
     meta: {
-      title: tdc('Visualizar') + ' ' + tdc('employee'),
+      title: tdc('View') + ' ' + tdc('employee'),
       requiresAuth: true,
       icon: 'visibility',
       requiredRole: 'view_employee',

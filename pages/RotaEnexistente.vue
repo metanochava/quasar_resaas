@@ -3,13 +3,13 @@
     <s-card class="welcome-card shadow-10">
       <q-card-section class="text-center">
         <div class="text-h4 q-mt-md text-weight-bold">
-          {{ tdc('Rota Ainda Nao Foi Configurada no Front End') }}
+          {{ tdc('This Route Has Not Been Configured in the Front End Yet') }}
         </div>
 
         <div class="text-subtitle1 text-grey-7 q-mt-sm">
-          {{ tdc('Rota solicitada') }}: <b>{{ route }}</b>
+          {{ tdc('Requested route') }}: <b>{{ route }}</b>
           <br>
-           {{ tdc('Parametro') }}: <b>{{ id }}</b>
+           {{ tdc('Parameter') }}: <b>{{ id }}</b>
         </div>
 
         <div class="text-subtitle2 text-grey-6 q-mt-sm">

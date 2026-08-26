@@ -8,7 +8,7 @@ export let userRoutes = [
     name: 'list_user',
     component: () => import('./UserLPage.vue'),
     meta: {
-      title: tdc('Vista de') + ' ' + tdc('user'),
+      title: tdc('View of') + ' ' + tdc('user'),
       requiresAuth: true,
       icon: 'list',
       requiredRole: 'list_user',
@@ -19,7 +19,7 @@ export let userRoutes = [
     name: 'add_user',
     component: () => import('./UserSEPage.vue'),
     meta: {
-      title: tdc('Adicionar') + ' ' + tdc('user'),
+      title: tdc('Add') + ' ' + tdc('user'),
       requiresAuth: true,
       icon: 'add',
       requiredRole: 'add_user',
@@ -30,7 +30,7 @@ export let userRoutes = [
     name: 'change_user',
     component: () => import('./UserSEPage.vue'),
     meta: {
-      title: tdc('Editar') + ' ' + tdc('user'),
+      title: tdc('Edit') + ' ' + tdc('user'),
       requiresAuth: true,
       icon: 'edit',
       requiredRole: 'change_user',
@@ -41,7 +41,7 @@ export let userRoutes = [
     name: 'view_user',
     component: () => import('./UserVPage.vue'),
     meta: {
-      title: tdc('Visualizar') + ' ' + tdc('user'),
+      title: tdc('View') + ' ' + tdc('user'),
       requiresAuth: true,
       icon: 'visibility',
       requiredRole: 'view_user',

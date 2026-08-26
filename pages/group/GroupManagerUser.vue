@@ -9,13 +9,13 @@
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        Gestão de Grupos de {{ Employee.form?.person_data.full_name}}
+        Manage Groups of {{ Employee.form?.person_data.full_name}}
       </div>
 
       <q-space />
 
       <q-badge color="white" text-color="primary">
-        {{ User.selectedGroups.length }} ativos
+        {{ User.selectedGroups.length }} active
       </q-badge>
 
       <s-btn dense flat icon="close" v-close-popup>
@@ -32,7 +32,7 @@
         dense
         outlined
         clearable
-        label="Pesquisar grupo"
+        label="Search group"
       >
         <template #prepend>
           <q-icon name="search" />
@@ -84,7 +84,7 @@
                 :color="User.hasGroup(group.id) ? 'primary' : 'grey-5'"
                 text-color="white"
               >
-                {{ User.hasGroup(group.id) ? 'Ativo' : 'Inativo' }}
+                {{ User.hasGroup(group.id) ? 'Active' : 'Inactive' }}
               </q-chip>
 
               <q-checkbox

@@ -135,7 +135,7 @@ function downloadPdf() {
 }
 
 
-// watch abrir modal
+// watch modal open
 watch(() => props.modelValue, async (val) => {
   if (val) {
     await nextTick()

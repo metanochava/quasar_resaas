@@ -59,7 +59,7 @@ export function setSettings(Theme, LayoutSettings, Typography, AnimationSettings
 
   const root = document.documentElement
 
-  // 👉 BORDER RADIUS (🔥 AQUI ESTÁ O QUE FALTAVA)
+  // 👉 BORDER RADIUS (🔥 THIS IS WHAT WAS MISSING)
   let radius = "4px"
 
 
@@ -131,7 +131,7 @@ export function setSettings(Theme, LayoutSettings, Typography, AnimationSettings
   }
 
   /* =========================
-    ⚡ ANIMAÇÃO
+    ⚡ ANIMATION
   ========================= */
 
   const speed =

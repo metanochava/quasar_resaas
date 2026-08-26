@@ -8,7 +8,7 @@ export let entityRoutes = [
     name: 'list_entity',
     component: () => import('./EntityLPage.vue'),
     meta: {
-      title: tdc('Vista de') + ' ' + tdc('entity'),
+      title: tdc('View of') + ' ' + tdc('entity'),
       requiresAuth: true,
       icon: 'list',
       requiredRole: 'list_entity',
@@ -19,7 +19,7 @@ export let entityRoutes = [
     name: 'add_entity',
     component: () => import('./EntitySEPage.vue'),
     meta: {
-      title: tdc('Adicionar') + ' ' + tdc('entity'),
+      title: tdc('Add') + ' ' + tdc('entity'),
       requiresAuth: true,
       icon: 'add',
       requiredRole: 'add_entity',
@@ -30,7 +30,7 @@ export let entityRoutes = [
     name: 'change_entity',
     component: () => import('./EntitySEPage.vue'),
     meta: {
-      title: tdc('Editar') + ' ' + tdc('entity'),
+      title: tdc('Edit') + ' ' + tdc('entity'),
       requiresAuth: true,
       icon: 'edit',
       requiredRole: 'change_entity',
@@ -41,7 +41,7 @@ export let entityRoutes = [
     name: 'view_entity',
     component: () => import('./EntityVPage.vue'),
     meta: {
-      title: tdc('Visualizar') + ' ' + tdc('entity'),
+      title: tdc('View') + ' ' + tdc('entity'),
       requiresAuth: true,
       icon: 'visibility',
       requiredRole: 'view_entity',

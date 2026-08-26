@@ -1,17 +1,17 @@
 <template>
-  <!-- BOTÃO PARA ABRIR A MODAL -->
+  <!-- BUTTON TO OPEN THE MODAL -->
   <div class="q-pa-sm col-12">
     <s-btn
       color="primary"
       icon="person_search"
-      label="Pesquisar Pessoa"
+      label="Search Person"
       no-caps
       class="full-width"
       @click="openSearchDialog"
     />
   </div>
 
-  <!-- MODAL DE PESQUISA -->
+  <!-- SEARCH MODAL -->
   <q-dialog
     v-model="showSearchDialog"
     persistent
@@ -22,7 +22,7 @@
     >
       <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
         <div class="text-h6">
-        {{ tdc('Pesquisar Pessoa') }}
+        {{ tdc('Search Person') }}
         </div>
 
         <q-space />
@@ -43,7 +43,7 @@
           dense
           clearable
           debounce="500"
-          label="Pesquisar pessoa"
+          label="Search person"
           @update:model-value="doSearch"
         >
           <template #prepend>
@@ -62,7 +62,7 @@
           />
         </div>
 
-        <!-- RESULTADOS -->
+        <!-- RESULTS -->
         <div
           v-else-if="Person.search"
           class="q-mt-md"
@@ -79,7 +79,7 @@
             v-if="Person.rows.length === 0"
             class="text-grey text-caption text-center q-pa-md"
           >
-            Nenhuma pessoa encontrada
+            No person found
           </div>
         </div>
       </q-card-section>
@@ -88,7 +88,7 @@
         <s-btn
           flat
           color="grey"
-          label="Cancelar"
+          label="Cancel"
           no-caps
           @click="closeSearchDialog"
         />
@@ -96,7 +96,7 @@
         <s-btn
           color="primary"
           icon="person_add"
-          label="Criar Pessoa"
+          label="Create Person"
           no-caps
           @click="openCreateDialog"
         />
@@ -104,7 +104,7 @@
     </q-card>
   </q-dialog>
 
-  <!-- MODAL PARA CRIAR PESSOA -->
+  <!-- MODAL TO CREATE PERSON -->
   <q-dialog
     v-model="showCreateDialog"
     persistent
@@ -115,7 +115,7 @@
     >
       <q-bar class="row items-center " :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
         <div class="text-h6">
-          Criar Pessoa
+          Create Person
         </div>
 
         <q-space />
@@ -195,7 +195,7 @@ async function doSearch(value) {
     return
   }
 
-  // Adapte ao nome da action existente no seu PersonStore
+  // Adapt to the name of the existing action in your PersonStore
   await Person.loadData({
     search
   })

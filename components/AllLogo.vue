@@ -13,7 +13,7 @@
       style="width:60%"
     />
 
-    <!-- FALLBACK TIPO ENTIDADE -->
+    <!-- FALLBACK ENTITY TYPE -->
     <img
       v-else-if="User.EntityType?.icon?.url"
       :src="User.EntityType.icon.url"
@@ -62,7 +62,7 @@ const route = useRoute()
 const loading = ref(false)
 
 /* =========================
-   LOAD ENTIDADE
+   LOAD ENTITY
 ========================= */
 async function loadEntity(id) {
   if (!id) return

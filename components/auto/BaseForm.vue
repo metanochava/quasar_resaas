@@ -72,16 +72,16 @@ const loading = ref(true)
 const saving = ref(false)
 const errors = ref(null)
 
-// 🔑 id dinâmico
+// 🔑 dynamic id
 const recordId = computed(() => props.id || route.params.id)
 
-// 📦 dados do store (já padrão teu)
+// 📦 data from the store (already your default pattern)
 const schema = computed(() => store.fields)
 const form = computed(() => store.form)
 const config = computed(() => store.config)
 const actions = computed(() => store.actions)
 
-// 🔐 permissões
+// 🔐 permissions
 const canDo = (action) => {
   if (!store.canDo) return true
   return store.canDo(action)
@@ -98,7 +98,7 @@ const load = async () => {
     // 🔥 INIT (schema + list)
     await store.init()
 
-    // 🔥 modo edição
+    // 🔥 edit mode
     if (recordId.value) {
       await store.getById(recordId.value)
     } else {

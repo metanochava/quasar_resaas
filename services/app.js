@@ -8,7 +8,7 @@ export const thumbStyle = {
   backgroundColor: 'var(--q-primary)',
   width: '8px',
   opacity: 0.75,
-  zIndex: 9999 // 🔥 aqui
+  zIndex: 9999 // 🔥 here
 }
 
 export const barStyle = {
@@ -21,14 +21,14 @@ export const barStyle = {
   marginBottom: '-3px',
   paddingTop: '3px',
   paddingBottom: '3px',
-   zIndex: 9998 // 🔥 aqui
+   zIndex: 9998 // 🔥 here
 }
 
 export const pegaDominio = function () {
-  let pagelocalurl = location.href // pega endereço que esta no navegador
-  pagelocalurl = pagelocalurl.split('/') // quebra o endeço de acordo com a / (barra)
+  let pagelocalurl = location.href // gets the address currently in the browser
+  pagelocalurl = pagelocalurl.split('/') // splits the address by / (slash)
   const dominiourl = pagelocalurl[0] + '//' + pagelocalurl[2]
-  return dominiourl // retorna a parte www.endereco.com.brs@
+  return dominiourl // returns the www.address.com part
 }
 
 

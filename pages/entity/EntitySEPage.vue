@@ -78,7 +78,7 @@ async function load(id) {
     return
   }
 
-  // 🔥 evita chamadas duplicadas com comparação segura
+  // 🔥 avoids duplicate calls with a safe comparison
   if (String(Entity.row?.id) === String(id)) {
     Entity.form = Entity.row 
     return
@@ -104,7 +104,7 @@ async function init() {
   }
 }
 
-// ---------------- WATCH ROTA (CORRIGIDO) ----------------
+// ---------------- WATCH ROUTE (FIXED) ----------------
 watch(
   () => route.params,
   async (params) => {
@@ -112,10 +112,10 @@ watch(
 
     const id = params.id
 
-    // 🔥 sempre carrega quando muda route
+    // 🔥 always reloads when the route changes
     await load(id)
   },
-  { immediate: false } // init já trata o primeiro carregamento
+  { immediate: false } // init already handles the first load
 )
 
 // ---------------- EVENTS ----------------

@@ -7,7 +7,7 @@
     <q-tooltip
       :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
     >
-      {{ $q.dark.isActive ? tdc('Clique para modo dia') : tdc('Clique para modo noite') }}
+      {{ $q.dark.isActive ? tdc('Click for light mode') : tdc('Click for dark mode') }}
     </q-tooltip>
   </s-btn>
 </template>

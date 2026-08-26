@@ -151,10 +151,10 @@ async function save() {
       <!-- HEADER -->
       <q-bar class="row items-center justify-between" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
          <div class="text-h6">
-          {{ form?.id ? ('Editar') : tdc('Novo') }}
+          {{ form?.id ? ('Edit') : tdc('New') }}
         </div>
         <s-btn dense flat icon="close" @click="close" >
-          <q-tooltip>{{('Fechar')}}</q-tooltip>
+          <q-tooltip>{{('Close')}}</q-tooltip>
         </s-btn>
       </q-bar>
 
@@ -211,8 +211,8 @@ async function save() {
 
       <!-- ACTIONS -->
       <q-card-actions align="right">
-        <s-btn flat label="Cancelar" @click="close" />
-        <s-btn color="primary" :loading="saving" label="Salvar" @click="save" />
+        <s-btn flat label="Cancel" @click="close" />
+        <s-btn color="primary" :loading="saving" label="Save" @click="save" />
 
         <ActionForm
           :store="Person"

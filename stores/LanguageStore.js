@@ -35,7 +35,7 @@ export const useLanguageStore = createBaseStore(
 
         const payload = res.data
 
-        // Função para achatar qualquer JSON
+        // Function to flatten any JSON
         const flattenTranslations = (obj, map = {}) => {
           for (const key in obj) {
             const value = obj[key]

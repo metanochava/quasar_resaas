@@ -109,7 +109,7 @@ export const useEntityStore = createBaseStore(
                   ...(selected.data || [])
                 ]
 
-                // remover duplicados por id
+                // remove duplicates by id
                 this.groups = Object.values(
                   merged.reduce((acc, g) => {
                     acc[g.id] = g
@@ -397,7 +397,7 @@ export const useEntityStore = createBaseStore(
             }))
 
             q.dialog({
-              title: tdc('Seleccione a Entity'),
+              title: tdc('Select the Entity'),
               options: {
                 type: 'radio',
                 model: 'opt1',

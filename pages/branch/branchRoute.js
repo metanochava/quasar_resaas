@@ -7,7 +7,7 @@ export let branchRoutes = [
     name: 'list_branch',
     component: () => import('./BranchLPage.vue'),
     meta: {
-      title: tdc('Vista de') + ' ' + tdc('branch'),
+      title: tdc('View of') + ' ' + tdc('branch'),
       requiresAuth: true,
       icon: 'list',
       requiredRole: 'list_branch',
@@ -18,7 +18,7 @@ export let branchRoutes = [
     name: 'add_branch',
     component: () => import('./BranchSEPage.vue'),
     meta: {
-      title: tdc('Adicionar') + ' ' + tdc('branch'),
+      title: tdc('Add') + ' ' + tdc('branch'),
       requiresAuth: true,
       icon: 'add',
       requiredRole: 'add_branch',
@@ -29,7 +29,7 @@ export let branchRoutes = [
     name: 'change_branch',
     component: () => import('./BranchSEPage.vue'),
     meta: {
-      title: tdc('Editar') + ' ' + tdc('branch'),
+      title: tdc('Edit') + ' ' + tdc('branch'),
       requiresAuth: true,
       icon: 'edit',
       requiredRole: 'change_branch',
@@ -40,7 +40,7 @@ export let branchRoutes = [
     name: 'view_branch',
     component: () => import('./BranchVPage.vue'),
     meta: {
-      title: tdc('Visualizar') + ' ' + tdc('branch'),
+      title: tdc('View') + ' ' + tdc('branch'),
       requiresAuth: true,
       icon: 'visibility',
       requiredRole: 'view_branch',

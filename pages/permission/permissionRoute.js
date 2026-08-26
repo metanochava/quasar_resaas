@@ -7,7 +7,7 @@ export let permissionRoutes = [
     name: 'list_permission',
     component: () => import('./PermissionLPage.vue'),
     meta: {
-      title: tdc('Vista de') + ' ' + tdc('permission'),
+      title: tdc('View of') + ' ' + tdc('permission'),
       requiresAuth: true,
       icon: 'list',
       requiredRole: 'list_permission',
@@ -18,7 +18,7 @@ export let permissionRoutes = [
     name: 'add_permission',
     component: () => import('./PermissionSEPage.vue'),
     meta: {
-      title: tdc('Adicionar') + ' ' + tdc('permission'),
+      title: tdc('Add') + ' ' + tdc('permission'),
       requiresAuth: true,
       icon: 'add',
       requiredRole: 'add_permission',
@@ -29,7 +29,7 @@ export let permissionRoutes = [
     name: 'change_permission',
     component: () => import('./PermissionSEPage.vue'),
     meta: {
-      title: tdc('Editar') + ' ' + tdc('permission'),
+      title: tdc('Edit') + ' ' + tdc('permission'),
       requiresAuth: true,
       icon: 'edit',
       requiredRole: 'change_permission',
@@ -40,7 +40,7 @@ export let permissionRoutes = [
     name: 'view_permission',
     component: () => import('./PermissionVPage.vue'),
     meta: {
-      title: tdc('Visualizar') + ' ' + tdc('permission'),
+      title: tdc('View') + ' ' + tdc('permission'),
       requiresAuth: true,
       icon: 'visibility',
       requiredRole: 'view_permission',

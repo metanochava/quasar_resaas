@@ -51,7 +51,7 @@ export default defineComponent({
     const computedRules = computed(() => {
       const rules = []
       if (props.required) {
-        rules.push(v => !!v || tdc("Campo obrigatório"))
+        rules.push(v => !!v || tdc("Required field"))
       }
       return rules
     })

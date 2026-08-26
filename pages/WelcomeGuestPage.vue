@@ -6,7 +6,7 @@
         <div class="text-h4 q-mt-md text-weight-bold"> {{ tdc('Welcome to') }} {{ tdc(User.EntityType?.name) }} {{ tdc('SaaS') }}</div>
 
         <div class="text-subtitle1 text-grey-7 q-mt-sm">
-          {{  tdc('Plataforma inteligente para gestão empresarial moderna') }}
+          {{  tdc('Smart platform for modern business management') }}
         </div>
       </q-card-section>
 
@@ -15,13 +15,13 @@
       <q-card-section class="text-center">
         <s-btn
           color="primary"
-          :label="tdc('Entrar no Sistema')"
+          :label="tdc('Sign In')"
           icon="login"
           class="q-px-lg"
           @click="$router.push('/login')"
         />
 
-        <s-btn flat color="secondary" :label="tdc('Criar Conta')" class="q-ml-md" />
+        <s-btn flat color="secondary" :label="tdc('Create Account')" class="q-ml-md" />
       </q-card-section>
     </s-card>
   </q-page>

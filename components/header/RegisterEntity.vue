@@ -6,7 +6,7 @@
 
           <q-card-section class="row ">
             <label class="text-h6 text-grey-9 text-center">
-              {{tdc('De qual deseja sair')}}
+              {{tdc('Which one do you want to log out of')}}
             </label>
           </q-card-section>
           <q-separator />
@@ -20,7 +20,7 @@
           </q-card-actions>
           <q-separator/>
           <q-card-actions class="row" >
-            <s-btn  class="col-12" flat v-close-popup>{{tdc('Cancelar')}}</s-btn>
+            <s-btn  class="col-12" flat v-close-popup>{{tdc('Cancel')}}</s-btn>
           </q-card-actions>
         </s-card>
 
@@ -59,7 +59,7 @@
                 <q-separator />
                 <q-item dense clickable v-if="User?.EntityType?.crair_entity"   :to="{name:'add_entity_self', params:{}}"  >
                   <q-item-section>
-                    <center><q-item-label overline class="text-blue"> {{ tdc('Registar Entity')}}</q-item-label> </center>
+                    <center><q-item-label overline class="text-blue"> {{ tdc('Register Entity')}}</q-item-label> </center>
                   </q-item-section>
                 </q-item>
                 <q-item dense clickable v-for="entity in User?.Entitys" :key="entity?.id" @click="selectEntity(entity)">
@@ -99,10 +99,10 @@
               </q-menu>
             </s-btn>
 
-            <s-btn v-show="User" style="width: 100%; border-color: transparent;"  icon="settings" dense size=""  :to="{name:'userDetails', params:{'user_id': User?.id}}" flat color="secondary" class="">{{tdc('Definições')}}</s-btn>
-            <s-btn v-show="User" style="width: 100%; border-color: transparent;"  icon="logout" dense size="" flat color="red" @click="modal_pergunta">{{tdc('Sair')}}</s-btn>
+            <s-btn v-show="User" style="width: 100%; border-color: transparent;"  icon="settings" dense size=""  :to="{name:'userDetails', params:{'user_id': User?.id}}" flat color="secondary" class="">{{tdc('Settings')}}</s-btn>
+            <s-btn v-show="User" style="width: 100%; border-color: transparent;"  icon="logout" dense size="" flat color="red" @click="modal_pergunta">{{tdc('Logout')}}</s-btn>
 
-            <s-btn v-show="!User"  style="width: 100%; border-color: transparent;" dense size="" :to="{name:'registarUser'}" flat color="primary" class="" :label="tdc('Registar')" />
+            <s-btn v-show="!User"  style="width: 100%; border-color: transparent;" dense size="" :to="{name:'registarUser'}" flat color="primary" class="" :label="tdc('Register')" />
             <s-btn v-show="!User"  style="width: 100%; border-color: transparent;" dense size="" :to="{name:'login'}" flat color="secondary" class="" >{{tdc('login')}}</s-btn>
 
             <q-separator color="primary" dense size="xs" />
@@ -151,7 +151,7 @@ export default defineComponent({
   },
 
   methods: {
-    /* --------------------- SELECT ENTIDADE --------------------- */
+    /* --------------------- SELECT ENTITY --------------------- */
     selectEntity (entity) {
       setStorage('l', 'userEntity', JSON.stringify(entity))
 
@@ -163,7 +163,7 @@ export default defineComponent({
       this.branchClosed = true
     },
 
-    /* --------------------- SELECT SUCURSAL --------------------- */
+    /* --------------------- SELECT BRANCH --------------------- */
     selectBranch (branch) {
       setStorage('l', 'userBranch', JSON.stringify(branch))
 
@@ -174,7 +174,7 @@ export default defineComponent({
       this.branchClosed = false
     },
 
-    /* --------------------- GET USER SUCURSALS --------------------- */
+    /* --------------------- GET USER BRANCHES --------------------- */
     async getUserBranchs () {
       this.spiner = true
 
@@ -193,7 +193,7 @@ export default defineComponent({
       }
     },
 
-    /* --------------------- GET USER PERFILS --------------------- */
+    /* --------------------- GET USER PROFILES --------------------- */
     async getUserProfiles () {
       try {
         await HTTPAuth.get(url({ type: 'u', url: 'saas/usuarios/' + this.User?.id + '/userProfiles/', params: {} }))
@@ -218,7 +218,7 @@ export default defineComponent({
       this.$router.push({ name: 'home', params: {} })
     },
 
-    /* --------------------- GET USER PERMISSOES --------------------- */
+    /* --------------------- GET USER PERMISSIONS --------------------- */
     async getUserPermissions () {
       if (getStorage('l', 'userBranch') !== null) {
         try {
@@ -236,7 +236,7 @@ export default defineComponent({
       }
     },
 
-    /* --------------------- GET ENTIDADE MODULOS --------------------- */
+    /* --------------------- GET ENTITY MODULES --------------------- */
     async getEntityApps () {
       if (getStorage('l', 'userEntity') !== null) {
         try {

@@ -91,7 +91,7 @@ function getPreview(f, value) {
   if (!value) return null
   if (!f.ui?.isFile && !f.ui?.isImage) return null
 
-  // File novo
+  // New file
   if (value instanceof File) {
     if (value.type.startsWith('image')) {
       return { type: 'image', src: URL.createObjectURL(value) }

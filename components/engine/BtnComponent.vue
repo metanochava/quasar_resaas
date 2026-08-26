@@ -117,7 +117,7 @@ export default defineComponent({
 
 <style scoped>
 
-/* animação exemplo */
+/* example animation */
 .btn-anim-pulse {
   animation: pulse 1.2s infinite;
 }

@@ -3,7 +3,7 @@
     :icon="fullscreen ? 'fullscreen_exit' : 'fullscreen'"
     @click="toggleFullScreen" >
     <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'">
-      {{ fullscreen ? tdc('Clique para desactivar da tela cheia'): tdc('Clique para activar da tela cheia') }}
+      {{ fullscreen ? tdc('Click to exit fullscreen'): tdc('Click to enter fullscreen') }}
     </q-tooltip>
   </s-btn>
 </template>

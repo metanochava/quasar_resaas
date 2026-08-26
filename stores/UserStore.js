@@ -138,7 +138,7 @@ export const useUserStore = createBaseStore(
           ...(selected.data || [])
         ]
 
-        // remover duplicados por id
+        // remove duplicates by id
         this.groups = Object.values(
           merged.reduce((acc, g) => {
             acc[g.id] = g

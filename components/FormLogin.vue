@@ -20,7 +20,7 @@
           <br>
           <q-form  @submit.prevent="login">
 
-            <s-input @keyup.enter="login()" outlined :readonly="User.loading"  clearable v-model="identifier" label="Usuario ou Celular ou Email">
+            <s-input @keyup.enter="login()" outlined :readonly="User.loading"  clearable v-model="identifier" label="Username or Phone or Email">
               <template v-slot:prepend>
                 <q-icon name="email" />
               </template>
@@ -29,7 +29,7 @@
               </template>
             </s-input>
          
-            <s-input @keyup.enter="login()" outlined  :readonly="User.loading" clearable v-model="password" :type="isPwd ? 'password': 'text'" label="Senha">
+            <s-input @keyup.enter="login()" outlined  :readonly="User.loading" clearable v-model="password" :type="isPwd ? 'password': 'text'" label="Password">
 
               <template v-slot:prepend>
                 <q-icon
@@ -48,7 +48,7 @@
             </s-input>
 
             <br/>
-            <s-checkbox  class="text-grey-7" dense   clearable v-model="User.manterLogado"  @click="check" :label="tdc('Manter-me logado')">
+            <s-checkbox  class="text-grey-7" dense   clearable v-model="User.manterLogado"  @click="check" :label="tdc('Keep me logged in')">
             </s-checkbox>
           </q-form>
         </q-card-section>
@@ -62,13 +62,13 @@
             @click="login()"
             color="positive" dense
             class="full-width "
-            :label="tdc('Entrar')"
+            :label="tdc('Login')"
           />
           <p></p>
         </q-card-actions>
         <q-card-actions align="around" >
-          <s-btn flat :to="{name:'esquecerpassword'}"  size="md"  color="purple" :label="tdc('Esqueci minha') + ' ' + tdc('Senha')" />
-          <s-btn flat :to="{name:'registarUser'}"  size="md" color="primary" class="" :label="tdc('Registar')" />
+          <s-btn flat :to="{name:'esquecerpassword'}"  size="md"  color="purple" :label="tdc('Forgot my') + ' ' + tdc('Password')" />
+          <s-btn flat :to="{name:'registarUser'}"  size="md" color="primary" class="" :label="tdc('Register')" />
         </q-card-actions>
       </s-card>
   </q-page>
@@ -132,7 +132,7 @@ export default defineComponent({
   watch: {
     'User.redirect'(val) {
       if (val) {
-        this.router.push({ name: val })   // ✅ agora funciona
+        this.router.push({ name: val })   // ✅ works now
         this.User.redirect = '' // reset
       }
     },
@@ -175,7 +175,7 @@ export default defineComponent({
         color: 'negative',
         textColor: 'white',
         actions: [{ icon: 'close', color: 'white' }],
-        message: 'Não foi possível recupera sua posição!'
+        message: 'Could not retrieve your location!'
       })
     },
 

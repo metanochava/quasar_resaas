@@ -1,17 +1,17 @@
 <template>
   <s-card class="column full-height app-card">
 
-    <!-- 🔥 HEADER FIXO -->
+    <!-- 🔥 FIXED HEADER -->
     <div class="app-header">
 
       <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
         <q-icon name="view_app" class="q-mr-sm" />
         <div class="text-subtitle1 text-weight-bold">
-          {{ tdc("Gestão de Apps") }}
+          {{ tdc("Apps Management") }}
         </div>
         <q-space />
         <q-badge color="white" text-color="primary">
-          {{ EntityType.selectedApps.length }} ativos
+          {{ EntityType.selectedApps.length }} active
         </q-badge>
 
         <s-btn dense flat icon="close" v-close-popup >
@@ -21,14 +21,14 @@
 
       <q-separator />
 
-      <!-- 🔍 SEARCH (FIXO) -->
+      <!-- 🔍 SEARCH (FIXED) -->
       <div class="q-pa-sm bg-grey-2">
         <q-input
           v-model="search"
           dense
           outlined
           clearable
-          placeholder="Pesquisar módulo..."
+          placeholder="Search module..."
         >
           <template #prepend>
             <q-icon name="search" />
@@ -38,7 +38,7 @@
 
     </div>
 
-    <!-- 🔥 LIST (SCROLL) -->
+    <!-- 🔥 LIST (SCROLLING) -->
     <q-card-section class="app-body">
 
       <div v-if="EntityType.loadingApps" class="flex flex-center q-pa-xl">
@@ -83,7 +83,7 @@
                 :color="EntityType.hasApp(mod.id) ? 'primary' : 'grey-5'"
                 text-color="white"
               >
-                {{ EntityType.hasApp(mod.id) ? 'Ativo' : 'Inativo' }}
+                {{ EntityType.hasApp(mod.id) ? 'Active' : 'Inactive' }}
               </q-chip>
 
               <q-checkbox
@@ -104,7 +104,7 @@
         v-if="!filteredApps.length"
         class="text-center text-grey q-pa-md"
       >
-        Nenhum módulo encontrado
+        No module found
       </div>
 
     </q-card-section>
@@ -149,14 +149,14 @@ onMounted(() => {
   flex-direction: column;
 }
 
-/* 🔥 HEADER FIXO */
+/* 🔥 FIXED HEADER */
 .app-header {
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
-/* 🔥 BODY COM SCROLL */
+/* 🔥 SCROLLING BODY */
 .app-body {
   flex: 1;
   overflow-y: auto;
@@ -168,7 +168,7 @@ onMounted(() => {
   border-left: 4px solid transparent;
 }
 
-/* 🔥 ITEM ATIVO */
+/* 🔥 ACTIVE ITEM */
 .app-active {
   background: rgba(25, 118, 210, 0.08);
   border-left-color: var(--q-primary);

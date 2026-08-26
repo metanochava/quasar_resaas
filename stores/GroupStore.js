@@ -85,7 +85,7 @@ export const useGroupStore = createBaseStore(
             groups.push({ label: profileSplint(element.name), value: element })
           })
           q.dialog({
-            title: tdc('Seleccione o Groups'),
+            title: tdc('Select the Groups'),
             options: {
               type: 'radio',
               model: 'opt1',

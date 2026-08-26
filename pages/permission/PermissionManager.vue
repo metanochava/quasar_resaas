@@ -6,7 +6,7 @@
       <q-input
         dense outlined
         v-model="Permission.search"
-        label="Pesquisar"
+        label="Search"
         @update:model-value="Permission.buildApps"
       >
         <template #append>
@@ -66,7 +66,7 @@
                   <div>
                     <div class="text-bold">{{ modelName }}
                       <label class="text-grey">
-                        {{ perms.length }} permissões
+                        {{ perms.length }} permissions
                       </label>
                     </div>
                   </div>
@@ -102,7 +102,7 @@
       <q-input
         dense outlined
         v-model="Permission.search"
-        label="Pesquisar"
+        label="Search"
         @update:model-value="Permission.buildApps"
       >
         <template #append>
@@ -127,7 +127,7 @@ const props = defineProps({
 
 const Permission = usePermissionStore()
 
-// 🔥 REATIVO (resolve problema de dados vazios)
+// 🔥 REACTIVE (fixes empty-data issue)
 watch(
   () => [props.AllPermissions, props.GroupPermissionsRe, props.Group],
   () => {
@@ -165,7 +165,7 @@ function label(c, m) {
 
   let code = (c || '').toLowerCase()
 
-  code = code.replace(model, '')   // só primeira ocorrência
+  code = code.replace(model, '')   // first occurrence only
 
   return code.replace(/_$/, '')
 }

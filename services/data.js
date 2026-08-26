@@ -23,7 +23,7 @@ export const ds = function (dataString = '') {
     d = data(dataArray[0])
   }
 
-  const l = (h !== '') ? (d + ' ' +tdc('às')+ ' ' + h) : d
+  const l = (h !== '') ? (d + ' ' +tdc('at')+ ' ' + h) : d
   if (l.includes('undefined')) {
     return ''
   }

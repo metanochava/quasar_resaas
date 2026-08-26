@@ -18,7 +18,7 @@ export const useMenuStore = defineStore('menu', {
 
       this.initialized = true
 
-      // 🔥 carrega menus aqui
+      // 🔥 load menus here
       import('src/core/rightMenus').then(({ setupRightMenus }) => {
         setupRightMenus(this)
       })

@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md q-gutter-sm">
-    <h2>{{ tdc('User permissoes') }}</h2>
+    <h2>{{ tdc('User permissions') }}</h2>
   </div>
 </template>
 <script >

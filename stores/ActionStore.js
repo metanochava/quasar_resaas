@@ -6,22 +6,22 @@ export const useActionStore = defineStore('action', {
       create: {
         icon: 'add',
         color: 'primary',
-        label: 'Criar'
+        label: 'Create'
       },
       edit: {
         icon: 'edit',
         color: 'warning',
-        label: 'Editar'
+        label: 'Edit'
       },
       delete: {
         icon: 'delete',
         color: 'negative',
-        label: 'Apagar'
+        label: 'Delete'
       },
       view: {
         icon: 'visibility',
         color: 'info',
-        label: 'Ver'
+        label: 'View'
       },
       pdf: {
         icon: 'picture_as_pdf',
@@ -36,7 +36,7 @@ export const useActionStore = defineStore('action', {
       toggle: {
         icon: 'toggle_on',
         color: 'positive',
-        label: 'Ativar/Desativar'
+        label: 'Activate/Deactivate'
       }
     }
   }),

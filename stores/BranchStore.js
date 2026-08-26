@@ -40,7 +40,7 @@ export const useBranchStore = createBaseStore(
                 branchs.push({ label: profileSplint(element.name), value: element })
               })
               q.dialog({
-                title: tdc('Seleccione a Branch'),
+                title: tdc('Select the Branch'),
                 options: {
                   type: 'radio',
                   model: 'opt1',

@@ -9,7 +9,7 @@
 
         <div class="text-h6">
 
-          Nova Pessoa
+          New Person
 
         </div>
 

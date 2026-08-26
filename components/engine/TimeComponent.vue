@@ -100,7 +100,7 @@ export default defineComponent({
       const rules = []
 
       if (props.required) {
-        rules.push(v => !!v || tdc("Campo obrigatório"))
+        rules.push(v => !!v || tdc("Required field"))
       }
 
       for (const validator of props.validators) {

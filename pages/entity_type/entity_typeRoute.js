@@ -6,7 +6,7 @@ export let entity_typeRoutes = [
     name: 'list_entitytype',
     component: () => import('./EntityTypeLPage.vue'),
     meta: {
-      title: tdc('Vista de') + ' ' + tdc('tipo entity'),
+      title: tdc('View of') + ' ' + tdc('entity type'),
       requiresAuth: true,
       icon: 'list',
       requiredRole: 'list_entitytype',
@@ -17,7 +17,7 @@ export let entity_typeRoutes = [
     name: 'add_entitytype',
     component: () => import('./EntityTypeSEPage.vue'),
     meta: {
-      title: tdc('Adicionar') + ' ' + tdc('tipo entity'),
+      title: tdc('Add') + ' ' + tdc('entity type'),
       requiresAuth: true,
       icon: 'add',
       requiredRole: 'add_entitytype',
@@ -28,7 +28,7 @@ export let entity_typeRoutes = [
     name: 'change_entitytype',
     component: () => import('./EntityTypeSEPage.vue'),
     meta: {
-      title: tdc('Editar') + ' ' + tdc('tipo entity'),
+      title: tdc('Edit') + ' ' + tdc('entity type'),
       requiresAuth: true,
       icon: 'edit',
       requiredRole: 'change_entitytype',
@@ -39,7 +39,7 @@ export let entity_typeRoutes = [
     name: 'view_entitytype',
     component: () => import('./EntityTypeVPage.vue'),
     meta: {
-      title: tdc('Visualizar') + ' ' + tdc('tipo entity'),
+      title: tdc('View') + ' ' + tdc('entity type'),
       requiresAuth: true,
       icon: 'visibility',
       requiredRole: 'view_entitytype',

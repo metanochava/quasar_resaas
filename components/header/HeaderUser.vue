@@ -12,7 +12,7 @@
 
           <q-card-section class="row ">
             <label class="text-h6 text-grey-9 text-center">
-              {{tdc('De qual deseja sair')}}
+              {{tdc('Which one do you want to log out of')}}
             </label>
           </q-card-section>
           <q-separator />
@@ -26,7 +26,7 @@
           </q-card-actions>
           <q-separator/>
           <q-card-actions class="row" >
-            <s-btn  class="col-12" flat v-close-popup>{{tdc('Cancelar')}}</s-btn>
+            <s-btn  class="col-12" flat v-close-popup>{{tdc('Cancel')}}</s-btn>
           </q-card-actions>
         </s-card>
 
@@ -63,7 +63,7 @@
                 <q-separator />
                 <q-item dense clickable v-if="User.EntityType?.crair_entity"   :to="{name:'add_entity_self', params:{}}"  >
                   <q-item-section>
-                    <q-item-label overline class="text-blue"> {{ tdc('Registar Entity')}}</q-item-label> 
+                    <q-item-label overline class="text-blue"> {{ tdc('Register Entity')}}</q-item-label> 
                   </q-item-section>
                 </q-item>
                 <q-item dense clickable v-for="entity in User?.Entitys" :key="entity?.id" @click=" entityClosed = false, branchClosed = true, Entity.select(entity)">
@@ -105,12 +105,12 @@
               </q-menu>
             </s-btn>
             <q-card-actions align="around" v-if="User.data">
-              <s-btn  icon="settings" dense size=""  :to="{name:'userDetails', params:{'user_id': User?.id}}" flat color="secondary" class="">{{tdc('Definições')}}</s-btn>
-              <s-btn  icon="logout" dense size="" flat color="red" @click="pergunta = !pergunta">{{tdc('Sair')}}</s-btn>
+              <s-btn  icon="settings" dense size=""  :to="{name:'userDetails', params:{'user_id': User?.id}}" flat color="secondary" class="">{{tdc('Settings')}}</s-btn>
+              <s-btn  icon="logout" dense size="" flat color="red" @click="pergunta = !pergunta">{{tdc('Logout')}}</s-btn>
             </q-card-actions>
 
             <q-card-actions align="around" v-else>
-              <s-btn  icon="person_add" dense size="" :to="{name:'registarUser'}" flat color="primary" class="" :label="tdc('Registar')" />
+              <s-btn  icon="person_add" dense size="" :to="{name:'registarUser'}" flat color="primary" class="" :label="tdc('Register')" />
               <s-btn  icon="login" dense size="" :to="{name:'login'}" flat color="secondary" class="" >{{tdc('login')}}</s-btn>
             </q-card-actions>
             <q-separator color="primary" dense size="xs" />
@@ -119,7 +119,7 @@
         </q-menu>
       </q-avatar>
       <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary'" v-if="User">{{User?.username }} </q-tooltip>
-      <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary'" v-else>{{tdc('Hóspede')}}</q-tooltip>
+      <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary'" v-else>{{tdc('Guest')}}</q-tooltip>
           
     </s-btn>
   </div>

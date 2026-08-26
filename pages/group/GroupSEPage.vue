@@ -89,14 +89,14 @@ async function init() {
     const id = route.params.id
     await load(id)
 
-    // 🔥 PRIMEIRO: buscar permissões
+    // 🔥 FIRST: fetch permissions
     const { data: all } = await HTTPAuth.get(
       url({ type: 'u', url: 'auth/permissions/' })
     )
 
     permissions.value = all || []
 
-    // 🔥 SÓ DEPOIS libera UI
+    // 🔥 ONLY THEN release the UI
     ready.value = true
 
   } catch (err) {
@@ -115,7 +115,7 @@ watch(
 
 // ---------------- EVENTS ----------------
 function onSaved(res) {
-  // opcional
+  // optional
 }
 
 // ---------------- LIFECYCLE ----------------

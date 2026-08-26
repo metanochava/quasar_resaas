@@ -4,7 +4,7 @@ import { HTTPAuth, url, HTTPAuthBlob } from '../services/api'
 
 export function createBaseStore(name, config, extend = {}) {
 
-  // 🔥 CONFIG IMUTÁVEL (NUNCA MUDA)
+  // 🔥 IMMUTABLE CONFIG (NEVER CHANGES)
   const BASE_CONFIG = Object.freeze({
     url: '' + config.app + '/' + config.model.toLowerCase() + 's',
     app: config.app,
@@ -20,10 +20,10 @@ export function createBaseStore(name, config, extend = {}) {
       const extended = extend.state ? extend.state() : {}
 
       return {
-        // 🔥 CONFIG FIXA
+        // 🔥 FIXED CONFIG
         _config: BASE_CONFIG,
 
-        // 🔥 DERIVADOS (nunca confiar diretamente neles)
+        // 🔥 DERIVED (never rely on them directly)
         url: BASE_CONFIG.url,
         app: BASE_CONFIG.app,
         model: BASE_CONFIG.model,
@@ -136,7 +136,7 @@ export function createBaseStore(name, config, extend = {}) {
       },
 
 
-      // 🔥 GUARDA DE SEGURANÇA GLOBAL
+      // 🔥 GLOBAL SAFETY GUARD
       assertConfig() {
         if (!this._config.app || !this._config.model) {
           console.error('BaseStore CONFIG ERROR:', this._config)

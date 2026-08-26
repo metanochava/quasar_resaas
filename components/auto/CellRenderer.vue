@@ -27,7 +27,7 @@ const imageUrl = computed(() => parsed.value?.url || '')
 // 🔘 boolean
 const isBoolean = computed(() => typeof props.value === 'boolean')
 
-// abrir modal
+// open modal
 function openPreview() {
   showPreview.value = true
 }
@@ -55,7 +55,7 @@ function openPreview() {
       dense
       size="sm"
       :color="value ? 'positive' : 'negative'"
-      :label="value ? 'Sim' : 'Não'"
+      :label="value ? 'Yes' : 'No'"
     />
   </template>
 

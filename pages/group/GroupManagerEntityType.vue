@@ -5,11 +5,11 @@
 
     <q-card class="modal-card">
 
-      <!-- HEADER FIXO -->
+      <!-- FIXED HEADER -->
       <div class="modal-header">
         <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
           <div class="text-subtitle2">
-            Permissões - {{ Group?.row?.name }}
+            Permissions - {{ Group?.row?.name }}
           </div>
           <q-space />
           <s-btn dense flat icon="close" v-close-popup />
@@ -47,13 +47,13 @@
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        Gestão de Grupos de {{EntityType.row.name}}
+        Manage Groups of {{EntityType.row.name}}
       </div>
 
       <q-space />
 
       <q-badge color="white" text-color="primary">
-        {{ EntityType.selectedGroups.length }} ativos
+        {{ EntityType.selectedGroups.length }} active
       </q-badge>
 
       <s-btn dense flat icon="close" v-close-popup>
@@ -72,7 +72,7 @@
             dense
             outlined
             clearable
-            label="Novo grupo"
+            label="New group"
             @keyup.enter="addGroup"
           >
             <template #prepend>
@@ -85,7 +85,7 @@
           <s-btn
             color="primary"
             icon="add"
-            label="Adicionar"
+            label="Add"
             unelevated
             no-caps
             :disable="!canAdd"
@@ -104,7 +104,7 @@
         dense
         outlined
         clearable
-        label="Pesquisar grupo"
+        label="Search group"
       >
         <template #prepend>
           <q-icon name="search" />
@@ -150,7 +150,7 @@
           <q-item-section side>
             <div class="row items-center q-gutter-sm">
 
-              <!-- 🔥 BOTÃO MODAL -->
+              <!-- 🔥 MODAL BUTTON -->
               <s-btn
                 icon="security"
                 size="sm"
@@ -165,7 +165,7 @@
                 :color="EntityType.hasGroup(group.id) ? 'primary' : 'grey-5'"
                 text-color="white"
               >
-                {{ EntityType.hasGroup(group.id) ? 'Ativo' : 'Inativo' }}
+                {{ EntityType.hasGroup(group.id) ? 'Active' : 'Inactive' }}
               </q-chip>
 
               <q-checkbox
@@ -207,7 +207,7 @@ const permissionsModal = ref(false)
 const permissions = ref([])
 const ready = ref(false)
 
-// 🔥 ABRIR MODAL
+// 🔥 OPEN MODAL
 async function openPermissions(group) {
   permissionsModal.value = true
   ready.value = false

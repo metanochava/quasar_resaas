@@ -131,20 +131,20 @@ export default defineComponent({
       const rules = []
 
       if (props.required) {
-        rules.push(v => !!v || tdc("Campo obrigatório"))
+        rules.push(v => !!v || tdc("Required field"))
       }
 
       if (props.type === "email") {
         rules.push(v => {
           if (!v) return true
-          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || tdc("Email inválido")
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || tdc("Invalid email")
         })
       }
 
       if (props.type === "number") {
         rules.push(v => {
           if (v === null || v === undefined || v === "") return true
-          return !isNaN(Number(v)) || tdc("Valor inválido")
+          return !isNaN(Number(v)) || tdc("Invalid value")
         })
       }
 

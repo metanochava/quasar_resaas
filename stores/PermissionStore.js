@@ -29,7 +29,7 @@ export const usePermissionStore = createBaseStore(
         this.buildApps()
       },
 
-      // 🔥 BUILD CORRIGIDO (USA content_type.label)
+      // 🔥 FIXED BUILD (USES content_type.label)
       buildApps() {
         const search = (this.search || '').toLowerCase()
 
@@ -44,12 +44,12 @@ export const usePermissionStore = createBaseStore(
 
         const grouped = list.reduce((acc, item) => {
 
-          // 🔥 EXTRAI APP E MODEL DO LABEL
-          const label = item.content_type?.label || 'Sem App | Sem Modelo'
+          // 🔥 EXTRACT APP AND MODEL FROM LABEL
+          const label = item.content_type?.label || 'No App | No Model'
           const [app, model] = label.split('|').map(s => s.trim())
 
-          const appName = app || 'Sem App'
-          const modelName = model || 'Sem Modelo'
+          const appName = app || 'No App'
+          const modelName = model || 'No Model'
 
           if (!acc[appName]) acc[appName] = {}
           if (!acc[appName][modelName]) acc[appName][modelName] = []
@@ -59,7 +59,7 @@ export const usePermissionStore = createBaseStore(
           return acc
         }, {})
 
-        // 🔥 ordenar apps e models
+        // 🔥 sort apps and models
         this.apps = Object.fromEntries(
           Object.entries(grouped)
             .sort(([a], [b]) => a.localeCompare(b))

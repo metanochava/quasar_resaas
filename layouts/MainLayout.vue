@@ -51,10 +51,10 @@
         <!-- Languages -->
         <HeaderLanguage />
 
-        <!-- Serviços -->
+        <!-- Services -->
         <Servicos />
 
-        <!-- Notificações -->
+        <!-- Notifications -->
         <Notificacoes /> &nbsp;
 
         <!-- User Menu -->
@@ -116,7 +116,7 @@
     </q-page-container>
 
 
-    <!-- -------------------- RODAPÉ -------------------- -->
+    <!-- -------------------- FOOTER -------------------- -->
 
     <Rodape />
 
@@ -224,13 +224,13 @@ export default defineComponent({
   },
 
   async mounted(){
-    // 🔥 RESTORE USER + SETTINGS (teu código original)
+    // 🔥 RESTORE USER + SETTINGS (your original code)
     if(this.User){
       this.User?.loadFromStorage()
       await this.Entity.getLayoutSettings(this.User?.Entity?.id)
     }
 
-    // 🔥 RESTORE ROTA
+    // 🔥 RESTORE ROUTE
     const lastRoute = localStorage.getItem('last_route')
     if (lastRoute && lastRoute !== this.$route.fullPath) {
       this.$router.replace(lastRoute)
@@ -251,12 +251,12 @@ export default defineComponent({
       }, 100)
     }
 
-    // 🔥 teu comportamento original
+    // 🔥 your original behavior
     if (['authwelcome','welcome'].includes(this.$route.name)){
       this.User.LeftTop = false
     }
 
-    // 🔥 SAVE SCROLL AO SAIR
+    // 🔥 SAVE SCROLL ON EXIT
     window.addEventListener('beforeunload', () => {
       localStorage.setItem('scroll_position', window.scrollY)
     })
@@ -272,10 +272,10 @@ export default defineComponent({
 
 html, body, #q-app {
   height: 100%;
-  /* overflow: hidden; 🔥 trava scroll global */
+  /* overflow: hidden; 🔥 locks global scroll */
 }
 
-/* 🔥 container principal */
+/* 🔥 main container */
 .page-container {
   height: 100%;
   display: flex;
@@ -283,7 +283,7 @@ html, body, #q-app {
   overflow: hidden;
 }
 
-/* 🔥 conteúdo da página */
+/* 🔥 page content */
 /* .page-content {
   flex: 1;
   display: flex;
@@ -294,7 +294,7 @@ html, body, #q-app {
 .page-content {
    height: 100%;
   flex: 1;
-  overflow-y: auto;  /* 🔥 AQUI VOLTA O SCROLL */
+  overflow-y: auto;  /* 🔥 THIS IS WHERE SCROLL COMES BACK */
 }
 
 </style>

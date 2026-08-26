@@ -13,7 +13,7 @@
             </div>
             <div class="col-md-3 text-right  items-center" style="font-size:12px;">
               <q-spinner-gears size="md" color="white" v-show="Load.count !==0"/>
-              <label v-show="Load.count !==0">{{ Load.count }}</label> <label  @click="this.comment = !this.comment">  {{tdc('Enviar comentário ou opinião')}} </label>
+              <label v-show="Load.count !==0">{{ Load.count }}</label> <label  @click="this.comment = !this.comment">  {{tdc('Send comment or feedback')}} </label>
             </div>
           </div>
         </q-toolbar-title>

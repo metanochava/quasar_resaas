@@ -6,7 +6,7 @@
         &nbsp; {{tdc('')}} {{ app }}  | {{ model }} 
         <q-space />
         <s-btn dense flat icon="close" v-close-popup>
-            <q-tooltip>{{tdc('Fechar')}}</q-tooltip>
+            <q-tooltip>{{tdc('Close')}}</q-tooltip>
         </s-btn>
         </q-bar>
 
@@ -15,9 +15,9 @@
                 v-model="text_text"
                 class=""
                 dense
-                :placeholder="tdc('Escreve aqui o codigo da accao')"
+                :placeholder="tdc('Write the action code here')"
                 type="textarea"
-                :rules="[ val => val && val.length > 0 || tdc('Este campo e obrigatório.')]"
+                :rules="[ val => val && val.length > 0 || tdc('This field is required.')]"
                 />
         </q-card-section>
 
@@ -27,8 +27,8 @@
         <q-separator />
 
         <q-card-actions align="right">
-        <s-btn  v-close-popup   :color="$q.dark.isActive ? '' : 'dark'" >{{tdc('Cancelar')}}</s-btn>
-        <s-btn  :color="$q.dark.isActive ? 'primary' : 'primary'" type="submit" @click="save_text" > {{tdc('Enviar')}}</s-btn>
+        <s-btn  v-close-popup   :color="$q.dark.isActive ? '' : 'dark'" >{{tdc('Cancel')}}</s-btn>
+        <s-btn  :color="$q.dark.isActive ? 'primary' : 'primary'" type="submit" @click="save_text" > {{tdc('Submit')}}</s-btn>
         </q-card-actions>
     </s-card>
 
