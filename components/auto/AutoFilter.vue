@@ -112,7 +112,7 @@ function apply() {
       <q-bar :class="['row items-center justify-between',$q.dark.isActive?'bg-dark text-white':'bg-primary text-white']">
         <div class="text-h6">{{ tdc('Filters') }}<span v-if="activeCount"> ({{ activeCount }})</span></div>
         <s-btn dense flat icon="close" @click="close">
-          <q-tooltip>{{ tdc('Close') }}</q-tooltip>
+          <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{ tdc('Close') }}</q-tooltip>
         </s-btn>
       </q-bar>
 

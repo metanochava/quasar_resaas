@@ -58,7 +58,7 @@
 
     <!-- BOTÃO DO UTILIZADOR -->
     <s-btn
-      round
+      
       flat
       class="user-button"
       aria-label="Menu do utilizador"
@@ -232,7 +232,7 @@
             class="menu-actions"
           >
             <s-btn
-              round
+              
               icon="settings"
               dense
               flat
@@ -244,20 +244,21 @@
                 }
               }"
             >
-              <q-tooltip>
+              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
                 {{ tdc('Settings') }}
               </q-tooltip>
+              
             </s-btn>
 
             <s-btn
-              round
+              
               icon="logout"
               dense
               flat
               color="red"
               @click="pergunta = true"
             >
-              <q-tooltip>
+              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
                 {{ tdc('Logout') }}
               </q-tooltip>
             </s-btn>
@@ -270,27 +271,27 @@
             class="menu-actions"
           >
             <s-btn
-              round
+              
               icon="person_add"
               dense
               flat
               color="primary"
               :to="{ name: 'registarUser' }"
             >
-              <q-tooltip>
+              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
                 {{ tdc('Register') }}
               </q-tooltip>
             </s-btn>
 
             <s-btn
-              round
+              
               icon="login"
               dense
               flat
               color="secondary"
               :to="{ name: 'login' }"
             >
-              <q-tooltip>
+              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
                 {{ tdc('Login') }}
               </q-tooltip>
             </s-btn>

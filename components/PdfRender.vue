@@ -26,7 +26,8 @@
           icon="download"
           @click="downloadPdf"
         >
-          <q-tooltip>Download</q-tooltip>
+          <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{ tdc('Download') }}</q-tooltip>
+
         </s-btn>
 
         <!-- CLOSE -->
@@ -51,6 +52,7 @@
 
 <script setup>
 import { computed, watch } from 'vue'
+import { tdc } from '../services/translation'
 
 // props
 const props = defineProps({

@@ -2,7 +2,7 @@
 <template>
    <div class="">
         <s-card>
-          <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
+          <q-bar :class="$q.dark.isActive ? 'bg-primary text-white' : ' bg-primary text-white'">
             &nbsp; {{tdc('Send comment or feedback')}}
             <q-space />
             <s-btn dense flat icon="close" v-close-popup>
@@ -27,7 +27,7 @@
           <q-separator />
 
           <q-card-actions align="right">
-            <s-btn  v-close-popup   :color="$q.dark.isActive ? '' : 'dark'" >{{tdc('Cancel')}}</s-btn>
+            <s-btn  v-close-popup   :color="$q.dark.isActive ? 'grey' : 'grey'" >{{tdc('Cancel')}}</s-btn>
             <s-btn   :color="$q.dark.isActive ? 'primary' : 'primary'" type="submit" @click="comentar" > {{tdc('Send')}}</s-btn>
           </q-card-actions>
         </s-card>

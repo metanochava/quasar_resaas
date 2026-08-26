@@ -65,7 +65,7 @@
           <p></p>
         </q-card-actions>
         <q-card-actions align="around" >
-          <s-btn flat :to="{name:'esquecerpassword'}"  size="md"  color="purple" :label="tdc('Forgot my') + ' ' + tdc('Password')" />
+          <s-btn flat :to="{name:'esquecerpassword'}"  size="md"  color="purple" :label="tdc('Forgot my password')" />
           <s-btn flat :to="{name:'registarUser'}"  size="md" color="primary" class="" :label="tdc('Register')" />
         </q-card-actions>
       </s-card>

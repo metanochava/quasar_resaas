@@ -154,7 +154,7 @@ async function save() {
           {{ form?.id ? ('Edit') : tdc('New') }}
         </div>
         <s-btn dense flat icon="close" @click="close" >
-          <q-tooltip>{{('Close')}}</q-tooltip>
+          <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{('Close')}}</q-tooltip>
         </s-btn>
       </q-bar>
 
