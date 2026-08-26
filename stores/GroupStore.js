@@ -32,9 +32,9 @@ export const useGroupStore = createBaseStore(
         this.row = group
         User.Group = this.row
         setStorage('l', 'userGroups', JSON.stringify(group))
+        await User.selectContext({ entity: User.Entity,  branch: User.Branch,  group: User.Group })
         await this.getUserPermissions()
         await User.getMenus()
-        await User.selectContext({ entity: User.Entity,  branch: User.Branch,  group: User.Group })
         User.redirect = 'authwelcome'
       },
 
@@ -44,9 +44,9 @@ export const useGroupStore = createBaseStore(
         setStorage('l', 'userGroup', JSON.stringify(group))
         this.row = group
         User.Group = this.row
+        await User.selectContext({ entity: User.Entity,  branch: User.Branch,  group: User.Group })
         await this.getUserPermissions()
         await User.getMenus()
-        await User.selectContext({ entity: User.Entity,  branch: User.Branch,  group: User.Group })
       },
 
       async getGroups () {
@@ -104,15 +104,15 @@ export const useGroupStore = createBaseStore(
         }
         return res
       },
-      async getPermissions() {
+      // async getPermissions() {
 
-        const { data } = await HTTPAuth.get(
-          url({ type: 'u', url: `django_resaas/groups/${this.row?.id}/permissions/` })
-        )
+      //   const { data } = await HTTPAuth.get(
+      //     url({ type: 'u', url: `django_resaas/groups/${this.row?.id}/permissions/` })
+      //   )
   
-        this.Permissions = data || []
+      //   this.Permissions = data || []
 
-      },
+      // },
 
       async getUserPermissions() {
 

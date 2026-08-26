@@ -406,7 +406,6 @@ export default defineComponent({
       this.entityClosed = false
       this.branchClosed = true
       this.Entity.select(entity)
-      
     },
 
     selectBranch (branch) {
