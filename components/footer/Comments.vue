@@ -25,7 +25,7 @@
           dense
           type="textarea"
           :placeholder="
-            tdc( 'Have feedback or suggestions? We would be happy to hear from you. Please do not include passwords, sensitive personal data, or confidential organizational information. <br>Need assistance? Visit the Help Center or contact your organization s support team.').replaceAll('<br>', '\n\n')"
+            tdc('Have feedback or suggestions? We would be happy to hear from you. Please do not include passwords, sensitive personal data, or confidential organizational information. <br>Need assistance? Visit the Help Center or contact your organization's support team.').replaceAll('<br>', '\n\n')"
           :rules="[
             val =>
               (val && val.length > 0) ||
