@@ -15,14 +15,14 @@
                 v-model="comment_text"
                 class=""
                 dense
-                :placeholder="tdc('Have some feedback? We would love to hear it; but please do not share confidential information. Have questions? Try help or support.')"
+                :placeholder="tdc('Have feedback or suggestions? We had be happy to hear from you. Please do not include passwords, sensitive personal data, or confidential organizational information. <br>Need assistance? Visit the Help Center or contact your organizations support team.')"
                 type="textarea"
                 :rules="[ val => val && val.length > 0 || tdc('This field is required.')]"
                 />
           </q-card-section>
 
           <q-card-section >
-            {{tdc('Some account and system information may be sent to Mytech. We will use it to fix problems and improve our services in accordance with our Privacy Policy and Terms of Service. We may send an email for more information or updates. Go to Legal Help to request content changes for legal reasons.')}}
+            {{tdc('Some account, entity, branch, and system information may be collected and processed to provide support, diagnose and resolve technical issues, maintain security, and improve the quality of our services. This information may be shared with authorized administrators or service providers when necessary, in accordance with the applicable Privacy Policy and Terms of Service. <br>  We may contact you by email or other authorized communication channels if additional information is required or to provide updates regarding your request. For privacy, data protection, or legal matters, please contact your organization or the appropriate system administrator.')}}
           </q-card-section>
           <q-separator />
 

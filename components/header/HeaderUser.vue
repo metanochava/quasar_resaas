@@ -1,126 +1,287 @@
-
 <template>
-  <div>
-    <q-dialog
-        v-model="showRegisterEntity"
-        persistent
-      >
+  <div class="header-user">
+    <!-- REGISTAR ENTIDADE -->
+    <q-dialog v-model="showRegisterEntity" persistent>
       <RegisterEntity />
     </q-dialog>
-    <q-dialog v-model="pergunta" persistent class="row">
-        <s-card style="width: 400px;" flat>
 
-          <q-card-section class="row ">
-            <label class="text-h6 text-grey-9 text-center">
-              {{tdc('Which one do you want to log out of')}}
-            </label>
-          </q-card-section>
-          <q-separator />
+    <!-- CONFIRMAÇÃO DE LOGOUT -->
+    <q-dialog v-model="pergunta" persistent>
+      <s-card class="logout-card" flat>
+        <q-card-section class="text-center">
+          <div class="text-h6 text-grey-9 dialog-title">
+            {{ tdc('Which one do you want to log out of') }}
+          </div>
+        </q-card-section>
 
-          <q-card-actions class="row" >
-            <s-btn flat   class="col-12" color="primary"  @click="pergunta = false, User.logout(User.Entity?.id)" > {{tdc(User.Entity?.name)}}</s-btn>
-          </q-card-actions>
+        <q-separator />
 
-          <q-card-actions class="row" >
-            <s-btn flat   class="col-12" color="primary"  @click="pergunta = false, User.logout('x')" > {{tdc(User?.EntityType?.name)}}</s-btn>
-          </q-card-actions>
-          <q-separator/>
-          <q-card-actions class="row" >
-            <s-btn  class="col-12" flat v-close-popup>{{tdc('Cancel')}}</s-btn>
-          </q-card-actions>
-        </s-card>
+        <q-card-actions vertical class="q-pa-sm">
+          <s-btn
+            v-if="User.Entity"
+            flat
+            color="primary"
+            class="full-width"
+            @click="logoutEntity"
+          >
+            <span class="ellipsis">
+              {{ tdc(User.Entity?.name) }}
+            </span>
+          </s-btn>
 
+          <s-btn
+            v-if="User.EntityType"
+            flat
+            color="primary"
+            class="full-width"
+            @click="logoutEntityType"
+          >
+            <span class="ellipsis">
+              {{ tdc(User.EntityType?.name) }}
+            </span>
+          </s-btn>
+        </q-card-actions>
+
+        <q-separator />
+
+        <q-card-actions>
+          <s-btn
+            flat
+            color="grey"
+            class="full-width"
+            :label="tdc('Cancel')"
+            v-close-popup
+          />
+        </q-card-actions>
+      </s-card>
     </q-dialog>
 
-    <s-btn round flat>
-      <q-avatar class="" size="45px" :class="$q.dark.isActive ? 'bg-white' : 'bg-white'" >
-        <img  :src="User?.profile" >
-        <q-card-actions align="center" v-if="User" flat>
-          <div class="text-h6 text-gry-8 row text-center">{{User?.username}}</div>
-        </q-card-actions>
-        <q-separator />
-        <q-menu flat  square  fit :offset="[130, 5]"  >
-          <s-card class="my-card"  style="width:270px;"  flat bordered square  >
-            <q-card-actions class="text-center row" v-if="User">
-              <div class=" col-12">
-                <q-avatar class="" size="120px"  >
-                  <img   :src="User?.profile" >
-                </q-avatar>
-              </div>
-              <div class=" text-center col-12 text-grey-9 text-h6">
-                {{User?.username}}
-              </div>
-            </q-card-actions>
-            <q-separator  v-if="User" />
-            <q-expansion-item
-                v-if="User.data"
-                dense
-                group="group"
-                :label="User?.Entity?.name || tdc('Entity') "
-                header-class=" text-grey-9"
-                v-model="entityClosed"
-              >
-                <q-separator />
-                <q-item dense clickable v-if="User.EntityType?.crair_entity"   :to="{name:'add_entity_self', params:{}}"  >
-                  <q-item-section>
-                    <q-item-label overline class="text-blue"> {{ tdc('Register Entity')}}</q-item-label> 
-                  </q-item-section>
-                </q-item>
-                <q-item dense clickable v-for="entity in User?.Entitys" :key="entity?.id" @click=" entityClosed = false, branchClosed = true, Entity.select(entity)">
-                  <q-item-section>
-                   <q-item-label overline> {{ tdc((entity?.name))}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-expansion-item>
-
-              <q-expansion-item
-                v-if="User.data"
-                dense
-                group="group"
-                :label="User?.Branch?.name || tdc('Branch') "
-                header-class=" text-grey-9"
-                v-model="branchClosed"
-              >
-                <q-separator />
-                <q-item dense clickable v-for="branch in User?.Branchs" :key="branch?.id"   @click=" branchClosed = false, Branch.select(branch)">
-                  <q-item-section>
-                    <q-item-label overline> {{ tdc(branch?.name)}}</q-item-label> 
-                  </q-item-section>
-                </q-item>
-              </q-expansion-item>
-
-            <s-btn dense  flat  size="" @click="branchClosed = false" color="grey" :label="tdc(profileSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
-              <q-menu fit>
-                <q-list dense   class="rounded-borders" style="min-width: 100px" >
-
-                  <q-item clickable v-close-popup @click="Group.select(group)" v-ripple v-for=" group in User.Groups" :key="group.id">
-                    <q-item-section>
-                      <q-item-label overline> {{ tdc(profileSplint(group.name))}}</q-item-label>
-
-                    </q-item-section>
-
-                  </q-item>
-
-                </q-list>
-              </q-menu>
-            </s-btn>
-            <q-card-actions align="around" v-if="User.data">
-              <s-btn  icon="settings" dense size=""  :to="{name:'userDetails', params:{'user_id': User?.id}}" flat color="secondary" class="">{{tdc('Settings')}}</s-btn>
-              <s-btn  icon="logout" dense size="" flat color="red" @click="pergunta = !pergunta">{{tdc('Logout')}}</s-btn>
-            </q-card-actions>
-
-            <q-card-actions align="around" v-else>
-              <s-btn  icon="person_add" dense size="" :to="{name:'registarUser'}" flat color="primary" class="" :label="tdc('Register')" />
-              <s-btn  icon="login" dense size="" :to="{name:'login'}" flat color="secondary" class="" >{{tdc('login')}}</s-btn>
-            </q-card-actions>
-            <q-separator color="primary" dense size="xs" />
-          </s-card>
-
-        </q-menu>
+    <!-- BOTÃO DO UTILIZADOR -->
+    <s-btn
+      round
+      flat
+      class="user-button"
+      aria-label="Menu do utilizador"
+    >
+      <q-avatar size="45px" class="bg-white">
+        <img
+          :src="User?.profile"
+          alt="Perfil"
+          class="profile-image"
+        />
       </q-avatar>
-      <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary'" v-if="User">{{User?.username }} </q-tooltip>
-      <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary'" v-else>{{tdc('Guest')}}</q-tooltip>
-          
+
+      <q-tooltip
+        :class="
+          $q.dark.isActive
+            ? 'bg-dark text-white'
+            : 'bg-primary text-white'
+        "
+      >
+        {{ User?.username || tdc('Guest') }}
+      </q-tooltip>
+
+      <!-- MENU -->
+      <q-menu
+        anchor="bottom right"
+        self="top right"
+        :offset="[0, 5]"
+        class="header-user-menu"
+      >
+        <s-card
+          flat
+          bordered
+          square
+          class="user-menu-card"
+        >
+          <!-- PERFIL -->
+          <q-card-section
+            v-if="User"
+            class="text-center q-pa-md"
+          >
+            <q-avatar size="100px">
+              <img
+                :src="User?.profile"
+                alt="Perfil"
+                class="profile-image"
+              />
+            </q-avatar>
+
+            <div class="username text-grey-9 text-h6 q-mt-sm">
+              {{ User?.username }}
+            </div>
+          </q-card-section>
+
+          <q-separator v-if="User" />
+
+          <!-- ENTIDADES -->
+          <q-expansion-item
+            v-if="User.data"
+            v-model="entityClosed"
+            dense
+            group="header-user-group"
+            :label="User?.Entity?.name || tdc('Entity')"
+            header-class="text-grey-9"
+            class="menu-expansion"
+          >
+            <q-separator />
+
+            <q-item
+              v-if="User.EntityType?.crair_entity"
+              dense
+              clickable
+              :to="{ name: 'add_entity_self' }"
+            >
+              <q-item-section class="item-content">
+                <q-item-label
+                  overline
+                  class="text-blue ellipsis"
+                >
+                  {{ tdc('Register Entity') }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item
+              v-for="entity in User?.Entitys || []"
+              :key="entity?.id"
+              dense
+              clickable
+              @click="selectEntity(entity)"
+            >
+              <q-item-section class="item-content">
+                <q-item-label overline class="ellipsis">
+                  {{ tdc(entity?.name) }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
+
+          <!-- SUCURSAIS -->
+          <q-expansion-item
+            v-if="User.data"
+            v-model="branchClosed"
+            dense
+            group="header-user-group"
+            :label="User?.Branch?.name || tdc('Branch')"
+            header-class="text-grey-9"
+            class="menu-expansion"
+          >
+            <q-separator />
+
+            <q-item
+              v-for="branch in User?.Branchs || []"
+              :key="branch?.id"
+              dense
+              clickable
+              @click="selectBranch(branch)"
+            >
+              <q-item-section class="item-content">
+                <q-item-label overline class="ellipsis">
+                  {{ tdc(branch?.name) }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
+
+          <!-- GRUPOS -->
+          <s-btn
+            v-if="User.data"
+            dense
+            flat
+            color="grey"
+            class="group-button full-width"
+            @click="branchClosed = false"
+          >
+            <span class="ellipsis">
+              {{ tdc(profileSplint(User?.Group?.name)) }}
+            </span>
+
+            <q-menu
+              anchor="bottom left"
+              self="top left"
+              fit
+            >
+              <q-list
+                dense
+                class="group-list rounded-borders"
+              >
+                <q-item
+                  v-for="group in User?.Groups || []"
+                  :key="group?.id"
+                  clickable
+                  v-close-popup
+                  v-ripple
+                  @click="Group.select(group)"
+                >
+                  <q-item-section class="item-content">
+                    <q-item-label overline class="ellipsis">
+                      {{ tdc(profileSplint(group?.name)) }}
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </s-btn>
+
+          <q-separator />
+
+          <!-- UTILIZADOR AUTENTICADO -->
+          <q-card-actions
+            v-if="User.data"
+            align="around"
+            class="menu-actions"
+          >
+            <s-btn
+              icon="settings"
+              dense
+              flat
+              color="secondary"
+              :to="{
+                name: 'userDetails',
+                params: {
+                  user_id: User?.id
+                }
+              }"
+              :label="tdc('Settings')"
+            />
+
+            <s-btn
+              icon="logout"
+              dense
+              flat
+              color="red"
+              :label="tdc('Logout')"
+              @click="pergunta = true"
+            />
+          </q-card-actions>
+
+          <!-- VISITANTE -->
+          <q-card-actions
+            v-else
+            align="around"
+            class="menu-actions"
+          >
+            <s-btn
+              icon="person_add"
+              dense
+              flat
+              color="primary"
+              :to="{ name: 'registarUser' }"
+              :label="tdc('Register')"
+            />
+
+            <s-btn
+              icon="login"
+              dense
+              flat
+              color="secondary"
+              :to="{ name: 'login' }"
+              :label="tdc('Login')"
+            />
+          </q-card-actions>
+        </s-card>
+      </q-menu>
     </s-btn>
   </div>
 </template>
@@ -132,6 +293,7 @@ import { useUserStore } from '../../stores/UserStore'
 import { useGroupStore } from '../../stores/GroupStore'
 import { useEntityStore } from '../../stores/EntityStore'
 import { useBranchStore } from '../../stores/BranchStore'
+
 import RegisterEntity from './RegisterEntity.vue'
 
 import { tdc } from '../../services/translation'
@@ -139,14 +301,25 @@ import { profileSplint } from '../../utils/profile.js'
 
 export default defineComponent({
   name: 'HeaderUser',
-  components: { RegisterEntity },
+
+  components: {
+    RegisterEntity
+  },
 
   setup () {
     const User = useUserStore()
     const Entity = useEntityStore()
     const Group = useGroupStore()
     const Branch = useBranchStore()
-    return { User, tdc, Entity, Group, Branch}
+
+    return {
+      User,
+      Entity,
+      Group,
+      Branch,
+      tdc,
+      profileSplint
+    }
   },
 
   data () {
@@ -155,17 +328,23 @@ export default defineComponent({
       entityClosed: false,
       pergunta: false,
       showRegisterEntity: false,
-      profileSplint: profileSplint,
+      sessionInterval: null
     }
   },
 
   watch: {
     'User.Group' (val) {
-
       if (!val) return
-      
-      if (this.$route.name !== 'welcome' && this.$route.name !== 'authwelcome') {
-        this.$router.push({ name: 'home' })
+
+      const allowedRoutes = [
+        'welcome',
+        'authwelcome'
+      ]
+
+      if (!allowedRoutes.includes(this.$route.name)) {
+        this.$router.push({
+          name: 'home'
+        })
       }
 
       this.User.getMenus()
@@ -173,39 +352,170 @@ export default defineComponent({
 
     'User.Entity' (val) {
       if (!val) return
+
       this.User.getMenus()
-      this.Entity.setEntityModelos(this.User.Entity.id)
+      this.Entity.setEntityModelos(val.id)
     },
 
     'User.isLogout' (val) {
       if (!val) return
-      if (this.User.Entity){
-        this.$router.push({ name: 'login' , query: { entity: this.User.Entity.id}})
-      }else{
-        this.$router.push({ name: 'login' })
+
+      if (this.User.Entity) {
+        this.$router.push({
+          name: 'login',
+          query: {
+            entity: this.User.Entity.id
+          }
+        })
+
+        return
       }
+
+      this.$router.push({
+        name: 'login'
+      })
     }
   },
 
-  
-  beforeUnmount () {
+  mounted () {
+    this.startSessionWatcher()
+  },
 
+  beforeUnmount () {
+    this.stopSessionWatcher()
   },
 
   methods: {
+    selectEntity (entity) {
+      this.entityClosed = false
+      this.branchClosed = true
+      this.Entity.select(entity)
+    },
+
+    selectBranch (branch) {
+      this.branchClosed = false
+      this.Branch.select(branch)
+    },
+
+    logoutEntity () {
+      this.pergunta = false
+      this.User.logout(this.User.Entity?.id)
+    },
+
+    logoutEntityType () {
+      this.pergunta = false
+      this.User.logout('x')
+    },
 
     startSessionWatcher () {
-      setInterval(async () => {
-        await this.User.checkSession()
-      }, 60000)
-    }
-  },
+      this.stopSessionWatcher()
 
-  async mounted () {
-    if (this.User) {
-      this.startSessionWatcher()
+      this.sessionInterval = setInterval(() => {
+        this.User.checkSession()
+      }, 60000)
+    },
+
+    stopSessionWatcher () {
+      if (!this.sessionInterval) return
+
+      clearInterval(this.sessionInterval)
+      this.sessionInterval = null
     }
   }
 })
 </script>
 
+<style scoped>
+.header-user {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.user-button {
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.logout-card {
+  width: min(400px, calc(100vw - 24px));
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.dialog-title {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.user-menu-card {
+  width: min(270px, calc(100vw - 16px));
+  max-width: calc(100vw - 16px);
+  overflow-x: hidden;
+}
+
+.username {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.menu-expansion {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.item-content {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.group-button {
+  min-width: 0;
+  max-width: 100%;
+  border-color: transparent;
+}
+
+.group-button :deep(.q-btn__content) {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.group-list {
+  width: min(270px, calc(100vw - 16px));
+  max-width: calc(100vw - 16px);
+  overflow-x: hidden;
+}
+
+.menu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 100%;
+}
+
+.menu-actions :deep(.q-btn) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ellipsis {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>
