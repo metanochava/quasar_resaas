@@ -1,129 +1,82 @@
+
+
+
 import axios from 'axios'
 import { getStorage } from './storage'
-import {useUserStore } from '../stores/UserStore'
-import { useLoadStore } from '../stores/LoadStore';
+import { useUserStore } from '../stores/UserStore'
+import { useLoadStore } from '../stores/LoadStore'
 import { Alert } from '../boot/alerts'
-import { safeParse } from '../utils/json';
+import { safeParse } from '../utils/json'
 
 const apiPrefix = process.env.API_PREFIX
-const apiBaseUrl = process.env.API + '/' + apiPrefix 
-
-
-
-/* ======================================================
-   URL BUILDER
-====================================================== */
+const apiBaseUrl = `${process.env.API}/${apiPrefix}`
 
 export const url = (payload = { type: 'u', url: '', params: {} }) => {
+  const entityType = useUserStore()?.EntityType?.name?.toLowerCase()
+  let finalUrl = apiBaseUrl
 
-  const User = useUserStore()
-  const entityTypeName = User?.EntityType?.name
+  if (payload.type === 'nu') finalUrl += `/${entityType}`
+  finalUrl += `/${payload.url}?format=json`
 
-  let urlFinal = ''
-
-  if (payload.type === 'u') {
-    urlFinal = `${apiBaseUrl}/${payload.url}`
-  }
-
-  if (payload.type === 'nu') {
-    urlFinal = `${apiBaseUrl}/${entityTypeName?.toLowerCase()}/${payload.url}`
-  }
-
-  urlFinal += '?format=json'
-
-  Object.entries(payload?.params || {}).forEach(([k, v]) => {
-    urlFinal += `&${encodeURIComponent(k)}=${encodeURIComponent(v)}`
+  Object.entries(payload.params || {}).forEach(([key, value]) => {
+    if (value !== undefined && value !== null)
+      finalUrl += `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`
   })
 
-  return urlFinal
+  return finalUrl
 }
 
-
-/* ======================================================
-   BASE AXIOS
-====================================================== */
-
 const createClient = (auth = false, blob = false) => {
-
   const instance = axios.create({
     baseURL: apiBaseUrl,
     withCredentials: false,
-    headers: {
-      Accept: 'application/json'
-    },
+    headers: { Accept: 'application/json' },
     responseType: blob ? 'blob' : 'json'
   })
 
-  /* ================= REQUEST ================= */
-
-  instance.interceptors.request.use((config) => {
-
+  instance.interceptors.request.use(config => {
     const User = useUserStore()
     const Load = useLoadStore()
 
-    config.headers = config.headers || {}
+    config.headers ||= {}
 
     if (auth) {
-      const token = User.access || getStorage('l', 'access')
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
+      const accessToken = User.access || getStorage('l', 'access')
+      const contextToken = getStorage('s', 'resaasContext')
+
+      if (accessToken)
+        config.headers.Authorization = `Bearer ${accessToken}`
+
+      if (contextToken)
+        config.headers['X-RESAAS-Context'] = contextToken
     }
 
-    if (config.data instanceof FormData) {
+    const language = safeParse(getStorage('l', 'userLang'))
+
+    if (language?.id) config.headers.L = language.id
+
+    if (config.data instanceof FormData)
       config.headers['Content-Type'] = 'multipart/form-data'
-    }
 
-    const headersMap = {
-      ET: 'entityType',
-      E: 'userEntity',
-      B: 'userBranch',
-      G: 'userGroup',
-      L: 'userLang'
-    }
-
-    Object.entries(headersMap).forEach(([key, storage]) => {
-      const data = safeParse(getStorage('l', storage))
-      if (data?.id) config.headers[key] = data.id
-    })
-
-    config.headers['fek'] = process.env.FRONT_END_KEY
-    config.headers['fep'] = process.env.FRONT_END_PASSWORD
+    config.headers.fek = process.env.FRONT_END_KEY
+    config.headers.fep = process.env.FRONT_END_PASSWORD
 
     Load.inc()
-
     return config
   })
 
-
-  /* ================= RESPONSE ================= */
-
   instance.interceptors.response.use(
-
-    (response) => {
-
-      const Load = useLoadStore()
-      Load.dec()
-
+    response => {
+      useLoadStore().dec()
       Alert(response)
-
       return response
     },
-
-    (error) => {
-
-      const User = useUserStore()
-      const Load = useLoadStore()
-
-      Load.dec()
-
+    error => {
+      useLoadStore().dec()
       Alert(error?.response)
 
-      const status = error?.response?.status
-
-      if (status === 401) {
-        User.logout('N')
-      }
+      if (error?.response?.status === 401)
+        useUserStore().logout('N')
 
       return Promise.reject(error)
     }
@@ -132,20 +85,9 @@ const createClient = (auth = false, blob = false) => {
   return instance
 }
 
-
-/* ======================================================
-   CLIENTES EXPORTADOS
-====================================================== */
-
-export const HTTPClient = createClient(false)
+export const HTTPClient = createClient()
 export const HTTPClientBlob = createClient(false, true)
-
 export const HTTPAuth = createClient(true)
 export const HTTPAuthBlob = createClient(true, true)
 
-
-/* ======================================================
-   WEBSOCKET URL
-====================================================== */
-
-export const wsApi = apiBaseUrl.replace('http', 'ws').replace('https', 'ws')
+export const wsApi = apiBaseUrl .replace('https', 'wss') .replace('http', 'ws')

@@ -7,14 +7,11 @@ export const setCookie = (cname, cvalue, exdays) => {
   document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/;SameSite=Lax' + secure
 }
 
-export const setStorage = (_type, _cname, _cvalue, _exdays) => {
-  if (_type === 'l') {
-    localStorage.setItem(_cname, _cvalue)
-  }
 
-  if (_type === 'c') {
-    setCookie(_cname, _cvalue, _exdays)
-  }
+export const setStorage = (type, name, value, days) => {
+  if (type === 'l') localStorage.setItem(name, value)
+  if (type === 's') sessionStorage.setItem(name, value)
+  if (type === 'c') setCookie(name, value, days)
 }
 
 export const getCookie = (cname, _help = 0) => {
@@ -36,33 +33,20 @@ export const getCookie = (cname, _help = 0) => {
   }
 }
 
-export const getStorage = (_type, _cname, _help = 0) => {
-  let result = null
-  if (_type === 'l') {
-    result = localStorage.getItem(_cname)
-  }
 
-  if (_type === 'c') {
-    if (_help === 0) {
-      result = getCookie(_cname)
-    } else {
-      result = getCookie(_cname, _help)
-    }
-  }
-  return result
+export const getStorage = (type, name, help = 0) => {
+  if (type === 'l') return localStorage.getItem(name)
+  if (type === 's') return sessionStorage.getItem(name)
+  if (type === 'c') return help === 0 ? getCookie(name) : getCookie(name, help)
+  return null
 }
 
 
-export const deleteStorage = (_type, _cname) => {
-  let result = null
-  if (_type === 'l') {
-    result = localStorage.removeItem(_cname)
-  }
-
-  if (_type === 'c') {
-    setCookie(_cname, null, 0)
-  }
-  return result
+export const deleteStorage = (type, name) => {
+  if (type === 'l') return localStorage.removeItem(name)
+  if (type === 's') return sessionStorage.removeItem(name)
+  if (type === 'c') return setCookie(name, null, 0)
+  return null
 }
 
 export const localStorageSetItem = (key, value) => {

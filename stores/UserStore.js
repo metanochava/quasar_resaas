@@ -7,6 +7,8 @@ import { createBaseStore } from '../base/base_store'
 import { setSettings } from '../services/theme'
 import { JSONSafeParse } from '../utils/json'
 
+import { createResaasContext,  clearResaasContext, getResaasContext } from '../services/tenantContext'
+
 
 
 
@@ -20,6 +22,7 @@ export const useUserStore = createBaseStore(
   {
   state: () => ({
     data: null,
+    ResaasContext: null,
     Language: {},
     EntityTypes: [],
     EntityType: {},
@@ -52,6 +55,7 @@ export const useUserStore = createBaseStore(
     AnimationSettings: {},
     Typography: {},
     LayoutSettings: {},
+
 
 
 
@@ -115,6 +119,42 @@ export const useUserStore = createBaseStore(
 
 
   actions: {
+    async refreshResaasContext() {
+      if (!this.Entity?.id) {
+        clearResaasContext()
+        this.ResaasContext = null
+        return null
+      }
+
+      const data = await createResaasContext({
+        entity: this.Entity,
+        branch: this.Branch,
+        group: this.Group
+      })
+
+      this.ResaasContext = data.token
+
+      return data
+    },
+    async selectContext({ entity, branch = null, group = null }) {
+      this.Entity = entity || null
+      this.Branch = branch || null
+      this.Group = group || null
+
+      entity
+        ? setStorage('l', 'userEntity', JSON.stringify(entity))
+        : deleteStorage('l', 'userEntity')
+
+      branch
+        ? setStorage('l', 'userBranch', JSON.stringify(branch))
+        : deleteStorage('l', 'userBranch')
+
+      group
+        ? setStorage('l', 'userGroup', JSON.stringify(group))
+        : deleteStorage('l', 'userGroup')
+
+      return this.refreshResaasContext()
+    },
     async loadGroups(UserId) {
       try {
         const id = UserId || this.row?.id
@@ -294,6 +334,7 @@ export const useUserStore = createBaseStore(
 
     loadFromStorage () {
 
+      this.ResaasContext = getResaasContext()
       this.Theme = JSONSafeParse(getStorage('l', 'entityTheme'))
       this.LayoutSettings = JSONSafeParse(getStorage('l', 'entityLayoutsettings'))
       this.Typography = JSONSafeParse(getStorage('l', 'entityTypography'))
@@ -349,6 +390,10 @@ export const useUserStore = createBaseStore(
         this.Branchs = []
         this.Branch = null
 
+        clearResaasContext()
+
+        this.ResaasContext = null
+
         const userEntity = getStorage('l', 'userEntity')
         
         deleteStorage('l', 'entityTheme')
@@ -374,6 +419,8 @@ export const useUserStore = createBaseStore(
         deleteStorage('l', 'manterlogado')
         deleteStorage('l', 'username')
         deleteStorage('l', 'password')
+
+
 
         if (x !== 'x') {
           setStorage('l', 'userEntity', userEntity)

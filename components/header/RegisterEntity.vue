@@ -214,6 +214,12 @@ export default defineComponent({
 
       if (this.User) this.User.Group = group
 
+      await User.selectContext({
+        entity: User.Entity,
+        branch: User.Branch,
+        group
+      })
+
       await this.getUserPermissions()
       this.$router.push({ name: 'home', params: {} })
     },
