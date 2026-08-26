@@ -46,8 +46,6 @@
                 />
               </template>
             </s-input>
-
-            <br/>
             <s-checkbox  class="text-grey-7" dense   clearable v-model="User.manterLogado"  @click="check" :label="tdc('Keep me logged in')">
             </s-checkbox>
           </q-form>
