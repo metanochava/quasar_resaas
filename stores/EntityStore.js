@@ -308,19 +308,7 @@ export const useEntityStore = createBaseStore(
       // ===============================
       // SELECT ENTIDADE
       // ===============================
-      async select(entity) {
-        if (!entity) return
-
-        const User = useUserStore()
-        const Branch = useBranchStore()
-
-        User.Entity = entity
-
-        setStorage('l', 'userEntity', JSON.stringify(entity))
-
-        await this.getLayoutSettings(entity.id)
-        await Branch.getUserBranchs()
-      },
+      
 
 
       // ===============================
@@ -350,22 +338,28 @@ export const useEntityStore = createBaseStore(
       
 
       async select_ (entity, q) {
+        if (!entity) return
         const User = useUserStore()
         const Branch = useBranchStore()
         User.Entity = entity
         await this.getLayoutSettings(entity.id)
         setStorage('l', 'userEntity', JSON.stringify(entity))
+        await User.selectContext({ entity: User.Entity,  branch: null,  group: null })
         Branch.getUserBranchs_(q)
       },
 
-      async select (entity) {
+      async select(entity) {
+        if (!entity) return
         const User = useUserStore()
         const Branch = useBranchStore()
         User.Entity = entity
-        await this.getLayoutSettings(entity.id)
         setStorage('l', 'userEntity', JSON.stringify(entity))
-        Branch.getUserBranchs()
+        await this.getLayoutSettings(entity.id)
+        await User.selectContext({ entity: User.Entity,  branch: null,  group: null })
+        await Branch.getUserBranchs()
       },
+
+
 
       async getUserEntitys_ (UserId, q) {
         const User = useUserStore()

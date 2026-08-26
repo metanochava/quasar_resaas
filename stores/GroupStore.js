@@ -34,6 +34,7 @@ export const useGroupStore = createBaseStore(
         setStorage('l', 'userGroups', JSON.stringify(group))
         await this.getUserPermissions()
         await User.getMenus()
+        await User.selectContext({ entity: User.Entity,  branch: User.Branch,  group: User.Group })
         User.redirect = 'authwelcome'
       },
 
@@ -45,6 +46,7 @@ export const useGroupStore = createBaseStore(
         User.Group = this.row
         await this.getUserPermissions()
         await User.getMenus()
+        await User.selectContext({ entity: User.Entity,  branch: User.Branch,  group: User.Group })
       },
 
       async getGroups () {

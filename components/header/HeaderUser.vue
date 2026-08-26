@@ -402,27 +402,16 @@ export default defineComponent({
   },
 
   methods: {
-    async selectEntity (entity) {
+    selectEntity (entity) {
       this.entityClosed = false
       this.branchClosed = true
       this.Entity.select(entity)
-
-      await User.selectContext({
-        entity,
-        branch: null,
-        group: null
-      })
       
     },
 
-    async selectBranch (branch) {
+    selectBranch (branch) {
       this.branchClosed = false
       this.Branch.select(branch)
-      await User.selectContext({
-        entity: User.Entity,
-        branch,
-        group: null
-      })
     },
 
     logoutEntity () {

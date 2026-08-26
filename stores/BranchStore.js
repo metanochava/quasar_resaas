@@ -58,21 +58,23 @@ export const useBranchStore = createBaseStore(
           })
       },
 
-      select_ (branch, q) {
+      async select_ (branch, q) {
         const User = useUserStore()
         let Group = useGroupStore()
         this.row = branch
         User.Branch = this.row
         setStorage('l', 'userBranch', JSON.stringify(branch))
+        await User.selectContext({ entity: User.Entity,  branch: User.Branch,  group: null })
         Group.getGroups_(q)
       },
 
-      select (branch) {
+      async select (branch) {
         const User = useUserStore()
         let Group = useGroupStore()
         this.row = branch
         User.Branch = this.row
         setStorage('l', 'userBranch', JSON.stringify(branch))
+        await User.selectContext({ entity: User.Entity,  branch: User.Branch,  group: null })
         Group.getGroups()
       },
 
