@@ -225,7 +225,6 @@
           </s-btn>
 
           <q-separator />
-
           <!-- UTILIZADOR AUTENTICADO -->
           <q-card-actions
             v-if="User.data"
@@ -233,6 +232,7 @@
             class="menu-actions"
           >
             <s-btn
+              round
               icon="settings"
               dense
               flat
@@ -243,17 +243,24 @@
                   user_id: User?.id
                 }
               }"
-              :label="tdc('Settings')"
-            />
+            >
+              <q-tooltip>
+                {{ tdc('Settings') }}
+              </q-tooltip>
+            </s-btn>
 
             <s-btn
+              round
               icon="logout"
               dense
               flat
               color="red"
-              :label="tdc('Logout')"
               @click="pergunta = true"
-            />
+            >
+              <q-tooltip>
+                {{ tdc('Logout') }}
+              </q-tooltip>
+            </s-btn>
           </q-card-actions>
 
           <!-- VISITANTE -->
@@ -263,22 +270,30 @@
             class="menu-actions"
           >
             <s-btn
+              round
               icon="person_add"
               dense
               flat
               color="primary"
               :to="{ name: 'registarUser' }"
-              :label="tdc('Register')"
-            />
+            >
+              <q-tooltip>
+                {{ tdc('Register') }}
+              </q-tooltip>
+            </s-btn>
 
             <s-btn
+              round
               icon="login"
               dense
               flat
               color="secondary"
               :to="{ name: 'login' }"
-              :label="tdc('Login')"
-            />
+            >
+              <q-tooltip>
+                {{ tdc('Login') }}
+              </q-tooltip>
+            </s-btn>
           </q-card-actions>
         </s-card>
       </q-menu>
