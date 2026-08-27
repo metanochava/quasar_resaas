@@ -1,6 +1,6 @@
 <template>
   <q-page class="docs-page">
-    <div class="docs-shell">
+    <div ref="shellRef" class="docs-shell" :style="{ height: shellHeight }">
       <!-- -------------------- SIDEBAR -------------------- -->
       <aside class="docs-sidebar">
         <div class="docs-switcher">
@@ -100,7 +100,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { marked } from 'marked'
 import { tdc } from '../../services/translation'
@@ -108,6 +108,30 @@ import { docsNav, docsProducts, defaultDocsProduct } from '../../router/docsRout
 
 const route = useRoute()
 const router = useRouter()
+
+// =========================================================
+// LOCK THE SHELL TO THE VIEWPORT HEIGHT LEFT BY THE HOST
+// LAYOUT (its header/footer), so only the columns below
+// scroll internally — never the whole page.
+// =========================================================
+
+const shellRef = ref(null)
+const shellHeight = ref('100vh')
+
+function measureShellHeight() {
+  if (!shellRef.value) return
+  const top = shellRef.value.getBoundingClientRect().top
+  shellHeight.value = `calc(100vh - ${top}px)`
+}
+
+onMounted(() => {
+  measureShellHeight()
+  window.addEventListener('resize', measureShellHeight)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', measureShellHeight)
+})
 
 // =========================================================
 // LOAD ALL docs/**/*.md AS RAW TEXT (bundled with the lib)
@@ -259,26 +283,27 @@ function onContentClick(event) {
 <style scoped>
 .docs-page {
   background: #fff;
+  overflow: hidden;
 }
 
 .docs-shell {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   max-width: 1400px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 /* -------------------- SIDEBAR -------------------- */
 
 .docs-sidebar {
-  position: sticky;
-  top: 0;
   width: 272px;
   min-width: 272px;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   border-right: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
 .docs-switcher {
@@ -336,6 +361,7 @@ function onContentClick(event) {
 .docs-nav-scroll {
   flex: 1;
   height: 100%;
+  min-height: 0;
 }
 
 .docs-nav {
@@ -374,6 +400,8 @@ function onContentClick(event) {
 .docs-content {
   flex: 1;
   min-width: 0;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .docs-content-inner {
@@ -407,11 +435,9 @@ function onContentClick(event) {
 /* -------------------- TOC -------------------- */
 
 .docs-toc {
-  position: sticky;
-  top: 0;
   width: 220px;
   min-width: 220px;
-  max-height: 100vh;
+  height: 100%;
   overflow-y: auto;
   padding: 40px 20px;
   display: flex;
