@@ -41,6 +41,7 @@
   "devDependencies": {
     "@vue/test-utils": "^2.5.0",
     "happy-dom": "^20.11.10",
+    "pinia": "^4.0.3",
     "vitest": "^4.1.11"
   }
 }
