@@ -8,6 +8,7 @@ import { groupRoutes } from '../pages/group/groupRoute'
 import { branchRoutes } from '../pages/branch/branchRoute'
 import { permissionRoutes } from '../pages/permission/permissionRoute'
 import { tdc } from '../services/translation'
+import { docsRoutes } from './docsRoutes.js'
 
 
 export let restRoutes = [
@@ -51,6 +52,7 @@ export let restRoutes = [
       title: tdc('Route') + ' ' + tdc('not found'),
     } 
   },
+  ...docsRoutes,
   ...entityRoutes,
   ...entity_typeRoutes,
   ...groupRoutes,
