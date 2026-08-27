@@ -17,6 +17,7 @@ Esta pasta contém a documentação técnica da biblioteca frontend
 -   [Permissões](features/permissions.md)
 -   [Tradução](features/translation.md)
 -   [API & headers](api/backend-integration.md)
+-   [Public exports](api/public-exports.md)
 -   [Criar um novo recurso](development/creating-resource.md)
 -   [Build](deployment/build.md)
 -   [Troubleshooting](troubleshooting/common-errors.md)
