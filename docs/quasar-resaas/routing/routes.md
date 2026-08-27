@@ -1,20 +1,20 @@
 # Router
 
-A lib não monta o `vue-router` da app — exporta arrays de rotas simples,
-para o host montar como quiser.
+The library doesn't mount the app's `vue-router` — it exports plain route
+arrays for the host to mount however it wants.
 
-## Arrays exportados
+## Exported arrays
 
-| Export | Ficheiro | Conteúdo |
+| Export | File | Contents |
 |---|---|---|
-| `authRoutes` | `router/authRoutes.js` | `/auth/login` (em `AuthLayout`) e `/welcome` (em `MainLayout`) |
-| `restRoutes` | `router/restRoutes.js` | scaffold/crud genéricos + rotas de `entity`, `entity_type`, `group`, `branch`, `user`, `permission`, `employee` |
-| `docsRoutes` | `router/docsRoutes.js` | `/docs/:slug(.*)*`, ver [documentação (docsRoutes)](../README.md) |
+| `authRoutes` | `router/authRoutes.js` | `/auth/login` (in `AuthLayout`) and `/welcome` (in `MainLayout`) |
+| `restRoutes` | `router/restRoutes.js` | generic scaffold/crud + `entity`, `entity_type`, `group`, `branch`, `user`, `permission`, `employee` routes |
+| `docsRoutes` | `router/docsRoutes.js` | `/docs/:slug(.*)*`, see [documentation (docsRoutes)](../README.md) |
 
-Cada grupo de páginas (`pages/entity/entityRoute.js`, etc.) exporta o seu
-próprio array (`entityRoutes`, ...) que `restRoutes` agrega com spread.
+Each page group (`pages/entity/entityRoute.js`, etc.) exports its own array
+(`entityRoutes`, ...) which `restRoutes` aggregates via spread.
 
-## Convenção de `meta`
+## `meta` convention
 
 ```js
 {
@@ -30,19 +30,19 @@ próprio array (`entityRoutes`, ...) que `restRoutes` agrega com spread.
 }
 ```
 
--   `title` — passa por [`tdc()`](../features/translation.md), traduzido em runtime.
--   `requiresAuth` — exigido pelo guard de autenticação do host.
--   `icon` — usado pelo menu (ex. `TopMenu`/`LeftMenu`) quando lista rotas.
--   `requiredRole` — codename de permissão, verificado com
-    [`User.can()`](../features/permissions.md). Por convenção o nome da rota
-    é igual ao `requiredRole` (`list_entity` → `list_entity`).
+-   `title` — passed through [`tdc()`](../features/translation.md), translated at runtime.
+-   `requiresAuth` — required by the host's authentication guard.
+-   `icon` — used by the menu (e.g. `TopMenu`/`LeftMenu`) when listing routes.
+-   `requiredRole` — permission codename, checked with
+    [`User.can()`](../features/permissions.md). By convention the route
+    name matches `requiredRole` (`list_entity` → `list_entity`).
 
-Rotas só de navegação (ex. `docsRoutes`, `/welcome`) omitem `requiredRole`.
+Navigation-only routes (e.g. `docsRoutes`, `/welcome`) omit `requiredRole`.
 
-## Montagem no host
+## Mounting in the host
 
-Confirmado em `/var/www/dev/front/src/router/routes.js` — a app consome os
-três arrays tal como o README descreve:
+Confirmed in `/var/www/dev/front/src/router/routes.js` — the app consumes
+the three arrays exactly as the README describes:
 
 ```js
 import { restRoutes, authRoutes, docsRoutes } from 'quasar_resaas'
@@ -68,10 +68,10 @@ routes = [
 ]
 ```
 
-As rotas de módulo próprias da app (`rhRoutes`, `saudeRoutes`, ...) seguem a
-mesma convenção de `meta` das rotas da lib — não há tratamento especial.
+The app's own module routes (`rhRoutes`, `saudeRoutes`, ...) follow the same
+`meta` convention as the library's routes — there's no special handling.
 
-## Rota "não encontrada"
+## "Not found" route
 
-`restRoutes` inclui `/route/:route/:id` → `RotaEnexistente.vue`, usada como
-alvo de fallback quando uma rota de recurso não existe.
+`restRoutes` includes `/route/:route/:id` → `RotaEnexistente.vue`, used as
+the fallback target when a resource route doesn't exist.

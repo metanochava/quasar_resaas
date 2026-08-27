@@ -1,33 +1,32 @@
-# Documentação do quasar_resaas
+# quasar_resaas Documentation
 
-Esta pasta contém a documentação técnica da biblioteca frontend
-`quasar_resaas`, companheira do backend `django_resaas`.
+This folder contains the technical documentation for the `quasar_resaas` frontend
+library, companion to the `django_resaas` backend.
 
-## Navegação
+## Navigation
 
--   [Arquitetura — Visão geral](architecture/overview.md)
--   [Arquitetura — Fluxo de dados](architecture/data-flow.md)
+-   [Architecture — Overview](architecture/overview.md)
+-   [Architecture — Data flow](architecture/data-flow.md)
 -   [Stores — BaseStore](stores/base-store.md)
--   [Stores — UserStore & contexto](stores/user-context.md)
--   [Componentes — Form](components/form.md)
--   [Componentes — ActionForm](components/action-form.md)
--   [Componentes — s-btn](components/button.md)
+-   [Stores — UserStore & context](stores/user-context.md)
+-   [Components — Form](components/form.md)
+-   [Components — ActionForm](components/action-form.md)
+-   [Components — s-btn](components/button.md)
 -   [Router](routing/routes.md)
 -   [Layout](layout/layout.md)
--   [Permissões](features/permissions.md)
--   [Tradução](features/translation.md)
+-   [Permissions](features/permissions.md)
+-   [Translation](features/translation.md)
 -   [API & headers](api/backend-integration.md)
 -   [Public exports](api/public-exports.md)
--   [Criar um novo recurso](development/creating-resource.md)
+-   [Creating a new resource](development/creating-resource.md)
 -   [Build](deployment/build.md)
 -   [Troubleshooting](troubleshooting/common-errors.md)
 
-## Objetivo
+## Purpose
 
-O `quasar_resaas` fornece componentes, stores e serviços Vue3/Quasar
-que lêem o schema exposto pelo `django_resaas` e geram formulários,
-tabelas, filtros e fluxo CRUD sem escrever isso à mão em cada ecrã.
+`quasar_resaas` provides Vue3/Quasar components, stores, and services that read the
+schema exposed by `django_resaas` and generate forms, tables, filters, and CRUD flow
+without hand-writing it on every screen.
 
-Esta pasta é renderizada dentro de qualquer app que instale o pacote,
-através de `docsRoutes` (ver [Arquitetura](architecture/overview.md)) —
-não é apenas markdown para o GitHub.
+This folder is rendered inside any app that installs the package, via `docsRoutes`
+(see [Architecture](architecture/overview.md)) — it isn't just markdown for GitHub.

@@ -1,69 +1,67 @@
 # BaseStore (`base/base_store.js`)
 
-`createBaseStore(name, config, extend)` é uma fábrica de stores Pinia
-que dá a qualquer recurso (`app` + `model` do backend) um CRUD completo
-sem repetir código.
+`createBaseStore(name, config, extend)` is a Pinia store factory that gives any
+resource (backend `app` + `model`) full CRUD without repeating code.
 
 ``` js
 export const useBranchStore = createBaseStore(
   'branch',
   { app: 'django_resaas', model: 'Branch' },
-  { state: () => ({}), actions: { /* extras específicos */ } }
+  { state: () => ({}), actions: { /* extras specific to this store */ } }
 )
 ```
 
-## Config imutável
+## Immutable config
 
-`BASE_CONFIG` é gerado uma vez (`Object.freeze`) a partir de
-`config.app`/`config.model`, e deriva `url` como
-`` `${app}/${model.toLowerCase()}s` ``. As actions nunca devem montar
-esta URL à mão — usam sempre os getters `safeApp`, `safeModel`,
-`safeUrl`.
+`BASE_CONFIG` is generated once (`Object.freeze`) from `config.app`/`config.model`,
+and derives `url` as `` `${app}/${model.toLowerCase()}s` ``. Actions should never
+build this URL by hand — they always use the `safeApp`, `safeModel`, `safeUrl`
+getters.
 
-## State comum
+## Shared state
 
-Todas as stores criadas por `createBaseStore` partilham:
-`loading`, `saving`, `fields`, `rows`, `row`, `form`, `actions`,
-`config`, `search`, `filters`, `pagination` (`page`, `rowsPerPage`,
-`rowsNumber`), e o estado de PDF (`pdf`, `showPdf`). `extend.state()`
-é fundido por cima — é o que `UserStore`, `BranchStore`, etc. usam
-para acrescentar campos próprios (ver
-[UserStore & context](user-context.md)).
+Every store created by `createBaseStore` shares:
+`loading`, `saving`, `fields`, `rows`, `row`, `form`, `actions`, `config`,
+`permissions`, `pdfConfig`, `search`, `filters`, `pagination` (`page`,
+`rowsPerPage`, `rowsNumber`), and the PDF display state (`pdf`, `showPdf`).
+`extend.state()` is merged on top — this is what `UserStore`, `BranchStore`,
+etc. use to add their own fields (see [UserStore & context](user-context.md)).
 
-## Actions principais
+## Main actions
 
 -   `init()` — `assertConfig()` -> `loadSchemaOnce()` -> `loadData()`,
-    com hooks `beforeInit`/`afterInit`.
--   `loadSchema()` / `loadSchemaOnce()` — chama
+    with `beforeInit`/`afterInit` hooks.
+-   `loadSchema()` / `loadSchemaOnce()` — calls
     `buildFormFromSchema({ app: this.safeApp, model: this.safeModel })`
-    (ver [Fluxo de dados](../architecture/data-flow.md)) e preenche
-    `fields`, `actions`, `config`.
--   `loadData(params)` — `GET safeUrl` com `page`, `page_size`,
-    `search`, `filters` e overrides; preenche `rows` e
+    (see [Data flow](../architecture/data-flow.md)) and fills in
+    `fields`, `actions`, `config`, `permissions`, `pdfConfig`.
+-   `loadData(params)` — `GET safeUrl` with `page`, `page_size`,
+    `search`, `filters`, and overrides; fills in `rows` and
     `pagination.rowsNumber`.
--   `getById(id)` — devolve `this.row` em cache se o id já corresponde;
-    caso contrário faz `GET safeUrl/{id}/` e sincroniza `row`/`form`.
--   `create()` / `update()` / `save()` — `save()` decide entre os dois
-    consoante `this.form.id` existir; ambos sincronizam `row`, `form` e
-    a lista `rows`.
--   `remove()` — `DELETE`, remove de `rows` e chama `resetForm()`.
--   `getPdf(id)` / `getPdfList()` — pedem PDF via `HTTPAuthBlob` e
-    guardam um `Blob` URL em `pdf` (usado por `s-pdf-render*`).
--   `resetForm()` — reconstrói `form` a partir de `fields[].default`,
-    ou limpa tudo se o schema ainda não carregou.
+-   `getById(id)` — returns the cached `this.row` if the id already matches;
+    otherwise does `GET safeUrl/{id}/` and syncs `row`/`form`.
+-   `create()` / `update()` / `save()` — `save()` picks between the two
+    depending on whether `this.form.id` exists; both sync `row`, `form`, and
+    the `rows` list.
+-   `remove()` — `DELETE`, removes from `rows` and calls `resetForm()`.
+-   `getPdf(id)` / `getPdfList()` — request a PDF via `HTTPAuthBlob`, preferring
+    the schema-provided `pdfConfig.detail_endpoint`/`list_endpoint` when
+    available (falling back to a computed `safeUrl`-based path otherwise), and
+    store a `Blob` URL in `pdf` (used by `s-pdf-render*`).
+-   `resetForm()` — rebuilds `form` from `fields[].default`, or clears
+    everything if the schema hasn't loaded yet.
 
 ## Hooks (`extend.hooks`)
 
-`runHook(name, payload)` chama, se existir, `extend.hooks[name]` com
-`this` ligado à store. Hooks disponíveis:
+`runHook(name, payload)` calls `extend.hooks[name]`, if it exists, with `this`
+bound to the store. Available hooks:
 `beforeInit/afterInit`, `beforeSchema/afterSchema`,
 `beforeLoad/afterLoad`, `beforeGet/afterGet`, `beforeCreate/afterCreate`,
-`beforeUpdate/afterUpdate`, `beforeDelete/afterDelete`. É o ponto de
-extensão preferido em vez de sobrepor uma action inteira.
+`beforeUpdate/afterUpdate`, `beforeDelete/afterDelete`. This is the preferred
+extension point rather than overriding an entire action.
 
 ## `assertConfig()`
 
-Guarda de segurança chamada no início de quase todas as actions —
-lança erro se `_config.app`/`_config.model` não estiverem definidos.
-Existe para falhar cedo quando uma store é mal configurada, em vez de
-um `undefined/undefineds` silencioso na URL.
+A safety guard called at the start of almost every action — throws an error if
+`_config.app`/`_config.model` aren't set. It exists to fail fast when a store
+is misconfigured, instead of a silent `undefined/undefineds` in the URL.

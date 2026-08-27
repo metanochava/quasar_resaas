@@ -1,22 +1,22 @@
-# Build & Instalação
+# Build & Installation
 
-## Como é publicado
+## How it's published
 
-`quasar_resaas` não vai ao npm — é consumido diretamente do GitHub:
+`quasar_resaas` doesn't go to npm — it's consumed directly from GitHub:
 
 ```json
 // front/package.json
 "quasar_resaas": "github:metanochava/quasar_resaas"
 ```
 
-Consequência prática: não há semver. `npm install` fixa o commit da branch por defeito (normalmente `main`) na altura da instalação; para apanhar commits novos da lib é preciso `npm update quasar_resaas` (ou remover `node_modules/quasar_resaas` + reinstalar), não basta correr `npm install` outra vez.
+Practical consequence: there's no semver. `npm install` pins the default branch's commit (usually `main`) at install time; to pick up new commits from the library you need `npm update quasar_resaas` (or remove `node_modules/quasar_resaas` and reinstall) — running `npm install` again isn't enough.
 
-## CommonJS num host ESM
+## ES modules throughout
 
-`package.json` da lib declara:
+The library's `package.json` declares:
 
 ```json
-"type": "commonjs",
+"type": "module",
 "main": "index.js",
 "exports": {
   ".": "./index.js",
@@ -25,11 +25,18 @@ Consequência prática: não há semver. `npm install` fixa o commit da branch p
 }
 ```
 
-enquanto `front/package.json` é `"type": "module"`. O Vite (usado pelo `@quasar/app-vite`) resolve isto na maior parte dos casos porque interpreta o `exports` map e faz interop CJS→ESM automaticamente — mas qualquer `require()` dentro da própria lib (ex.: `services/token.js`, `boot/cripto.js` usam `require('crypto-js')` em vez de `import`) só funciona porque o ficheiro onde estão é tratado como CJS pelo `"type": "commonjs"` da lib. Copiar esse padrão para código novo dentro do host (`front`, que é ESM) não funciona.
+This matches what the code actually is: `index.js` and everything it imports use `import`/`export`
+syntax throughout, so `"type": "module"` is the honest declaration (it used to say `"commonjs"`,
+which was wrong — a plain `require('quasar_resaas')` would have thrown a `SyntaxError`
+immediately; it only ever worked because Vite transpiles it regardless of the declared type).
+`auto-imports.cjs` needs no special handling: a `.cjs` extension is always treated as CommonJS by
+Node regardless of the package's `"type"`, so its own `require`-free, plain `module.exports` style
+keeps working unchanged. When adding new code to the library, use `import`/`export` — there's no
+CJS `require()` anywhere in this codebase to mirror.
 
 ## Auto-imports
 
-`quasar.config.js` do host importa o mapa de auto-imports da lib e regista-o junto dos presets do `unplugin-auto-import`:
+The host's `quasar.config.js` imports the library's auto-imports map and registers it alongside `unplugin-auto-import`'s presets:
 
 ```js
 import RESAAS_AUTO_IMPORTS from 'quasar_resaas/auto-imports'
@@ -40,21 +47,21 @@ imports: [
 ]
 ```
 
-`auto-imports.cjs` só exporta *nomes* (`useUserStore`, `HTTPAuth`, `tdc`, …) — a lista de stores/API/utils disponíveis sem `import` explícito nas SFCs. Só cobre o que está listado ali; um export novo em `index.js` da lib que não seja também adicionado a `auto-imports.cjs` continua a exigir `import { X } from 'quasar_resaas'` manual.
+`auto-imports.cjs` only exports *names* (`useUserStore`, `HTTPAuth`, `tdc`, …) — the list of stores/API/utils available without an explicit `import` in SFCs. It only covers what's listed there; a new export in the library's `index.js` that isn't also added to `auto-imports.cjs` still requires a manual `import { X } from 'quasar_resaas'`.
 
-## Passos de instalação num host novo
+## Install steps on a new host
 
 ```bash
 npm install
-# postinstall corre automaticamente:
+# postinstall runs automatically:
 quasar prepare
 ```
 
-`quasar prepare` gera `src/auto-imports.d.ts` (declarações para o editor) a partir da configuração acima — sem isto o editor não reconhece os globais da lib, mas o build continua a funcionar.
+`quasar prepare` generates `src/auto-imports.d.ts` (editor declarations) from the configuration above — without this the editor doesn't recognize the library's globals, but the build still works.
 
-## Componentes globais
+## Global components
 
-Os componentes `s-*` (ver `components/button.md`, `components/form.md`) só existem depois de o host chamar explicitamente o `Components` exportado pela lib dentro de um dos seus próprios boot files — não é algo que aconteça por adicionar a lib ao array `boot` do `quasar.config.js` (esse array só aceita ficheiros dentro de `src/boot` do host):
+The `s-*` components (see `components/button.md`, `components/form.md`) only exist after the host explicitly calls the `Components` export from the library inside one of its own boot files — it doesn't happen just by adding the library to `quasar.config.js`'s `boot` array (that array only accepts files inside the host's own `src/boot`):
 
 ```js
 // front/src/boot/theme_engine.js
@@ -62,12 +69,12 @@ import { Components } from 'quasar_resaas'
 export default ({ app }) => { Components({ app }) }
 ```
 
-e esse boot próprio (`theme_engine`) tem de estar listado em `quasar.config.js`:
+and that boot file (`theme_engine`) has to be listed in `quasar.config.js`:
 
 ```js
 boot: ['pinia', 'quasar_saas', 'i18n', 'axios', 'app_ready', 'theme_engine']
 ```
 
-Sem isto, `<s-auto-crud>`/`<s-btn>`/etc. nas SFCs falham com "Failed to resolve component" no build/dev.
+Without this, `<s-auto-crud>`/`<s-btn>`/etc. in SFCs fail with "Failed to resolve component" at build/dev time.
 
-Da mesma forma, `setPinia()` (ver `stores/base-store.md`) é chamado no boot `quasar_saas.js` do host, não pela lib sozinha — omitir este passo faz `getPinia()` lançar `Pinia not initialized` na primeira store acedida.
+Likewise, `setPinia()` (see `stores/base-store.md`) is called in the host's `quasar_saas.js` boot file, not by the library alone — skipping this step makes `getPinia()` throw `Pinia not initialized` on the first store accessed.

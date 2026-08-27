@@ -1,65 +1,68 @@
-# Integração com o Backend
+# Backend Integration
 
-## Cliente HTTP
+## HTTP client
 
-`services/api.js` cria quatro instâncias axios sobre `apiBaseUrl` (`${process.env.API}/${process.env.API_PREFIX}`):
+`services/api.js` creates four axios instances over `apiBaseUrl` (`${process.env.API}/${process.env.API_PREFIX}`):
 
 ```
-HTTPClient      // sem autenticação
-HTTPClientBlob  // sem autenticação, resposta blob
-HTTPAuth        // autenticado
-HTTPAuthBlob    // autenticado, resposta blob (ex.: PDF)
+HTTPClient      // unauthenticated
+HTTPClientBlob  // unauthenticated, blob response
+HTTPAuth        // authenticated
+HTTPAuthBlob    // authenticated, blob response (e.g. PDF)
 ```
 
-O helper `url({ type, url, params })` monta o URL final. `type: 'nu'` insere o nome do `EntityType` ativo no path (`.../<entityType>/<url>`); `type: 'u'` não insere.
+The `url({ type, url, params })` helper builds the final URL. `type: 'nu'` inserts the active `EntityType`'s name into the path (`.../<entityType>/<url>`); `type: 'u'` doesn't.
 
-## Cabeçalhos enviados em cada pedido
+## Headers sent on every request
 
-O interceptor de request em `createClient()` acrescenta, quando `auth: true`:
+The request interceptor in `createClient()` adds, when `auth: true`:
 
-| Header | Origem | Propósito |
+| Header | Source | Purpose |
 |---|---|---|
-| `Authorization: Bearer <token>` | `User.access` ou `localStorage` (`access`) | autenticação JWT |
-| `X-RESAAS-Context` | `sessionStorage` (`resaasContext`) | token de contexto de tenant (ver abaixo) |
-| `L` | `sessionStorage` (`userLang`) | id do idioma ativo |
-| `fek` / `fep` | `process.env.FRONT_END_KEY` / `FRONT_END_PASSWORD` | chave/senha de aplicação (identifica o front perante o backend, independente do utilizador) |
+| `Authorization: Bearer <token>` | `User.access` or `localStorage` (`access`) | JWT authentication |
+| `X-RESAAS-Context` | `sessionStorage` (`resaasContext`) | tenant context token (see below) |
+| `L` | `sessionStorage` (`userLang`) | active language id |
+| `fek` / `fep` | `process.env.FRONT_END_KEY` / `FRONT_END_PASSWORD` | application key/secret (identifies the front to the backend, independent of the user) |
 
-Em erro `401`, o próprio interceptor chama `useUserStore().logout('N')`.
+On a `401` error, the interceptor itself calls `useUserStore().logout('N')`.
 
-## Contexto de tenant (`X-RESAAS-Context`)
+## Tenant context (`X-RESAAS-Context`)
 
-O backend (django_resaas, doc `architecture/multi-tenancy.md` — `entity_id`, `branch_id`, `group_id`) não recebe esses ids em cada pedido individual. O frontend troca-os **uma vez** por um token opaco:
+The backend (django_resaas, doc `architecture/multi-tenancy.md` — `entity_id`, `branch_id`, `group_id`) doesn't receive these ids on every individual request. The frontend exchanges them **once** for an opaque token:
 
 ```js
 // services/tenantContext.js
 await createResaasContext({ entity, branch, group })
 // POST resaas/context/  { entity_id, branch_id, group_id }
-// -> { token } guardado em sessionStorage como X-RESAAS-Context
+// -> { token } stored in sessionStorage as X-RESAAS-Context
 ```
 
-Todos os pedidos autenticados seguintes reenviam esse token no header `X-RESAAS-Context`, e é o backend quem o decodifica para aplicar os filtros de `entity_id`/`branch_id` descritos em multi-tenancy.md. Sem este token, o backend não sabe qual entidade/sucursal aplicar.
+Every subsequent authenticated request resends that token in the
+`X-RESAAS-Context` header, and it's the backend that decodes it to apply the
+`entity_id`/`branch_id` filters described in multi-tenancy.md. Without this
+token, the backend has no way of knowing which entity/branch to apply.
 
-`createResaasContext` lança:
-- `Entity is required` — se chamado sem `entity`;
-- `RESAAS context token was not returned` — se a resposta do backend não trouxer `token`.
+`createResaasContext` throws:
+- `Entity is required` — if called without `entity`;
+- `RESAAS context token was not returned` — if the backend's response doesn't include a `token`.
 
-## Schema de formulário
+## Form schema
 
-`buildFormFromSchema({ app, model, fetchRelationOptions })` (`utils/autoForm.js`) pede o schema do model ao backend:
+`buildFormFromSchema({ app, model, fetchRelationOptions })` (`utils/autoForm.js`) requests the model's schema from the backend:
 
 ```
 GET django_resaas/resaasapps/{app}/{model}/schema/
 ```
 
-e converte cada campo (`ForeignKey`, `CharField`, `IntegerField`, …) em props Quasar (`rules`, `options`, componente `s-input`/etc.), incluindo `onFilter` assíncrono com cache e debounce (350ms) para campos de relação, que por omissão pesquisam em:
+and converts each field (`ForeignKey`, `CharField`, `IntegerField`, …) into Quasar props (`rules`, `options`, `s-input`/etc. component), including an async `onFilter` with caching and debounce (350ms) for relation fields, which by default search on:
 
 ```
-GET django_resaas/relations/?model={relation}&search={termo}
+GET django_resaas/relations/?model={relation}&search={term}
 ```
 
-Lança `app/model required` se `app` ou `model` não forem passados — ver [troubleshooting](../troubleshooting/common-errors.md#app-model-required).
+Throws `app/model required` if `app` or `model` aren't passed — see [troubleshooting](../troubleshooting/common-errors.md#app-model-required).
 
-## Ver também
+## See also
 
-- [Autenticação e criação de recurso](../development/creating-resource.md)
-- [Erros comuns](../troubleshooting/common-errors.md)
+- [Authentication and creating a resource](../development/creating-resource.md)
+- [Common errors](../troubleshooting/common-errors.md)

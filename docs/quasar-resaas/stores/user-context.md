@@ -1,71 +1,71 @@
-# UserStore & contexto de tenant
+# UserStore & tenant context
 
-`stores/UserStore.js` é criada com `createBaseStore('user', { app:
-'django_resaas', model: 'User' }, {...})` — herda tudo de
-[BaseStore](base-store.md) e acrescenta o essencial de autenticação e
-multi-tenancy do lado do frontend.
+`stores/UserStore.js` is created with `createBaseStore('user', { app:
+'django_resaas', model: 'User' }, {...})` — it inherits everything from
+[BaseStore](base-store.md) and adds the essentials of authentication and
+multi-tenancy on the frontend side.
 
-## Sessão
+## Session
 
--   `login(data, q)` — `POST login/`, guarda `access`/`refresh` em
-    storage local (365 dias) e chama `me()`.
--   `me()` — `GET me/`, preenche `this.data` e muda o idioma ativo via
-    `LanguageStore` se o backend devolver `language`.
+-   `login(data, q)` — `POST login/`, stores `access`/`refresh` in local
+    storage (365 days) and calls `me()`.
+-   `me()` — `GET me/`, fills in `this.data` and switches the active language
+    via `LanguageStore` if the backend returns `language`.
 -   `refreshToken()` / `isTokenExpired(token)` / `checkSession()` —
-    renovação de token baseada no `exp` do JWT decodificado (sem
-    verificar assinatura, só payload).
--   `logout(x)` — `x === 'N'` faz apenas logout local (ex.: 401 vindo
-    do interceptor); caso contrário chama `POST logout/` e limpa todo
-    o storage relacionado (tema, tokens, entidade/branch/grupo,
-    permissões, credenciais "manter sessão").
--   `loadFromStorage()` — repõe todo o state (tema, tipografia,
-    entidade/branch/grupo, tokens, permissões) a partir do
-    `localStorage`/`sessionStorage` no arranque da app.
+    token renewal based on the decoded JWT's `exp` (no signature
+    verification, payload only).
+-   `logout(x)` — `x === 'N'` does only a local logout (e.g. a 401 coming
+    from the interceptor); otherwise it calls `POST logout/` and clears all
+    related storage (theme, tokens, entity/branch/group, permissions,
+    "keep session" credentials).
+-   `loadFromStorage()` — restores the entire state (theme, typography,
+    entity/branch/group, tokens, permissions) from
+    `localStorage`/`sessionStorage` on app startup.
 
-## Permissões
+## Permissions
 
-`Permissions` é um `Set` de strings em minúsculas. Os getters `can` e
-`hasPermission` fazem o mesmo check:
-`state.Permissions.has(String(perm).toLowerCase())`. É isto que
-alimenta o prop `:can="User.can"` usado pelas páginas (ex.
+`Permissions` is a `Set` of lowercase strings. The `can` and `hasPermission`
+getters do the same check:
+`state.Permissions.has(String(perm).toLowerCase())`. This is what powers the
+`:can="User.can"` prop used by pages (e.g.
 `s-auto-crud :can="User.can"`).
 
-## Contexto de tenant (`Entity` / `Branch` / `Group`)
+## Tenant context (`Entity` / `Branch` / `Group`)
 
-O tenant ativo vive em três campos do `UserStore`: `Entity`, `Branch`,
-`Group`. Mudar qualquer um passa por
-`selectContext({ entity, branch, group })`, que:
+The active tenant lives in three `UserStore` fields: `Entity`, `Branch`,
+`Group`. Changing any of them goes through
+`selectContext({ entity, branch, group })`, which:
 
-1. atualiza o state e sincroniza `localStorage`
+1. updates the state and syncs `localStorage`
    (`userEntity`/`userBranch`/`userGroup`);
-2. chama `refreshResaasContext()`.
+2. calls `refreshResaasContext()`.
 
-`refreshResaasContext()` chama `createResaasContext` (ver abaixo) só
-se houver `Entity.id`; caso contrário limpa o contexto
+`refreshResaasContext()` calls `createResaasContext` (see below) only
+if `Entity.id` exists; otherwise it clears the context
 (`clearResaasContext()`).
 
 ## `services/tenantContext.js`
 
-Gera e guarda o token de contexto enviado ao backend:
+Generates and stores the context token sent to the backend:
 
 ``` js
 createResaasContext({ entity, branch, group })
 // POST resaas/context/  { entity_id, branch_id, group_id }
-// -> setResaasContext(data.token)   (sessionStorage, chave "resaasContext")
+// -> setResaasContext(data.token)   (sessionStorage, key "resaasContext")
 ```
 
-Este token é o equivalente, do lado do frontend, ao contexto de tenant
-descrito em `django_resaas` (`entity_id`/`branch_id`/`group_id` — ver a
-documentação do backend, `architecture/multi-tenancy.md`). O
-interceptor de `services/api.js` lê-o com `getResaasContext()` e
-envia-o em **todas** as chamadas autenticadas como
-`X-RESAAS-Context` (ver [API & headers](../api/backend-integration.md)).
-Sem `Entity` selecionada não há token de contexto, e portanto o
-backend não sabe em que tenant filtrar os dados.
+This token is the frontend-side equivalent of the tenant context described
+in `django_resaas` (`entity_id`/`branch_id`/`group_id` — see the backend
+documentation, `architecture/multi-tenancy.md`). The interceptor in
+`services/api.js` reads it with `getResaasContext()` and sends it on
+**every** authenticated call as `X-RESAAS-Context` (see
+[API & headers](../api/backend-integration.md)). Without a selected `Entity`
+there is no context token, so the backend has no way of knowing which tenant
+to filter data by.
 
 ## `core/context.js`
 
-Só guarda a instância de Pinia (`setPinia`/`getPinia`) para que
-`base_store.js` e os serviços consigam aceder a stores fora de
-componentes Vue. Não tem relação direta com o "contexto de tenant"
-acima além do nome — não confundir os dois "contextos".
+Only stores the Pinia instance (`setPinia`/`getPinia`) so that
+`base_store.js` and the services can access stores outside Vue components.
+It has no direct relationship to the "tenant context" above beyond the name
+— don't confuse the two "contexts".

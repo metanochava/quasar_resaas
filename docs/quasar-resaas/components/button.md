@@ -1,30 +1,28 @@
 # s-btn
 
-`s-btn` (`components/engine/BtnComponent.vue`) é um wrapper fino sobre
-`q-btn` que aplica automaticamente o [theme engine](../layout/layout.md)
-e a [tradução](../features/translation.md) — não introduz nenhuma prop
-de permissão própria.
+`s-btn` (`components/engine/BtnComponent.vue`) is a thin wrapper around
+`q-btn` that automatically applies the [theme engine](../layout/layout.md)
+and [translation](../features/translation.md) — it doesn't introduce any
+permission prop of its own.
 
-## O que faz
+## What it does
 
-- Traduz `label` com `tdc(label)` automaticamente.
-- Aplica `dense`, `round` e o estilo (`flat`/`outline`/`unelevated`/
-  `push`) a partir das preferências de layout do utilizador
-  (`User.ps.layout`), salvo se a prop correspondente for passada
-  explicitamente.
-- Aplica animação (`ripple` ou `pulse`) a partir de
-  `User.ps.animation`.
-- Todas as restantes props (`color`, `icon`, `loading`, `type`,
-  `@click`, ...) passam diretamente para o `q-btn` subjacente.
+- Translates `label` with `tdc(label)` automatically.
+- Applies `dense`, `round`, and the style (`flat`/`outline`/`unelevated`/
+  `push`) from the user's layout preferences (`User.ps.layout`), unless the
+  corresponding prop is passed explicitly.
+- Applies animation (`ripple` or `pulse`) from `User.ps.animation`.
+- All other props (`color`, `icon`, `loading`, `type`, `@click`, ...) pass
+  straight through to the underlying `q-btn`.
 
-## Não faz permission-gating
+## Does not do permission-gating
 
-Ao contrário do que o nome poderia sugerir, `s-btn` **não** esconde-se
-sozinho por permissão. Quem chama decide isso com `v-if`:
+Despite what the name might suggest, `s-btn` does **not** hide itself based
+on permission. The caller decides that with `v-if`:
 
 ``` vue
 <s-btn
-  v-if="User.can('delete_' + model.toLowerCase())"
+  v-if="User.can(store.permissions?.delete || 'delete_' + model.toLowerCase())"
   color="negative"
   icon="delete"
   :loading="store.saving"
@@ -33,10 +31,13 @@ sozinho por permissão. Quem chama decide isso com `v-if`:
 />
 ```
 
-Este é o padrão usado em [`s-action-form`](action-form.md) e
-[`s-form-two`](form.md) para todos os botões de CRUD.
+This is the pattern used in [`s-action-form`](action-form.md) and
+[`s-form-two`](form.md) for all CRUD buttons — prefer the schema-provided
+permission codename (`store.permissions.*`) over hand-building
+`'<action>_' + model.toLowerCase()`, falling back to the convention only
+when the store hasn't loaded a schema yet.
 
-## Uso simples
+## Simple usage
 
 ``` vue
 <s-btn color="primary" icon="save" label="Save" @click="save" />

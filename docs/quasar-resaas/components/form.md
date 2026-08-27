@@ -1,26 +1,25 @@
 # Form (`s-form-two`)
 
-`s-form-two` (`components/auto/FormTwo.vue`) é o formulário de página
-inteira para criar/editar um registo. Ao contrário de `s-auto-form`, não
-recebe `schema`/`module`/`model` diretamente — recebe a instância de
-[store](../stores/base-store.md) já carregada.
+`s-form-two` (`components/auto/FormTwo.vue`) is the full-page form for
+creating/editing a record. Unlike `s-auto-form`, it doesn't receive
+`schema`/`module`/`model` directly — it receives the already-loaded
+[store](../stores/base-store.md) instance.
 
 ## Props
 
-| Prop | Tipo | Default | Descrição |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `store` | `Object` | — | Instância da store (ver [BaseStore](../stores/base-store.md)); expõe `form`, `row`, `model`, `saving` |
-| `ignoreFields` | `Array` | `[]` | Campos a esconder do form |
-| `leftCol` / `centerCol` / `rightCol` | `String` | `col-3` / `col` / `col-4` | Classes das colunas quando os slots `left`/`right` são usados |
+| `store` | `Object` | — | Resource store instance (see [BaseStore](../stores/base-store.md)); exposes `form`, `row`, `model`, `saving` |
+| `ignoreFields` | `Array` | `[]` | Fields to hide from the form |
+| `leftCol` / `centerCol` / `rightCol` | `String` | `col-3` / `col` / `col-4` | Column classes when the `left`/`right` slots are used |
 
 ## Slots
 
-`header`, `left`, `center`, `right`, `footer` — quando ausentes, o
-componente desenha o seu próprio cabeçalho (título + Cancelar/Guardar),
-o formulário via `s-form` (engine) no centro, e o rodapé via
-[`s-action-form`](action-form.md).
+`header`, `left`, `center`, `right`, `footer` — when absent, the component
+draws its own header (title + Cancel/Save), the form via `s-form` (engine) in
+the center, and the footer via [`s-action-form`](action-form.md).
 
-## Uso
+## Usage
 
 ``` vue
 <s-form-two
@@ -30,21 +29,21 @@ o formulário via `s-form` (engine) no centro, e o rodapé via
 />
 ```
 
-`isEdit` é calculado a partir de `store.form?.id`. O botão de gravar
-(`add_<model>`) ou editar (`change_<model>`) só aparece se
-`User.can(...)` autorizar — ver [Permissions](../features/permissions.md).
+`isEdit` is computed from `store.form?.id`. The save button (`add_<model>`)
+or edit button (`change_<model>`) only appears if `User.can(...)` allows it
+— see [Permissions](../features/permissions.md).
 
-## Relação com outros componentes
+## Relationship to other components
 
-- **`s-auto-form`** (`AutoForm.vue`) é o formulário em **diálogo/modal**,
-  guiado por `schema` + `app`/`model` recebidos como props soltas em vez
-  de uma store — usado dentro de `s-form-modal`.
-- **`s-auto-crud`** (`AutoCrud.vue`) combina `s-auto-table` +
-  `s-form-modal` (que embrulha `s-auto-form`) + `s-auto-filter` numa
-  página de listagem completa. `s-form-two` é a alternativa de página
-  dedicada (não-modal) ao mesmo fluxo de edição.
+- **`s-auto-form`** (`AutoForm.vue`) is the **dialog/modal** form, driven
+  by `schema` + `app`/`model` received as loose props instead of a store —
+  used inside `s-form-modal`.
+- **`s-auto-crud`** (`AutoCrud.vue`) combines `s-auto-table` +
+  `s-form-modal` (which wraps `s-auto-form`) + `s-auto-filter` into a
+  complete listing page. `s-form-two` is the dedicated (non-modal) page
+  alternative to the same editing flow.
 
-> ⚠️ Nota de versão: a API de `s-form-two` baseada em `store` é a atual
-> no código-fonte. Consumidores a usar props soltas (`schema`, `module`,
-> `model`, `data`, `can-do`) estão numa versão publicada anterior —
-> verificar a versão instalada antes de copiar exemplos.
+> ⚠️ Version note: the `store`-based API of `s-form-two` is the current one
+> in the source code. Consumers using loose props (`schema`, `module`,
+> `model`, `data`, `can-do`) are on a previously published version —
+> check the installed version before copying examples.

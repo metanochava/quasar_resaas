@@ -1,21 +1,20 @@
-# Arquitetura do quasar_resaas
+# quasar_resaas Architecture
 
-## Visão geral
+## Overview
 
-`quasar_resaas` não é uma app — é uma biblioteca que se instala dentro
-de uma app Quasar/Vue 3 (`main`) e liga-se ao backend `django_resaas`.
-Tudo o que exporta (rotas, stores, componentes, serviços) é consumido
-pela app hospedeira, nunca corre sozinho.
+`quasar_resaas` isn't an app — it's a library installed inside a Quasar/Vue 3 app
+(`main`) that connects to the `django_resaas` backend. Everything it exports (routes,
+stores, components, services) is consumed by the host app; it never runs on its own.
 
 ``` text
-App hospedeira (ex: front)
+Host app (e.g.: front)
        |
        v
 quasar_resaas (boot: components.js, alerts.js)
        |
        +---- Stores (Pinia)      -> base/base_store.js
-       +---- Componentes s-*     -> boot/components.js
-       +---- Rotas               -> restRoutes / authRoutes / docsRoutes
+       +---- s-* Components      -> boot/components.js
+       +---- Routes              -> restRoutes / authRoutes / docsRoutes
        +---- Composable          -> useResaas()
        |
        v
@@ -25,51 +24,49 @@ services/api.js (HTTPAuth / HTTPClient)
 django_resaas (REST API)
 ```
 
-## Ponto de entrada (`index.js`)
+## Entry point (`index.js`)
 
-O `index.js` é uma fachada — reexporta tudo o que a app hospedeira
-pode precisar, agrupado por camada:
+`index.js` is a facade — it re-exports everything the host app might need, grouped
+by layer:
 
--   **Routers** — `restRoutes`, `authRoutes`, `docsRoutes` (ver
+-   **Routers** — `restRoutes`, `authRoutes`, `docsRoutes` (see
     [Router](../routing/routes.md))
--   **Composable** — `useResaas()` (ver abaixo)
+-   **Composable** — `useResaas()` (see below)
 -   **Stores** — `UserStore`, `EntityStore`, `BranchStore`,
-    `PermissionStore`, etc. (ver [BaseStore](../stores/base-store.md))
--   **Base** — `createBaseStore` (fábrica de stores)
+    `PermissionStore`, etc. (see [BaseStore](../stores/base-store.md))
+-   **Base** — `createBaseStore` (store factory)
 -   **Utils** — `buildFormFromSchema`, `json`, `text`, `profile`
 -   **Services** — `api`, `app`, `base`, `data`, `storage`,
     `translation`, `theme`, `routing`, `token`
--   **Boot** — `alerts`, `Components` (registo global dos `s-*`)
--   **Componentes/Layouts** — `MainLayout`, `AuthLayout`, `CrudPage`
+-   **Boot** — `alerts`, `Components` (global registration of `s-*`)
+-   **Components/Layouts** — `MainLayout`, `AuthLayout`, `CrudPage`
 
-## Registo de componentes (`boot/components.js`)
+## Component registration (`boot/components.js`)
 
-Todos os componentes da biblioteca são registados globalmente com o
-prefixo `s-` (ex.: `s-btn`, `s-auto-form`, `s-auto-crud`), para que
-qualquer página da app hospedeira os use sem import explícito. Ver
-[Form](../components/form.md), [ActionForm](../components/action-form.md)
-e [s-btn](../components/button.md).
+Every component in the library is registered globally with the `s-` prefix (e.g.
+`s-btn`, `s-auto-form`, `s-auto-crud`), so any page in the host app can use them
+without an explicit import. See [Form](../components/form.md),
+[ActionForm](../components/action-form.md), and [s-btn](../components/button.md).
 
-## Contexto Pinia (`core/context.js`)
+## Pinia context (`core/context.js`)
 
-`base/base_store.js` e vários serviços precisam de uma instância de
-Pinia fora de componentes Vue. `setPinia(piniaInstance)` deve ser
-chamado uma vez no boot da app hospedeira; `getPinia()` lança erro se
-isso não tiver acontecido — é a forma da biblioteca falhar cedo em vez
-de silenciosamente.
+`base/base_store.js` and several services need a Pinia instance outside of Vue
+components. `setPinia(piniaInstance)` must be called once during the host app's
+boot; `getPinia()` throws if that hasn't happened yet — this is the library's way
+of failing fast instead of failing silently.
 
 ## `useResaas()`
 
-Composable de conveniência (`composables/useResaas.js`) que devolve,
-num único objeto, as stores mais usadas (`User`, `Entity`, `EntityType`,
-`Branch`, `Menu`, `Person`), os clientes HTTP (`HTTPAuth`, `HTTPClient`,
-`wsApi`, `url`), `buildFormFromSchema`, `createBaseStore` e `tdc`
-(tradução). Não introduz lógica nova — apenas evita repetir vários
-`useXStore()` em cada página.
+A convenience composable (`composables/useResaas.js`) that returns, in a single
+object, the most-used stores (`User`, `Entity`, `EntityType`, `Branch`, `Menu`,
+`Person`), the HTTP clients (`HTTPAuth`, `HTTPClient`, `wsApi`, `url`),
+`buildFormFromSchema`, `createBaseStore`, and `tdc` (translation). It doesn't
+introduce new logic — it just avoids repeating several `useXStore()` calls on
+every page.
 
-## Ligação ao backend
+## Connecting to the backend
 
-Toda a comunicação passa por `services/api.js`
-([API & headers](../api/backend-integration.md)). Não há chamadas
-`fetch`/`axios` soltas nas páginas — o padrão é sempre store ou
-`HTTPAuth` importado da biblioteca.
+All communication goes through `services/api.js`
+([API & headers](../api/backend-integration.md)). There are no loose
+`fetch`/`axios` calls on pages — the pattern is always a store or `HTTPAuth`
+imported from the library.

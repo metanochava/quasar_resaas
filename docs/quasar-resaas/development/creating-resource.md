@@ -1,27 +1,27 @@
-# Criar um Novo Recurso Frontend
+# Creating a New Frontend Resource
 
-Assume-se que o model já existe no backend (django_resaas) com `RESAAS.crud = True` e a view registada — ver `development/creating-resource.md` do django_resaas para esse lado.
+Assumes the model already exists in the backend (django_resaas) with `RESAAS.crud = True` and its view registered — see django_resaas's `development/creating-resource.md` for that side.
 
-Exemplo real: `Cargo` (`front/src/pages/rh/cargo/`).
+Real example: `Cargo` (`front/src/pages/rh/cargo/`).
 
-## 1. Páginas
+## 1. Pages
 
-Três ficheiros por recurso:
+Three files per resource:
 
 ```
-CargoLPage.vue   // lista — usa <s-auto-crud>
-CargoSEPage.vue  // criar/editar — usa <s-form-two>
-CargoVPage.vue   // ver detalhe
+CargoLPage.vue   // list — uses <s-auto-crud>
+CargoSEPage.vue  // create/edit — uses <s-form-two>
+CargoVPage.vue   // view detail
 ```
 
-`CargoLPage.vue` delega tudo ao componente automático:
+`CargoLPage.vue` delegates everything to the automatic component:
 
 ```vue
 <s-auto-crud :module="module" :model="model" :can="User.can"
   :ignoreFields="ignoreFields" route="view_cargo" />
 ```
 
-`CargoSEPage.vue` carrega o schema e, se a rota tiver `:id`, o registo existente:
+`CargoSEPage.vue` loads the schema and, if the route has `:id`, the existing record:
 
 ```js
 const data = await buildFormFromSchema({ module, model, schemaPath })
@@ -31,17 +31,17 @@ const id = route.params.id || route.query.id
 if (id) selectedRow.value = (await HTTPAuth.get(url({ type:'u', url:`${module}/${model}s/${id}/` }))).data
 ```
 
-> `buildFormFromSchema` em `utils/autoForm.js` espera `{ app, model }`, não `{ module, schemaPath }` — ver [erros comuns](../troubleshooting/common-errors.md#app-model-required) antes de copiar este ficheiro para um novo recurso.
+> `buildFormFromSchema` in `utils/autoForm.js` expects `{ app, model }`, not `{ module, schemaPath }` — see [common errors](../troubleshooting/common-errors.md#app-model-required) before copying this file for a new resource.
 
-## 2. Rotas
+## 2. Routes
 
-Um ficheiro `<recurso>Routes.js` por recurso, com as 4 ações padrão e `requiredRole` a bater certo com os codenames de permissão do backend (`list_`, `add_`, `change_`, `view_` + nome do model):
+One `<resource>Routes.js` file per resource, with the 4 standard actions and `requiredRole` matching the backend's permission codenames (`list_`, `add_`, `change_`, `view_` + model name):
 
 ```js
 // pages/rh/cargo/cargoRoutes.js
 export let cargoRoutes = [
   { path: '/list_cargo',   name: 'list_cargo',   component: () => import('./CargoLPage.vue'),
-    meta: { title: tdc('Vista de')+' '+tdc('cargo'), requiresAuth: true, icon: 'list', requiredRole: 'list_cargo' } },
+    meta: { title: tdc('View of')+' '+tdc('cargo'), requiresAuth: true, icon: 'list', requiredRole: 'list_cargo' } },
   { path: '/add_cargo',    name: 'add_cargo',    component: () => import('./CargoSEPage.vue'),
     meta: { requiresAuth: true, icon: 'add', requiredRole: 'add_cargo' } },
   { path: '/change_cargo/:id', name: 'change_cargo', component: () => import('./CargoSEPage.vue'),
@@ -51,21 +51,21 @@ export let cargoRoutes = [
 ]
 ```
 
-## 3. Agregação
+## 3. Aggregation
 
-O ficheiro de rotas do recurso é importado e espalhado no `routes.js` do módulo (`pages/rh/routes.js`), que por sua vez é espalhado em `src/router/routes.js` junto com `restRoutes`/`authRoutes`/`docsRoutes` do próprio `quasar_resaas`. Não há registo automático — um recurso novo sem este passo simplesmente não aparece no router.
+The resource's routes file is imported and spread into the module's `routes.js` (`pages/rh/routes.js`), which is in turn spread into `src/router/routes.js` alongside `quasar_resaas`'s own `restRoutes`/`authRoutes`/`docsRoutes`. There's no automatic registration — a new resource without this step simply doesn't appear in the router.
 
-## 4. Menu lateral (opcional)
+## 4. Side menu (optional)
 
-Só é necessário se o recurso precisar de um painel lateral de contexto (`RightMenu.vue`). Regista-se em `src/core/rightMenus.js`:
+Only needed if the resource requires a contextual side panel (`RightMenu.vue`). Registered in `src/core/rightMenus.js`:
 
 ```js
 import CargoRightMenu from './../pages/rh/cargo/RightMenu.vue'
 menu.registerRightMenu('view_cargo', CargoRightMenu)
 ```
 
-A maioria dos recursos (caso do `Cargo` atual) não tem `RightMenu.vue` e pode ignorar este passo.
+Most resources (like the current `Cargo`) don't have a `RightMenu.vue` and can skip this step.
 
-## 5. Permissões
+## 5. Permissions
 
-`requiredRole` em cada rota e `:can="User.can"` em `<s-auto-crud>` devem corresponder aos codenames (`list`, `add`, `change`, `view`, `delete`) que o backend expõe para o model — ver `security/permissions.md` do django_resaas.
+`requiredRole` on each route and `:can="User.can"` on `<s-auto-crud>` must match the codenames (`list`, `add`, `change`, `view`, `delete`) the backend exposes for the model — see django_resaas's `security/permissions.md`.

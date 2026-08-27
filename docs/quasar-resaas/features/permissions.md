@@ -1,13 +1,13 @@
-# Permissões
+# Permissions
 
-O frontend não decide permissões — apenas espelha o que o backend
-(`django_resaas`, ver a sua documentação de Permissões) já calculou. A UI
-só esconde/mostra; a autoridade final continua a ser a API.
+The frontend doesn't decide permissions — it only mirrors what the backend
+(`django_resaas`, see its Permissions documentation) has already computed.
+The UI only shows/hides; the final authority remains the API.
 
 ## `User.can()`
 
-`UserStore` guarda os codenames do utilizador num `Set` e expõe dois
-getters equivalentes:
+`UserStore` keeps the user's codenames in a `Set` and exposes two
+equivalent getters:
 
 ```js
 // stores/UserStore.js
@@ -17,48 +17,48 @@ hasPermission: (state) => (perm) => state.Permissions.has(String(perm).toLowerCa
 can:           (state) => (perm) => state.Permissions.has(String(perm).toLowerCase()),
 ```
 
-`Permissions` é reconstruído a partir do `localStorage`
-(`userPermissions`) em `loadFromStorage()`. Uso típico numa página CRUD:
+`Permissions` is rebuilt from `localStorage`
+(`userPermissions`) in `loadFromStorage()`. Typical usage in a CRUD page:
 
 ```vue
 <!-- pages/rh/cargo/CargoLPage.vue -->
 <s-auto-crud :module="module" :model="model" :can="User.can" route="view_cargo" />
 ```
 
-`s-auto-crud`/`AutoTable`/`AutoForm` recebem `can` e decidem internamente
-que ações mostrar (editar, apagar, criar) — ver
+`s-auto-crud`/`AutoTable`/`AutoForm` receive `can` and internally decide
+which actions to show (edit, delete, create) — see
 [`components/form.md`](form.md).
 
-## Rotas
+## Routes
 
-Por convenção, `meta.requiredRole` de cada rota é o próprio nome da rota
-(`list_cargo`, `add_cargo`, ...) — ver [routing/routes.md](../routing/routes.md).
-O guard de navegação do host verifica `User.can(to.meta.requiredRole)`
-antes de permitir a entrada.
+By convention, each route's `meta.requiredRole` is the route's own name
+(`list_cargo`, `add_cargo`, ...) — see [routing/routes.md](../routing/routes.md).
+The host's navigation guard checks `User.can(to.meta.requiredRole)` before
+allowing entry.
 
-## Gestão de permissões por grupo
+## Group-level permission management
 
-A tela real de administração é `pages/permission/PermissionManager.vue`,
-ligada a `PermissionStore` (`usePermissionStore`, um
-[`base_store`](../stores/base-store.md) com `app: 'auth'`, `model: 'Permission'`):
+The real admin screen is `pages/permission/PermissionManager.vue`, bound to
+`PermissionStore` (`usePermissionStore`, a
+[`base_store`](../stores/base-store.md) with `app: 'auth'`, `model: 'Permission'`):
 
--   `initPermissions(all, groupPerms, group)` — carrega o universo de
-    permissões e as do grupo selecionado.
--   `buildApps()` — agrupa permissões por app/model (a partir de
-    `content_type.label`, formato `"App | Model"`) e aplica o filtro de
-    pesquisa (`this.search`).
--   `hasPermission(id)` / `appState()` / `modelState()` — estado
-    (marcado/indeterminado) para os checkboxes por app e por model.
--   `toggle(permission)` — chama `POST .../permissions/:id/addToGroup/`
-    ou `.../removeFromGroup/`, com rollback otimista em caso de erro.
+-   `initPermissions(all, groupPerms, group)` — loads the universe of
+    permissions and the selected group's own.
+-   `buildApps()` — groups permissions by app/model (from
+    `content_type.label`, format `"App | Model"`) and applies the search
+    filter (`this.search`).
+-   `hasPermission(id)` / `appState()` / `modelState()` — state
+    (checked/indeterminate) for the per-app and per-model checkboxes.
+-   `toggle(permission)` — calls `POST .../permissions/:id/addToGroup/`
+    or `.../removeFromGroup/`, with optimistic rollback on error.
 
 ```text
 q-checkbox (app)   ──toggleApp()──┐
 q-checkbox (model) ──toggle()─────┼──> HTTPClient.post(...)
-                                   └──> groupPermissions atualizado
+                                   └──> groupPermissions updated
 ```
 
-`components/UserPermissioes.vue` e `components/PagePermissoes.vue`
-existem como pontos de montagem (usados no dialog `pagepermissoes` do
-`MainLayout`) mas estão ainda por implementar — apenas um título, sem
-lógica. Não confiar neles como referência de comportamento.
+`components/UserPermissioes.vue` and `components/PagePermissoes.vue` exist
+as mounting points (used in `MainLayout`'s `pagepermissoes` dialog) but are
+still unimplemented — just a title, no logic. Don't rely on them as a
+reference for behavior.

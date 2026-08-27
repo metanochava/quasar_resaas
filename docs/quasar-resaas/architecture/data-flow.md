@@ -1,10 +1,10 @@
-# Fluxo de dados — do schema ao ecrã
+# Data flow — from schema to screen
 
-Exemplo real: uma página de edição na app hospedeira que usa
-`s-form-two` (`front/src/pages/rh/cargo/CargoSEPage.vue`).
+Real example: an edit page in the host app that uses `s-form-two`
+(`front/src/pages/rh/cargo/CargoSEPage.vue`).
 
 ``` text
-Página (CargoSEPage.vue)
+Page (CargoSEPage.vue)
    |
    |  buildFormFromSchema({ app, model })
    v
@@ -14,7 +14,7 @@ utils/autoForm.js
    v
 services/api.js (HTTPAuth)
    |  + Authorization: Bearer <access>
-   |  + X-RESAAS-Context: <token>   (ver stores/user-context.md)
+   |  + X-RESAAS-Context: <token>   (see stores/user-context.md)
    v
 django_resaas (backend)
    |
@@ -23,48 +23,47 @@ utils/schema.js -> normalizeSchema()
    |
    v
 buildFormFromSchema()
-   - gera `rules` de validação por campo (obrigatório, min/max, JSON)
-   - resolve opções de relação (`ForeignKey`/`M2M`) via
-     `django_resaas/relations/`, com cache e debounce (350ms)
-   - devolve { schema, fields, actions, config, permissions, ... }
+   - generates per-field validation `rules` (required, min/max, JSON)
+   - resolves relation options (`ForeignKey`/`M2M`) via
+     `django_resaas/relations/`, with caching and debounce (350ms)
+   - returns { schema, fields, actions, config, permissions, ... }
    v
-s-form-two / s-auto-form renderizam os campos
+s-form-two / s-auto-form render the fields
 ```
 
 ## `buildFormFromSchema` (`utils/autoForm.js`)
 
-Assinatura atual:
+Current signature:
 
 ``` js
 buildFormFromSchema({ app, model, fetchRelationOptions } = {})
 ```
 
-Lança `app/model required` se `app` ou `model` não forem passados.
-Para cada campo do schema:
+Throws `app/model required` if `app` or `model` aren't passed. For each field in
+the schema:
 
--   deteta tipo (`isFileType`, `isNumericType`, `isCharType`,
-    `isRelationType`) para decidir o componente `s-*` a usar
+-   detects the type (`isFileType`, `isNumericType`, `isCharType`,
+    `isRelationType`) to decide which `s-*` component to use
     (`f.component || 's-input'`);
--   constrói `rules` a partir de `required`, `min_length`,
-    `max_length`, `min`, `max` e `JSONField`;
--   se o campo é uma relação, liga `onFilter` a um fetcher com
-    debounce e cache em memória (`__relationCache`) — evita repetir
-    pedidos ao digitar numa combo de pesquisa.
+-   builds `rules` from `required`, `min_length`, `max_length`, `min`, `max`,
+    and `JSONField`;
+-   if the field is a relation, wires `onFilter` to a debounced fetcher with an
+    in-memory cache (`__relationCache`) — avoids repeating requests while typing
+    in a search combo.
 
-> **Nota:** `base/base_store.js` chama sempre
-> `buildFormFromSchema({ app: this.safeApp, model: this.safeModel })`
-> — este é o caminho consistente com a assinatura atual. O exemplo em
-> `CargoSEPage.vue` chama `buildFormFromSchema({ module, model,
-> schemaPath })`, que **não corresponde** aos parâmetros que a função
-> lê (`app`, `model`, `fetchRelationOptions`); `module`/`schemaPath`
-> são ignorados. Vale a pena confirmar se essa página está a usar uma
-> versão desatualizada da API antes de a tomar como referência.
+> **Note:** `base/base_store.js` always calls
+> `buildFormFromSchema({ app: this.safeApp, model: this.safeModel })` —
+> this is the path consistent with the current signature. The example in
+> `CargoSEPage.vue` calls `buildFormFromSchema({ module, model,
+> schemaPath })`, which **does not match** the parameters the function
+> actually reads (`app`, `model`, `fetchRelationOptions`); `module`/`schemaPath`
+> are ignored. It's worth confirming whether that page is using an outdated
+> version of the API before taking it as a reference.
 
-## Pedidos via store (`create`/`update`/`loadData`)
+## Requests via a store (`create`/`update`/`loadData`)
 
-Para páginas que usam uma store criada com `createBaseStore` (ver
-[BaseStore](../stores/base-store.md)), o mesmo padrão
-schema-fetch-render acontece dentro de `store.init()`, e as operações
-de CRUD (`loadData`, `getById`, `create`, `update`, `remove`) usam
-`this.safeUrl` (derivado de `app/model`) contra os mesmos
-`HTTPAuth`/`url()`.
+For pages that use a store created with `createBaseStore` (see
+[BaseStore](../stores/base-store.md)), the same schema-fetch-render pattern
+happens inside `store.init()`, and CRUD operations (`loadData`, `getById`,
+`create`, `update`, `remove`) use `this.safeUrl` (derived from `app/model`)
+against the same `HTTPAuth`/`url()`.

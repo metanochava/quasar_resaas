@@ -1,33 +1,35 @@
 # ActionForm (`s-action-form`)
 
-`s-action-form` (`components/auto/ActionForm.vue`) é a barra de ações
-(Cancelar/Repor/Editar/Eliminar/Guardar) usada no rodapé de
-[`s-form-two`](form.md) e de qualquer outro formulário orientado a uma
-`store`.
+`s-action-form` (`components/auto/ActionForm.vue`) is the action bar
+(Cancel/Reset/Edit/Delete/Save) used in the footer of
+[`s-form-two`](form.md) and any other store-driven form.
 
 ## Props
 
-| Prop | Tipo | Default | Descrição |
+| Prop | Type | Default | Description |
 |---|---|---|---|
-| `store` | `Object` | *obrigatório* | Store do recurso; usa `store.model`, `store.saving`, `store.row`/`store.form` |
-| `reform` | `Object` | `null` | Objeto de formulário externo (ex.: `resetForm()`, `delete()`) — se ausente, cai para `store` |
-| `buttons` | `Array` | `['cancel','reset','edit','delete','save']` | Que botões mostrar |
+| `store` | `Object` | *required* | Resource store; uses `store.model`, `store.saving`, `store.row`/`store.form` |
+| `reform` | `Object` | `null` | External form object (e.g. `resetForm()`, `delete()`) — falls back to `store` if absent |
+| `buttons` | `Array` | `['cancel','reset','edit','delete','save']` | Which buttons to show |
 
 ## Emits
 
 `save`, `cancel`, `reset`, `delete`
 
-## Comportamento
+## Behavior
 
-- `isEdit` = `!!(store.row?.id || store.form?.id)`; **Editar** só é
-  visível em edição, **Guardar** só em criação.
-- Cada botão é protegido por permissão: Eliminar exige
-  `delete_<model>`, Editar exige `change_<model>`, Guardar exige
-  `add_<model>` — ver [Permissions](../features/permissions.md).
-- `reset` chama `reform.resetForm()` se existir; `delete` chama
-  `reform.delete()` ou, na sua falta, `store.delete()`.
+- `isEdit` = `!!(store.row?.id || store.form?.id)`; **Edit** is only
+  visible when editing, **Save** only when creating.
+- Each button is guarded by a permission: Delete requires
+  `delete_<model>`, Edit requires `change_<model>`, Save requires
+  `add_<model>` — see [Permissions](../features/permissions.md). The actual
+  codename is read from `store.permissions.*` (populated from the schema
+  response by `createBaseStore`'s `loadSchema()`), falling back to the
+  `<action>_<model>` convention only when the store hasn't loaded a schema.
+- `reset` calls `reform.resetForm()` if it exists; `delete` calls
+  `reform.delete()` or, failing that, `store.delete()`.
 
-## Uso
+## Usage
 
 ``` vue
 <s-action-form
