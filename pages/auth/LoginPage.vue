@@ -50,7 +50,8 @@ import {
   useEntityTypeStore
 } from 'quasar_resaas'
 
-import FormLogin from './FormLogin.vue'
+
+import FormLogin from './../../components/FormLogin.vue'
 
 
 const $q = useQuasar()
