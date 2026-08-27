@@ -1,20 +1,19 @@
 <template>
-
-
+  <q-page class="column">
 
     <s-card
+      flat
+      class="col"
       :class="
         $q.dark.isActive
           ? 'bg-dark text-white q-pa-md text-center'
           : 'bg-saas q-pa-md text-center'
       "
     >
-
       <FormLogin />
-
     </s-card>
 
-
+  </q-page>
 </template>
 
 
