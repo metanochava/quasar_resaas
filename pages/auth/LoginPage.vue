@@ -1,8 +1,31 @@
 <template>
-  <s-card :class="$q.dark.isActive ? 'bg-dark text-white q-pa-md text-center' : 'bg-saas q-pa-md text-center'" >
-    <FormLogin />
-  </s-card>
+
+  <q-page
+    class="flex flex-center q-pa-md"
+  >
+
+    <s-card
+      :class="
+        $q.dark.isActive
+          ? 'bg-dark text-white q-pa-md text-center'
+          : 'bg-saas q-pa-md text-center'
+      "
+    >
+
+      <FormLogin />
+
+    </s-card>
+
+  </q-page>
+
 </template>
+
+
+<script setup>
+
+import FormLogin from '../components/FormLogin.vue'
+
+</script>
 
 <script>
 import { defineComponent } from 'vue'
