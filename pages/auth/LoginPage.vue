@@ -1,8 +1,6 @@
 <template>
 
-  <q-page
-    class="flex flex-center q-pa-md"
-  >
+
 
     <s-card
       :class="
@@ -16,7 +14,6 @@
 
     </s-card>
 
-  </q-page>
 
 </template>
 
