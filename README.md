@@ -173,9 +173,16 @@ You never set these by hand — call `createResaasContext()` once per entity/bra
 
 ## 📖 Documentation site (`docsRoutes`)
 
-The [`docs/`](docs/README.md) folder isn't just markdown for GitHub — it ships inside the package and renders as a real, navigable documentation site inside any app that installs `quasar_resaas`, attached under the host's own `MainLayout`.
+The `docs/` folder isn't just markdown for GitHub — it ships inside the package and renders as a real, navigable documentation site inside any app that installs `quasar_resaas`, attached under the host's own `MainLayout`, styled after the official Quasar Framework docs (product switcher, grouped sidebar, "on this page" outline).
 
-There's no per-topic page to write: a single `DocsPage.vue` reads `docs/**/*.md` (bundled with the library, parsed at runtime with `marked`) and renders whichever one matches the route's `:slug`, with a sidebar built from `docsNav`. Exactly like `restRoutes`, it's exported as a plain, flat route array for the host to spread wherever it mounts its own routes:
+It hosts **two separate documentation trees on the same site**:
+
+| Product | Folder | Covers |
+|---|---|---|
+| [`quasar_resaas`](docs/quasar-resaas/README.md) | `docs/quasar-resaas/` | this library — components, stores, router, docs site itself |
+| [`django_resaas`](docs/django-resaas/README.md) | `docs/django-resaas/` | the backend API it talks to — multi-tenancy, permissions, models |
+
+There's no per-topic page to write: a single `DocsPage.vue` reads `docs/<product>/**/*.md` (bundled with the library, parsed at runtime with `marked`) and renders whichever one matches the route's `:product/:slug`, with a sidebar built from `docsNav[product]` and a product switcher built from `docsProducts`. Exactly like `restRoutes`, it's exported as a plain, flat route array for the host to spread wherever it mounts its own routes:
 
 ```js
 import { restRoutes, authRoutes, docsRoutes } from 'quasar_resaas'
@@ -187,13 +194,16 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       ...restRoutes,
-      ...docsRoutes   // → /docs, /docs/architecture/overview, /docs/api/backend-integration, ...
+      ...docsRoutes
+      // → /docs                                     (redirects to /docs/quasar-resaas)
+      // → /docs/quasar-resaas/architecture/overview
+      // → /docs/django-resaas/architecture/multi-tenancy
     ]
   }
 ]
 ```
 
-Internal links between docs (e.g. `docs/README.md` linking to `architecture/overview.md`) are rewritten on click into client-side navigation instead of dead `.md` hrefs.
+Internal links between docs (e.g. `docs/quasar-resaas/README.md` linking to `architecture/overview.md`) are rewritten on click into client-side navigation instead of dead `.md` hrefs, and correctly cross into the other product's tree if a link ever needs to.
 
 ---
 
@@ -257,16 +267,28 @@ import { ... } from 'quasar_resaas/core/...'      // core utilities
 
 ## 📚 Documentation
 
-Full technical documentation lives in [`docs/`](docs/README.md):
+Full technical documentation lives in [`docs/`](docs/quasar-resaas/README.md), split into two products served by the same docs site (see above):
 
-- [Architecture](docs/architecture/overview.md) · [Data flow](docs/architecture/data-flow.md)
-- [BaseStore](docs/stores/base-store.md) · [UserStore & context](docs/stores/user-context.md)
-- [Form](docs/components/form.md) · [ActionForm](docs/components/action-form.md) · [s-btn](docs/components/button.md)
-- [Router](docs/routing/routes.md) · [Layout](docs/layout/layout.md)
-- [Permissions](docs/features/permissions.md) · [Translation](docs/features/translation.md)
-- [API & headers](docs/api/backend-integration.md)
-- [Creating a new frontend resource](docs/development/creating-resource.md)
-- [Build](docs/deployment/build.md) · [Troubleshooting](docs/troubleshooting/common-errors.md)
+**`quasar_resaas`** (this library) — [`docs/quasar-resaas/`](docs/quasar-resaas/README.md)
+
+- [Architecture](docs/quasar-resaas/architecture/overview.md) · [Data flow](docs/quasar-resaas/architecture/data-flow.md)
+- [BaseStore](docs/quasar-resaas/stores/base-store.md) · [UserStore & context](docs/quasar-resaas/stores/user-context.md)
+- [Form](docs/quasar-resaas/components/form.md) · [ActionForm](docs/quasar-resaas/components/action-form.md) · [s-btn](docs/quasar-resaas/components/button.md)
+- [Router](docs/quasar-resaas/routing/routes.md) · [Layout](docs/quasar-resaas/layout/layout.md)
+- [Permissions](docs/quasar-resaas/features/permissions.md) · [Translation](docs/quasar-resaas/features/translation.md)
+- [API & headers](docs/quasar-resaas/api/backend-integration.md)
+- [Creating a new frontend resource](docs/quasar-resaas/development/creating-resource.md)
+- [Build](docs/quasar-resaas/deployment/build.md) · [Troubleshooting](docs/quasar-resaas/troubleshooting/common-errors.md)
+
+**`django_resaas`** (backend) — [`docs/django-resaas/`](docs/django-resaas/README.md)
+
+- [Architecture](docs/django-resaas/architecture/overview.md) · [Multi-tenancy](docs/django-resaas/architecture/multi-tenancy.md) · [Request lifecycle](docs/django-resaas/architecture/request-lifecycle.md)
+- [Models & RESAAS](docs/django-resaas/models/resaas-config.md)
+- [BaseAPIView](docs/django-resaas/api/base-api-view.md) · [Search](docs/django-resaas/api/search.md) · [Filters & pagination](docs/django-resaas/api/filters-pagination.md)
+- [Permissions](docs/django-resaas/security/permissions.md)
+- [Soft delete](docs/django-resaas/features/soft-delete.md) · [Files & PDF](docs/django-resaas/features/files-pdf.md)
+- [Creating a new resource](docs/django-resaas/development/creating-resource.md)
+- [Git flow & releases](docs/django-resaas/deployment/releases.md) · [Troubleshooting](docs/django-resaas/troubleshooting/common-errors.md)
 
 ---
 
