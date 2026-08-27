@@ -1,45 +1,81 @@
 <template>
+
   <q-page class="column">
 
     <s-card
       flat
-      class="col"
-      :class="
+      class="col row q-pa-md"
+      :class="[
         $q.dark.isActive
-          ? 'bg-dark text-white q-pa-md text-center'
-          : 'bg-saas q-pa-md text-center'
-      "
+          ? 'bg-dark text-white'
+          : 'bg-saas',
+
+        loginPositionClass
+      ]"
     >
+
       <FormLogin />
+
     </s-card>
 
   </q-page>
+
 </template>
 
 
-<script>
-import { defineComponent } from 'vue'
+<script setup>
 
-import { useUserStore } from '../../stores/UserStore'
-import FormLogin from './../../components/FormLogin.vue'
+import { computed } from 'vue'
 
-export default defineComponent({
-  components: {
-    FormLogin,
-  },
-  setup() {
-    const User = useUserStore()
-    return {
-      User,
-    }
-  },
-  data() {
-    return {}
-  },
-  computed: {},
+import { useEntityStore } from 'quasar_resaas'
 
-  mounted() {},
+import FormLogin from './FormLogin.vue'
 
-  methods: {},
+
+const Entity = useEntityStore()
+
+
+// =========================================================
+// LOGIN POSITION
+// =========================================================
+
+const loginPositionClass = computed(() => {
+
+  const position =
+    Entity?.row?.login_position ||
+    Entity?.login_position ||
+    'bottom-right'
+
+  const positions = {
+
+    'top-left':
+      'items-start justify-start',
+
+    'top-right':
+      'items-start justify-end',
+
+    'center':
+      'items-center justify-center',
+
+    'bottom-left':
+      'items-end justify-start',
+
+    'bottom-right':
+      'items-end justify-end'
+
+  }
+
+  return (
+    positions[position] ||
+    positions.center
+  )
+
 })
+
+// top-left
+// top-right
+// center
+// bottom-left
+// bottom-right
+
 </script>
