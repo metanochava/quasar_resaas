@@ -47,3 +47,10 @@ copilot-messages.log
 # System files
 .DS_Store
 .project/attachments/files/**
+
+# Dependencies (never commit; install via package-lock.json)
+node_modules/
+
+# Editor / local project artifacts
+/.project/
+/files/
