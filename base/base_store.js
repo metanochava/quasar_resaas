@@ -41,6 +41,8 @@ export function createBaseStore(name, config, extend = {}) {
 
         actions: [],
         config: {},
+        permissions: {},
+        pdfConfig: {},
 
         search: '',
         filters: {},
@@ -183,6 +185,8 @@ export function createBaseStore(name, config, extend = {}) {
         this.fields = rsp?.fields || []
         this.actions = rsp?.actions || []
         this.config = rsp?.config || {}
+        this.permissions = rsp?.permissions || {}
+        this.pdfConfig = rsp?.pdf || {}
 
         await this.runHook('afterSchema', this.fields)
       },
@@ -371,30 +375,30 @@ export function createBaseStore(name, config, extend = {}) {
       },
       
       async getPdf(id) {
-        
-        if(id){
-          const res = await HTTPAuthBlob.get(url({ type: 'u', url: `${this.safeUrl}/${id}/pdf` }))
-          const blob = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
-          this.pdf = blob
-          this.showPdf = true
-        }else{
-          const res = await HTTPAuthBlob.get(url({ type: 'u', url: `${this.safeUrl}/${this.row.id}/pdf` }))
-          const blob = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
-          this.pdf = blob
-          this.showPdf = true
-          return  blob
-        }    
+        const pdfId = id || this.row.id
+        // prefer the schema-provided endpoint (already resolved against the
+        // model's real RESAAS config) over re-deriving it from safeUrl
+        const endpoint = this.pdfConfig?.detail_endpoint
+          ? this.pdfConfig.detail_endpoint.replace('{id}', pdfId)
+          : `${this.safeUrl}/${pdfId}/pdf`
+
+        const res = await HTTPAuthBlob.get(url({ type: 'u', url: endpoint }))
+        const blob = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+        this.pdf = blob
+        this.showPdf = true
+
+        if (!id) return blob
       },
 
       async getPdfList() {
+        const endpoint = this.pdfConfig?.list_endpoint || `${this.safeUrl}/pdflist`
 
         const res = await HTTPAuthBlob.get(url({ type: 'u',
-          url: `${this.safeUrl}/pdflist` , params: {
+          url: endpoint, params: {
                 page: this.pagination.page,
                 page_size: this.pagination.rowsPerPage,
                 search: this.search,
-                ...this.filters,
-                ...params
+                ...this.filters
               }
           }
         ))

@@ -1,5 +1,43 @@
 export const RESAAS_SCHEMA_VERSION = '1.0'
 
+// Canonical defaults, mirroring django_resaas's ResaasSchemaBuilder
+// (core/schema/builder.py's build_ui/build_filters/build_pagination/build_pdf -
+// see docs/api/schema-contract.md). These exist so a component only ever
+// needs to declare its OWN fallback once, here, instead of re-deriving the
+// backend's defaults locally (which is how three different, disagreeing
+// copies of this same list ended up across the codebase).
+export const DEFAULT_UI = {
+  crud: true,
+  dense: true,
+  striped: true,
+  show_search: true,
+  show_filters: true,
+  show_columns: true,
+  show_refresh: true,
+  show_pdf: true,
+  show_pdf_list: true
+}
+
+export const DEFAULT_FILTERS = {
+  enabled: true,
+  search: true,
+  search_fields: [],
+  fields: []
+}
+
+export const DEFAULT_PAGINATION = {
+  enabled: true,
+  page_size: 10,
+  page_size_options: [5, 10, 20, 50, 100, 200, 500, 1000, 0],
+  default_ordering: '-id'
+}
+
+export const DEFAULT_PDF = {
+  enabled: true,
+  detail: true,
+  list: true
+}
+
 export function normalizeSchema(data = {}) {
   const schema = data?.data || data || {}
   const model = schema.model
@@ -23,38 +61,22 @@ export function normalizeSchema(data = {}) {
     routes: { ...(schema.routes || schema.config?.routes || {}) },
 
     ui: {
-      crud: true,
-      dense: true,
-      striped: true,
-      show_search: true,
-      show_filters: true,
-      show_columns: true,
-      show_refresh: true,
-      show_pdf: true,
-      show_pdf_list: true,
+      ...DEFAULT_UI,
       ...(schema.ui || {})
     },
 
     filters: {
-      enabled: true,
-      search: true,
-      search_fields: [],
-      fields: [],
+      ...DEFAULT_FILTERS,
       ...(schema.filters || {})
     },
 
     pagination: {
-      enabled: true,
-      page_size: 10,
-      page_size_options: [5, 10, 20, 50, 100],
-      default_ordering: '-id',
+      ...DEFAULT_PAGINATION,
       ...(schema.pagination || {})
     },
 
     pdf: {
-      enabled: true,
-      detail: true,
-      list: true,
+      ...DEFAULT_PDF,
       ...(schema.pdf || {})
     },
 

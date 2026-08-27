@@ -1,8 +1,6 @@
-
-
+import CryptoJS from 'crypto-js'
 
 function base64url (source) {
-  const CryptoJS = require('crypto-js')
   // Encode in classical base64
   let encodedSource = CryptoJS.enc.Base64.stringify(source)
 
@@ -22,8 +20,6 @@ export const createToken = (data, secret) => {
   if (!secret) {
     throw new Error('createToken: a secret must be provided explicitly (do not sign tokens client-side with a hardcoded secret)')
   }
-  // const base64url = require('base64url');
-  const CryptoJS = require('crypto-js')
   const header = {
     alg: 'HS256',
     typ: 'JWT'

@@ -17,8 +17,8 @@
           v-if="
             has('delete') &&
             User.can(
-              'delete_' +
-              (store.model || '').toLowerCase()
+              store.permissions?.delete ||
+              'delete_' + (store.model || '').toLowerCase()
             )
           "
           v-show="isEdit"
@@ -64,8 +64,8 @@
           v-if="
             has('edit') &&
             User.can(
-              'change_' +
-              (store.model || '').toLowerCase()
+              store.permissions?.change ||
+              'change_' + (store.model || '').toLowerCase()
             )
           "
           v-show="isEdit"
@@ -83,8 +83,8 @@
           v-if="
             has('save') &&
             User.can(
-              'add_' +
-              (store.model || '').toLowerCase()
+              store.permissions?.add ||
+              'add_' + (store.model || '').toLowerCase()
             )
           "
           v-show="!isEdit"

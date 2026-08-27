@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 
 import { useActionStore } from '../../stores/ActionStore'
 import { useUserStore } from '../../stores/UserStore'
+import { DEFAULT_UI, DEFAULT_PAGINATION, DEFAULT_PDF } from '../../utils/schema'
 
 
 const User =useUserStore()
@@ -156,28 +157,21 @@ const permissions = computed(() => ({
 }))
 
 const schemaUi = computed(() => ({
+  ...DEFAULT_UI,
+  ...(props.schema?.ui || {}),
   title: props.schema?.ui?.title || props.model,
-  crud: props.schema?.ui?.crud ?? props.config?.crud ?? true,
-  dense: props.schema?.ui?.dense ?? true,
-  striped: props.schema?.ui?.striped ?? true,
-  show_search: props.schema?.ui?.show_search ?? true,
-  show_filters: props.schema?.ui?.show_filters ?? true,
-  show_columns: props.schema?.ui?.show_columns ?? true,
-  show_refresh: props.schema?.ui?.show_refresh ?? true,
-  show_pdf: props.schema?.ui?.show_pdf ?? true,
-  show_pdf_list: props.schema?.ui?.show_pdf_list ?? true
+  crud: props.schema?.ui?.crud ?? props.config?.crud ?? DEFAULT_UI.crud
 }))
 
 const schemaPdf = computed(() => ({
-  enabled: props.schema?.pdf?.enabled ?? true,
-  detail: props.schema?.pdf?.detail ?? true,
-  list: props.schema?.pdf?.list ?? true,
+  ...DEFAULT_PDF,
+  ...(props.schema?.pdf || {}),
   detail_permission: props.schema?.pdf?.detail_permission || permissions.value.pdf,
   list_permission: props.schema?.pdf?.list_permission || permissions.value.pdf_list
 }))
 
 const rowsPerPageOptions = computed(() =>
-  props.schema?.pagination?.page_size_options || [10, 20, 50, 100, 200, 500, 1000, 0]
+  props.schema?.pagination?.page_size_options || DEFAULT_PAGINATION.page_size_options
 )
 
 function can(permission) {

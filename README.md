@@ -61,7 +61,6 @@ npm install quasar_resaas
 * 🔐 **Tenant-aware HTTP client** — `HTTPAuth` / `HTTPClient` (axios) attach `Authorization`, `X-RESAAS-Context` and `L` on every request automatically
 * 🌍 **Built-in i18n** — `tdc()` translation helper, backed by the same cascade as `django_resaas`
 * 📄 **PDF preview** — `PdfRender` / `PdfRenderPro` for backend-generated documents (invoices, reports, lists)
-* 🖱️ **Drag & drop** — `vuedraggable` / `vue-draggable-plus` for reorderable menus and form builders
 * 🧩 **Ready layouts & pages** — `MainLayout`, `AuthLayout`, `CrudPage`, plus scaffolded list/edit/view pages for entity, branch, user, group, permission, employee
 * 📖 **Self-hosted documentation site** — `docsRoutes` renders the `docs/` folder itself (this README's linked pages) as navigable screens inside the host app, under its own `MainLayout`
 * 🔑 **Auth boot** — JWT login flow, token storage/refresh, encrypted local storage (`crypto-js`)
@@ -229,9 +228,9 @@ The `components/engine/*` set (`InputComponent`, `SelectComponent`, `DateCompone
 ```js
 import { createBaseStore } from 'quasar_resaas'
 
-export const useEmployeeStore = createBaseStore({
-  resource: 'employees',
-  app: 'hr'
+export const useEmployeeStore = createBaseStore('employee', {
+  app: 'hr',
+  model: 'Employee'
 })
 ```
 
@@ -249,7 +248,6 @@ Gives the resource list/pagination/filters, current item, and create/update/dele
 | HTTP | `axios` |
 | PDF | `pdfjs-dist` |
 | Docs rendering | `marked` |
-| Drag & drop | `vuedraggable`, `vue-draggable-plus` |
 | Storage security | `crypto-js` |
 | Misc | `figlet` (CLI banners) |
 

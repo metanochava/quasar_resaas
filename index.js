@@ -53,6 +53,7 @@ export * from './utils/autoForm.js'
 export * from './utils/json.js'
 export * from './utils/text.js'
 export * from './utils/profile.js'
+export * from './utils/schema.js'
 
 
 // =========================================================
@@ -85,6 +86,9 @@ export * from './services/routing.js'
 
 // Token
 export * from './services/token.js'
+
+// Tenant context
+export * from './services/tenantContext.js'
 
 
 // =========================================================
