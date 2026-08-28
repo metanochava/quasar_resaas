@@ -4,6 +4,7 @@
 
     <s-card
       flat
+      square
       class="text-center bg-transparent login-card"
     >
 

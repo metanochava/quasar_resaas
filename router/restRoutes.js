@@ -7,6 +7,21 @@ import { employeeRoutes } from '../pages/employee/employeeRoute'
 import { groupRoutes } from '../pages/group/groupRoute'
 import { branchRoutes } from '../pages/branch/branchRoute'
 import { permissionRoutes } from '../pages/permission/permissionRoute'
+import { departmentRoutes } from '../pages/department/departmentRoute'
+import { job_positionRoutes } from '../pages/job_position/job_positionRoute'
+import { contractRoutes } from '../pages/contract/contractRoute'
+import { specialtyRoutes } from '../pages/specialty/specialtyRoute'
+import { employee_specialtyRoutes } from '../pages/employee_specialty/employee_specialtyRoute'
+import { shiftRoutes } from '../pages/shift/shiftRoute'
+import { employee_shiftRoutes } from '../pages/employee_shift/employee_shiftRoute'
+import { shift_scheduleRoutes } from '../pages/shift_schedule/shift_scheduleRoute'
+import { attendanceRoutes } from '../pages/attendance/attendanceRoute'
+import { salary_componentRoutes } from '../pages/salary_component/salary_componentRoute'
+import { employee_salaryRoutes } from '../pages/employee_salary/employee_salaryRoute'
+import { payroll_periodRoutes } from '../pages/payroll_period/payroll_periodRoute'
+import { payrollRoutes } from '../pages/payroll/payrollRoute'
+import { payroll_itemRoutes } from '../pages/payroll_item/payroll_itemRoute'
+import { payslipRoutes } from '../pages/payslip/payslipRoute'
 import { tdc } from '../services/translation'
 import { docsRoutes } from './docsRoutes'
 
@@ -60,5 +75,20 @@ export let restRoutes = [
   ...userRoutes,
   ...permissionRoutes,
   ...employeeRoutes,
+  ...departmentRoutes,
+  ...job_positionRoutes,
+  ...contractRoutes,
+  ...specialtyRoutes,
+  ...employee_specialtyRoutes,
+  ...shiftRoutes,
+  ...employee_shiftRoutes,
+  ...shift_scheduleRoutes,
+  ...attendanceRoutes,
+  ...salary_componentRoutes,
+  ...employee_salaryRoutes,
+  ...payroll_periodRoutes,
+  ...payrollRoutes,
+  ...payroll_itemRoutes,
+  ...payslipRoutes,
 ]
 
