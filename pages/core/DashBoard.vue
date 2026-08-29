@@ -128,17 +128,17 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
 
-import { useUserStore } from '../../stores/UserStore'
+import { useBranchStore } from '../../stores/BranchStore'
 import { useGroupStore } from '../../stores/GroupStore'
 import { usePermissionStore } from '../../stores/PermissionStore'
-import { useBranchStore } from '../../stores/BranchStore'
+import { useUserStore } from '../../stores/UserStore'
 
 const router = useRouter()
 
-const User = useUserStore()
+const Branch = useBranchStore()
 const Group = useGroupStore()
 const Permission = usePermissionStore()
-const Branch = useBranchStore()
+const User = useUserStore()
 
 const loading = ref(true)
 

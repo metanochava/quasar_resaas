@@ -123,16 +123,16 @@ import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
 import { HTTPAuth, url } from '../../services/api'
 
+import { useBranchStore } from '../../stores/BranchStore'
 import { useEntityStore } from '../../stores/EntityStore'
 import { useEntityTypeStore } from '../../stores/EntityTypeStore'
-import { useBranchStore } from '../../stores/BranchStore'
 import { useUserStore } from '../../stores/UserStore'
 
 const router = useRouter()
 
+const Branch = useBranchStore()
 const Entity = useEntityStore()
 const EntityType = useEntityTypeStore()
-const Branch = useBranchStore()
 const User = useUserStore()
 
 const loading = ref(true)
