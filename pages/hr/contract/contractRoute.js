@@ -1,4 +1,4 @@
-import { tdc } from '../../../../services/translation.js'
+import { tdc } from '../../../services/translation.js'
 
 export let contractRoutes = [
   {

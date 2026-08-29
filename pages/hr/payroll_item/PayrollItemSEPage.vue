@@ -18,8 +18,8 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { usePayrollItemStore } from '../../stores/PayrollItemStore'
-import FormTwo from '../../components/auto/FormTwo.vue'
+import { usePayrollItemStore } from '../../../stores/PayrollItemStore'
+import FormTwo from '../../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()

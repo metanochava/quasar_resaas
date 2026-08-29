@@ -18,8 +18,8 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEmployeeShiftStore } from '../../stores/EmployeeShiftStore'
-import FormTwo from '../../components/auto/FormTwo.vue'
+import { useEmployeeShiftStore } from '../../../stores/EmployeeShiftStore'
+import FormTwo from '../../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
