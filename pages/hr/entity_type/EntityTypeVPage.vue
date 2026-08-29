@@ -1,35 +1,16 @@
 <template>
-  
-  <q-page class="q-pa-sm">
-
-
-      <q-dialog v-model="openGroups" persistent full-height full-width>
-        <GroupManager  :entityId="Entity.form?.id" />
-      </q-dialog>
-
+  <q-page class=" q-pa-sm ">
     <!-- FORM -->
-    <div v-if="Entity.loading" class="flex flex-center q-pa-lg">
+    <div v-if="EntityType.loading" class="flex flex-center q-pa-lg">
       <q-spinner size="40px" color="primary" />
     </div>
     <FormTwo
       v-else
-      :store="Entity"
+      :store="EntityType"
       :ignore-fields="ignoreFields"
       @saved="onSaved"
-    >
+    />
 
-      <template #right v-if="Entity.form?.id">
-          <s-card class="q-pa-0 q-gutter-sm " flat>
-            <s-btn @click="openGroups = !openGroups" label="Groups" color="primary" class="full-width" />
-          </s-card>
-        </template>
-
-        <template #footer v-if="Entity.form?.id">
-          
-        </template>
-
-    </FormTwo>
- 
   </q-page>
 </template>
 
@@ -37,23 +18,18 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntityStore } from '../../stores/EntityStore'
+import { useEntityTypeStore } from '../../../stores/EntityTypeStore.js'
 import FormTwo from '../../components/auto/FormTwo.vue'
-
-
-
-import GroupManager from '../hr/group/GroupManagerEntity.vue'
-
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const Entity = useEntityStore()
+const EntityType = useEntityTypeStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
-const openGroups = ref(false)
+
 const ignoreFields = [
   'id',
   'created_at',
@@ -74,17 +50,18 @@ async function load(id) {
 
   if (!id) {
 
-    Entity.resetForm?.()
+    EntityType.resetForm?.()
     return
   }
+
 
   // 🔥 avoids duplicate calls with a safe comparison
-  if (String(Entity.row?.id) === String(id)) {
-    Entity.form = Entity.row 
+  if (String(EntityType.row?.id) === String(id)) {
+    EntityType.form = EntityType.row 
     return
   }
 
-  Entity.row =  await Entity.getById(id)
+  EntityType.row =  await EntityType.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -92,7 +69,7 @@ async function init() {
   try {
     ready.value = false
 
-    await Entity.init()
+    await EntityType.init()
 
     const id = route.params.id
     await load(id)
