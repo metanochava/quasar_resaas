@@ -63,7 +63,7 @@ import FormTwo from '../../components/auto/FormTwo.vue'
 
 import ModelManager from './ModelManager.vue'
 import AppManager from './AppManager.vue'
-import GroupManager from '../hr/group/GroupManagerEntityType.vue'
+import GroupManager from '../group/GroupManagerEntityType.vue'
 import { tdc } from '../../services/translation'
 
 

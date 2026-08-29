@@ -42,7 +42,7 @@ import FormTwo from '../../components/auto/FormTwo.vue'
 
 
 
-import GroupManager from '../hr/group/GroupManagerEntity.vue'
+import GroupManager from '../group/GroupManagerEntity.vue'
 
 
 // ---------------- ROUTE ----------------

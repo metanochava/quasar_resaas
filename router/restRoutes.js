@@ -1,10 +1,10 @@
 
 
 import { entityRoutes } from './../pages/entity/entityRoute'
-import { entity_typeRoutes } from '../pages/hr/entity_type/entity_typeRoute'
+import { entity_typeRoutes } from '../pages/entity_type/entity_typeRoute.js'
 import { userRoutes } from '../pages/user/userRoute'
 import { employeeRoutes } from '../pages/hr/employee/employeeRoute'
-import { groupRoutes } from '../pages/hr/group/groupRoute'
+import { groupRoutes } from '../pages/group/groupRoute.ts'
 import { branchRoutes } from '../pages/branch/branchRoute'
 import { permissionRoutes } from '../pages/permission/permissionRoute'
 import { departmentRoutes } from '../pages/hr/department/departmentRoute'

@@ -18,7 +18,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEntityTypeStore } from '../../../stores/EntityTypeStore.js'
+import { useEntityTypeStore } from '../../stores/EntityTypeStore.js'
 import FormTwo from '../../components/auto/FormTwo.vue'
 
 // ---------------- ROUTE ----------------

@@ -1,4 +1,4 @@
-import { tdc } from '../../services/translation'
+import { tdc } from '../../../services/translation'
 
 export let attendanceRoutes = [
   {
