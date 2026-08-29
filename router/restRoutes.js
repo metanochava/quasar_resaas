@@ -71,6 +71,28 @@ export let restRoutes = [
     } 
   },
   { 
+    path: '/view_django_resaas_dashboard', 
+    name: 'view_django_resaas_dashboard', 
+    component: () => import('../pages/django_resaas/DashBoard.vue'), 
+    meta: { 
+      title: tdc('View') + ' ' + tdc('Dashboard'),
+      requiresAuth: true, 
+      icon: 'inventory_2',
+      requiredRole: 'view_django_resaas_dashboard'
+    } 
+  },
+  { 
+    path: '/view_core_dashboard', 
+    name: 'view_core_dashboard', 
+    component: () => import('../pages/core/DashBoard.vue'), 
+    meta: { 
+      title: tdc('View') + ' ' + tdc('Dashboard'),
+      requiresAuth: true, 
+      icon: 'inventory_2',
+      requiredRole: 'view_core_dashboard'
+    } 
+  },
+  { 
     path: '/route/:route/:id', 
     name: 'route_inexistente', 
     component: () => import('../pages/RotaEnexistente.vue'), 
