@@ -20,7 +20,7 @@
     :config="config"
     @request="onRequest"
     @create="openCreate"
-    @PDF="openPdf"
+    @pdf="openPdf"
     @pdfList="openPdfList"
     @edit="openEdit"
     @delete="onDelete"
