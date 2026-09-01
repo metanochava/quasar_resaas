@@ -101,8 +101,8 @@
       <s-card flat bordered>
         <q-card-section>
           <div class="text-subtitle1 text-weight-medium q-mb-sm">{{ tdc('Quick Access') }}</div>
-          <div class="row q-col-gutter-sm">
-            <q-btn
+          <div class="row q-gutter-sm">
+            <s-btn
               v-for="link in quickLinks" :key="link.route"
               outline no-caps color="primary"
               :icon="link.icon" :label="tdc(link.label)"
