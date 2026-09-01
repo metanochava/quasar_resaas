@@ -267,14 +267,16 @@ export function createBaseStore(name, config, extend = {}) {
       getForm(){
         return this.form
       },
-      async getById(id) {
+      async getById(id, options = {}) {
         this.assertConfig()
 
         await this.runHook('beforeGet', id)
 
         if (!id) return
 
-        if (this.row?.id === id) return this.row
+        const { force = false } = options
+
+        if (!force && this.row?.id === id) return this.row
 
         this.loading = true
 
@@ -293,6 +295,21 @@ export function createBaseStore(name, config, extend = {}) {
         } finally {
           this.loading = false
         }
+      },
+
+      // Clears the cached row so the next getById() re-fetches instead
+      // of returning the cached copy.
+      invalidateRow() {
+        this.row = null
+      },
+
+      // Re-fetches the currently loaded row by id, bypassing the cache -
+      // use after something outside the normal update()/save() flow
+      // (a custom action, a websocket event, ...) may have changed it
+      // server-side.
+      async refreshRow() {
+        if (!this.row?.id) return
+        return await this.getById(this.row.id, { force: true })
       },
 
       // =========================
@@ -314,7 +331,11 @@ export function createBaseStore(name, config, extend = {}) {
           this.row = data
           this.form = { ...data }
 
-          this.rows.unshift(data)
+          // Re-fetch instead of unshift()-ing the new row locally: a
+          // generic store can't know the list's real ordering, active
+          // filters/search, or the current page - only the server does.
+          // This also keeps pagination.rowsNumber correct.
+          await this.loadData()
 
           await this.runHook('afterCreate', data)
 
@@ -328,7 +349,12 @@ export function createBaseStore(name, config, extend = {}) {
       // =========================
       // UPDATE
       // =========================
-      async update() {
+      // `method: 'put'` opts into a full replace when a form is known to
+      // always carry a complete representation of the object; the
+      // default is PATCH, since a custom form only rendering some of
+      // the schema's fields is normal, and PUTting that would ask the
+      // backend to treat every missing field as absent.
+      async update({ method = 'patch' } = {}) {
         this.assertConfig()
 
         const id = this.form?.id
@@ -339,7 +365,9 @@ export function createBaseStore(name, config, extend = {}) {
         this.saving = true
 
         try {
-          const { data } = await HTTPAuth.put(
+          const httpMethod = method === 'put' ? 'put' : 'patch'
+
+          const { data } = await HTTPAuth[httpMethod](
             url({ type: 'u', url: `${this.safeUrl}/${id}/` }),
             this.form
           )
@@ -377,7 +405,11 @@ export function createBaseStore(name, config, extend = {}) {
             url({ type: 'u', url: `${this.safeUrl}/${id}/` })
           )
 
-          this.rows = this.rows.filter(i => i.id !== id)
+          // Re-fetch instead of filtering the row out locally: with the
+          // deleted row gone, the current page can now be short a row
+          // relative to the server's real count/pagination - only a
+          // fresh loadData() gets rowsNumber and the page contents right.
+          await this.loadData()
 
           this.resetForm()
 
@@ -425,9 +457,9 @@ export function createBaseStore(name, config, extend = {}) {
       // =========================
       // SAVE
       // =========================
-      async save() {
+      async save(options = {}) {
         const data =  this.form?.id
-          ? await this.update()
+          ? await this.update(options)
           : await this.create()
 
         return data

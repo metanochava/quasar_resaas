@@ -103,7 +103,12 @@ export function canSchema(User, schema, action) {
 export function resolveActionEndpoint(action, row = null) {
   if (!action?.endpoint) return action?.url || ''
 
-  return action.details && row?.id
+  // "detail" is the conceptual/API name going forward (matches DRF's
+  // own `detail=` kwarg); "details" is what older schema responses
+  // carry - both mean the same thing, see docs/api/schema-contract.md.
+  const isDetailAction = action?.detail ?? action?.details
+
+  return isDetailAction && row?.id
     ? action.endpoint.replace('{id}', row.id)
     : action.endpoint
 }

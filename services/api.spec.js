@@ -89,4 +89,56 @@ describe('url()', () => {
     expect(query.has('filter')).toBe(false)
     expect(query.get('page')).toBe('1')
   })
+
+  it('encodes accented characters correctly', () => {
+    const result = url({
+      type: 'u',
+      url: 'demo/products',
+      params: { search: 'José Silva' },
+    })
+
+    const query = new URL(result).searchParams
+    expect(query.get('search')).toBe('José Silva')
+  })
+
+  it('encodes literal &, =, and ? in param values without corrupting the query string', () => {
+    const result = url({
+      type: 'u',
+      url: 'demo/products',
+      params: { search: 'a&b=c?d' },
+    })
+
+    const query = new URL(result).searchParams
+    expect(query.get('search')).toBe('a&b=c?d')
+    // only the params we actually passed made it into the query string
+    expect([...query.keys()]).toEqual(['format', 'search'])
+  })
+
+  it('keeps falsy-but-meaningful values: 0, false, and an empty string', () => {
+    const result = url({
+      type: 'u',
+      url: 'demo/products',
+      params: { page: 0, active: false, search: '' },
+    })
+
+    const query = new URL(result).searchParams
+    expect(query.has('page')).toBe(true)
+    expect(query.get('page')).toBe('0')
+    expect(query.has('active')).toBe(true)
+    expect(query.get('active')).toBe('false')
+    expect(query.has('search')).toBe(true)
+    expect(query.get('search')).toBe('')
+  })
+
+  it('a realistic multi-value filter set (search with accents + array filter) resolves correctly', () => {
+    const result = url({
+      type: 'u',
+      url: 'demo/products',
+      params: { search: 'José Silva', state: ['Active', 'Pending'] },
+    })
+
+    const query = new URL(result).searchParams
+    expect(query.get('search')).toBe('José Silva')
+    expect(query.getAll('state')).toEqual(['Active', 'Pending'])
+  })
 })
