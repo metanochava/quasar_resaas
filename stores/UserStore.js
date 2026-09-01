@@ -320,6 +320,21 @@ export const useUserStore = createBaseStore(
       return rsp
     },
 
+    async updateProfile(payload) {
+      const id = this.data?.id
+      if (!id) return
+
+      const rsp = await HTTPAuth.patch(
+        url({ type: 'u', url: `django_resaas/users/${id}/`, params: {} }),
+        payload
+      )
+
+      this.data = { ...this.data, ...rsp.data }
+      setStorage('l', 'user', JSON.stringify(this.data), 365)
+
+      return rsp
+    },
+
     async change_password_email(email, antiga, nova) {
       const data = { email: email, password: antiga, passwordNova: nova }
       const rsp = await HTTPAuth.post(url({type: "u", url: "change_password_email/", params: {}}), data )

@@ -232,22 +232,18 @@
             class="menu-actions"
           >
             <s-btn
-              
+
               icon="settings"
               dense
               flat
               color="secondary"
-              :to="{
-                name: 'userDetails',
-                params: {
-                  user_id: User?.id
-                }
-              }"
+              v-close-popup
+              @click="User.toggleSettings()"
             >
               <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
                 {{ tdc('Settings') }}
               </q-tooltip>
-              
+
             </s-btn>
 
             <s-btn
