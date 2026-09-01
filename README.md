@@ -123,7 +123,10 @@ const fields = ref([])
 const formModel = ref({})
 
 async function loadSchema() {
-  fields.value = await buildFormFromSchema({ app: 'hr', model: 'Employee' })
+  // buildFormFromSchema() returns the full result object - fields,
+  // actions, permissions, routes, ui, filters, pagination, pdf, schema
+  const result = await buildFormFromSchema({ app: 'hr', model: 'Employee' })
+  fields.value = result.fields
 }
 ```
 

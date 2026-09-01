@@ -65,5 +65,7 @@ the schema:
 For pages that use a store created with `createBaseStore` (see
 [BaseStore](../stores/base-store.md)), the same schema-fetch-render pattern
 happens inside `store.init()`, and CRUD operations (`loadData`, `getById`,
-`create`, `update`, `remove`) use `this.safeUrl` (derived from `app/model`)
-against the same `HTTPAuth`/`url()`.
+`create`, `update`, `remove`) use `this.safeUrl` against the same
+`HTTPAuth`/`url()`. Once `loadSchema()` has resolved, `safeUrl` prefers the
+schema's own `model.endpoint` over the `app/model` convention - see
+[BaseStore](../stores/base-store.md#immutable-config).

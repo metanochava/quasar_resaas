@@ -1,0 +1,140 @@
+{
+  "schema_version": "1.0",
+  "model": {
+    "app": "sales",
+    "name": "order",
+    "class_name": "Order",
+    "label": "Order",
+    "label_plural": "Orders",
+    "pk": "id",
+    "endpoint": "custom/orders/"
+  },
+  "fields": [
+    {
+      "name": "reference",
+      "type": "CharField",
+      "label": "Reference",
+      "required": true,
+      "max_length": 50
+    },
+    {
+      "name": "confirmed",
+      "type": "BooleanField",
+      "label": "Confirmed",
+      "required": true
+    },
+    {
+      "name": "status",
+      "type": "CharField",
+      "label": "Status",
+      "required": true,
+      "choices": [
+        ["draft", "Draft"],
+        ["confirmed", "Confirmed"],
+        ["cancelled", "Cancelled"]
+      ]
+    },
+    {
+      "name": "customer",
+      "type": "ForeignKey",
+      "label": "Customer",
+      "required": true,
+      "relation": "sales.Customer"
+    },
+    {
+      "name": "due_date",
+      "type": "DateField",
+      "label": "Due Date",
+      "required": false
+    },
+    {
+      "name": "total",
+      "type": "DecimalField",
+      "label": "Total",
+      "required": true
+    }
+  ],
+  "actions": [
+    {
+      "action": "confirm",
+      "app": "sales",
+      "model": "order",
+      "label": "Confirm",
+      "icon": "mdi-check",
+      "tooltip": "Confirm this order",
+      "position": "top",
+      "order": 0,
+      "visible": true,
+      "method": "POST",
+      "methods": ["POST"],
+      "detail": true,
+      "details": true,
+      "url": "confirm",
+      "autorequest": true,
+      "endpoint": "custom/orders/{id}/confirm/",
+      "permission": "confirm_order"
+    }
+  ],
+  "permissions": {
+    "list": "list_order",
+    "view": "view_order",
+    "add": "add_order",
+    "change": "change_order",
+    "delete": "delete_order",
+    "restore": "restore_order",
+    "hard_delete": "hard_delete_order",
+    "pdf": "pdf_order",
+    "pdf_list": "pdf_list_order",
+    "custom": { "confirm": "confirm_order" }
+  },
+  "routes": {
+    "list": "list_order",
+    "add": "add_order",
+    "change": "change_order",
+    "view": "view_order"
+  },
+  "ui": {
+    "title": "Orders",
+    "icon": "mdi-cart",
+    "crud": true,
+    "dense": true,
+    "striped": true,
+    "show_search": true,
+    "show_filters": true,
+    "show_columns": true,
+    "show_refresh": true,
+    "show_pdf": true,
+    "show_pdf_list": true
+  },
+  "filters": {
+    "enabled": true,
+    "search": true,
+    "search_fields": ["reference"],
+    "fields": ["reference", "status", "customer", "due_date", "total"]
+  },
+  "pagination": {
+    "enabled": true,
+    "page_size": 25,
+    "page_size_options": [5, 10, 20, 50, 100, 200, 500, 1000, 0],
+    "default_ordering": "-id"
+  },
+  "pdf": {
+    "enabled": true,
+    "detail": true,
+    "list": true,
+    "detail_permission": "pdf_order",
+    "list_permission": "pdf_list_order",
+    "detail_endpoint": "custom/orders/{id}/pdf/",
+    "list_endpoint": "custom/orders/pdflist/"
+  },
+  "module": "sales",
+  "config": {
+    "crud": true,
+    "routes": {
+      "list": "list_order",
+      "add": "add_order",
+      "change": "change_order",
+      "view": "view_order"
+    }
+  }
+}

@@ -69,3 +69,38 @@ Most resources (like the current `Cargo`) don't have a `RightMenu.vue` and can s
 ## 5. Permissions
 
 `requiredRole` on each route and `:can="User.can"` on `<s-auto-crud>` must match the codenames (`list`, `add`, `change`, `view`, `delete`) the backend exposes for the model — see django_resaas's `security/permissions.md`.
+
+## 6. Custom actions (`@resaas_action`) and refresh
+
+A model whose backend view declares `@resaas_action(...)` (see
+django_resaas's `development/creating-resource.md`) shows up in
+`schema.actions`, and `<s-auto-crud>` (`components/auto/AutoCrud.vue`)
+already knows how to run it - no extra wiring needed:
+
+- it checks `hasPermission(action.permission)` before showing/running it;
+- it resolves the URL via `resolveActionEndpoint(action, row)` -
+  `.../{id}/confirm/` for a `detail: true` action, `.../export/` for a
+  collection-level one;
+- it uses `action.method` **as-is** (the single, unambiguous method the
+  backend already resolved - never re-derived or guessed from the
+  action's name);
+- when `action.autorequest` is `true`, it fires the request itself and
+  then reloads the list (`loadData()`).
+
+If the same store also backs a **detail** view showing a single record
+(`store.row`, via `getById()`), that view stays in sync separately, using
+the exact same primitives `AutoCrud`'s list refresh uses under the hood -
+see [BaseStore](../stores/base-store.md#main-actions):
+
+```js
+// after a custom action changes the record this page is showing
+await store.refreshRow()          // row-only: re-fetches store.row, forced
+// or, if the list on screen also needs to reflect it:
+await store.loadData()            // list-only
+// or both, independently:
+await Promise.all([store.refreshRow(), store.loadData()])
+```
+
+No new "refresh" metadata was introduced for this - `refreshRow()`,
+`invalidateRow()` and `loadData()` are the same general-purpose primitives
+every other store action already uses.

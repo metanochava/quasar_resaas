@@ -47,6 +47,7 @@ export function createBaseStore(name, config, extend = {}) {
         config: {},
         permissions: {},
         pdfConfig: {},
+        paginationConfig: {},
 
         search: '',
         filters: {},
@@ -92,12 +93,18 @@ export function createBaseStore(name, config, extend = {}) {
       // =========================
       // 🔍 SEARCH
       // =========================
+      // Changing search/filters resets to page 1: a page number that made
+      // sense under the old criteria can easily be out of range (or just
+      // showing the wrong slice) under the new one - see the FILTERS
+      // actions below for the same reasoning.
       setSearch(search) {
         this.search = search
+        this.pagination.page = 1
       },
 
       clearSearch() {
         this.search = ''
+        this.pagination.page = 1
       },
 
       // =========================
@@ -105,6 +112,7 @@ export function createBaseStore(name, config, extend = {}) {
       // =========================
       setFilters(filters = {}) {
         this.filters = { ...filters }
+        this.pagination.page = 1
       },
 
       updateFilter(key, value) {
@@ -112,16 +120,19 @@ export function createBaseStore(name, config, extend = {}) {
           ...this.filters,
           [key]: value
         }
+        this.pagination.page = 1
       },
 
       removeFilter(key) {
         const newFilters = { ...this.filters }
         delete newFilters[key]
         this.filters = newFilters
+        this.pagination.page = 1
       },
 
       clearFilters() {
         this.filters = {}
+        this.pagination.page = 1
       },
 
       // =========================
@@ -201,6 +212,14 @@ export function createBaseStore(name, config, extend = {}) {
         this.permissions = rsp?.permissions || {}
         this.pdfConfig = rsp?.pdf || {}
         this.schemaEndpoint = rsp?.schema?.model?.endpoint || null
+
+        // schema.pagination (page_size, page_size_options, default_ordering)
+        // was being silently dropped - the backend is supposed to be the
+        // authority here too, so seed the live pagination cursor from it.
+        this.paginationConfig = rsp?.pagination || {}
+        if (this.paginationConfig.page_size) {
+          this.pagination.rowsPerPage = this.paginationConfig.page_size
+        }
 
         await this.runHook('afterSchema', this.fields)
       },
@@ -404,6 +423,15 @@ export function createBaseStore(name, config, extend = {}) {
           await HTTPAuth.delete(
             url({ type: 'u', url: `${this.safeUrl}/${id}/` })
           )
+
+          // If this was the last row on a page beyond the first, step
+          // back a page BEFORE reloading: the default DRF paginator
+          // returns 404 "Invalid page" for a page number past the new
+          // last page, so re-requesting the now-empty current page
+          // would turn a successful delete into a thrown error.
+          if (this.rows.length <= 1 && this.pagination.page > 1) {
+            this.pagination.page -= 1
+          }
 
           // Re-fetch instead of filtering the row out locally: with the
           // deleted row gone, the current page can now be short a row

@@ -15,8 +15,16 @@ export const url = (payload = { type: 'u', url: '', params: {} }) => {
   const entityType = useUserStore()?.EntityType?.name?.toLowerCase()
   let finalUrl = apiBaseUrl
 
+  // strip a leading slash the caller's path might carry, so
+  // "demo/products/" and "/demo/products/" both join onto apiBaseUrl
+  // with exactly one slash, never two. The trailing slash is NOT
+  // touched - DRF's routers require it (APPEND_SLASH), so every
+  // existing caller already includes it deliberately for detail/list
+  // endpoints ("demo/products/42/", "demo/products/42/archive/", ...).
+  const path = String(payload.url || '').replace(/^\/+/, '')
+
   if (payload.type === 'nu') finalUrl += `/${entityType}`
-  finalUrl += `/${payload.url}`
+  finalUrl += `/${path}`
 
   // URLSearchParams (not manual string concatenation) so encoding is
   // always correct - spaces, special characters, and arrays (appended

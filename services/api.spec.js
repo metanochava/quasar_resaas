@@ -141,4 +141,72 @@ describe('url()', () => {
     expect(query.get('search')).toBe('José Silva')
     expect(query.getAll('state')).toEqual(['Active', 'Pending'])
   })
+
+  it('encodes #, +, %, and / in param values without corrupting the query string', () => {
+    const result = url({
+      type: 'u',
+      url: 'demo/products',
+      params: { search: 'a#b+c%d/e' },
+    })
+
+    const query = new URL(result).searchParams
+    expect(query.get('search')).toBe('a#b+c%d/e')
+    expect([...query.keys()]).toEqual(['format', 'search'])
+  })
+
+  it('keeps a literal boolean true value', () => {
+    const result = url({
+      type: 'u',
+      url: 'demo/products',
+      params: { active: true },
+    })
+
+    const query = new URL(result).searchParams
+    expect(query.get('active')).toBe('true')
+  })
+
+  it('an empty array param contributes no keys at all (deterministic no-op)', () => {
+    const result = url({
+      type: 'u',
+      url: 'demo/products',
+      params: { status: [] },
+    })
+
+    const query = new URL(result).searchParams
+    expect(query.has('status')).toBe(false)
+    expect([...query.keys()]).toEqual(['format'])
+  })
+
+  it('a plain string param produces the expected ?key=value', () => {
+    const result = url({
+      type: 'u',
+      url: 'demo/products',
+      params: { search: 'produto' },
+    })
+
+    expect(result).toBe(
+      'https://api.test/v1/demo/products?format=json&search=produto'
+    )
+  })
+})
+
+describe('url() - path building (no duplicate/missing slashes)', () => {
+  it('a path with a trailing slash, no trailing slash, and a stray leading slash all resolve to the same base', () => {
+    const withTrailing = url({ type: 'u', url: 'demo/products/', params: {} })
+    const withLeading = url({ type: 'u', url: '/demo/products/', params: {} })
+
+    // both join onto apiBaseUrl with exactly one slash - no "//" anywhere
+    // past the protocol, and the meaningful trailing slash (DRF's
+    // APPEND_SLASH) is preserved either way
+    expect(withTrailing).not.toMatch(/[^:]\/\//)
+    expect(withLeading).not.toMatch(/[^:]\/\//)
+    expect(withTrailing).toBe(withLeading)
+    expect(withTrailing).toBe('https://api.test/v1/demo/products/?format=json')
+  })
+
+  it('a detail URL built from a trailing-slash-free safeUrl never doubles the slash', () => {
+    // mirrors how base_store.js builds `${this.safeUrl}/${id}/`
+    const result = url({ type: 'u', url: 'demo/products/42/', params: {} })
+    expect(result).not.toMatch(/[^:]\/\//)
+  })
 })

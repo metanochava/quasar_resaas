@@ -106,17 +106,46 @@ describe('schemaPermission / canSchema', () => {
 })
 
 describe('resolveActionEndpoint', () => {
-  it('substitutes {id} for a detail action', () => {
+  it('substitutes {id} for a detail action (legacy "details" key)', () => {
     const action = { details: true, endpoint: 'demo/products/{id}/archive/' }
     expect(resolveActionEndpoint(action, { id: '42' })).toBe(
       'demo/products/42/archive/'
     )
   })
 
-  it('leaves a non-detail action endpoint untouched', () => {
+  it('leaves a non-detail action endpoint untouched (legacy "details" key)', () => {
     const action = { details: false, endpoint: 'demo/products/export/' }
     expect(resolveActionEndpoint(action, { id: '42' })).toBe(
       'demo/products/export/'
+    )
+  })
+
+  it('substitutes {id} using the "detail" key (current schema contract)', () => {
+    const action = {
+      detail: true, details: true, endpoint: 'demo/products/{id}/archive/',
+    }
+    expect(resolveActionEndpoint(action, { id: '42' })).toBe(
+      'demo/products/42/archive/'
+    )
+  })
+
+  it('a full decorator -> ModelExtraAction -> schema -> frontend action resolves consistently', () => {
+    // shape exactly as ResaasSchemaBuilder.build_actions() produces it for
+    // @resaas_action(detail=True, ...) - see docs/api/schema-contract.md
+    const action = {
+      action: 'archive',
+      detail: true,
+      details: true,
+      method: 'POST',
+      methods: ['POST'],
+      endpoint: 'demo/products/{id}/archive/',
+      permission: 'archive_product',
+    }
+
+    expect(action.detail).toBe(true)
+    expect(action.detail).toBe(action.details)
+    expect(resolveActionEndpoint(action, { id: '99' })).toBe(
+      'demo/products/99/archive/'
     )
   })
 
