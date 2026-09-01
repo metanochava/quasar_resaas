@@ -365,10 +365,10 @@ async function onRunAction(action, row) {
   const actionUrl = resolveActionEndpoint(action, row)
   if (!actionUrl) return
 
-  const method = (action.method || 'POST')
-    .split(',')[0]
-    .trim()
-    .toUpperCase()
+  // action.method is already the single, unambiguous primary method
+  // resolved by the backend (ResaasSchemaBuilder.build_actions) - the
+  // frontend just trusts it instead of re-deriving it locally.
+  const method = String(action.method || 'POST').trim().toUpperCase()
 
   if (method === 'GET') {
     await HTTPAuth.get(endpoint(actionUrl))

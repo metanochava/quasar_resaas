@@ -28,6 +28,70 @@ function makeBlobResponse() {
   return { data: new Blob(['%PDF-1.4'], { type: 'application/pdf' }) }
 }
 
+describe('createBaseStore - safeUrl authority', () => {
+  it('falls back to the {app}/{model}s convention before the schema loads', () => {
+    const useProductStore = createBaseStore('product-url-fallback', {
+      app: 'demo',
+      model: 'Product',
+    })
+    const store = useProductStore()
+
+    expect(store.safeUrl).toBe('demo/products')
+  })
+
+  it('prefers schema.model.endpoint once loadSchema() resolves', async () => {
+    buildFormFromSchema.mockResolvedValue({
+      fields: [], actions: [], config: {}, permissions: {}, pdf: {},
+      schema: { model: { endpoint: 'demo/products/' } },
+    })
+
+    const useProductStore = createBaseStore('product-url-schema', {
+      app: 'demo',
+      model: 'Product',
+    })
+    const store = useProductStore()
+
+    await store.loadSchema()
+
+    // trailing slash from the backend's convention is normalized away so
+    // every action's own `${safeUrl}/...` concatenation stays correct
+    expect(store.safeUrl).toBe('demo/products')
+  })
+
+  it('a differently-shaped schema endpoint is honored verbatim (minus trailing slash)', async () => {
+    buildFormFromSchema.mockResolvedValue({
+      fields: [], actions: [], config: {}, permissions: {}, pdf: {},
+      schema: { model: { endpoint: 'custom/path/products/' } },
+    })
+
+    const useProductStore = createBaseStore('product-url-custom', {
+      app: 'demo',
+      model: 'Product',
+    })
+    const store = useProductStore()
+
+    await store.loadSchema()
+
+    expect(store.safeUrl).toBe('custom/path/products')
+  })
+
+  it('keeps the convention fallback when the schema response has no model.endpoint', async () => {
+    buildFormFromSchema.mockResolvedValue({
+      fields: [], actions: [], config: {}, permissions: {}, pdf: {},
+    })
+
+    const useProductStore = createBaseStore('product-url-no-schema-field', {
+      app: 'demo',
+      model: 'Product',
+    })
+    const store = useProductStore()
+
+    await store.loadSchema()
+
+    expect(store.safeUrl).toBe('demo/products')
+  })
+})
+
 describe('createBaseStore - schema-derived permissions/pdf config', () => {
   it('loadSchema captures permissions and pdf config from the schema response', async () => {
     buildFormFromSchema.mockResolvedValue({

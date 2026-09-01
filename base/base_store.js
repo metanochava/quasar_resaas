@@ -32,6 +32,10 @@ export function createBaseStore(name, config, extend = {}) {
         saving: false,
 
         _schemaLoaded: false,
+        // set from schema.model.endpoint once loadSchema() resolves;
+        // the safeUrl getter below prefers this over the app/model
+        // convention whenever it's available
+        schemaEndpoint: null,
         fields: [],
         rows: [],
         showPdf: false,
@@ -63,7 +67,16 @@ export function createBaseStore(name, config, extend = {}) {
     getters: {
       safeApp: (state) => state._config.app,
       safeModel: (state) => state._config.model,
-      safeUrl: (state) => state._config.url,
+
+      // Single authority for the resource's base URL. Once the schema
+      // has been loaded, `schema.model.endpoint` (the backend's own
+      // resolved endpoint - see ResaasSchemaBuilder.build_model) wins;
+      // the `{app}/{model}s` convention only remains a fallback for
+      // stores that never call loadSchema()/init(). Every action below
+      // goes through this getter, so there's exactly one place that
+      // knows this rule.
+      safeUrl: (state) =>
+        (state.schemaEndpoint || state._config.url).replace(/\/+$/, ''),
 
       item: (state) => state.row,
       items: (state) => state.rows,
@@ -187,6 +200,7 @@ export function createBaseStore(name, config, extend = {}) {
         this.config = rsp?.config || {}
         this.permissions = rsp?.permissions || {}
         this.pdfConfig = rsp?.pdf || {}
+        this.schemaEndpoint = rsp?.schema?.model?.endpoint || null
 
         await this.runHook('afterSchema', this.fields)
       },

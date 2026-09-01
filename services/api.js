@@ -16,14 +16,28 @@ export const url = (payload = { type: 'u', url: '', params: {} }) => {
   let finalUrl = apiBaseUrl
 
   if (payload.type === 'nu') finalUrl += `/${entityType}`
-  finalUrl += `/${payload.url}?format=json`
+  finalUrl += `/${payload.url}`
+
+  // URLSearchParams (not manual string concatenation) so encoding is
+  // always correct - spaces, special characters, and arrays (appended
+  // as repeated `key=value` pairs, the convention DRF/django-filter
+  // expect for multi-value filters) all come out right.
+  const query = new URLSearchParams({ format: 'json' })
 
   Object.entries(payload.params || {}).forEach(([key, value]) => {
-    if (value !== undefined && value !== null)
-      finalUrl += `&${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    if (value === undefined || value === null) return
+
+    if (Array.isArray(value)) {
+      value.forEach(item => {
+        if (item !== undefined && item !== null) query.append(key, item)
+      })
+      return
+    }
+
+    query.append(key, value)
   })
 
-  return finalUrl
+  return `${finalUrl}?${query.toString()}`
 }
 
 const createClient = (auth = false, blob = false) => {
