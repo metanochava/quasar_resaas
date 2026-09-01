@@ -337,13 +337,13 @@ export const useUserStore = createBaseStore(
 
     async change_password_email(email, antiga, nova) {
       const data = { email: email, password: antiga, passwordNova: nova }
-      const rsp = await HTTPAuth.post(url({type: "u", url: "change_password_email/", params: {}}), data )
+      const rsp = await HTTPAuth.post(url({type: "u", url: "password/change/email/", params: {}}), data )
       return rsp
     },
 
     async change_password_numero(mobile, otp, nova) {
       const data = { mobile: mobile, otp: otp, password: nova }
-      const rsp = await HTTPAuth.post(url({type: "u", url: "change_password_email/", params: {}}), data )
+      const rsp = await HTTPAuth.post(url({type: "u", url: "password/change/mobile/", params: {}}), data )
       return rsp
     },
 
