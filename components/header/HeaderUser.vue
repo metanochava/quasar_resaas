@@ -247,7 +247,20 @@
             </s-btn>
 
             <s-btn
-              
+              icon="palette"
+              dense
+              flat
+              color="secondary"
+              v-close-popup
+              @click="User.toggleThemeStudio()"
+            >
+              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+                {{ tdc('Appearance') }}
+              </q-tooltip>
+            </s-btn>
+
+            <s-btn
+
               icon="logout"
               dense
               flat

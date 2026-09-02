@@ -37,7 +37,13 @@ export const useUserStore = createBaseStore(
     Menus: [],
     search: '',
     AllMenus: [],
+    // Settings: the logged-in user's own account modal (profile/security).
+    // ThemeStudio: the entity-wide layout/branding modal. Deliberately
+    // separate booleans/dialogs - one is "my account", the other is
+    // "how this entity looks for everyone" (see components/
+    // UserAccountModal.vue vs components/DefinicoesLayout.vue).
     Settings: false,
+    ThemeStudio: false,
     Permissions: new Set(),
     access: null,
     refresh: null,
@@ -261,6 +267,9 @@ export const useUserStore = createBaseStore(
     toggleSettings(){
       this.Settings = !this.Settings
       setStorage('l', 'settings', this.Settings)
+    },
+    toggleThemeStudio(){
+      this.ThemeStudio = !this.ThemeStudio
     },
     toggleLeftTop(){
       this.LeftTop = !this.LeftTop

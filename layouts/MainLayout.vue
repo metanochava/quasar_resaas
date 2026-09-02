@@ -9,7 +9,13 @@
       <PagePermissoes />
     </q-dialog>
 
+    <!-- logged-in user's own account (profile/security) -->
     <q-dialog v-model="User.Settings" full-width full-height>
+      <UserAccountModal />
+    </q-dialog>
+
+    <!-- entity-wide layout/branding (Theme Studio) -->
+    <q-dialog v-model="User.ThemeStudio" full-width full-height>
       <DefinicoesLayout />
     </q-dialog>
 
@@ -153,6 +159,7 @@ import { barStyle, thumbStyle } from '../services/app'
 import UserPermissioes from '../components/UserPermissioes.vue'
 import PagePermissoes from '../components/PagePermissoes.vue'
 import DefinicoesLayout from '../components/DefinicoesLayout.vue'
+import UserAccountModal from '../components/UserAccountModal.vue'
 
 export default defineComponent({
   components: {
@@ -169,7 +176,8 @@ export default defineComponent({
     Rodape,
     UserPermissioes,
     PagePermissoes,
-    DefinicoesLayout
+    DefinicoesLayout,
+    UserAccountModal
   },
 
   setup() {

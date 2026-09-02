@@ -1,29 +1,27 @@
 <template>
   <s-card class="theme-studio-engine">
     <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
-      <div class="text-h6">{{ barTitle }}</div>
+      <div class="text-h6">🎨 Theme Studio</div>
 
       <q-space />
 
-      <template v-if="isAppearanceTab">
-        <s-switch
-          v-model="darkMode"
-          label="Dark"
-          @update:model-value="applyDarkMode"
-        />
+      <s-switch
+        v-model="darkMode"
+        label="Dark"
+        @update:model-value="applyDarkMode"
+      />
 
-        <s-btn-toggle
-          v-model="previewMode"
-          dense
-          toggle-color="white"
-          :options="[
-            { label: 'Desktop', value: 'desktop' },
-            { label: 'Mobile', value: 'mobile' }
-          ]"
-        />
+      <s-btn-toggle
+        v-model="previewMode"
+        dense
+        toggle-color="white"
+        :options="[
+          { label: 'Desktop', value: 'desktop' },
+          { label: 'Mobile', value: 'mobile' }
+        ]"
+      />
 
-        <s-btn flat dense icon="save" label="Save" @click="saveTheme" />
-      </template>
+      <s-btn flat dense icon="save" label="Save" @click="saveTheme" />
 
       <s-btn flat dense icon="close" v-close-popup />
     </q-bar>
@@ -31,10 +29,8 @@
     <q-card-section class="q-pa-md">
       <div class="row q-col-gutter-lg">
         <!-- LEFT -->
-        <div :class="isAppearanceTab ? 'col-12 col-md-4' : 'col-12'">
+        <div class="col-12 col-md-4">
           <q-tabs v-model="tab" dense align="justify">
-            <q-tab name="profile" icon="person" :label="tdc('Profile')" />
-            <q-tab name="security" icon="lock" :label="tdc('Security')" />
             <q-tab name="cores" icon="palette" label="Colors" />
             <q-tab name="font" icon="font_download" label="Font" />
             <q-tab name="layout" icon="dashboard_customize" label="Layout" />
@@ -44,229 +40,6 @@
           <q-separator />
 
           <q-tab-panels v-model="tab" animated style="min-height: 800px">
-            <!-- PROFILE -->
-            <q-tab-panel name="profile" class="q-pa-none">
-              <div class="row justify-center q-mb-md">
-                <div class="column items-center">
-                  <q-avatar size="96px" class="cursor-pointer avatar-picker" @click="triggerAvatarPick">
-                    <img :src="avatarPreview" alt="Avatar" />
-                    <div class="avatar-overlay">
-                      <q-icon name="photo_camera" size="20px" />
-                    </div>
-                  </q-avatar>
-
-                  <input
-                    ref="avatarInput"
-                    type="file"
-                    accept="image/*"
-                    class="hidden-input"
-                    @change="onAvatarSelected"
-                  />
-
-                  <div class="text-caption text-grey-7 q-mt-xs">
-                    {{ tdc('Click the photo to change it') }}
-                  </div>
-                </div>
-              </div>
-
-              <s-card bordered class="q-mb-md">
-                <q-card-section class="text-subtitle1">
-                  {{ tdc('Account') }}
-                </q-card-section>
-
-                <q-card-section class="q-gutter-md">
-                  <s-input
-                    v-model="profileForm.username"
-                    :label="tdc('Username')"
-                    dense
-                    outlined
-                  />
-
-                  <s-input
-                    v-model="profileForm.email"
-                    type="email"
-                    :label="tdc('Email')"
-                    dense
-                    outlined
-                  />
-                </q-card-section>
-              </s-card>
-
-              <s-card bordered class="q-mb-md">
-                <q-card-section class="text-subtitle1">
-                  {{ tdc('Personal data') }}
-                </q-card-section>
-
-                <q-card-section class="q-gutter-md">
-                  <div class="row q-col-gutter-md">
-                    <div class="col-12 col-sm-6">
-                      <s-input
-                        v-model="personForm.name"
-                        :label="tdc('First name')"
-                        dense
-                        outlined
-                      />
-                    </div>
-
-                    <div class="col-12 col-sm-6">
-                      <s-input
-                        v-model="personForm.surname"
-                        :label="tdc('Last name')"
-                        dense
-                        outlined
-                      />
-                    </div>
-                  </div>
-
-                  <div class="row q-col-gutter-md">
-                    <div class="col-12 col-sm-6">
-                      <s-select
-                        v-model="personForm.gender"
-                        :options="genderOptions"
-                        emit-value
-                        map-options
-                        :label="tdc('Gender')"
-                        dense
-                        outlined
-                      />
-                    </div>
-
-                    <div class="col-12 col-sm-6">
-                      <s-input
-                        v-model="personForm.date_of_birth"
-                        type="date"
-                        :label="tdc('Date of birth')"
-                        dense
-                        outlined
-                      />
-                    </div>
-                  </div>
-
-                  <s-input
-                    v-model="personForm.nationality"
-                    :label="tdc('Nationality')"
-                    dense
-                    outlined
-                  />
-                </q-card-section>
-              </s-card>
-
-              <div class="row justify-end q-mt-md">
-                <s-btn
-                  color="primary"
-                  icon="save"
-                  :label="tdc('Save changes')"
-                  :loading="savingProfile"
-                  @click="saveProfile"
-                />
-              </div>
-            </q-tab-panel>
-
-            <!-- SECURITY -->
-            <q-tab-panel name="security" class="q-pa-none">
-              <s-card bordered class="q-mb-md">
-                <q-card-section class="text-subtitle1">
-                  {{ tdc('Change password') }}
-                </q-card-section>
-
-                <q-card-section class="q-gutter-md">
-                  <s-input
-                    v-model="passwordForm.current"
-                    type="password"
-                    :label="tdc('Current password')"
-                    dense
-                    outlined
-                  />
-
-                  <s-input
-                    v-model="passwordForm.next"
-                    type="password"
-                    :label="tdc('New password')"
-                    :hint="tdc('At least 8 characters')"
-                    dense
-                    outlined
-                  />
-
-                  <s-input
-                    v-model="passwordForm.confirm"
-                    type="password"
-                    :label="tdc('Confirm new password')"
-                    dense
-                    outlined
-                  />
-
-                  <div v-if="passwordMismatch" class="text-caption text-negative">
-                    {{ tdc('Passwords do not match') }}
-                  </div>
-
-                  <div v-if="!User.data?.email" class="text-caption text-grey-7">
-                    {{ tdc('An email is required on your account to change the password') }}
-                  </div>
-                </q-card-section>
-
-                <q-card-actions align="right">
-                  <s-btn
-                    color="primary"
-                    icon="lock_reset"
-                    :label="tdc('Update password')"
-                    :loading="savingPassword"
-                    :disable="!canSubmitPassword"
-                    @click="submitPasswordChange"
-                  />
-                </q-card-actions>
-              </s-card>
-
-              <s-card bordered>
-                <q-card-section class="text-subtitle1">
-                  {{ tdc('Change phone number') }}
-                </q-card-section>
-
-                <q-card-section class="q-gutter-md">
-                  <div class="row q-col-gutter-md">
-                    <div class="col-12 col-sm-5">
-                      <s-select
-                        v-model="phoneForm.dial"
-                        :options="countryOptions"
-                        emit-value
-                        map-options
-                        :label="tdc('Country')"
-                        dense
-                        outlined
-                      />
-                    </div>
-
-                    <div class="col-12 col-sm-7">
-                      <s-input
-                        v-model="phoneForm.national"
-                        :label="tdc('Phone number')"
-                        dense
-                        outlined
-                      />
-                    </div>
-                  </div>
-
-                  <div v-if="phoneForm.national && !isPhoneValid" class="text-caption text-negative">
-                    {{ tdc('Invalid phone number') }}
-                  </div>
-
-                  <div class="text-caption text-grey-7">
-                    {{ tdc('Full number') }}: {{ fullPhoneNumber || '—' }}
-                  </div>
-                </q-card-section>
-
-                <q-card-actions align="right">
-                  <s-btn
-                    color="primary"
-                    icon="phone_iphone"
-                    :label="tdc('Update phone number')"
-                    :loading="savingPhone"
-                    :disable="!isPhoneValid"
-                    @click="submitPhoneChange"
-                  />
-                </q-card-actions>
-              </s-card>
-            </q-tab-panel>
-
             <!-- COLORS -->
             <q-tab-panel name="cores">
               <s-input
@@ -602,7 +375,7 @@
         </div>
 
         <!-- RIGHT / PREVIEW -->
-        <div v-if="isAppearanceTab" class="col-12 col-md-8">
+        <div class="col-12 col-md-8">
           <div
             :class="[
               previewMode === 'mobile' ? 'mobile-frame' : '',
@@ -831,9 +604,6 @@ import { defineComponent, h } from "vue"
 import { Dark, setCssVar, QBtn, QInput, QCard, QDrawer } from "quasar"
 import { HTTPAuth, url } from "../services/api"
 import { useUserStore } from "../stores/UserStore"
-import { tdc } from "../services/translation"
-import { COUNTRIES, countryLabel } from "../utils/countries"
-import { toE164, isValidE164, splitE164 } from "../utils/phone"
 
 export default defineComponent({
   name: "ThemeStudioEngine",
@@ -992,12 +762,12 @@ export default defineComponent({
 
   setup() {
     const User = useUserStore()
-    return { User, tdc }
+    return { User }
   },
 
   data() {
     return {
-      tab: "profile",
+      tab: "cores",
       search: "",
       colorDialog: false,
       selectedKey: null,
@@ -1010,40 +780,6 @@ export default defineComponent({
       },
       transitionKey: 0,
 
-      loadingProfile: false,
-      savingProfile: false,
-      savingPassword: false,
-      savingPhone: false,
-
-      avatarPreview: "",
-      avatarFile: null,
-
-      personId: null,
-      personExists: false,
-
-      profileForm: {
-        username: "",
-        email: ""
-      },
-
-      personForm: {
-        name: "",
-        surname: "",
-        gender: null,
-        date_of_birth: null,
-        nationality: ""
-      },
-
-      passwordForm: {
-        current: "",
-        next: "",
-        confirm: ""
-      },
-
-      phoneForm: {
-        dial: "258",
-        national: ""
-      },
       fontOptions: [
         "Ubuntu",
         "Roboto",
@@ -1061,52 +797,6 @@ export default defineComponent({
   },
 
   computed: {
-    isAppearanceTab() {
-      return ["cores", "font", "layout", "animation"].includes(this.tab)
-    },
-
-    barTitle() {
-      if (this.tab === "profile") return "👤 " + this.tdc("Profile")
-      if (this.tab === "security") return "🔒 " + this.tdc("Security")
-      return "🎨 Theme Studio"
-    },
-
-    countryOptions() {
-      return COUNTRIES.map(c => ({
-        label: countryLabel(c),
-        value: c.dial
-      }))
-    },
-
-    genderOptions() {
-      return [
-        { label: this.tdc("Masculine"), value: "M" },
-        { label: this.tdc("Feminine"), value: "F" },
-        { label: this.tdc("Others"), value: "O" }
-      ]
-    },
-
-    fullPhoneNumber() {
-      return toE164(this.phoneForm.dial, this.phoneForm.national)
-    },
-
-    isPhoneValid() {
-      return isValidE164(this.fullPhoneNumber)
-    },
-
-    passwordMismatch() {
-      return !!this.passwordForm.confirm && this.passwordForm.next !== this.passwordForm.confirm
-    },
-
-    canSubmitPassword() {
-      return !!(
-        this.User.data?.email &&
-        this.passwordForm.current &&
-        this.passwordForm.next?.length >= 8 &&
-        this.passwordForm.next === this.passwordForm.confirm
-      )
-    },
-
     previewState() {
       return {
         theme: this.User.Theme || {},
@@ -1185,133 +875,9 @@ export default defineComponent({
     this.applyThemeVars()
     this.darkMode = this.$q.dark.isActive
     this.applyTypography()
-    this.loadProfile()
   },
 
   methods: {
-    triggerAvatarPick() {
-      this.$refs.avatarInput?.click()
-    },
-
-    onAvatarSelected(e) {
-      const file = e.target.files?.[0]
-      if (!file) return
-
-      this.avatarFile = file
-      this.avatarPreview = URL.createObjectURL(file)
-      this.uploadAvatar()
-    },
-
-    async uploadAvatar() {
-      if (!this.avatarFile) return
-
-      const fd = new FormData()
-      fd.append("profile", this.avatarFile)
-
-      await this.User.updateProfile(fd)
-    },
-
-    async loadProfile() {
-      if (!this.User.data?.id) return
-
-      this.loadingProfile = true
-
-      try {
-        this.profileForm.username = this.User.data?.username || ""
-        this.profileForm.email = this.User.data?.email || ""
-        this.avatarPreview = this.User.profile
-
-        const { dial, national } = splitE164(this.User.data?.mobile)
-        this.phoneForm.dial = dial
-        this.phoneForm.national = national
-
-        const { data } = await HTTPAuth.get(
-          url({
-            type: "u",
-            url: `django_resaas/users/${this.User.data.id}/userPerson/`
-          })
-        )
-
-        if (data?.id) {
-          this.personId = data.id
-          this.personExists = true
-          this.personForm.name = data.name || ""
-          this.personForm.surname = data.surname || ""
-          this.personForm.gender = data.gender || null
-          this.personForm.date_of_birth = data.date_of_birth || null
-          this.personForm.nationality = data.nationality || ""
-        }
-      } catch (e) {
-        this.personExists = false
-      } finally {
-        this.loadingProfile = false
-      }
-    },
-
-    async saveProfile() {
-      this.savingProfile = true
-
-      try {
-        await this.User.updateProfile({
-          username: this.profileForm.username,
-          email: this.profileForm.email || null
-        })
-
-        const personPayload = { ...this.personForm }
-
-        if (this.personExists) {
-          await HTTPAuth.patch(
-            url({ type: "u", url: `django_resaas/persons/${this.personId}/` }),
-            personPayload
-          )
-        } else {
-          const { data } = await HTTPAuth.post(
-            url({ type: "u", url: "django_resaas/persons/" }),
-            { ...personPayload, user: this.User.data.id }
-          )
-
-          this.personId = data?.id
-          this.personExists = !!data?.id
-        }
-      } finally {
-        this.savingProfile = false
-      }
-    },
-
-    async submitPasswordChange() {
-      if (!this.canSubmitPassword) return
-
-      this.savingPassword = true
-
-      try {
-        await this.User.change_password_email(
-          this.User.data.email,
-          this.passwordForm.current,
-          this.passwordForm.next
-        )
-
-        this.passwordForm.current = ""
-        this.passwordForm.next = ""
-        this.passwordForm.confirm = ""
-      } finally {
-        this.savingPassword = false
-      }
-    },
-
-    async submitPhoneChange() {
-      if (!this.isPhoneValid) return
-
-      this.savingPhone = true
-
-      try {
-        await this.User.updateProfile({
-          mobile: this.fullPhoneNumber
-        })
-      } finally {
-        this.savingPhone = false
-      }
-    },
-
     openColor(key) {
       this.selectedKey = key
       this.tempColor = this.User.Theme[key]
@@ -1394,8 +960,11 @@ export default defineComponent({
   },
 
   watch: {
-    "User.Settings" (val) {
-      if (val) this.loadProfile()
+    "User.ThemeStudio" (val) {
+      if (val) {
+        this.applyThemeVars()
+        this.applyTypography()
+      }
     },
 
     "User.Theme": {
@@ -1452,31 +1021,6 @@ export default defineComponent({
 
 .preview-mini-card {
   cursor: pointer;
-}
-
-.hidden-input {
-  display: none;
-}
-
-.avatar-picker {
-  position: relative;
-  overflow: hidden;
-}
-
-.avatar-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.35);
-  color: #fff;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.avatar-picker:hover .avatar-overlay {
-  opacity: 1;
 }
 
 .anim-disabled *,
