@@ -23,7 +23,6 @@ import { payrollRoutes } from '../pages/hr/payroll/payrollRoute'
 import { payroll_itemRoutes } from '../pages/hr/payroll_item/payroll_itemRoute'
 import { payslipRoutes } from '../pages/hr/payslip/payslipRoute'
 import { tdc } from '../services/translation'
-import { docsRoutes } from './docsRoutes'
 
 
 export let restRoutes = [
@@ -100,7 +99,6 @@ export let restRoutes = [
       title: tdc('Route') + ' ' + tdc('not found'),
     } 
   },
-  ...docsRoutes,
   ...entityRoutes,
   ...entity_typeRoutes,
   ...groupRoutes,

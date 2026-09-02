@@ -26,9 +26,10 @@ multi-tenancy on the frontend side.
 
 `Permissions` is a `Set` of lowercase strings. The `can` and `hasPermission`
 getters do the same check:
-`state.Permissions.has(String(perm).toLowerCase())`. This is what powers the
-`:can="User.can"` prop used by pages (e.g.
-`s-auto-crud :can="User.can"`).
+`state.Permissions.has(String(perm).toLowerCase())`. Components like
+[`AutoCrud`](../components/auto-crud.md) call `useUserStore()` and this
+getter directly (`User.can(action.permission)`) rather than receiving
+permissions as a prop — see [Permissions](../features/permissions.md).
 
 ## Tenant context (`Entity` / `Branch` / `Group`)
 

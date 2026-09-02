@@ -9,7 +9,7 @@ arrays for the host to mount however it wants.
 |---|---|---|
 | `authRoutes` | `router/authRoutes.js` | `/auth/login` (in `AuthLayout`) and `/welcome` (in `MainLayout`) |
 | `restRoutes` | `router/restRoutes.js` | generic scaffold/crud + `entity`, `entity_type`, `group`, `branch`, `user`, `permission`, `employee` routes |
-| `docsRoutes` | `router/docsRoutes.js` | `/docs/:slug(.*)*`, see [documentation (docsRoutes)](../README.md) |
+| `docsRoutes` | `router/docsRoutes.js` | `/docs/:product/:slug(.*)*`, mounted under its own `DocLayout` (not `MainLayout`) — see [documentation (docsRoutes)](../README.md) |
 
 Each page group (`pages/entity/entityRoute.js`, etc.) exports its own array
 (`entityRoutes`, ...) which `restRoutes` aggregates via spread.

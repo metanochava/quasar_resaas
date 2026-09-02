@@ -39,7 +39,7 @@ by layer:
 -   **Services** — `api`, `app`, `base`, `data`, `storage`,
     `translation`, `theme`, `routing`, `token`
 -   **Boot** — `alerts`, `Components` (global registration of `s-*`)
--   **Components/Layouts** — `MainLayout`, `AuthLayout`, `CrudPage`
+-   **Components/Layouts** — `MainLayout`, `AuthLayout`, `DocLayout`, `CrudPage`
 
 ## Component registration (`boot/components.js`)
 

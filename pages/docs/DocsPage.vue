@@ -267,16 +267,24 @@ function onContentClick(event) {
   if (!anchor) return
 
   const href = anchor.getAttribute('href') || ''
-  if (!href.endsWith('.md')) return
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href) || href.startsWith('//')) return
+
+  const [path, fragment] = href.split('#')
+  if (!path.endsWith('.md')) return
 
   event.preventDefault()
 
   const baseDir = effectiveSlug.value.split('/').slice(0, -1).join('/')
-  const resolved = resolveRelativePath(baseDir, href).replace(/\.md$/, '')
+  const resolved = resolveRelativePath(baseDir, path).replace(/\.md$/, '')
   const [product, ...rest] = resolved.split('/')
   const targetProduct = docsProducts.some(p => p.key === product) ? product : currentProduct.value
 
-  router.push({ name: 'docs', params: { product: targetProduct, slug: rest.filter(Boolean) } })
+  router.push({ name: 'docs', params: { product: targetProduct, slug: rest.filter(Boolean) } }).then(() => {
+    if (!fragment) return
+    requestAnimationFrame(() => {
+      document.getElementById(fragment)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  })
 }
 </script>
 

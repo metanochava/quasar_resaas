@@ -113,5 +113,9 @@ export {
 } from './layouts/AuthLayout.vue'
 
 export {
+  default as DocLayout
+} from './layouts/DocLayout.vue'
+
+export {
   default as CrudPage
 } from './pages/CrudPage.vue'

@@ -22,12 +22,15 @@ can:           (state) => (perm) => state.Permissions.has(String(perm).toLowerCa
 
 ```vue
 <!-- pages/rh/cargo/CargoLPage.vue -->
-<s-auto-crud :module="module" :model="model" :can="User.can" route="view_cargo" />
+<s-auto-crud app="rh" model="Cargo" route="view_cargo" />
 ```
 
-`s-auto-crud`/`AutoTable`/`AutoForm` receive `can` and internally decide
-which actions to show (edit, delete, create) — see
-[`components/form.md`](form.md).
+`s-auto-crud` (see [AutoCrud](../components/auto-crud.md)) has no `can`
+prop to pass — it calls `useUserStore()` internally and checks
+`User.can(...)` against each action's `permission` from `schema.permissions`
+to decide which actions to show (edit, delete, create) — see
+[Form](../components/form.md) for how the modal form it opens
+(`s-auto-form`) is gated the same way.
 
 ## Routes
 

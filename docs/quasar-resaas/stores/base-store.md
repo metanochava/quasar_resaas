@@ -122,6 +122,46 @@ bound to the store. Available hooks:
 `beforeUpdate/afterUpdate`, `beforeDelete/afterDelete`. This is the preferred
 extension point rather than overriding an entire action.
 
+## Extending the store
+
+`createBaseStore(name, config, extend)`'s third argument has two distinct
+extension points, and they answer different questions:
+
+- **`extend.actions`** is spread **after** the base actions
+  (`...(extend.actions || {})`), so an action with the same name
+  **replaces** the built-in one entirely — use this when the default
+  implementation is fundamentally wrong for this resource (a non-standard
+  endpoint, a different pagination shape, ...).
+- **`extend.hooks`** (see [Hooks](#hooks-extendhooks) above) run
+  **alongside** the built-in behavior instead — the gentler option when you
+  just need to react to something (notify another store, trigger a
+  side-effect) without changing what the base action itself does.
+
+```js
+export const useEmployeeStore = createBaseStore('employee', {
+  app: 'hr', model: 'Employee'
+}, {
+  actions: {
+    // completely replaces the base loadData()
+    async loadData(params = {}) {
+      return await this.loadDataForMyOwnEndpoint(params)
+    }
+  },
+  hooks: {
+    // runs in addition to the base afterCreate()
+    afterCreate(data) {
+      this.notifySomethingElse(data)
+    }
+  }
+})
+```
+
+When the override goes beyond what either extension point can express — a
+genuinely different screen flow — build the page with `BaseStore` plus
+individual `s-*` components directly instead of
+[`AutoCrud`](../components/auto-crud.md), which doesn't accept a store
+extension at all (see [AutoCrud](../components/auto-crud.md#it-does-not-use-createbasestorepinia)).
+
 ## `assertConfig()`
 
 A safety guard called at the start of almost every action — throws an error if

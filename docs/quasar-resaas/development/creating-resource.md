@@ -1,6 +1,8 @@
 # Creating a New Frontend Resource
 
-Assumes the model already exists in the backend (django_resaas) with `RESAAS.crud = True` and its view registered — see django_resaas's `development/creating-resource.md` for that side.
+Assumes the model already exists in the backend (django_resaas) with `RESAAS.crud = True` and its view registered — see
+[`../../django-resaas/development/creating-resource.md`](../../django-resaas/development/creating-resource.md)
+for that side.
 
 Real example: `Cargo` (`front/src/pages/rh/cargo/`).
 
@@ -14,10 +16,15 @@ CargoSEPage.vue  // create/edit — uses <s-form-two>
 CargoVPage.vue   // view detail
 ```
 
-`CargoLPage.vue` delegates everything to the automatic component:
+`CargoLPage.vue` delegates everything to the automatic component. Its real
+props are `app`/`model` (strings, both required), `route`, `ignoreFields`,
+`ignoreFieldsFilter`, and `extraActions` — see
+[AutoCrud](../components/auto-crud.md) for the full reference. There's no
+`can`/`module` prop: `AutoCrud` reads `useUserStore()` internally to check
+permissions on every action.
 
 ```vue
-<s-auto-crud :module="module" :model="model" :can="User.can"
+<s-auto-crud app="rh" model="Cargo"
   :ignoreFields="ignoreFields" route="view_cargo" />
 ```
 
@@ -68,14 +75,20 @@ Most resources (like the current `Cargo`) don't have a `RightMenu.vue` and can s
 
 ## 5. Permissions
 
-`requiredRole` on each route and `:can="User.can"` on `<s-auto-crud>` must match the codenames (`list`, `add`, `change`, `view`, `delete`) the backend exposes for the model — see django_resaas's `security/permissions.md`.
+`requiredRole` on each route must match the codenames (`list`, `add`,
+`change`, `view`, `delete`) the backend exposes for the model — see
+[`../../django-resaas/security/permissions.md`](../../django-resaas/security/permissions.md). `<s-auto-crud>` doesn't need any
+extra wiring for this: it checks `User.can(...)` against each action's
+`permission` (from `schema.permissions`) itself — see
+[Permissions](../features/permissions.md).
 
 ## 6. Custom actions (`@resaas_action`) and refresh
 
 A model whose backend view declares `@resaas_action(...)` (see
-django_resaas's `development/creating-resource.md`) shows up in
-`schema.actions`, and `<s-auto-crud>` (`components/auto/AutoCrud.vue`)
-already knows how to run it - no extra wiring needed:
+[`../../django-resaas/development/creating-resource.md`](../../django-resaas/development/creating-resource.md))
+shows up in `schema.actions`, and `<s-auto-crud>`
+([`components/auto/AutoCrud.vue`](../components/auto-crud.md)) already knows
+how to run it - no extra wiring needed:
 
 - it checks `hasPermission(action.permission)` before showing/running it;
 - it resolves the URL via `resolveActionEndpoint(action, row)` -
