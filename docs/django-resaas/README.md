@@ -21,6 +21,7 @@ Esta pasta contém a documentação técnica do framework backend
 -   [Permissões](security/permissions.md)
 -   [Soft delete](features/soft-delete.md)
 -   [Ficheiros e PDF](features/files-pdf.md)
+-   [Notificações (Email/SMS/WhatsApp)](features/notifications.md)
 -   [Criar um novo recurso](development/creating-resource.md)
 -   [Comandos de gestão](development/management-commands.md)
 -   [A app hr](hr/overview.md)

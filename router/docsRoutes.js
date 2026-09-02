@@ -82,6 +82,7 @@ export const docsNav = {
 
     { section: 'Features', slug: 'features/soft-delete', title: 'Soft delete' },
     { section: 'Features', slug: 'features/files-pdf', title: 'Files & PDF' },
+    { section: 'Features', slug: 'features/notifications', title: 'Notifications' },
 
     { section: 'Development', slug: 'development/creating-resource', title: 'Creating a resource' },
     { section: 'Development', slug: 'development/management-commands', title: 'Management commands' },
