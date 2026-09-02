@@ -119,21 +119,30 @@ The frontend's job is to present the UI and hold local state — it never re-imp
 ```js
 import { buildFormFromSchema } from 'quasar_resaas'
 
-const fields = ref([])
-const formModel = ref({})
+const schemaFields = ref([])
+const showForm = ref(false)
+const editingRow = ref(null)   // null = create, an object = edit that record
 
 async function loadSchema() {
   // buildFormFromSchema() returns the full result object - fields,
   // actions, permissions, routes, ui, filters, pagination, pdf, schema
   const result = await buildFormFromSchema({ app: 'hr', model: 'Employee' })
-  fields.value = result.fields
+  schemaFields.value = result.fields
 }
 ```
 
 ```vue
+<!-- AutoForm's real props: modelValue (v-model, open/close), schema
+     (the fields ARRAY from buildFormFromSchema, not "fields"), app/model
+     (strings, used for the create/update request), data (the record
+     being edited, or omit/null to create) -->
 <AutoForm
-  :fields="fields"
-  :model="formModel"
+  v-model="showForm"
+  :schema="schemaFields"
+  app="hr"
+  model="Employee"
+  :data="editingRow"
+  @saved="showForm = false"
 />
 ```
 
@@ -272,6 +281,7 @@ Full technical documentation lives in [`docs/`](docs/quasar-resaas/README.md), s
 
 **`quasar_resaas`** (this library) — [`docs/quasar-resaas/`](docs/quasar-resaas/README.md)
 
+- [**FAQ / Getting started**](docs/quasar-resaas/faq.md) — installation and the practical "how do I...?" questions
 - [Architecture](docs/quasar-resaas/architecture/overview.md) · [Data flow](docs/quasar-resaas/architecture/data-flow.md)
 - [BaseStore](docs/quasar-resaas/stores/base-store.md) · [UserStore & context](docs/quasar-resaas/stores/user-context.md)
 - [Form](docs/quasar-resaas/components/form.md) · [ActionForm](docs/quasar-resaas/components/action-form.md) · [s-btn](docs/quasar-resaas/components/button.md)

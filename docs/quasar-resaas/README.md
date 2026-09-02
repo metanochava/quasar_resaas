@@ -5,6 +5,7 @@ library, companion to the `django_resaas` backend.
 
 ## Navigation
 
+-   [FAQ / Getting started](faq.md)
 -   [Architecture — Overview](architecture/overview.md)
 -   [Architecture — Data flow](architecture/data-flow.md)
 -   [Stores — BaseStore](stores/base-store.md)

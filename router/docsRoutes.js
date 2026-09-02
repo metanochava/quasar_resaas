@@ -32,6 +32,8 @@ export const docsProducts = [
 
 export const docsNav = {
   'quasar-resaas': [
+    { section: 'Getting started', slug: 'faq', title: 'FAQ' },
+
     { section: 'Architecture', slug: 'architecture/overview', title: 'Overview' },
     { section: 'Architecture', slug: 'architecture/data-flow', title: 'Data flow' },
 
@@ -56,9 +58,12 @@ export const docsNav = {
   ],
 
   'django-resaas': [
+    { section: 'Getting started', slug: 'faq', title: 'FAQ' },
+
     { section: 'Architecture', slug: 'architecture/overview', title: 'Overview' },
     { section: 'Architecture', slug: 'architecture/multi-tenancy', title: 'Multi-tenancy' },
     { section: 'Architecture', slug: 'architecture/request-lifecycle', title: 'Request lifecycle' },
+    { section: 'Architecture', slug: 'architecture/registry', title: 'View registry' },
 
     { section: 'Models', slug: 'models/resaas-config', title: 'Models & RESAAS' },
 
