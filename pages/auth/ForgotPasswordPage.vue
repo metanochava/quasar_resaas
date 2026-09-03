@@ -1,8 +1,11 @@
 <template>
-  <q-page class="row items-center justify-evenly bg-transparent">
-    <s-card flat square class="text-center bg-transparent forgot-card">
+  <q-page class="row items-center justify-evenly">
+    <div class="q-gutter-y-sm text-center forgot-wrap">
+      <AllLogo v-if="showLoginLogo" />
+
+      <s-card flat square class="text-center bg-transparent forgot-card">
       <q-card-section class="text-left">
-        <div class="text-h6 q-mb-md">{{ tdc('Forgot my password') }}</div>
+        <div class="text-h6 q-mb-md text-center">{{ tdc('Forgot my password') }}</div>
 
         <div v-if="sent" class="text-body2 q-mb-md">
           {{ tdc('If that email is registered, we sent a link to reset your password') }}
@@ -44,7 +47,8 @@
           />
         </q-card-actions>
       </q-card-section>
-    </s-card>
+      </s-card>
+    </div>
   </q-page>
 </template>
 
@@ -54,11 +58,20 @@ import { defineComponent } from 'vue'
 import { HTTPClient, url } from '../../services/api'
 import { tdc } from '../../services/translation'
 
+import AllLogo from '../../components/AllLogo.vue'
+import { useShowLoginLogo } from '../../composables/useShowLoginLogo'
+
 export default defineComponent({
   name: 'ForgotPasswordPage',
 
+  components: {
+    AllLogo
+  },
+
   setup() {
-    return { tdc }
+    const { showLoginLogo } = useShowLoginLogo()
+
+    return { tdc, showLoginLogo }
   },
 
   data() {
@@ -93,8 +106,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.forgot-wrap {
+  width: 100%;
+  max-width: 360px;
+}
+
 .forgot-card {
   width: 100%;
-  max-width: 340px;
 }
 </style>

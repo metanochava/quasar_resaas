@@ -8,6 +8,56 @@
       <s-btn flat dense icon="close" v-close-popup />
     </q-bar>
 
+    <!-- =================================================
+         OTP CONFIRMATION DIALOG (email/mobile changes)
+    ================================================== -->
+    <q-dialog v-model="contactOtpDialog" persistent>
+      <s-card square flat bordered class="text-center contact-otp-card">
+        <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
+          <div class="ellipsis">{{ contactOtpIdentifier }}</div>
+          <q-space />
+          <s-btn dense flat icon="close" :disable="confirmingContactOtp" v-close-popup @click="contactOtpDialog = false">
+            <q-tooltip>{{ tdc('Close') }}</q-tooltip>
+          </s-btn>
+        </q-bar>
+
+        <q-card-section>
+          <div class="text-subtitle2 q-mb-md">
+            {{ tdc('Enter the code we sent to') }} {{ contactOtpIdentifier }}
+          </div>
+
+          <OtpInput v-model="contactOtp" :length="6" @complete="confirmContactOtp" />
+
+          <div v-if="contactOtpError" class="text-caption text-negative q-mt-sm">
+            {{ contactOtpError }}
+          </div>
+
+          <s-btn
+            size="md"
+            color="positive"
+            dense
+            class="full-width q-mt-lg"
+            :disable="contactOtp.length !== 6"
+            :loading="confirmingContactOtp"
+            :label="tdc('Confirm')"
+            @click="confirmContactOtp(contactOtp)"
+          />
+
+          <s-btn
+            flat
+            size="sm"
+            color="grey-7"
+            dense
+            class="full-width q-mt-sm"
+            :disable="confirmingContactOtp"
+            :loading="requestingContactOtp"
+            :label="tdc('Resend code')"
+            @click="requestContactOtp(contactOtpChannel, contactOtpIdentifier)"
+          />
+        </q-card-section>
+      </s-card>
+    </q-dialog>
+
     <q-card-section class="q-pa-md">
       <div class="row justify-center">
         <div class="col-12 col-md-8 col-lg-6">
@@ -63,7 +113,26 @@
                     :label="tdc('Email')"
                     dense
                     outlined
-                  />
+                  >
+                    <template #append>
+                      <s-btn
+                        v-if="emailChanged"
+                        dense
+                        flat
+                        round
+                        icon="send"
+                        color="primary"
+                        :loading="requestingContactOtp && contactOtpChannel === 'email'"
+                        @click="requestContactOtp('email', profileForm.email)"
+                      >
+                        <q-tooltip>{{ tdc('Verify and update email') }}</q-tooltip>
+                      </s-btn>
+                    </template>
+                  </s-input>
+
+                  <div v-if="emailChanged" class="text-caption text-grey-7">
+                    {{ tdc('Confirming a new email requires a verification code') }}
+                  </div>
                 </q-card-section>
               </s-card>
 
@@ -93,29 +162,23 @@
                     </div>
                   </div>
 
-                  <div class="row q-col-gutter-md">
-                    <div class="col-12 col-sm-6">
-                      <s-select
-                        v-model="personForm.gender"
-                        :options="genderOptions"
-                        emit-value
-                        map-options
-                        :label="tdc('Gender')"
-                        dense
-                        outlined
-                      />
-                    </div>
+                  <s-select
+                    v-model="personForm.gender"
+                    :options="genderOptions"
+                    emit-value
+                    map-options
+                    :label="tdc('Gender')"
+                    dense
+                    outlined
+                  />
 
-                    <div class="col-12 col-sm-6">
-                      <s-input
-                        v-model="personForm.date_of_birth"
-                        type="date"
-                        :label="tdc('Date of birth')"
-                        dense
-                        outlined
-                      />
-                    </div>
-                  </div>
+                  <s-input
+                    v-model="personForm.date_of_birth"
+                    type="date"
+                    :label="tdc('Date of birth')"
+                    dense
+                    outlined
+                  />
 
                   <s-input
                     v-model="personForm.nationality"
@@ -197,28 +260,22 @@
                 </q-card-section>
 
                 <q-card-section class="q-gutter-md">
-                  <div class="row q-col-gutter-md">
-                    <div class="col-12 col-sm-5">
-                      <s-select
-                        v-model="phoneForm.dial"
-                        :options="countryOptions"
-                        emit-value
-                        map-options
-                        :label="tdc('Country')"
-                        dense
-                        outlined
-                      />
-                    </div>
+                  <s-select
+                    v-model="phoneForm.dial"
+                    :options="countryOptions"
+                    emit-value
+                    map-options
+                    :label="tdc('Country')"
+                    dense
+                    outlined
+                  />
 
-                    <div class="col-12 col-sm-7">
-                      <s-input
-                        v-model="phoneForm.national"
-                        :label="tdc('Phone number')"
-                        dense
-                        outlined
-                      />
-                    </div>
-                  </div>
+                  <s-input
+                    v-model="phoneForm.national"
+                    :label="tdc('Phone number')"
+                    dense
+                    outlined
+                  />
 
                   <div v-if="phoneForm.national && !isPhoneValid" class="text-caption text-negative">
                     {{ tdc('Invalid phone number') }}
@@ -233,8 +290,8 @@
                   <s-btn
                     color="primary"
                     icon="phone_iphone"
-                    :label="tdc('Update phone number')"
-                    :loading="savingPhone"
+                    :label="tdc('Send verification code')"
+                    :loading="requestingContactOtp && contactOtpChannel === 'mobile'"
                     :disable="!isPhoneValid"
                     @click="submitPhoneChange"
                   />
@@ -256,8 +313,14 @@ import { tdc } from "../services/translation"
 import { COUNTRIES, countryLabel } from "../utils/countries"
 import { toE164, isValidE164, splitE164 } from "../utils/phone"
 
+import OtpInput from "./OtpInput.vue"
+
 export default defineComponent({
   name: "UserAccountModal",
+
+  components: {
+    OtpInput
+  },
 
   setup() {
     const User = useUserStore()
@@ -271,7 +334,6 @@ export default defineComponent({
       loadingProfile: false,
       savingProfile: false,
       savingPassword: false,
-      savingPhone: false,
 
       avatarPreview: "",
       avatarFile: null,
@@ -301,7 +363,15 @@ export default defineComponent({
       phoneForm: {
         dial: "258",
         national: ""
-      }
+      },
+
+      contactOtpDialog: false,
+      contactOtpChannel: "",
+      contactOtpIdentifier: "",
+      contactOtp: "",
+      contactOtpError: "",
+      requestingContactOtp: false,
+      confirmingContactOtp: false
     }
   },
 
@@ -345,6 +415,10 @@ export default defineComponent({
         this.passwordForm.next?.length >= 8 &&
         this.passwordForm.next === this.passwordForm.confirm
       )
+    },
+
+    emailChanged() {
+      return !!this.profileForm.email && this.profileForm.email !== (this.User.data?.email || "")
     }
   },
 
@@ -416,9 +490,11 @@ export default defineComponent({
       this.savingProfile = true
 
       try {
+        // email is NEVER part of this save - it can only change through
+        // the OTP-confirmed flow below (requestContactOtp/confirmContactOtp),
+        // enforced server-side too (UserSerializer makes it read-only).
         await this.User.updateProfile({
-          username: this.profileForm.username,
-          email: this.profileForm.email || null
+          username: this.profileForm.username
         })
 
         const personPayload = { ...this.personForm }
@@ -464,15 +540,62 @@ export default defineComponent({
 
     async submitPhoneChange() {
       if (!this.isPhoneValid) return
+      await this.requestContactOtp("mobile", this.fullPhoneNumber)
+    },
 
-      this.savingPhone = true
+    // =====================================================
+    // EMAIL / MOBILE CHANGE — always OTP-confirmed, the new
+    // value only takes effect after confirmContactOtp() succeeds.
+    // =====================================================
+
+    async requestContactOtp(channel, identifier) {
+      if (!identifier) return
+
+      this.contactOtpChannel = channel
+      this.contactOtpIdentifier = identifier
+      this.contactOtp = ""
+      this.contactOtpError = ""
+      this.requestingContactOtp = true
 
       try {
-        await this.User.updateProfile({
-          mobile: this.fullPhoneNumber
-        })
+        await HTTPAuth.post(
+          url({ type: "u", url: "profile/contact/otp/request/" }),
+          { channel, identifier }
+        )
+
+        this.contactOtpDialog = true
       } finally {
-        this.savingPhone = false
+        this.requestingContactOtp = false
+      }
+    },
+
+    async confirmContactOtp(otp) {
+      if (!otp || otp.length !== 6) return
+
+      this.confirmingContactOtp = true
+      this.contactOtpError = ""
+
+      try {
+        const { data } = await HTTPAuth.post(
+          url({ type: "u", url: "profile/contact/otp/confirm/" }),
+          {
+            channel: this.contactOtpChannel,
+            identifier: this.contactOtpIdentifier,
+            otp
+          }
+        )
+
+        this.User.data = { ...this.User.data, ...data }
+
+        if (this.contactOtpChannel === "email") {
+          this.profileForm.email = data.email || ""
+        }
+
+        this.contactOtpDialog = false
+      } catch (e) {
+        this.contactOtpError = this.tdc("Invalid or expired code")
+      } finally {
+        this.confirmingContactOtp = false
       }
     }
   },
@@ -513,5 +636,9 @@ export default defineComponent({
 
 .avatar-picker:hover .avatar-overlay {
   opacity: 1;
+}
+
+.contact-otp-card {
+  width: min(360px, 92vw);
 }
 </style>
