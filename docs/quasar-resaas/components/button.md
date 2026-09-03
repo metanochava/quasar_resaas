@@ -15,6 +15,25 @@ permission prop of its own.
 - All other props (`color`, `icon`, `loading`, `type`, `@click`, ...) pass
   straight through to the underlying `q-btn`.
 
+## API reference
+
+`s-btn` (`BtnComponent.vue`) declares no props of its own (`inheritAttrs:
+false` + `useAttrs()`) — everything below is read directly off whatever
+attrs the caller passes; anything not in this table falls straight through
+to `q-btn` unchanged, so the [full QBtn prop list](https://quasar.dev/vue-components/button)
+still applies.
+
+| Attr | Overridden by layout preference | Default when omitted |
+|---|---|---|
+| `label` | — | Passed through `tdc()` for translation |
+| `dense` | `User.ps.layout.button_dense` | Layout preference |
+| `round` | `User.ps.layout.button_round` | Layout preference |
+| `flat` | `User.ps.layout.button_style === 'flat'` | Layout preference |
+| `outline` | `User.ps.layout.button_style === 'outline'` | Layout preference |
+| `unelevated` | `User.ps.layout.button_style === 'unelevated'` | Layout preference |
+| `push` | `User.ps.layout.button_style === 'push'` | Layout preference |
+| `ripple` | `User.ps.animation.button_animation === 'ripple'` | Always set (not overridable via a prop — driven only by the animation preference) |
+
 ## Does not do permission-gating
 
 Despite what the name might suggest, `s-btn` does **not** hide itself based

@@ -18,12 +18,13 @@ and derives a fallback `url` as `` `${app}/${model.toLowerCase()}s` ``. Actions
 should never build this URL by hand — they always use the `safeApp`, `safeModel`,
 `safeUrl` getters.
 
-**`safeUrl` is backend-authoritative.** Once `loadSchema()`/`init()` has resolved,
-`safeUrl` returns `schema.model.endpoint` (trailing slash normalized away) - the
-`{app}/{model}s` convention above only remains a fallback for a store that never
-loads its schema. Never re-derive the endpoint from `app`/`model` yourself when a
-schema is available - see [Data flow](../architecture/data-flow.md) and
-`base/schema_contract.spec.js` for the tested contract.
+> [!WARNING]
+> **`safeUrl` is backend-authoritative.** Once `loadSchema()`/`init()` has resolved,
+> `safeUrl` returns `schema.model.endpoint` (trailing slash normalized away) - the
+> `{app}/{model}s` convention above only remains a fallback for a store that never
+> loads its schema. Never re-derive the endpoint from `app`/`model` yourself when a
+> schema is available - see [Data flow](../architecture/data-flow.md) and
+> `base/schema_contract.spec.js` for the tested contract.
 
 ## Shared state
 

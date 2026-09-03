@@ -36,8 +36,9 @@ qual âmbito de URL (`/api/<scope>/...`) e com que métodos HTTP, com base nas d
 - `frontend.access` (`super`, `read`, `readwrite`, `write`) delimita tanto o âmbito de URL (contra
   `FRONT_END.URL_RULES`) como o método HTTP permitido para esse nível de acesso.
 
-**Problema conhecido:** a linha comentada em `src/dev/settings.py` referencia
-`django_resaas.core.middleware.frontend.FrontEndMiddleware` (sem underscore), mas o módulo real é
-`django_resaas.core.middleware.front_end` (com underscore). Descomentar essa linha tal como está
-levantaria `ModuleNotFoundError` — o caminho precisa do underscore acrescentado antes de este
-middleware poder ser ativado de facto.
+> [!WARNING]
+> Problema conhecido: a linha comentada em `src/dev/settings.py` referencia
+> `django_resaas.core.middleware.frontend.FrontEndMiddleware` (sem underscore), mas o módulo
+> real é `django_resaas.core.middleware.front_end` (com underscore). Descomentar essa linha
+> tal como está levantaria `ModuleNotFoundError` — o caminho precisa do underscore
+> acrescentado antes de este middleware poder ser ativado de facto.

@@ -68,5 +68,7 @@ to filter data by.
 
 Only stores the Pinia instance (`setPinia`/`getPinia`) so that
 `base_store.js` and the services can access stores outside Vue components.
-It has no direct relationship to the "tenant context" above beyond the name
-— don't confuse the two "contexts".
+
+> [!NOTE]
+> This file has no direct relationship to the "tenant context" above beyond
+> the name — don't confuse the two "contexts".

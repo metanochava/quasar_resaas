@@ -38,6 +38,7 @@ const id = route.params.id || route.query.id
 if (id) selectedRow.value = (await HTTPAuth.get(url({ type:'u', url:`${module}/${model}s/${id}/` }))).data
 ```
 
+> [!WARNING]
 > `buildFormFromSchema` in `utils/autoForm.js` expects `{ app, model }`, not `{ module, schemaPath }` — see [common errors](../troubleshooting/common-errors.md#app-model-required) before copying this file for a new resource.
 
 ## 2. Routes

@@ -61,7 +61,8 @@ q-checkbox (model) ──toggle()─────┼──> HTTPClient.post(...)
                                    └──> groupPermissions updated
 ```
 
-`components/UserPermissioes.vue` and `components/PagePermissoes.vue` exist
-as mounting points (used in `MainLayout`'s `pagepermissoes` dialog) but are
-still unimplemented — just a title, no logic. Don't rely on them as a
-reference for behavior.
+> [!WARNING]
+> `components/UserPermissioes.vue` and `components/PagePermissoes.vue` exist
+> as mounting points (used in `MainLayout`'s `pagepermissoes` dialog) but are
+> still unimplemented — just a title, no logic. Don't rely on them as a
+> reference for behavior.

@@ -9,10 +9,12 @@ actions, exportação em PDF — sem fixar nenhuma dessas convenções do lado d
 `.../<app>/<model>/schema/` de cada app, e é exercitado de ponta a ponta pela app de demonstração
 em `src/dev/demo`.
 
-Este documento é a referência oficial para essa forma. É protegido por
-`src/django_resaas/core/schema/tests/test_builder.py` — qualquer alteração ao JSON abaixo tem de
-vir acompanhada de uma alteração correspondente no teste, para que a divergência entre este
-documento e o output real seja apanhada em CI.
+Este documento é a referência oficial para essa forma.
+
+> [!NOTE]
+> É protegido por `src/django_resaas/core/schema/tests/test_builder.py` — qualquer alteração
+> ao JSON abaixo tem de vir acompanhada de uma alteração correspondente no teste, para que a
+> divergência entre este documento e o output real seja apanhada em CI.
 
 ## Utilização
 
@@ -35,9 +37,10 @@ si próprio.
   significado de um campo) exigem subir `ResaasSchemaBuilder.SCHEMA_VERSION` para `"2.0"`.
   Consumidores devem verificar `schema_version` antes de confiar em comportamento exclusivo da
   2.0.
-- `module` e `config` (ver abaixo) são **aliases obsoletos**, mantidos apenas por compatibilidade
-  com consumidores mais antigos. Código novo deve ler `model.app` e `routes`/`ui.crud`
-  diretamente.
+> [!NOTE]
+> `module` e `config` (ver abaixo) são **aliases obsoletos**, mantidos apenas por
+> compatibilidade com consumidores mais antigos. Código novo deve ler `model.app` e
+> `routes`/`ui.crud` diretamente.
 
 ## Forma
 
@@ -143,11 +146,13 @@ si próprio.
 
 Toda a secção sobreponível (`ui`, `filters`, `pagination`, `pdf`, `routes`) é um **merge raso de
 dicionário**: `{**default, **(configured or {})}`. Definir `RESAAS.ui = {"dense": False}` só
-sobrepõe `dense` — todas as outras chaves de `ui` mantêm o seu valor por omissão. É por isto que
-um consumidor nunca deve redeclarar estes valores por omissão localmente (ver
-[Referência pública da API](public-api-reference.md) e o `utils/schema.js` do `quasar_resaas`, que
-agora importa estas constantes em vez de as redeclarar) — o backend é a única fonte de verdade
-sobre o que "não definido" significa.
+sobrepõe `dense` — todas as outras chaves de `ui` mantêm o seu valor por omissão.
+
+> [!TIP]
+> Um consumidor nunca deve redeclarar estes valores por omissão localmente (ver
+> [Referência pública da API](public-api-reference.md) e o `utils/schema.js` do
+> `quasar_resaas`, que agora importa estas constantes em vez de as redeclarar) — o backend é
+> a única fonte de verdade sobre o que "não definido" significa.
 
 ## Relacionados
 

@@ -52,10 +52,11 @@ não pode tocar:
   convenção por omissão `{action}_{model}` tem o `.name` mantido em sincronia com o label/model da
   action automaticamente.
 
-A remoção de órfãos só acontece em `ActionSyncService.sync_registry()` (o ponto de entrada do
-sinal `post_migrate` / `manage.py sync_actions`), que agrega as actions declaradas por todas as
-views registadas *antes* de decidir o que já não existe em lado nenhum do código. Chamar
-`sync_view()` diretamente numa única view só faz upsert — nunca apaga, já que uma view não tem
-forma de saber se uma view irmã do mesmo model ainda declara uma action que ela própria não vê.
-Ver `src/django_resaas/tests/test_permissions.py` e `test_action_sync.py` para o comportamento
-exato e testado.
+> [!NOTE]
+> A remoção de órfãos só acontece em `ActionSyncService.sync_registry()` (o ponto de entrada
+> do sinal `post_migrate` / `manage.py sync_actions`), que agrega as actions declaradas por
+> todas as views registadas *antes* de decidir o que já não existe em lado nenhum do código.
+> Chamar `sync_view()` diretamente numa única view só faz upsert — nunca apaga, já que uma
+> view não tem forma de saber se uma view irmã do mesmo model ainda declara uma action que
+> ela própria não vê. Ver `src/django_resaas/tests/test_permissions.py` e
+> `test_action_sync.py` para o comportamento exato e testado.

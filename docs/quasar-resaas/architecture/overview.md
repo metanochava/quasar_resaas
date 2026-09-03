@@ -52,8 +52,12 @@ without an explicit import. See [Form](../components/form.md),
 
 `base/base_store.js` and several services need a Pinia instance outside of Vue
 components. `setPinia(piniaInstance)` must be called once during the host app's
-boot; `getPinia()` throws if that hasn't happened yet — this is the library's way
-of failing fast instead of failing silently.
+boot.
+
+> [!NOTE]
+> `getPinia()` throws if `setPinia()` hasn't run yet — this is the library's way
+> of failing fast instead of failing silently. If you see that error, check the
+> host app's boot order first.
 
 ## `useResaas()`
 

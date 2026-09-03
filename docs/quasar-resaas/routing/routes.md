@@ -49,8 +49,8 @@ import { restRoutes, authRoutes, docsRoutes } from 'quasar_resaas'
 import { MainLayout, CrudPage } from 'quasar_resaas'
 
 routes = [
-  ...docsRoutes,
   ...authRoutes,
+  ...docsRoutes,
   {
     path: '/',
     component: MainLayout,
@@ -59,14 +59,20 @@ routes = [
       { path: 'crud', component: CrudPage, name: 'crud_state' },
       { path: 'crud/:module/:model/go', component: CrudPage, name: 'crud_route' },
       ...restRoutes,
-      ...rhRoutes,
       ...stockRoutes,
       ...saudeRoutes,
-      ...hrRoutes,
+      ...vendasRoutes,
     ],
   },
 ]
 ```
+
+> [!NOTE]
+> `docsRoutes` is a **top-level** entry (its own `DocLayout`, no app
+> chrome) — it must sit alongside `authRoutes`, never nested inside
+> `MainLayout`'s `children`. It used to be spread into `restRoutes` itself;
+> that's no longer the case, so a host project upgrading past that change
+> needs this import added explicitly, exactly as shown above.
 
 The app's own module routes (`rhRoutes`, `saudeRoutes`, ...) follow the same
 `meta` convention as the library's routes — there's no special handling.

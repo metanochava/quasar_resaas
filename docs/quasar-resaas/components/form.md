@@ -19,6 +19,12 @@ creating/editing a record. Unlike `s-auto-form`, it doesn't receive
 draws its own header (title + Cancel/Save), the form via `s-form` (engine) in
 the center, and the footer via [`s-action-form`](action-form.md).
 
+## Events
+
+| Event | Payload | Fired when |
+|---|---|---|
+| `saved` | — | After a successful save (create or update) |
+
 ## Usage
 
 ``` vue
@@ -43,7 +49,8 @@ or edit button (`change_<model>`) only appears if `User.can(...)` allows it
   complete listing page. `s-form-two` is the dedicated (non-modal) page
   alternative to the same editing flow.
 
-> ⚠️ Version note: the `store`-based API of `s-form-two` is the current one
-> in the source code. Consumers using loose props (`schema`, `module`,
-> `model`, `data`, `can-do`) are on a previously published version —
-> check the installed version before copying examples.
+> [!WARNING]
+> The `store`-based API of `s-form-two` is the current one in the source
+> code. Consumers using loose props (`schema`, `module`, `model`, `data`,
+> `can-do`) are on a previously published version — check the installed
+> version before copying examples.

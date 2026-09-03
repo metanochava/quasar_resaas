@@ -80,6 +80,30 @@
             <q-icon name="search_off" size="42px" />
             <div>{{ tdc('Documentation page not found') }}: <b>{{ currentSlug }}</b></div>
           </div>
+
+          <nav
+            v-if="html && (prevNextNav.prev || prevNextNav.next)"
+            class="docs-prevnext"
+          >
+            <router-link
+              v-if="prevNextNav.prev"
+              class="docs-prevnext-link docs-prevnext-prev"
+              :to="{ name: 'docs', params: { product: currentProduct, slug: prevNextNav.prev.slug.split('/') } }"
+            >
+              <span class="docs-prevnext-label">&larr; {{ tdc('Previous') }}</span>
+              <span class="docs-prevnext-title">{{ tdc(prevNextNav.prev.title) }}</span>
+            </router-link>
+            <span v-else />
+
+            <router-link
+              v-if="prevNextNav.next"
+              class="docs-prevnext-link docs-prevnext-next"
+              :to="{ name: 'docs', params: { product: currentProduct, slug: prevNextNav.next.slug.split('/') } }"
+            >
+              <span class="docs-prevnext-label">{{ tdc('Next') }} &rarr;</span>
+              <span class="docs-prevnext-title">{{ tdc(prevNextNav.next.title) }}</span>
+            </router-link>
+          </nav>
         </div>
       </main>
 
@@ -209,6 +233,20 @@ const effectiveSlug = computed(() => `${currentProduct.value}/${currentSlug.valu
 const rawContent = computed(() => docsMap[effectiveSlug.value] || null)
 
 // =========================================================
+// PREVIOUS / NEXT PAGE (order is docsNav's own declaration order)
+// =========================================================
+
+const prevNextNav = computed(() => {
+  const list = docsNav[currentProduct.value] || []
+  const idx = list.findIndex(e => e.slug === currentSlug.value)
+  if (idx === -1) return { prev: null, next: null }
+  return {
+    prev: idx > 0 ? list[idx - 1] : null,
+    next: idx < list.length - 1 ? list[idx + 1] : null
+  }
+})
+
+// =========================================================
 // MARKDOWN RENDERING (headings get slugged ids for the TOC)
 // =========================================================
 
@@ -226,7 +264,31 @@ function slugify(text) {
 const renderer = new marked.Renderer()
 renderer.heading = (text, level, raw) => {
   const id = slugify(raw)
-  return `<h${level} id="${id}">${text}</h${level}>\n`
+  return (
+    `<h${level} id="${id}">` +
+    `<a class="docs-heading-anchor" href="#${id}" aria-label="Link to this section">#</a>` +
+    `${text}</h${level}>\n`
+  )
+}
+
+// GitHub/Quasar/mkdocs-style callouts: a blockquote whose first line is
+// "[!NOTE]" / "[!TIP]" / "[!WARNING]" renders as a styled callout box
+// instead of a plain quote. Any other blockquote falls through unchanged.
+const CALLOUT_ICONS = { note: 'info', tip: 'lightbulb', warning: 'warning' }
+
+renderer.blockquote = (quote) => {
+  const match = quote.match(/^<p>\[!(NOTE|TIP|WARNING)\]\s*\n/i)
+  if (!match) return `<blockquote>${quote}</blockquote>\n`
+
+  const type = match[1].toLowerCase()
+  const body = '<p>' + quote.slice(match[0].length)
+
+  return (
+    `<div class="docs-callout docs-callout-${type}">` +
+    `<i class="material-icons docs-callout-icon">${CALLOUT_ICONS[type]}</i>` +
+    `<div class="docs-callout-body">${body}</div>` +
+    `</div>\n`
+  )
 }
 
 const html = computed(() => {
@@ -592,6 +654,115 @@ function onContentClick(event) {
   border-radius: 0 6px 6px 0;
 }
 
+/* -------------------- CALLOUTS ([!NOTE]/[!TIP]/[!WARNING]) -------------------- */
+
+.docs-markdown .docs-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 1.2em 0;
+  padding: 0.7em 1em;
+  border-radius: 0 6px 6px 0;
+  border-left: 4px solid;
+}
+
+.docs-markdown .docs-callout-body p {
+  margin: 0;
+}
+
+.docs-callout-icon {
+  font-size: 20px;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+.docs-callout-note {
+  border-color: #1976d2;
+  background: rgba(25, 118, 210, 0.06);
+  color: rgba(0, 0, 0, 0.75);
+}
+.docs-callout-note .docs-callout-icon { color: #1976d2; }
+
+.docs-callout-tip {
+  border-color: #21ba45;
+  background: rgba(33, 186, 69, 0.06);
+  color: rgba(0, 0, 0, 0.75);
+}
+.docs-callout-tip .docs-callout-icon { color: #21ba45; }
+
+.docs-callout-warning {
+  border-color: #f2c037;
+  background: rgba(242, 192, 55, 0.09);
+  color: rgba(0, 0, 0, 0.75);
+}
+.docs-callout-warning .docs-callout-icon { color: #b8860b; }
+
+/* -------------------- HEADING PERMALINKS -------------------- */
+
+.docs-markdown h2,
+.docs-markdown h3 {
+  position: relative;
+}
+
+.docs-heading-anchor {
+  position: absolute;
+  left: -1.05em;
+  opacity: 0;
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.3);
+  transition: opacity 0.15s ease;
+}
+
+.docs-markdown h2:hover .docs-heading-anchor,
+.docs-markdown h3:hover .docs-heading-anchor {
+  opacity: 1;
+}
+
+/* -------------------- PREV / NEXT -------------------- */
+
+.docs-prevnext {
+  display: flex;
+  gap: 16px;
+  margin-top: 3em;
+  padding-top: 1.5em;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.docs-prevnext-link {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  text-decoration: none;
+  max-width: 46%;
+  transition: border-color 0.15s ease;
+}
+
+.docs-prevnext-link:hover {
+  border-color: #1976d2;
+}
+
+.docs-prevnext-next {
+  margin-left: auto;
+  text-align: right;
+}
+
+.docs-prevnext-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.docs-prevnext-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1976d2;
+}
+
 body.body--dark .docs-page {
   background: #121212;
 }
@@ -620,5 +791,27 @@ body.body--dark .docs-markdown code {
 body.body--dark .docs-markdown blockquote {
   color: rgba(255, 255, 255, 0.7);
   background: rgba(255, 255, 255, 0.05);
+}
+
+body.body--dark .docs-callout-note,
+body.body--dark .docs-callout-tip,
+body.body--dark .docs-callout-warning {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+body.body--dark .docs-heading-anchor {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+body.body--dark .docs-prevnext {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.body--dark .docs-prevnext-link {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.body--dark .docs-prevnext-label {
+  color: rgba(255, 255, 255, 0.5);
 }
 </style>

@@ -11,8 +11,10 @@ Verificar sempre primeiro se já existe uma release aberta:
 git branch -a | grep release
 ```
 
-Começar uma segunda branch de release enquanto outra ainda está aberta é a forma mais comum deste
-processo correr mal — ver [Troubleshooting](../troubleshooting/common-errors.md#já-existe-uma-branch-de-release).
+> [!WARNING]
+> Começar uma segunda branch de release enquanto outra ainda está aberta é a forma mais
+> comum deste processo correr mal — ver
+> [Troubleshooting](../troubleshooting/common-errors.md#já-existe-uma-branch-de-release).
 
 ## Fluxo
 
@@ -40,10 +42,11 @@ grep version pyproject.toml
 
 ## Regra importante
 
-Subir a versão **depois** de confirmar que não há nenhuma release pendente, nunca antes. Um
-commit de subida de versão feito antes de verificar pode acabar na `develop` sem nenhuma branch de
-release correspondente para o transportar — a versão passa então a dizer uma coisa enquanto o
-código realmente lançado diz outra.
+> [!WARNING]
+> Subir a versão **depois** de confirmar que não há nenhuma release pendente, nunca antes.
+> Um commit de subida de versão feito antes de verificar pode acabar na `develop` sem
+> nenhuma branch de release correspondente para o transportar — a versão passa então a dizer
+> uma coisa enquanto o código realmente lançado diz outra.
 
 ## Diagnóstico
 

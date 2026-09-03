@@ -75,9 +75,12 @@ correrem.
 `initial()` exige que `self.module_name` esteja definido (via `@registerView(...)` — ver
 [Criar um novo recurso](../development/creating-resource.md)) e verifica
 `EntityApp.objects.filter(entity_id=request.entity_id, app__name=module_name, state="Active").exists()`
-antes de mais nada correr. Uma view sem `module_name` definido, ou um tenant que não tenha ativado
-esse módulo, é rejeitado antes de o queryset sequer ser tocado — ver
-`src/django_resaas/tests/test_module_activation.py`.
+antes de mais nada correr.
+
+> [!WARNING]
+> Uma view sem `module_name` definido, ou um tenant que não tenha ativado esse módulo, é
+> rejeitado antes de o queryset sequer ser tocado — ver
+> `src/django_resaas/tests/test_module_activation.py`.
 
 ## Pesquisa, filtros, paginação
 

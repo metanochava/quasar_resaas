@@ -14,11 +14,12 @@ O `TenantContextMiddleware` corre em cada pedido e inicializa sempre os cinco ca
 
 ## Regra de ouro: o tenant nunca é adivinhado
 
-**O `django_resaas` nunca escolhe um tenant automaticamente.** Uma subclasse de `BaseModel`
-(qualquer model com as duas FKs `entity`/`branch`) exige que sejam definidas *explicitamente*
-antes do `.save()` — não há fallback para "a primeira Entity" ou "a primeira Branch". Se qualquer
-uma faltar, `save()` levanta imediatamente `django.core.exceptions.ValidationError`; nada é
-gravado no tenant errado por acidente.
+> [!WARNING]
+> O `django_resaas` nunca escolhe um tenant automaticamente. Uma subclasse de `BaseModel`
+> (qualquer model com as duas FKs `entity`/`branch`) exige que sejam definidas
+> *explicitamente* antes do `.save()` — não há fallback para "a primeira Entity" ou "a
+> primeira Branch". Se qualquer uma faltar, `save()` levanta imediatamente
+> `django.core.exceptions.ValidationError`; nada é gravado no tenant errado por acidente.
 
 ```python
 # core/base/models.py
@@ -33,11 +34,15 @@ def ensure_tenant(self):
 
 No caminho da API, `BaseAPIView.perform_create()` define `entity`/`branch` explicitamente a partir
 de `request.entity_id`/`request.branch_id` antes de gravar, pelo que isto nunca aparece num pedido
-autenticado normal. Aparece — deliberadamente — sempre que se constrói uma instância de
-`BaseModel` sem passar pela API: sessões de shell, management commands, tarefas Celery, sinais,
-migrações de dados, fixtures. Esses pontos de chamada têm de definir `entity`/`branch`
-explicitamente eles próprios; ver `src/django_resaas/tests/test_tenant.py` para o comportamento
-exato que isto fixa (incluindo que nunca "empresta" a branch de outro tenant).
+autenticado normal.
+
+> [!NOTE]
+> O `ensure_tenant()` aparece — deliberadamente — sempre que se constrói uma instância de
+> `BaseModel` sem passar pela API: sessões de shell, management commands, tarefas Celery,
+> sinais, migrações de dados, fixtures. Esses pontos de chamada têm de definir
+> `entity`/`branch` explicitamente eles próprios; ver `src/django_resaas/tests/test_tenant.py`
+> para o comportamento exato que isto fixa (incluindo que nunca "empresta" a branch de outro
+> tenant).
 
 ## Regra principal (queries)
 
@@ -54,8 +59,10 @@ if hasattr(Model, "branch_id"):
     qs = qs.filter(branch_id=self.request.branch_id)
 ```
 
-Quando o manager é trocado, por exemplo para `all_objects` ou `deleted_objects`, os filtros de
-tenant têm de ser reaplicados.
+> [!WARNING]
+> Quando o manager é trocado, por exemplo para `all_objects` ou `deleted_objects`, os filtros
+> de tenant têm de ser reaplicados — caso contrário a troca alarga silenciosamente o queryset
+> para além da entity/branch atual.
 
 ## Objetivo
 

@@ -54,9 +54,10 @@ REST_FRAMEWORK = {
 }
 ```
 
-O `hr` não é opcional na prática: `django_resaas/urls.py` faz `include('hr.urls')`
-incondicionalmente, pelo que qualquer projeto que instale `django_resaas` precisa também de `hr`
-instalado — ver [`hr/overview.md`](../hr/overview.md).
+> [!NOTE]
+> O `hr` não é opcional na prática: `django_resaas/urls.py` faz `include('hr.urls')`
+> incondicionalmente, pelo que qualquer projeto que instale `django_resaas` precisa também
+> de `hr` instalado — ver [`hr/overview.md`](../hr/overview.md).
 
 `TenantContextMiddleware` e `FileAccessMiddleware` são os dois middlewares ativos por omissão —
 ver [`architecture/middleware.md`](../architecture/middleware.md) para o que cada um faz e para o
@@ -93,11 +94,13 @@ python manage.py create_entity   # interativo: superuser + tenant + grupo Admin
 python manage.py migrate         # outra vez - ver abaixo
 ```
 
-O segundo `migrate` não é um erro. As permissões de CRUD (`list_<model>`, `add_<model>`, ...) são
-criadas por um sinal `post_migrate` que não faz nada até existir pelo menos um `EntityType` — o
-`create_entity` é o que cria o primeiro. Correr `migrate` outra vez (idempotente — não aplica
-migrações novas) dispara o sinal de novo, agora que a condição está satisfeita. Sem este passo,
-todos os pedidos falham a autorização, sem permissões disponíveis para atribuir a nenhum grupo.
+> [!WARNING]
+> O segundo `migrate` não é um erro. As permissões de CRUD (`list_<model>`, `add_<model>`,
+> ...) são criadas por um sinal `post_migrate` que não faz nada até existir pelo menos um
+> `EntityType` — o `create_entity` é o que cria o primeiro. Correr `migrate` outra vez
+> (idempotente — não aplica migrações novas) dispara o sinal de novo, agora que a condição
+> está satisfeita. Sem este passo, todos os pedidos falham a autorização, sem permissões
+> disponíveis para atribuir a nenhum grupo.
 
 `create_root` é a alternativa para um ambiente novo de raiz (superuser + estrutura de tenant
 completa numa só vez); `create_entity` serve para acrescentar outra entidade/sucursal a uma

@@ -62,5 +62,8 @@ views (diretamente ou via `views/__init__.py` de cada app, ex.: `hr/views/__init
 efeito secundário de construir o router — ver o comentário no topo de `dev/urls.py` para o porquê
 de `build_saas_urls()` correr especificamente *depois* dos `include(...)` acima. Um processo que
 nunca toca no `ROOT_URLCONF` (um `manage.py migrate` isolado, por exemplo) pode nunca preencher
-`VIEW_REGISTRY` — nesse caso, `sync_resaas_actions` (o recetor do `post_migrate`) não faz nada
-silenciosamente — isto é uma limitação conhecida, não algo que esta fase tenha alterado.
+`VIEW_REGISTRY`.
+
+> [!NOTE]
+> Quando isso acontece, `sync_resaas_actions` (o recetor do `post_migrate`) não faz nada
+> silenciosamente — isto é uma limitação conhecida, não algo que esta fase tenha alterado.

@@ -36,4 +36,7 @@ The response interceptor in `services/api.js` automatically calls `useUserStore(
 
 ## Silent errors in stores (`console.error` without throwing)
 
-`EntityStore.js`, `EntityTypeStore.js`, `PermissionStore.js`, and `UserStore.js` catch network/API failures with `try/catch` and only do `console.error('<action> error', e)` — the UI doesn't automatically get error feedback in these cases (`getSettings`, `loadGroups`, `toggleGroup`, `createGroup`, `getUserEntitys`, `savePermissions`, among others). If an action seems to "do nothing" with no visible message, check the browser console first before assuming the request was never made.
+`EntityStore.js`, `EntityTypeStore.js`, `PermissionStore.js`, and `UserStore.js` catch network/API failures with `try/catch` and only do `console.error('<action> error', e)` — the UI doesn't automatically get error feedback in these cases (`getSettings`, `loadGroups`, `toggleGroup`, `createGroup`, `getUserEntitys`, `savePermissions`, among others).
+
+> [!TIP]
+> If an action seems to "do nothing" with no visible message, check the browser console first before assuming the request was never made.

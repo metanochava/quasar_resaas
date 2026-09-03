@@ -67,8 +67,10 @@ base de idioma/frontend/tradução.
 python manage.py check
 ```
 
-Desde a limpeza da Fase 2, isto corre a própria framework de system checks do Django
-(`django.core.checks`). Antes, um comando local ao projeto sombreava-o com o mesmo nome.
+> [!NOTE]
+> Desde a limpeza da Fase 2, isto corre a própria framework de system checks do Django
+> (`django.core.checks`). Antes, um comando local ao projeto sombreava-o com o mesmo nome —
+> ver `check_metano` abaixo para onde isso passou a viver.
 
 ## `check_metano`
 

@@ -75,6 +75,10 @@ and that boot file (`theme_engine`) has to be listed in `quasar.config.js`:
 boot: ['pinia', 'quasar_saas', 'i18n', 'axios', 'app_ready', 'theme_engine']
 ```
 
-Without this, `<s-auto-crud>`/`<s-btn>`/etc. in SFCs fail with "Failed to resolve component" at build/dev time.
+> [!WARNING]
+> Without this, `<s-auto-crud>`/`<s-btn>`/etc. in SFCs fail with "Failed to resolve component" at build/dev time.
 
-Likewise, `setPinia()` (see `stores/base-store.md`) is called in the host's `quasar_saas.js` boot file, not by the library alone — skipping this step makes `getPinia()` throw `Pinia not initialized` on the first store accessed.
+Likewise, `setPinia()` (see `stores/base-store.md`) is called in the host's `quasar_saas.js` boot file, not by the library alone.
+
+> [!WARNING]
+> Skipping the `setPinia()` step makes `getPinia()` throw `Pinia not initialized` on the first store accessed.

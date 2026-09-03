@@ -14,7 +14,12 @@
 
 ## Emits
 
-`save`, `cancel`, `reset`, `delete`
+| Event | Payload | Fired when |
+|---|---|---|
+| `save` | — | Save button clicked |
+| `cancel` | — | Cancel button clicked |
+| `reset` | — | Reset button clicked, after `reform.resetForm()` runs |
+| `delete` | `obj` (`store.form` at the time of deletion) | After `reform.delete()`/`store.delete()` resolves |
 
 ## Behavior
 

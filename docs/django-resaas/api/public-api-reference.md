@@ -60,12 +60,17 @@ delete/restore/hard delete). Também neste módulo:
   `branch_id`, `group_id`, `lang_id`), depois verifica numa única query se o `BranchUserGroup` do
   utilizador concede uma permissão com esse codename para a branch/entity/entity_type atuais.
 - `hasApp(codigo)` — decorator de método; devolve 403 a menos que a app `codigo` dada esteja ativa
-  (`EntityApp`, `state=1`) para a entidade do pedido. **Problema conhecido:** filtra por
-  `app__codigo`, mas `django_resaas.models.app.App` não tem nenhum campo `codigo` — chamar este
-  decorator levantaria `FieldError`. Não tem nenhum ponto de chamada no código atual, pelo que
-  isto nunca surgiu na prática; fica sinalizado aqui em vez de corrigido, já que corrigir
-  implicaria adivinhar o nome/semântica do campo pretendido (fora do âmbito de uma passagem só de
-  documentação).
+  (`EntityApp`, `state=1`) para a entidade do pedido.
+
+  > [!WARNING]
+  > Problema conhecido: filtra por `app__codigo`, mas `django_resaas.models.app.App` não tem
+  > nenhum campo `codigo` — chamar este decorator levantaria `FieldError`. Não tem nenhum
+  > ponto de chamada no código atual, pelo que isto nunca surgiu na prática; fica sinalizado
+  > aqui em vez de corrigido, já que corrigir implicaria adivinhar o nome/semântica do campo
+  > pretendido (fora do âmbito de uma passagem só de documentação). Usa a verificação real de
+  > ativação de módulo (`EntityApp.objects.filter(entity__id=..., app__name=module,
+  > state="Active")`, ver [BaseAPIView#module-activation](base-api-view.md#module-activation))
+  > em vez disto.
 - `hasPermission(role=None)` — decorator de método que envolve `check_permission()`, devolvendo
   uma resposta 403 `fail()` em vez de levantar.
 - `isPermited(request=None, role=None)` — um alias fino para `check_permission()`.

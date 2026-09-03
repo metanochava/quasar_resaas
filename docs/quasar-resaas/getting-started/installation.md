@@ -67,8 +67,9 @@ export default ({ app }) => {
 boot: ['pinia', 'i18n', 'axios', 'theme_engine']
 ```
 
-Skipping this step fails at build/dev time with `Failed to resolve component:
-s-...` — see [Troubleshooting](../troubleshooting/common-errors.md).
+> [!WARNING]
+> Skipping this step fails at build/dev time with `Failed to resolve component:
+> s-...` — see [Troubleshooting](../troubleshooting/common-errors.md).
 
 ## 3. Initialize the Pinia bridge
 
@@ -87,9 +88,10 @@ export default ({ app, store }) => {
 }
 ```
 
-Skipping this throws `Pinia not initialized. Call setPinia(pinia) in boot.`
-the first time any store (`UserStore`, `EntityStore`, a store built with
-[`createBaseStore`](../stores/base-store.md), ...) is used.
+> [!WARNING]
+> Skipping this throws `Pinia not initialized. Call setPinia(pinia) in boot.`
+> the first time any store (`UserStore`, `EntityStore`, a store built with
+> [`createBaseStore`](../stores/base-store.md), ...) is used.
 
 ## 4. Configure the environment
 

@@ -40,9 +40,11 @@ Exige a permissão `restore_<model>`.
 DELETE .../<id>/hard_delete/
 ```
 
-Remove a linha permanentemente (ignora `deleted_at` por completo). A mesma localização delimitada
-por tenant que o restore. Exige a permissão separada `hard_delete_<model>` — um grupo que só tenha
-`delete_<model>` (soft delete) não consegue fazer hard delete.
+> [!WARNING]
+> Remove a linha permanentemente (ignora `deleted_at` por completo) — não há `restore` que
+> traga isto de volta. A mesma localização delimitada por tenant que o restore. Exige a
+> permissão separada `hard_delete_<model>` — um grupo que só tenha `delete_<model>` (soft
+> delete) não consegue fazer hard delete.
 
 ## Utilização direta no model
 

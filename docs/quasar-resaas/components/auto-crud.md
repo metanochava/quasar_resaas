@@ -39,6 +39,12 @@ There is no `can`/`module` prop — permissions are checked internally via
 `schema.model.endpoint` once the schema has loaded — see
 [Data flow](../architecture/data-flow.md)).
 
+## Events
+
+| Event | Payload | Fired when |
+|---|---|---|
+| `runaction` | `(action, row)` | A custom `@resaas_action` was triggered and `action.autorequest` is **not** `true` — see [Custom actions](#custom-actions-resaasaction) below |
+
 ## Lifecycle
 
 On mount (and whenever `app`/`model` change), `AutoCrud`:

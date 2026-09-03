@@ -51,13 +51,15 @@ the schema:
     in-memory cache (`__relationCache`) — avoids repeating requests while typing
     in a search combo.
 
-> **Note:** `base/base_store.js` always calls
+> [!WARNING]
+> `base/base_store.js` always calls
 > `buildFormFromSchema({ app: this.safeApp, model: this.safeModel })` —
 > this is the path consistent with the current signature. The example in
 > `CargoSEPage.vue` calls `buildFormFromSchema({ module, model,
 > schemaPath })`, which **does not match** the parameters the function
 > actually reads (`app`, `model`, `fetchRelationOptions`); `module`/`schemaPath`
-> are ignored. It's worth confirming whether that page is using an outdated
+> are silently ignored — no error, just a form that never fills in relation
+> options. It's worth confirming whether that page is using an outdated
 > version of the API before taking it as a reference.
 
 ## Requests via a store (`create`/`update`/`loadData`)

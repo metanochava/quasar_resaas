@@ -33,9 +33,19 @@ the drawers and are persisted to `localStorage`
 (`ui_left_menu`/`ui_right_menu`), as is the last visited route
 (`last_route`) and the scroll position.
 
-Global dialogs also live here: `User.Settings` (opens
-`DefinicoesLayout`) and a page-permissions dialog
-(`PagePermissoes` — still a placeholder, no logic).
+Global dialogs also live here, as two deliberately separate modals/toggles
+— "my account" and "how this entity looks for everyone" are not the same
+screen:
+
+- `User.Settings` (`User.toggleSettings()`) opens `UserAccountModal` — the
+  logged-in user's own profile/security (personal data, password, phone
+  number).
+- `User.ThemeStudio` (`User.toggleThemeStudio()`) opens `DefinicoesLayout`
+  — the entity-wide Theme Studio (colors, font, layout, animation).
+
+> [!NOTE]
+> There's also a page-permissions dialog (`PagePermissoes`) mounted here —
+> still a placeholder, no logic.
 
 ## RightMenu — per-route contextual menu
 
@@ -82,8 +92,9 @@ component (`<script setup>`), typically combining `s-pdf-render` and a
 </template>
 ```
 
-If the current route has no registered menu, `RightMenuSegundo` just shows
-an empty space — this isn't an error, it's the default state.
+> [!NOTE]
+> If the current route has no registered menu, `RightMenuSegundo` just
+> shows an empty space — this isn't an error, it's the default state.
 
 ## LeftMenu / TopMenu
 

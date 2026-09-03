@@ -38,8 +38,9 @@ A view não tem nenhum `module_name` definido — nunca foi decorada com `@regis
    `Permission.objects.filter(content_type__model="<model>", codename="<prefixo>_<model>")`.
 2. Confirmar que o grupo do utilizador o tem, para a branch *atual* — `check_permission()` resolve
    permissões por branch/entity/entity_type, não globalmente. Ver [Permissões](../security/permissions.md).
-3. Lembrar que a cache de permissões por pedido (`request._perm_cache`) só vive durante esse único
-   pedido — atribuir uma permissão faz efeito no pedido seguinte, não retroativamente.
+3. > [!TIP]
+   > A cache de permissões por pedido (`request._perm_cache`) só vive durante esse único
+   > pedido — atribuir uma permissão faz efeito no pedido seguinte, não retroativamente.
 
 ## `django.core.exceptions.ValidationError` ao gravar, mencionando "explicit entity and branch"
 
