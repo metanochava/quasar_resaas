@@ -68,7 +68,7 @@
 
           <q-separator />
 
-          <q-tab-panels v-model="tab" animated>
+          <q-tab-panels v-model="tab" animated class="account-tab-panels">
             <!-- PROFILE -->
             <q-tab-panel name="profile" class="q-pa-none q-pt-md">
               <div class="row justify-center q-mb-md">
@@ -94,7 +94,7 @@
                 </div>
               </div>
 
-              <s-card bordered class="q-mb-md">
+              <s-card flat bordered class="q-mb-md">
                 <q-card-section class="text-subtitle1">
                   {{ tdc('Account') }}
                 </q-card-section>
@@ -136,7 +136,7 @@
                 </q-card-section>
               </s-card>
 
-              <s-card bordered class="q-mb-md">
+              <s-card flat bordered class="q-mb-md">
                 <q-card-section class="text-subtitle1">
                   {{ tdc('Personal data') }}
                 </q-card-section>
@@ -202,7 +202,7 @@
 
             <!-- SECURITY -->
             <q-tab-panel name="security" class="q-pa-none q-pt-md">
-              <s-card bordered class="q-mb-md">
+              <s-card flat bordered class="q-mb-md">
                 <q-card-section class="text-subtitle1">
                   {{ tdc('Change password') }}
                 </q-card-section>
@@ -254,7 +254,7 @@
                 </q-card-actions>
               </s-card>
 
-              <s-card bordered>
+              <s-card flat bordered>
                 <q-card-section class="text-subtitle1">
                   {{ tdc('Change phone number') }}
                 </q-card-section>
@@ -610,7 +610,14 @@ export default defineComponent({
 
 <style scoped>
 .user-account-modal {
+  max-height: 90vh;
   overflow: hidden;
+}
+
+.account-tab-panels {
+  max-height: calc(90vh - 140px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .hidden-input {
