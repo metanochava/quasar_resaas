@@ -20,6 +20,7 @@ import { attendanceRoutes } from '../pages/hr/attendance/attendanceRoute'
 import { holidayRoutes } from '../pages/hr/holiday/holidayRoute'
 import { salary_componentRoutes } from '../pages/hr/salary_component/salary_componentRoute'
 import { employee_salaryRoutes } from '../pages/hr/employee_salary/employee_salaryRoute'
+import { employee_salary_componentRoutes } from '../pages/hr/employee_salary_component/employee_salary_componentRoute'
 import { payroll_periodRoutes } from '../pages/hr/payroll_period/payroll_periodRoute'
 import { payrollRoutes } from '../pages/hr/payroll/payrollRoute'
 import { payroll_itemRoutes } from '../pages/hr/payroll_item/payroll_itemRoute'
@@ -137,6 +138,7 @@ export let restRoutes = [
   ...holidayRoutes,
   ...salary_componentRoutes,
   ...employee_salaryRoutes,
+  ...employee_salary_componentRoutes,
   ...payroll_periodRoutes,
   ...payrollRoutes,
   ...payroll_itemRoutes,

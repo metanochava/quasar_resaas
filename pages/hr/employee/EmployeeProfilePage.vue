@@ -62,6 +62,7 @@
           <q-tab name="onboarding" :label="tdc('Onboarding')" />
           <q-tab name="performance" :label="tdc('Performance')" />
           <q-tab name="training" :label="tdc('Training')" />
+          <q-tab name="payroll" :label="tdc('Payroll')" />
         </q-tabs>
 
         <q-separator />
@@ -549,6 +550,68 @@
                       {{ cert.issued_by }} · {{ cert.issued_at }}
                       <span v-if="cert.expires_at"> · {{ tdc('expires') }} {{ cert.expires_at }}</span>
                     </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </template>
+          </q-tab-panel>
+
+          <!-- PAYROLL -->
+          <q-tab-panel name="payroll">
+            <div v-if="Employee.loadingPayroll" class="flex flex-center q-pa-lg">
+              <q-spinner size="30px" color="primary" />
+            </div>
+
+            <template v-else>
+              <div class="text-subtitle2 text-grey-8 q-mb-sm">{{ tdc('Current salary structure') }}</div>
+
+              <div v-if="!Employee.currentSalary" class="text-grey-6 q-pa-md q-mb-lg">
+                {{ tdc('No active salary structure for this employee.') }}
+              </div>
+
+              <q-list v-else bordered separator class="q-mb-lg">
+                <q-item>
+                  <q-item-section>
+                    <q-item-label>{{ tdc('Base salary') }}</q-item-label>
+                    <q-item-label caption>
+                      {{ tdc('Effective') }} {{ Employee.currentSalary.effective_date }}
+                    </q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <div class="text-subtitle1">{{ Employee.currentSalary.base_salary }}</div>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+
+              <div class="text-subtitle2 text-grey-8 q-mb-sm">{{ tdc('Payslips') }}</div>
+
+              <div v-if="!Employee.payrolls.length" class="text-grey-6 q-pa-md">
+                {{ tdc('No payroll history for this employee yet.') }}
+              </div>
+
+              <q-list v-else separator>
+                <q-item v-for="payroll in Employee.payrolls" :key="payroll.id">
+                  <q-item-section>
+                    <q-item-label>{{ payroll.period_data?.name }}</q-item-label>
+                    <q-item-label caption>
+                      {{ tdc('Net salary') }}: {{ payroll.net_salary }}
+                    </q-item-label>
+                  </q-item-section>
+
+                  <q-item-section side>
+                    <q-badge :color="payrollStatusColor(payroll.status)">
+                      {{ payroll.status?.label || payroll.status }}
+                    </q-badge>
+                  </q-item-section>
+
+                  <q-item-section side v-if="payroll.payslip_id">
+                    <s-btn
+                      flat round dense icon="picture_as_pdf"
+                      :href="payslipPdfUrl(payroll)"
+                      target="_blank"
+                    >
+                      <q-tooltip>{{ tdc('View payslip PDF') }}</q-tooltip>
+                    </s-btn>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -1043,6 +1106,22 @@ async function doAddCertification() {
   }
 }
 
+// ---------------- PAYROLL ----------------
+function payrollStatusColor(status) {
+  const value = status?.value || status
+  switch (value) {
+    case 'confirmed':
+    case 'paid': return 'positive'
+    case 'cancelled': return 'grey-7'
+    case 'reviewed': return 'warning'
+    default: return 'primary'
+  }
+}
+
+function payslipPdfUrl(payroll) {
+  return url({ type: 'u', url: `hr/payslips/${payroll.payslip_id}/pdf/` })
+}
+
 async function load(id) {
   if (!id) return
   await Employee.getById(id, { force: true })
@@ -1071,6 +1150,10 @@ watch(tab, (value) => {
 
   if (value === 'training' && employee.value?.id) {
     Employee.loadTraining(employee.value.id)
+  }
+
+  if (value === 'payroll' && employee.value?.id) {
+    Employee.loadPayroll(employee.value.id)
   }
 })
 

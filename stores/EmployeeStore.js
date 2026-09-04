@@ -39,6 +39,9 @@ export const useEmployeeStore = createBaseStore(
       certifications: [],
       loadingTraining: false,
       addingCertification: false,
+      payrolls: [],
+      currentSalary: null,
+      loadingPayroll: false,
     }),
 
     getters: {
@@ -392,6 +395,35 @@ export const useEmployeeStore = createBaseStore(
           await this.loadTraining(employeeId)
         } finally {
           this.addingCertification = false
+        }
+      },
+
+      // Loaded on demand by EmployeeProfilePage's Payroll tab, same
+      // on-demand pattern as loadContracts/.../loadTraining. Payslip
+      // generation/confirmation only happens through PayrollRunPage.vue
+      // (hr/services/payroll_service.py) - this only reads history.
+      async loadPayroll(employeeId) {
+        if (!employeeId) return
+
+        this.loadingPayroll = true
+
+        try {
+          const [payrollsRes, salaryRes] = await Promise.all([
+            HTTPAuth.get(url({
+              type: 'u', url: 'hr/payrolls/', params: { employee: employeeId, page_size: 50 }
+            })),
+            HTTPAuth.get(url({
+              type: 'u', url: 'hr/employeesalaries/',
+              params: { employee: employeeId, is_active: true, page_size: 1 }
+            })),
+          ])
+
+          this.payrolls = payrollsRes.data?.results ?? payrollsRes.data ?? []
+
+          const salaries = salaryRes.data?.results ?? salaryRes.data ?? []
+          this.currentSalary = salaries[0] || null
+        } finally {
+          this.loadingPayroll = false
         }
       },
     }

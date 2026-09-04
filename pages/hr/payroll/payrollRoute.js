@@ -44,5 +44,19 @@ export let payrollRoutes = [
       icon: 'visibility',
       requiredRole: 'view_payroll',
     },
-  }
+  },
+  // Custom controlled workflow (pedido secção 78: Period -> Generate ->
+  // Review -> Validate -> Confirm) - not a generic CRUD add page, see
+  // PayrollRunPage.vue.
+  {
+    path: '/payroll_run',
+    name: 'payroll_run',
+    component: () => import('./PayrollRunPage.vue'),
+    meta: {
+      title: tdc('Payroll Run'),
+      requiresAuth: true,
+      icon: 'play_circle',
+      requiredRole: 'list_payrollperiod',
+    },
+  },
 ]
