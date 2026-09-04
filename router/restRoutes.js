@@ -24,6 +24,16 @@ import { payroll_periodRoutes } from '../pages/hr/payroll_period/payroll_periodR
 import { payrollRoutes } from '../pages/hr/payroll/payrollRoute'
 import { payroll_itemRoutes } from '../pages/hr/payroll_item/payroll_itemRoute'
 import { payslipRoutes } from '../pages/hr/payslip/payslipRoute'
+import { leave_typeRoutes } from '../pages/hr/leave_type/leave_typeRoute'
+import { leave_requestRoutes } from '../pages/hr/leave_request/leave_requestRoute'
+import { leave_balance_entryRoutes } from '../pages/hr/leave_balance_entry/leave_balance_entryRoute'
+import { job_openingRoutes } from '../pages/hr/job_opening/job_openingRoute'
+import { candidateRoutes } from '../pages/hr/candidate/candidateRoute'
+import { applicationRoutes } from '../pages/hr/application/applicationRoute'
+import { interviewRoutes } from '../pages/hr/interview/interviewRoute'
+import { onboarding_templateRoutes } from '../pages/hr/onboarding_template/onboarding_templateRoute'
+import { onboarding_template_taskRoutes } from '../pages/hr/onboarding_template_task/onboarding_template_taskRoute'
+import { employee_onboardingRoutes } from '../pages/hr/employee_onboarding/employee_onboardingRoute'
 import { tdc } from '../services/translation'
 
 
@@ -125,5 +135,15 @@ export let restRoutes = [
   ...payrollRoutes,
   ...payroll_itemRoutes,
   ...payslipRoutes,
+  ...leave_typeRoutes,
+  ...leave_requestRoutes,
+  ...leave_balance_entryRoutes,
+  ...job_openingRoutes,
+  ...candidateRoutes,
+  ...applicationRoutes,
+  ...interviewRoutes,
+  ...onboarding_templateRoutes,
+  ...onboarding_template_taskRoutes,
+  ...employee_onboardingRoutes,
 ]
 

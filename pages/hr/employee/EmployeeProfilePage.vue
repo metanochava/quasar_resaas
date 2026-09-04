@@ -58,6 +58,8 @@
           <q-tab name="employment" :label="tdc('Employment')" />
           <q-tab name="contract" :label="tdc('Contract')" />
           <q-tab name="attendance" :label="tdc('Attendance')" />
+          <q-tab name="leave" :label="tdc('Leave')" />
+          <q-tab name="onboarding" :label="tdc('Onboarding')" />
         </q-tabs>
 
         <q-separator />
@@ -229,22 +231,271 @@
               </q-item>
             </q-list>
           </q-tab-panel>
+
+          <!-- LEAVE -->
+          <q-tab-panel name="leave">
+            <div class="row items-center q-mb-md">
+              <div class="col row q-gutter-sm">
+                <q-badge
+                  v-for="balance in Employee.leaveBalances"
+                  :key="balance.leave_type_id"
+                  color="primary"
+                  class="q-pa-sm"
+                >
+                  {{ balance.leave_type_name }}: {{ balance.balance }} {{ tdc('day(s)') }}
+                </q-badge>
+              </div>
+              <div class="col-auto">
+                <s-btn
+                  color="primary"
+                  icon="add"
+                  :label="tdc('New request')"
+                  @click="openNewLeaveRequest"
+                />
+              </div>
+            </div>
+
+            <div v-if="Employee.loadingLeave" class="flex flex-center q-pa-lg">
+              <q-spinner size="30px" color="primary" />
+            </div>
+
+            <div v-else-if="!Employee.leaveRequests.length" class="text-grey-6 q-pa-md">
+              {{ tdc('No leave requests found for this employee.') }}
+            </div>
+
+            <q-list v-else separator>
+              <q-item v-for="request in Employee.leaveRequests" :key="request.id">
+                <q-item-section>
+                  <q-item-label>
+                    {{ request.leave_type_data?.name }}
+                  </q-item-label>
+                  <q-item-label caption>
+                    {{ request.start_date }} → {{ request.end_date }}
+                    ({{ request.days }} {{ tdc('day(s)') }})
+                  </q-item-label>
+                  <q-item-label caption v-if="request.status?.value === 'rejected' && request.rejection_reason">
+                    {{ tdc('Reason') }}: {{ request.rejection_reason }}
+                  </q-item-label>
+                </q-item-section>
+
+                <q-item-section side>
+                  <div class="row items-center q-gutter-sm">
+                    <q-badge :color="leaveStatusColor(request.status)">
+                      {{ request.status?.label || request.status }}
+                    </q-badge>
+                    <s-btn
+                      v-if="['draft', 'pending'].includes(request.status?.value || request.status)"
+                      flat
+                      dense
+                      round
+                      icon="cancel"
+                      :loading="Employee.requestingLeave"
+                      @click="cancelLeaveRequest(request.id)"
+                    >
+                      <q-tooltip>{{ tdc('Cancel') }}</q-tooltip>
+                    </s-btn>
+                  </div>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-tab-panel>
+
+          <!-- ONBOARDING -->
+          <q-tab-panel name="onboarding">
+            <div v-if="Employee.loadingOnboarding" class="flex flex-center q-pa-lg">
+              <q-spinner size="30px" color="primary" />
+            </div>
+
+            <!-- NO ACTIVE/PAST ONBOARDING - offer to start one -->
+            <div v-else-if="!Employee.onboarding" class="q-pa-md text-center">
+              <div class="text-grey-6 q-mb-md">
+                {{ tdc('This employee has no onboarding checklist yet.') }}
+              </div>
+              <s-btn
+                color="primary"
+                icon="assignment_turned_in"
+                :label="tdc('Start onboarding')"
+                @click="openStartOnboarding"
+              />
+            </div>
+
+            <!-- ACTIVE/COMPLETED/CANCELLED ONBOARDING -->
+            <template v-else>
+              <div class="row items-center q-col-gutter-md q-mb-md">
+                <div class="col-auto">
+                  <q-badge :color="onboardingStatusColor(Employee.onboarding.status)" class="q-pa-sm">
+                    {{ Employee.onboarding.status?.label || Employee.onboarding.status }}
+                  </q-badge>
+                </div>
+                <div class="col">
+                  <q-linear-progress
+                    :value="(Employee.onboarding.progress || 0) / 100"
+                    color="primary"
+                    size="14px"
+                    rounded
+                  >
+                    <div class="absolute-full flex flex-center">
+                      <q-badge color="white" text-color="primary">
+                        {{ Employee.onboarding.progress || 0 }}%
+                      </q-badge>
+                    </div>
+                  </q-linear-progress>
+                </div>
+                <div class="col-auto row q-gutter-sm" v-if="isOnboardingActive">
+                  <s-btn
+                    color="positive"
+                    icon="task_alt"
+                    :label="tdc('Complete onboarding')"
+                    :loading="Employee.onboardingActionLoading"
+                    @click="doCompleteOnboarding"
+                  />
+                  <s-btn
+                    flat
+                    color="negative"
+                    icon="cancel"
+                    :label="tdc('Cancel')"
+                    :loading="Employee.onboardingActionLoading"
+                    @click="doCancelOnboarding"
+                  />
+                </div>
+              </div>
+
+              <div v-if="onboardingError" class="text-negative text-caption q-mb-md">
+                {{ onboardingError }}
+              </div>
+
+              <div v-if="!Employee.onboarding.tasks?.length" class="text-grey-6 q-pa-md">
+                {{ tdc('No tasks on this checklist.') }}
+              </div>
+
+              <q-list v-else separator>
+                <q-item v-for="task in Employee.onboarding.tasks" :key="task.id">
+                  <q-item-section avatar>
+                    <q-checkbox
+                      :model-value="task.is_done"
+                      :disable="!isOnboardingActive || Employee.onboardingActionLoading"
+                      @update:model-value="(val) => toggleOnboardingTask(task, val)"
+                    />
+                  </q-item-section>
+
+                  <q-item-section>
+                    <q-item-label :class="{ 'text-strike text-grey-6': task.is_done }">
+                      {{ task.title }}
+                      <q-badge v-if="task.is_required" color="grey-7" class="q-ml-sm">
+                        {{ tdc('Required') }}
+                      </q-badge>
+                    </q-item-label>
+                    <q-item-label caption v-if="task.description">
+                      {{ task.description }}
+                    </q-item-label>
+                  </q-item-section>
+
+                  <q-item-section side v-if="task.is_done">
+                    <q-item-label caption>
+                      {{ task.done_by_data?.label || '' }}
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </template>
+          </q-tab-panel>
         </q-tab-panels>
       </s-card>
     </template>
+
+    <!-- NEW LEAVE REQUEST DIALOG -->
+    <q-dialog v-model="leaveDialog">
+      <s-card style="width: min(420px, 92vw);">
+        <q-card-section>
+          <div class="text-subtitle1">{{ tdc('New leave request') }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-gutter-md">
+          <s-select
+            v-model="leaveForm.leave_type"
+            :options="leaveTypeOptions"
+            emit-value
+            map-options
+            outlined
+            :label="tdc('Leave type')"
+          />
+          <q-input v-model="leaveForm.start_date" type="date" outlined :label="tdc('Start date')" />
+          <q-input v-model="leaveForm.end_date" type="date" outlined :label="tdc('End date')" />
+          <q-input v-model="leaveForm.reason" type="textarea" outlined :label="tdc('Reason')" />
+          <div v-if="leaveError" class="text-negative text-caption">{{ leaveError }}</div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <s-btn flat :label="tdc('Cancel')" v-close-popup />
+          <s-btn
+            color="primary"
+            :label="tdc('Submit')"
+            :loading="Employee.requestingLeave"
+            @click="submitLeaveRequest"
+          />
+        </q-card-actions>
+      </s-card>
+    </q-dialog>
+
+    <!-- START ONBOARDING DIALOG -->
+    <q-dialog v-model="onboardingDialog">
+      <s-card style="width: min(420px, 92vw);">
+        <q-card-section>
+          <div class="text-subtitle1">{{ tdc('Start onboarding') }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-gutter-md">
+          <s-select
+            v-model="onboardingTemplateChoice"
+            :options="onboardingTemplateOptions"
+            emit-value
+            map-options
+            outlined
+            clearable
+            :label="tdc('Template (optional)')"
+          />
+          <div v-if="onboardingError" class="text-negative text-caption">{{ onboardingError }}</div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <s-btn flat :label="tdc('Cancel')" v-close-popup />
+          <s-btn
+            color="primary"
+            :label="tdc('Start')"
+            :loading="Employee.onboardingActionLoading"
+            @click="doStartOnboarding"
+          />
+        </q-card-actions>
+      </s-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEmployeeStore } from '../../../stores/EmployeeStore'
+import { useLeaveTypeStore } from '../../../stores/LeaveTypeStore'
+import { useOnboardingTemplateStore } from '../../../stores/OnboardingTemplateStore'
 import { tdc } from '../../../services/translation'
 
 const route = useRoute()
 const Employee = useEmployeeStore()
+const LeaveType = useLeaveTypeStore()
+const OnboardingTemplate = useOnboardingTemplateStore()
 
 const tab = ref('personal')
+
+const leaveDialog = ref(false)
+const leaveError = ref('')
+const leaveForm = reactive({
+  leave_type: null,
+  start_date: '',
+  end_date: '',
+  reason: '',
+})
+
+const leaveTypeOptions = computed(() =>
+  (LeaveType.rows || []).map((row) => ({ label: row.name, value: row.id }))
+)
 
 const employee = computed(() => Employee.row)
 const person = computed(() => employee.value?.person_data)
@@ -321,6 +572,139 @@ async function doCheckOut() {
   await Employee.checkOut(employee.value.id)
 }
 
+function leaveStatusColor(status) {
+  const value = status?.value || status
+  switch (value) {
+    case 'approved': return 'positive'
+    case 'pending': return 'warning'
+    case 'rejected': return 'negative'
+    case 'cancelled':
+    case 'draft': return 'grey-7'
+    default: return 'grey-5'
+  }
+}
+
+async function openNewLeaveRequest() {
+  leaveForm.leave_type = null
+  leaveForm.start_date = ''
+  leaveForm.end_date = ''
+  leaveForm.reason = ''
+  leaveError.value = ''
+
+  if (!LeaveType.rows?.length) {
+    await LeaveType.loadData({ page_size: 100 })
+  }
+
+  leaveDialog.value = true
+}
+
+async function submitLeaveRequest() {
+  leaveError.value = ''
+
+  if (!leaveForm.leave_type || !leaveForm.start_date || !leaveForm.end_date) {
+    leaveError.value = tdc('Leave type, start date and end date are required.')
+    return
+  }
+
+  try {
+    await Employee.requestLeave(employee.value.id, {
+      leave_type: leaveForm.leave_type,
+      start_date: leaveForm.start_date,
+      end_date: leaveForm.end_date,
+      reason: leaveForm.reason,
+    })
+    leaveDialog.value = false
+  } catch (err) {
+    leaveError.value = err?.response?.data?.detail
+      || Object.values(err?.response?.data || {})[0]?.[0]
+      || tdc('Could not submit this leave request.')
+  }
+}
+
+async function cancelLeaveRequest(leaveRequestId) {
+  await Employee.cancelLeaveRequest(employee.value.id, leaveRequestId)
+}
+
+// ---------------- ONBOARDING ----------------
+const onboardingDialog = ref(false)
+const onboardingTemplateChoice = ref(null)
+const onboardingError = ref('')
+
+const onboardingTemplateOptions = computed(() =>
+  (OnboardingTemplate.rows || []).map((row) => ({ label: row.name, value: row.id }))
+)
+
+const isOnboardingActive = computed(() => {
+  const value = Employee.onboarding?.status?.value || Employee.onboarding?.status
+  return value === 'in_progress' || value === 'not_started'
+})
+
+function onboardingStatusColor(status) {
+  const value = status?.value || status
+  switch (value) {
+    case 'completed': return 'positive'
+    case 'in_progress': return 'warning'
+    case 'cancelled': return 'grey-7'
+    default: return 'grey-5'
+  }
+}
+
+async function openStartOnboarding() {
+  onboardingTemplateChoice.value = null
+  onboardingError.value = ''
+
+  if (!OnboardingTemplate.rows?.length) {
+    await OnboardingTemplate.loadData({ page_size: 100 })
+  }
+
+  onboardingDialog.value = true
+}
+
+async function doStartOnboarding() {
+  onboardingError.value = ''
+
+  try {
+    await Employee.startOnboarding(employee.value.id, onboardingTemplateChoice.value)
+    onboardingDialog.value = false
+  } catch (err) {
+    onboardingError.value = err?.response?.data?.detail || tdc('Could not start onboarding.')
+  }
+}
+
+async function toggleOnboardingTask(task, done) {
+  onboardingError.value = ''
+
+  try {
+    if (done) {
+      await Employee.completeOnboardingTask(employee.value.id, task.id)
+    } else {
+      await Employee.reopenOnboardingTask(employee.value.id, task.id)
+    }
+  } catch (err) {
+    onboardingError.value = err?.response?.data?.detail || tdc('Could not update this task.')
+  }
+}
+
+async function doCompleteOnboarding() {
+  onboardingError.value = ''
+
+  try {
+    await Employee.completeOnboarding(employee.value.id, Employee.onboarding.id)
+  } catch (err) {
+    onboardingError.value = err?.response?.data?.detail || tdc('Could not complete this onboarding.')
+  }
+}
+
+async function doCancelOnboarding() {
+  onboardingError.value = ''
+
+  try {
+    await Employee.cancelOnboarding(employee.value.id, Employee.onboarding.id)
+  } catch (err) {
+    onboardingError.value = err?.response?.data?.detail || tdc('Could not cancel this onboarding.')
+  }
+}
+
 async function load(id) {
   if (!id) return
   await Employee.getById(id, { force: true })
@@ -333,6 +717,14 @@ async function load(id) {
 watch(tab, (value) => {
   if (value === 'attendance' && employee.value?.id) {
     Employee.loadAttendances(employee.value.id)
+  }
+
+  if (value === 'leave' && employee.value?.id) {
+    Employee.loadLeave(employee.value.id)
+  }
+
+  if (value === 'onboarding' && employee.value?.id) {
+    Employee.loadOnboarding(employee.value.id)
   }
 })
 
