@@ -142,7 +142,7 @@
                 </q-card-section>
 
                 <q-card-section class="q-gutter-md">
-                  <div class="row q-col-gutter-md">
+                  
                     
                       <s-input
                         v-model="personForm.name"
@@ -160,7 +160,7 @@
                         outlined
                       />
                     
-                  </div>
+
 
                   <s-select
                     v-model="personForm.gender"
