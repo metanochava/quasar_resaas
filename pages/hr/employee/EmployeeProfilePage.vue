@@ -60,6 +60,7 @@
           <q-tab name="attendance" :label="tdc('Attendance')" />
           <q-tab name="leave" :label="tdc('Leave')" />
           <q-tab name="onboarding" :label="tdc('Onboarding')" />
+          <q-tab name="performance" :label="tdc('Performance')" />
         </q-tabs>
 
         <q-separator />
@@ -399,6 +400,96 @@
               </q-list>
             </template>
           </q-tab-panel>
+
+          <!-- PERFORMANCE -->
+          <q-tab-panel name="performance">
+            <div v-if="Employee.loadingPerformance" class="flex flex-center q-pa-lg">
+              <q-spinner size="30px" color="primary" />
+            </div>
+
+            <template v-else>
+              <div class="text-subtitle2 text-grey-8 q-mb-sm">{{ tdc('Goals') }}</div>
+
+              <div v-if="!Employee.goals.length" class="text-grey-6 q-pa-md">
+                {{ tdc('No goals set for this employee.') }}
+              </div>
+
+              <q-list v-else separator class="q-mb-lg">
+                <q-item v-for="goal in Employee.goals" :key="goal.id">
+                  <q-item-section>
+                    <q-item-label>
+                      {{ goal.title }}
+                      <q-badge :color="goalStatusColor(goal.status)" class="q-ml-sm">
+                        {{ goal.status?.label || goal.status }}
+                      </q-badge>
+                    </q-item-label>
+                    <q-item-label caption v-if="goal.target">
+                      {{ tdc('Target') }}: {{ goal.target }}
+                    </q-item-label>
+                    <q-linear-progress
+                      :value="(goal.progress || 0) / 100"
+                      color="primary"
+                      size="10px"
+                      rounded
+                      class="q-mt-sm"
+                    >
+                      <div class="absolute-full flex flex-center">
+                        <q-badge color="white" text-color="primary" style="font-size: 10px;">
+                          {{ goal.progress || 0 }}%
+                        </q-badge>
+                      </div>
+                    </q-linear-progress>
+                  </q-item-section>
+
+                  <q-item-section side>
+                    <s-btn
+                      flat
+                      dense
+                      icon="edit"
+                      :label="tdc('Update progress')"
+                      @click="openUpdateGoalProgress(goal)"
+                    />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+
+              <div class="text-subtitle2 text-grey-8 q-mb-sm">{{ tdc('Reviews') }}</div>
+
+              <div v-if="!Employee.reviews.length" class="text-grey-6 q-pa-md">
+                {{ tdc('No performance reviews for this employee.') }}
+              </div>
+
+              <q-list v-else separator>
+                <q-item v-for="review in Employee.reviews" :key="review.id">
+                  <q-item-section>
+                    <q-item-label>
+                      {{ review.review_type?.label || review.review_type }}
+                      <q-badge :color="reviewStatusColor(review.status)" class="q-ml-sm">
+                        {{ review.status?.label || review.status }}
+                      </q-badge>
+                    </q-item-label>
+                    <q-item-label caption v-if="review.overall_rating">
+                      {{ tdc('Overall rating') }}: {{ review.overall_rating }}/5
+                    </q-item-label>
+                    <q-item-label caption v-if="review.comments">
+                      {{ review.comments }}
+                    </q-item-label>
+                  </q-item-section>
+
+                  <q-item-section side v-if="(review.status?.value || review.status) === 'draft'">
+                    <s-btn
+                      color="positive"
+                      dense
+                      icon="check"
+                      :label="tdc('Submit')"
+                      :loading="Employee.performanceActionLoading"
+                      @click="doSubmitReview(review.id)"
+                    />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </template>
+          </q-tab-panel>
         </q-tab-panels>
       </s-card>
     </template>
@@ -462,6 +553,49 @@
             :label="tdc('Start')"
             :loading="Employee.onboardingActionLoading"
             @click="doStartOnboarding"
+          />
+        </q-card-actions>
+      </s-card>
+    </q-dialog>
+
+    <q-dialog v-model="goalProgressDialog">
+      <s-card style="width: min(420px, 92vw);">
+        <q-card-section>
+          <div class="text-subtitle1">{{ goalProgressForm.title }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-gutter-md">
+          <div>
+            <div class="text-caption text-grey-7 q-mb-xs">
+              {{ tdc('Progress') }}: {{ goalProgressForm.progress }}%
+            </div>
+            <q-slider
+              v-model="goalProgressForm.progress"
+              :min="0"
+              :max="100"
+              :step="5"
+              label
+              color="primary"
+            />
+          </div>
+          <s-select
+            v-model="goalProgressForm.status"
+            :options="goalStatusOptions"
+            emit-value
+            map-options
+            outlined
+            clearable
+            :label="tdc('Status (optional override)')"
+          />
+          <div v-if="goalProgressError" class="text-negative text-caption">{{ goalProgressError }}</div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <s-btn flat :label="tdc('Cancel')" v-close-popup />
+          <s-btn
+            color="primary"
+            :label="tdc('Save')"
+            :loading="Employee.performanceActionLoading"
+            @click="doUpdateGoalProgress"
           />
         </q-card-actions>
       </s-card>
@@ -705,6 +839,67 @@ async function doCancelOnboarding() {
   }
 }
 
+// ---------------- PERFORMANCE ----------------
+function goalStatusColor(status) {
+  const value = status?.value || status
+  switch (value) {
+    case 'completed': return 'positive'
+    case 'in_progress': return 'warning'
+    case 'missed': return 'negative'
+    default: return 'grey-7'
+  }
+}
+
+function reviewStatusColor(status) {
+  const value = status?.value || status
+  return value === 'submitted' ? 'positive' : 'grey-7'
+}
+
+const goalStatusOptions = [
+  { label: tdc('Not Started'), value: 'not_started' },
+  { label: tdc('In Progress'), value: 'in_progress' },
+  { label: tdc('Completed'), value: 'completed' },
+  { label: tdc('Missed'), value: 'missed' },
+]
+
+const goalProgressDialog = ref(false)
+const goalProgressError = ref('')
+const goalProgressForm = reactive({
+  id: null,
+  title: '',
+  progress: 0,
+  status: null,
+})
+
+function openUpdateGoalProgress(goal) {
+  goalProgressForm.id = goal.id
+  goalProgressForm.title = goal.title
+  goalProgressForm.progress = goal.progress || 0
+  goalProgressForm.status = null
+  goalProgressError.value = ''
+  goalProgressDialog.value = true
+}
+
+async function doUpdateGoalProgress() {
+  goalProgressError.value = ''
+
+  try {
+    await Employee.updateGoalProgress(
+      employee.value.id,
+      goalProgressForm.id,
+      goalProgressForm.progress,
+      goalProgressForm.status,
+    )
+    goalProgressDialog.value = false
+  } catch (err) {
+    goalProgressError.value = err?.response?.data?.detail || tdc('Could not update this goal.')
+  }
+}
+
+async function doSubmitReview(reviewId) {
+  await Employee.submitReview(employee.value.id, reviewId)
+}
+
 async function load(id) {
   if (!id) return
   await Employee.getById(id, { force: true })
@@ -725,6 +920,10 @@ watch(tab, (value) => {
 
   if (value === 'onboarding' && employee.value?.id) {
     Employee.loadOnboarding(employee.value.id)
+  }
+
+  if (value === 'performance' && employee.value?.id) {
+    Employee.loadPerformance(employee.value.id)
   }
 })
 

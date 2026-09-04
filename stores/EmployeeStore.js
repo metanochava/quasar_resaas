@@ -31,6 +31,10 @@ export const useEmployeeStore = createBaseStore(
       onboarding: null,
       loadingOnboarding: false,
       onboardingActionLoading: false,
+      goals: [],
+      reviews: [],
+      loadingPerformance: false,
+      performanceActionLoading: false,
     }),
 
     getters: {
@@ -285,6 +289,64 @@ export const useEmployeeStore = createBaseStore(
           await this.loadOnboarding(employeeId)
         } finally {
           this.onboardingActionLoading = false
+        }
+      },
+
+      // Loaded on demand by EmployeeProfilePage's Performance tab - same
+      // on-demand pattern as loadContracts/loadAttendances/loadLeave/
+      // loadOnboarding. Goals/reviews only change through
+      // updateGoalProgress/submitReview below (backend enforces this via
+      // read-only fields - hr/serializers/employee_goal.py,
+      // hr/serializers/performance_review.py), never a free PATCH here.
+      async loadPerformance(employeeId) {
+        if (!employeeId) return
+
+        this.loadingPerformance = true
+
+        try {
+          const [goalsRes, reviewsRes] = await Promise.all([
+            HTTPAuth.get(url({
+              type: 'u', url: 'hr/employeegoals/', params: { employee: employeeId }
+            })),
+            HTTPAuth.get(url({
+              type: 'u', url: 'hr/performancereviews/', params: { employee: employeeId }
+            })),
+          ])
+
+          this.goals = goalsRes.data?.results ?? goalsRes.data ?? []
+          this.reviews = reviewsRes.data?.results ?? reviewsRes.data ?? []
+        } finally {
+          this.loadingPerformance = false
+        }
+      },
+
+      async updateGoalProgress(employeeId, goalId, progress, newStatus) {
+        this.performanceActionLoading = true
+
+        try {
+          const payload = { progress }
+          if (newStatus) payload.status = newStatus
+
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/employeegoals/${goalId}/update_progress/` }),
+            payload
+          )
+          await this.loadPerformance(employeeId)
+        } finally {
+          this.performanceActionLoading = false
+        }
+      },
+
+      async submitReview(employeeId, reviewId) {
+        this.performanceActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/performancereviews/${reviewId}/submit_review/` })
+          )
+          await this.loadPerformance(employeeId)
+        } finally {
+          this.performanceActionLoading = false
         }
       },
     }

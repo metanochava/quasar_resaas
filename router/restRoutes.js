@@ -34,6 +34,10 @@ import { interviewRoutes } from '../pages/hr/interview/interviewRoute'
 import { onboarding_templateRoutes } from '../pages/hr/onboarding_template/onboarding_templateRoute'
 import { onboarding_template_taskRoutes } from '../pages/hr/onboarding_template_task/onboarding_template_taskRoute'
 import { employee_onboardingRoutes } from '../pages/hr/employee_onboarding/employee_onboardingRoute'
+import { performance_cycleRoutes } from '../pages/hr/performance_cycle/performance_cycleRoute'
+import { competencyRoutes } from '../pages/hr/competency/competencyRoute'
+import { employee_goalRoutes } from '../pages/hr/employee_goal/employee_goalRoute'
+import { performance_reviewRoutes } from '../pages/hr/performance_review/performance_reviewRoute'
 import { tdc } from '../services/translation'
 
 
@@ -145,5 +149,9 @@ export let restRoutes = [
   ...onboarding_templateRoutes,
   ...onboarding_template_taskRoutes,
   ...employee_onboardingRoutes,
+  ...performance_cycleRoutes,
+  ...competencyRoutes,
+  ...employee_goalRoutes,
+  ...performance_reviewRoutes,
 ]
 
