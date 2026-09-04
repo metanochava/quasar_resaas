@@ -39,7 +39,7 @@ export let employeeRoutes = [
   {
     path: '/view_employee/:id',
     name: 'view_employee',
-    component: () => import('./EmployeeVPage.vue'),
+    component: () => import('./EmployeeProfilePage.vue'),
     meta: {
       title: tdc('View') + ' ' + tdc('employee'),
       requiresAuth: true,

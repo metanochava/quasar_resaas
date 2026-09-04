@@ -9,6 +9,7 @@ import { branchRoutes } from '../pages/branch/branchRoute'
 import { permissionRoutes } from '../pages/permission/permissionRoute'
 import { departmentRoutes } from '../pages/hr/department/departmentRoute'
 import { job_positionRoutes } from '../pages/hr/job_position/job_positionRoute'
+import { job_gradeRoutes } from '../pages/hr/job_grade/job_gradeRoute'
 import { contractRoutes } from '../pages/hr/contract/contractRoute.js'
 import { specialtyRoutes } from '../pages/hr/specialty/specialtyRoute'
 import { employee_specialtyRoutes } from '../pages/hr/employee_specialty/employee_specialtyRoute'
@@ -16,6 +17,7 @@ import { shiftRoutes } from '../pages/hr/shift/shiftRoute'
 import { employee_shiftRoutes } from '../pages/hr/employee_shift/employee_shiftRoute'
 import { shift_scheduleRoutes } from '../pages/hr/shift_schedule/shift_scheduleRoute'
 import { attendanceRoutes } from '../pages/hr/attendance/attendanceRoute'
+import { holidayRoutes } from '../pages/hr/holiday/holidayRoute'
 import { salary_componentRoutes } from '../pages/hr/salary_component/salary_componentRoute'
 import { employee_salaryRoutes } from '../pages/hr/employee_salary/employee_salaryRoute'
 import { payroll_periodRoutes } from '../pages/hr/payroll_period/payroll_periodRoute'
@@ -108,6 +110,7 @@ export let restRoutes = [
   ...employeeRoutes,
   ...departmentRoutes,
   ...job_positionRoutes,
+  ...job_gradeRoutes,
   ...contractRoutes,
   ...specialtyRoutes,
   ...employee_specialtyRoutes,
@@ -115,6 +118,7 @@ export let restRoutes = [
   ...employee_shiftRoutes,
   ...shift_scheduleRoutes,
   ...attendanceRoutes,
+  ...holidayRoutes,
   ...salary_componentRoutes,
   ...employee_salaryRoutes,
   ...payroll_periodRoutes,
