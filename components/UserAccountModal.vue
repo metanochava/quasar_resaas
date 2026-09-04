@@ -143,23 +143,23 @@
 
                 <q-card-section class="q-gutter-md">
                   <div class="row q-col-gutter-md">
-                    <div class="col-12 col-sm-6">
+                    
                       <s-input
                         v-model="personForm.name"
                         :label="tdc('First name')"
                         dense
                         outlined
                       />
-                    </div>
+                   
 
-                    <div class="col-12 col-sm-6">
+                    
                       <s-input
                         v-model="personForm.surname"
                         :label="tdc('Last name')"
                         dense
                         outlined
                       />
-                    </div>
+                    
                   </div>
 
                   <s-select
