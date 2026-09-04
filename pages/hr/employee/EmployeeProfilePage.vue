@@ -61,6 +61,7 @@
           <q-tab name="leave" :label="tdc('Leave')" />
           <q-tab name="onboarding" :label="tdc('Onboarding')" />
           <q-tab name="performance" :label="tdc('Performance')" />
+          <q-tab name="training" :label="tdc('Training')" />
         </q-tabs>
 
         <q-separator />
@@ -490,6 +491,69 @@
               </q-list>
             </template>
           </q-tab-panel>
+
+          <!-- TRAINING -->
+          <q-tab-panel name="training">
+            <div v-if="Employee.loadingTraining" class="flex flex-center q-pa-lg">
+              <q-spinner size="30px" color="primary" />
+            </div>
+
+            <template v-else>
+              <div class="text-subtitle2 text-grey-8 q-mb-sm">{{ tdc('Trainings') }}</div>
+
+              <div v-if="!Employee.trainings.length" class="text-grey-6 q-pa-md">
+                {{ tdc('No trainings found for this employee.') }}
+              </div>
+
+              <q-list v-else separator class="q-mb-lg">
+                <q-item v-for="training in Employee.trainings" :key="training.id">
+                  <q-item-section>
+                    <q-item-label>
+                      {{ training.session_data?.label }}
+                    </q-item-label>
+                    <q-item-label caption v-if="training.score">
+                      {{ tdc('Score') }}: {{ training.score }}
+                    </q-item-label>
+                  </q-item-section>
+
+                  <q-item-section side>
+                    <q-badge :color="trainingStatusColor(training.status)">
+                      {{ training.status?.label || training.status }}
+                    </q-badge>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+
+              <div class="row items-center q-mb-sm">
+                <div class="col text-subtitle2 text-grey-8">{{ tdc('Certifications') }}</div>
+                <div class="col-auto">
+                  <s-btn
+                    flat
+                    dense
+                    icon="add"
+                    :label="tdc('Add certification')"
+                    @click="openAddCertification"
+                  />
+                </div>
+              </div>
+
+              <div v-if="!Employee.certifications.length" class="text-grey-6 q-pa-md">
+                {{ tdc('No certifications found for this employee.') }}
+              </div>
+
+              <q-list v-else separator>
+                <q-item v-for="cert in Employee.certifications" :key="cert.id">
+                  <q-item-section>
+                    <q-item-label>{{ cert.name }}</q-item-label>
+                    <q-item-label caption>
+                      {{ cert.issued_by }} · {{ cert.issued_at }}
+                      <span v-if="cert.expires_at"> · {{ tdc('expires') }} {{ cert.expires_at }}</span>
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </template>
+          </q-tab-panel>
         </q-tab-panels>
       </s-card>
     </template>
@@ -596,6 +660,32 @@
             :label="tdc('Save')"
             :loading="Employee.performanceActionLoading"
             @click="doUpdateGoalProgress"
+          />
+        </q-card-actions>
+      </s-card>
+    </q-dialog>
+
+    <!-- ADD CERTIFICATION DIALOG -->
+    <q-dialog v-model="certificationDialog">
+      <s-card style="width: min(420px, 92vw);">
+        <q-card-section>
+          <div class="text-subtitle1">{{ tdc('Add certification') }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-gutter-md">
+          <q-input v-model="certificationForm.name" outlined :label="tdc('Name')" />
+          <q-input v-model="certificationForm.issued_by" outlined :label="tdc('Issued by')" />
+          <q-input v-model="certificationForm.issued_at" type="date" outlined :label="tdc('Issued at')" />
+          <q-input v-model="certificationForm.expires_at" type="date" outlined :label="tdc('Expires at (optional)')" />
+          <div v-if="certificationError" class="text-negative text-caption">{{ certificationError }}</div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <s-btn flat :label="tdc('Cancel')" v-close-popup />
+          <s-btn
+            color="primary"
+            :label="tdc('Save')"
+            :loading="Employee.addingCertification"
+            @click="doAddCertification"
           />
         </q-card-actions>
       </s-card>
@@ -900,6 +990,59 @@ async function doSubmitReview(reviewId) {
   await Employee.submitReview(employee.value.id, reviewId)
 }
 
+// ---------------- TRAINING ----------------
+function trainingStatusColor(status) {
+  const value = status?.value || status
+  switch (value) {
+    case 'completed': return 'positive'
+    case 'failed':
+    case 'dropped': return 'negative'
+    case 'attending': return 'warning'
+    default: return 'grey-7'
+  }
+}
+
+const certificationDialog = ref(false)
+const certificationError = ref('')
+const certificationForm = reactive({
+  name: '',
+  issued_by: '',
+  issued_at: '',
+  expires_at: '',
+})
+
+function openAddCertification() {
+  certificationForm.name = ''
+  certificationForm.issued_by = ''
+  certificationForm.issued_at = ''
+  certificationForm.expires_at = ''
+  certificationError.value = ''
+  certificationDialog.value = true
+}
+
+async function doAddCertification() {
+  certificationError.value = ''
+
+  if (!certificationForm.name || !certificationForm.issued_at) {
+    certificationError.value = tdc('Name and issued date are required.')
+    return
+  }
+
+  try {
+    await Employee.addCertification(employee.value.id, {
+      name: certificationForm.name,
+      issued_by: certificationForm.issued_by,
+      issued_at: certificationForm.issued_at,
+      expires_at: certificationForm.expires_at || null,
+    })
+    certificationDialog.value = false
+  } catch (err) {
+    certificationError.value = err?.response?.data?.detail
+      || Object.values(err?.response?.data || {})[0]?.[0]
+      || tdc('Could not add this certification.')
+  }
+}
+
 async function load(id) {
   if (!id) return
   await Employee.getById(id, { force: true })
@@ -924,6 +1067,10 @@ watch(tab, (value) => {
 
   if (value === 'performance' && employee.value?.id) {
     Employee.loadPerformance(employee.value.id)
+  }
+
+  if (value === 'training' && employee.value?.id) {
+    Employee.loadTraining(employee.value.id)
   }
 })
 

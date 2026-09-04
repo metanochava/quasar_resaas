@@ -38,6 +38,8 @@ import { performance_cycleRoutes } from '../pages/hr/performance_cycle/performan
 import { competencyRoutes } from '../pages/hr/competency/competencyRoute'
 import { employee_goalRoutes } from '../pages/hr/employee_goal/employee_goalRoute'
 import { performance_reviewRoutes } from '../pages/hr/performance_review/performance_reviewRoute'
+import { courseRoutes } from '../pages/hr/course/courseRoute'
+import { training_sessionRoutes } from '../pages/hr/training_session/training_sessionRoute'
 import { tdc } from '../services/translation'
 
 
@@ -153,5 +155,7 @@ export let restRoutes = [
   ...competencyRoutes,
   ...employee_goalRoutes,
   ...performance_reviewRoutes,
+  ...courseRoutes,
+  ...training_sessionRoutes,
 ]
 

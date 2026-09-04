@@ -35,6 +35,10 @@ export const useEmployeeStore = createBaseStore(
       reviews: [],
       loadingPerformance: false,
       performanceActionLoading: false,
+      trainings: [],
+      certifications: [],
+      loadingTraining: false,
+      addingCertification: false,
     }),
 
     getters: {
@@ -347,6 +351,47 @@ export const useEmployeeStore = createBaseStore(
           await this.loadPerformance(employeeId)
         } finally {
           this.performanceActionLoading = false
+        }
+      },
+
+      // Loaded on demand by EmployeeProfilePage's Training tab, same
+      // on-demand pattern as loadContracts/loadAttendances/loadLeave/
+      // loadOnboarding/loadPerformance. Enrollment happens through
+      // TrainingSessionStore.enroll (hr/trainingsessions/{id}/enroll/) -
+      // this only reads what the employee is already enrolled in/holds.
+      async loadTraining(employeeId) {
+        if (!employeeId) return
+
+        this.loadingTraining = true
+
+        try {
+          const [trainingsRes, certsRes] = await Promise.all([
+            HTTPAuth.get(url({
+              type: 'u', url: 'hr/employeetrainings/', params: { employee: employeeId }
+            })),
+            HTTPAuth.get(url({
+              type: 'u', url: 'hr/certifications/', params: { employee: employeeId }
+            })),
+          ])
+
+          this.trainings = trainingsRes.data?.results ?? trainingsRes.data ?? []
+          this.certifications = certsRes.data?.results ?? certsRes.data ?? []
+        } finally {
+          this.loadingTraining = false
+        }
+      },
+
+      async addCertification(employeeId, payload) {
+        this.addingCertification = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: 'hr/certifications/' }),
+            { ...payload, employee: employeeId }
+          )
+          await this.loadTraining(employeeId)
+        } finally {
+          this.addingCertification = false
         }
       },
     }
