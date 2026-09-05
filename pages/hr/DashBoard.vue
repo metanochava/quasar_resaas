@@ -168,6 +168,136 @@
 
       </div>
 
+      <!-- FASE 10: LEAVE / RECRUITMENT / ONBOARDING / PERFORMANCE -->
+      <div class="row q-col-gutter-md q-mb-md">
+
+        <div v-if="available.leave" class="col-6 col-sm-3 col-lg-2">
+          <s-card flat bordered class="kpi-card cursor-pointer" @click="router.push({ name: 'leave_approvals' })">
+            <q-card-section class="row items-center no-wrap">
+              <q-avatar color="warning" text-color="white" icon="event_busy" size="42px" class="q-mr-md" />
+              <div>
+                <div class="text-caption text-grey-7">{{ tdc('Pending Leave') }}</div>
+                <div class="text-h6 text-weight-bold">{{ pendingLeaveCount }}</div>
+              </div>
+            </q-card-section>
+          </s-card>
+        </div>
+
+        <div v-if="available.recruitment" class="col-6 col-sm-3 col-lg-2">
+          <s-card flat bordered class="kpi-card cursor-pointer" @click="router.push({ name: 'list_jobopening' })">
+            <q-card-section class="row items-center no-wrap">
+              <q-avatar color="secondary" text-color="white" icon="work" size="42px" class="q-mr-md" />
+              <div>
+                <div class="text-caption text-grey-7">{{ tdc('Open Job Openings') }}</div>
+                <div class="text-h6 text-weight-bold">{{ openJobOpeningsCount }}</div>
+              </div>
+            </q-card-section>
+          </s-card>
+        </div>
+
+        <div v-if="available.recruitment" class="col-6 col-sm-3 col-lg-2">
+          <s-card flat bordered class="kpi-card cursor-pointer" @click="router.push({ name: 'list_application' })">
+            <q-card-section class="row items-center no-wrap">
+              <q-avatar color="accent" text-color="white" icon="people_alt" size="42px" class="q-mr-md" />
+              <div>
+                <div class="text-caption text-grey-7">{{ tdc('Candidates in Pipeline') }}</div>
+                <div class="text-h6 text-weight-bold">{{ activePipelineCount }}</div>
+              </div>
+            </q-card-section>
+          </s-card>
+        </div>
+
+        <div v-if="available.onboarding" class="col-6 col-sm-3 col-lg-2">
+          <s-card flat bordered class="kpi-card cursor-pointer" @click="router.push({ name: 'list_employeeonboarding' })">
+            <q-card-section class="row items-center no-wrap">
+              <q-avatar color="info" text-color="white" icon="checklist" size="42px" class="q-mr-md" />
+              <div>
+                <div class="text-caption text-grey-7">{{ tdc('Onboarding In Progress') }}</div>
+                <div class="text-h6 text-weight-bold">{{ onboardingInProgressCount }}</div>
+              </div>
+            </q-card-section>
+          </s-card>
+        </div>
+
+        <div v-if="available.performance" class="col-6 col-sm-3 col-lg-2">
+          <s-card flat bordered class="kpi-card cursor-pointer" @click="router.push({ name: 'list_performancereview' })">
+            <q-card-section class="row items-center no-wrap">
+              <q-avatar color="primary" text-color="white" icon="insights" size="42px" class="q-mr-md" />
+              <div>
+                <div class="text-caption text-grey-7">{{ tdc('Reviews Due') }}</div>
+                <div class="text-h6 text-weight-bold">{{ reviewsDueCount }}</div>
+              </div>
+            </q-card-section>
+          </s-card>
+        </div>
+
+        <div v-if="available.training" class="col-6 col-sm-3 col-lg-2">
+          <s-card flat bordered class="kpi-card">
+            <q-card-section class="row items-center no-wrap">
+              <q-avatar color="negative" text-color="white" icon="verified" size="42px" class="q-mr-md" />
+              <div>
+                <div class="text-caption text-grey-7">{{ tdc('Certifications Expiring (30d)') }}</div>
+                <div class="text-h6 text-weight-bold">{{ expiringCertificationsCount }}</div>
+              </div>
+            </q-card-section>
+          </s-card>
+        </div>
+
+      </div>
+
+      <!-- FASE 10: EMPLOYEE LIFECYCLE (ultimos 30 dias) -->
+      <div v-if="available.lifecycle" class="row q-col-gutter-md q-mb-md">
+
+        <div class="col-6 col-sm-3 col-lg-2">
+          <s-card flat bordered class="kpi-card cursor-pointer" @click="router.push({ name: 'list_promotion' })">
+            <q-card-section class="row items-center no-wrap">
+              <q-avatar color="positive" text-color="white" icon="trending_up" size="42px" class="q-mr-md" />
+              <div>
+                <div class="text-caption text-grey-7">{{ tdc('Promotions (30d)') }}</div>
+                <div class="text-h6 text-weight-bold">{{ recentPromotionsCount }}</div>
+              </div>
+            </q-card-section>
+          </s-card>
+        </div>
+
+        <div class="col-6 col-sm-3 col-lg-2">
+          <s-card flat bordered class="kpi-card cursor-pointer" @click="router.push({ name: 'list_transfer' })">
+            <q-card-section class="row items-center no-wrap">
+              <q-avatar color="info" text-color="white" icon="swap_horiz" size="42px" class="q-mr-md" />
+              <div>
+                <div class="text-caption text-grey-7">{{ tdc('Transfers (30d)') }}</div>
+                <div class="text-h6 text-weight-bold">{{ recentTransfersCount }}</div>
+              </div>
+            </q-card-section>
+          </s-card>
+        </div>
+
+        <div class="col-6 col-sm-3 col-lg-2">
+          <s-card flat bordered class="kpi-card cursor-pointer" @click="router.push({ name: 'list_termination' })">
+            <q-card-section class="row items-center no-wrap">
+              <q-avatar color="grey-7" text-color="white" icon="person_remove" size="42px" class="q-mr-md" />
+              <div>
+                <div class="text-caption text-grey-7">{{ tdc('Terminations (30d)') }}</div>
+                <div class="text-h6 text-weight-bold">{{ recentTerminationsCount }}</div>
+              </div>
+            </q-card-section>
+          </s-card>
+        </div>
+
+        <div class="col-6 col-sm-3 col-lg-2">
+          <s-card flat bordered class="kpi-card cursor-pointer" @click="router.push({ name: 'list_disciplinarycase' })">
+            <q-card-section class="row items-center no-wrap">
+              <q-avatar color="negative" text-color="white" icon="gavel" size="42px" class="q-mr-md" />
+              <div>
+                <div class="text-caption text-grey-7">{{ tdc('Open Disciplinary Cases') }}</div>
+                <div class="text-h6 text-weight-bold">{{ openDisciplinaryCount }}</div>
+              </div>
+            </q-card-section>
+          </s-card>
+        </div>
+
+      </div>
+
       <!-- QUICK ACCESS -->
       <s-card flat bordered>
         <q-card-section>
@@ -198,6 +328,16 @@ import { useDepartmentStore } from '../../stores/DepartmentStore'
 import { useAttendanceStore } from '../../stores/AttendanceStore'
 import { usePayrollStore } from '../../stores/PayrollStore'
 import { useContractStore } from '../../stores/ContractStore'
+import { useLeaveRequestStore } from '../../stores/LeaveRequestStore'
+import { useJobOpeningStore } from '../../stores/JobOpeningStore'
+import { useApplicationStore } from '../../stores/ApplicationStore'
+import { useEmployeeOnboardingStore } from '../../stores/EmployeeOnboardingStore'
+import { usePerformanceReviewStore } from '../../stores/PerformanceReviewStore'
+import { useCertificationStore } from '../../stores/CertificationStore'
+import { usePromotionStore } from '../../stores/PromotionStore'
+import { useTransferStore } from '../../stores/TransferStore'
+import { useTerminationStore } from '../../stores/TerminationStore'
+import { useDisciplinaryCaseStore } from '../../stores/DisciplinaryCaseStore'
 
 const router = useRouter()
 
@@ -206,8 +346,33 @@ const Department = useDepartmentStore()
 const Attendance = useAttendanceStore()
 const Payroll = usePayrollStore()
 const Contract = useContractStore()
+const LeaveRequest = useLeaveRequestStore()
+const JobOpening = useJobOpeningStore()
+const Application = useApplicationStore()
+const EmployeeOnboarding = useEmployeeOnboardingStore()
+const PerformanceReview = usePerformanceReviewStore()
+const Certification = useCertificationStore()
+const Promotion = usePromotionStore()
+const Transfer = useTransferStore()
+const Termination = useTerminationStore()
+const DisciplinaryCase = useDisciplinaryCaseStore()
 
 const loading = ref(true)
+
+// Fase 10: cada dominio (Fases 3-9) e carregado a parte, com
+// Promise.allSettled - se o grupo do utilizador nao tiver a permissao
+// view_<model> de um dominio, o backend devolve erro (BaseAPIView ja
+// filtra por tenant+permissao) e essa seccao e simplesmente omitida,
+// em vez de partir o dashboard inteiro. Nao ha nenhum "gate" de
+// permissao decidido no frontend - so reage ao que o backend permitiu.
+const available = ref({
+  leave: false,
+  recruitment: false,
+  onboarding: false,
+  performance: false,
+  training: false,
+  lifecycle: false
+})
 
 const todayISO = new Date().toISOString().slice(0, 10)
 const todayLabel = new Date().toLocaleDateString(undefined, {
@@ -229,6 +394,34 @@ onMounted(async () => {
     Payroll.loadData({ page_size: 500 }),
     Contract.loadData({ page_size: 500 })
   ])
+
+  const [
+    leaveRes, jobRes, appRes, onboardRes,
+    reviewRes, certRes, promoRes, transferRes, termRes, discRes
+  ] = await Promise.allSettled([
+    LeaveRequest.loadData({ status: 'pending', page_size: 200 }),
+    JobOpening.loadData({ status: 'open', page_size: 200 }),
+    Application.loadData({ page_size: 500 }),
+    EmployeeOnboarding.loadData({ status: 'in_progress', page_size: 200 }),
+    PerformanceReview.loadData({ status: 'draft', page_size: 200 }),
+    Certification.loadData({ page_size: 500 }),
+    Promotion.loadData({ page_size: 200 }),
+    Transfer.loadData({ page_size: 200 }),
+    Termination.loadData({ page_size: 200 }),
+    DisciplinaryCase.loadData({ status: 'open', page_size: 200 })
+  ])
+
+  available.value.leave = leaveRes.status === 'fulfilled'
+  available.value.recruitment = jobRes.status === 'fulfilled' && appRes.status === 'fulfilled'
+  available.value.onboarding = onboardRes.status === 'fulfilled'
+  available.value.performance = reviewRes.status === 'fulfilled'
+  available.value.training = certRes.status === 'fulfilled'
+  available.value.lifecycle = (
+    promoRes.status === 'fulfilled' &&
+    transferRes.status === 'fulfilled' &&
+    termRes.status === 'fulfilled' &&
+    discRes.status === 'fulfilled'
+  )
 
   loading.value = false
 })
@@ -321,6 +514,37 @@ const payrollTotalNet = computed(() =>
     .reduce((sum, p) => sum + Number(p.net_salary || 0), 0)
 )
 
+// Fase 10: metricas das Fases 3-9 - cada uma so e mostrada quando o
+// respectivo `available.*` e true (ver Promise.allSettled em onMounted).
+const soonISO = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+const sinceISO = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+
+const pendingLeaveCount = computed(() => LeaveRequest.pagination.rowsNumber || LeaveRequest.rows.length)
+
+const openJobOpeningsCount = computed(() => JobOpening.pagination.rowsNumber || JobOpening.rows.length)
+const activePipelineCount = computed(() =>
+  Application.rows.filter(a => !['hired', 'rejected', 'withdrawn'].includes(a.status)).length
+)
+
+const onboardingInProgressCount = computed(() => EmployeeOnboarding.pagination.rowsNumber || EmployeeOnboarding.rows.length)
+
+const reviewsDueCount = computed(() => PerformanceReview.pagination.rowsNumber || PerformanceReview.rows.length)
+
+const expiringCertificationsCount = computed(() =>
+  Certification.rows.filter(c => c.expires_at && c.expires_at <= soonISO).length
+)
+
+const recentPromotionsCount = computed(() =>
+  Promotion.rows.filter(p => p.effective_date >= sinceISO).length
+)
+const recentTransfersCount = computed(() =>
+  Transfer.rows.filter(t => t.effective_date >= sinceISO).length
+)
+const recentTerminationsCount = computed(() =>
+  Termination.rows.filter(t => t.termination_date >= sinceISO).length
+)
+const openDisciplinaryCount = computed(() => DisciplinaryCase.pagination.rowsNumber || DisciplinaryCase.rows.length)
+
 function formatCurrency(value) {
   return new Intl.NumberFormat(undefined, {
     minimumFractionDigits: 2, maximumFractionDigits: 2
@@ -368,7 +592,16 @@ const quickLinks = [
   { label: 'Job Positions', icon: 'badge', route: 'list_jobposition' },
   { label: 'Attendance', icon: 'event_available', route: 'list_attendance' },
   { label: 'Contracts', icon: 'description', route: 'list_contract' },
-  { label: 'Payroll', icon: 'payments', route: 'list_payroll' }
+  { label: 'Payroll', icon: 'payments', route: 'list_payroll' },
+  { label: 'Leave Approvals', icon: 'event_busy', route: 'leave_approvals' },
+  { label: 'Job Openings', icon: 'work', route: 'list_jobopening' },
+  { label: 'Applications', icon: 'people_alt', route: 'list_application' },
+  { label: 'Onboarding', icon: 'checklist', route: 'list_employeeonboarding' },
+  { label: 'Performance Reviews', icon: 'insights', route: 'list_performancereview' },
+  { label: 'Promotions', icon: 'trending_up', route: 'list_promotion' },
+  { label: 'Transfers', icon: 'swap_horiz', route: 'list_transfer' },
+  { label: 'Terminations', icon: 'person_remove', route: 'list_termination' },
+  { label: 'Disciplinary Cases', icon: 'gavel', route: 'list_disciplinarycase' }
 ]
 
 </script>
