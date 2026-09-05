@@ -63,6 +63,7 @@
           <q-tab name="performance" :label="tdc('Performance')" />
           <q-tab name="training" :label="tdc('Training')" />
           <q-tab name="payroll" :label="tdc('Payroll')" />
+          <q-tab name="history" :label="tdc('History')" />
         </q-tabs>
 
         <q-separator />
@@ -617,6 +618,169 @@
               </q-list>
             </template>
           </q-tab-panel>
+
+          <!-- HISTORY (Fase 9: Employee Lifecycle) -->
+          <q-tab-panel name="history">
+            <div v-if="Employee.loadingHistory" class="flex flex-center q-pa-lg">
+              <q-spinner size="30px" color="primary" />
+            </div>
+
+            <template v-else>
+              <div v-if="lifecycleError" class="text-negative text-caption q-mb-md">
+                {{ lifecycleError }}
+              </div>
+
+              <!-- PROMOTIONS / TRANSFERS -->
+              <div class="row items-center q-mb-sm">
+                <div class="text-subtitle2 col">{{ tdc('Promotions & Transfers') }}</div>
+                <div class="col-auto q-gutter-sm" v-if="isEmployeeActive">
+                  <s-btn dense flat color="primary" icon="trending_up" :label="tdc('Promote')" @click="openPromotionDialog" />
+                  <s-btn dense flat color="primary" icon="compare_arrows" :label="tdc('Transfer')" @click="openTransferDialog" />
+                </div>
+              </div>
+
+              <div v-if="!Employee.promotions.length && !Employee.transfers.length" class="text-grey-6 q-pa-sm q-mb-md">
+                {{ tdc('No promotions or transfers yet.') }}
+              </div>
+              <q-list v-else bordered separator class="q-mb-md">
+                <q-item v-for="p in Employee.promotions" :key="'promo-' + p.id">
+                  <q-item-section avatar><q-icon name="trending_up" color="positive" /></q-item-section>
+                  <q-item-section>
+                    <q-item-label>{{ tdc('Promoted to') }} {{ p.new_position_data?.label }}</q-item-label>
+                    <q-item-label caption>{{ p.effective_date }} · {{ p.reason || '-' }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item v-for="t in Employee.transfers" :key="'transfer-' + t.id">
+                  <q-item-section avatar><q-icon name="compare_arrows" color="primary" /></q-item-section>
+                  <q-item-section>
+                    <q-item-label>{{ tdc('Transferred to') }} {{ t.to_branch_data?.label }}</q-item-label>
+                    <q-item-label caption>{{ t.effective_date }} · {{ t.reason || '-' }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+
+              <q-separator class="q-my-md" />
+
+              <!-- EXIT: RESIGNATION / TERMINATION -->
+              <div class="row items-center q-mb-sm">
+                <div class="text-subtitle2 col">{{ tdc('Exit') }}</div>
+                <div class="col-auto q-gutter-sm" v-if="isEmployeeActive">
+                  <s-btn dense flat color="warning" icon="logout" :label="tdc('Submit resignation')" @click="openResignationDialog" />
+                  <s-btn dense flat color="negative" icon="person_off" :label="tdc('Terminate')" @click="openTerminationDialog" />
+                </div>
+              </div>
+
+              <div v-if="!Employee.resignations.length && !Employee.terminations.length" class="text-grey-6 q-pa-sm q-mb-md">
+                {{ tdc('No exit records.') }}
+              </div>
+              <q-list v-else bordered separator class="q-mb-md">
+                <q-item v-for="r in Employee.resignations" :key="'resign-' + r.id">
+                  <q-item-section>
+                    <q-item-label>{{ tdc('Resignation') }} · {{ r.last_working_date }}</q-item-label>
+                    <q-item-label caption>{{ r.reason || '-' }}</q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-badge :color="resignationStatusColor(r.status)">{{ r.status?.label || r.status }}</q-badge>
+                  </q-item-section>
+                  <q-item-section side v-if="(r.status?.value || r.status) === 'submitted'">
+                    <div class="q-gutter-xs">
+                      <s-btn dense flat color="positive" icon="check" :loading="Employee.lifecycleActionLoading" @click="acceptResignation(r.id)">
+                        <q-tooltip>{{ tdc('Accept') }}</q-tooltip>
+                      </s-btn>
+                      <s-btn dense flat color="grey-7" icon="undo" :loading="Employee.lifecycleActionLoading" @click="withdrawResignation(r.id)">
+                        <q-tooltip>{{ tdc('Withdraw') }}</q-tooltip>
+                      </s-btn>
+                    </div>
+                  </q-item-section>
+                </q-item>
+                <q-item v-for="term in Employee.terminations" :key="'term-' + term.id">
+                  <q-item-section>
+                    <q-item-label>{{ tdc('Termination') }} · {{ term.termination_date }}</q-item-label>
+                    <q-item-label caption>{{ term.termination_type?.label || term.termination_type }} · {{ term.reason || '-' }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+
+              <!-- OFFBOARDING -->
+              <template v-if="!isEmployeeActive">
+                <q-separator class="q-my-md" />
+                <div class="row items-center q-mb-sm">
+                  <div class="text-subtitle2 col">{{ tdc('Offboarding') }}</div>
+                </div>
+
+                <div v-if="!Employee.offboarding" class="q-pa-sm q-mb-md">
+                  <s-btn color="primary" icon="assignment_late" :label="tdc('Start offboarding')" :loading="Employee.lifecycleActionLoading" @click="doStartOffboarding" />
+                </div>
+
+                <template v-else>
+                  <div class="row items-center q-col-gutter-md q-mb-md">
+                    <div class="col-auto">
+                      <q-badge :color="onboardingStatusColor(Employee.offboarding.status)" class="q-pa-sm">
+                        {{ Employee.offboarding.status?.label || Employee.offboarding.status }}
+                      </q-badge>
+                    </div>
+                    <div class="col">
+                      <q-linear-progress :value="(Employee.offboarding.progress || 0) / 100" color="primary" size="14px" rounded>
+                        <div class="absolute-full flex flex-center">
+                          <q-badge color="white" text-color="primary">{{ Employee.offboarding.progress || 0 }}%</q-badge>
+                        </div>
+                      </q-linear-progress>
+                    </div>
+                    <div class="col-auto row q-gutter-sm" v-if="isOffboardingActive">
+                      <s-btn color="positive" icon="task_alt" :label="tdc('Complete')" :loading="Employee.lifecycleActionLoading" @click="doCompleteOffboarding" />
+                      <s-btn flat color="negative" icon="cancel" :label="tdc('Cancel')" :loading="Employee.lifecycleActionLoading" @click="doCancelOffboarding" />
+                    </div>
+                  </div>
+
+                  <q-list separator>
+                    <q-item v-for="task in Employee.offboarding.tasks" :key="task.id">
+                      <q-item-section avatar>
+                        <q-checkbox
+                          :model-value="task.is_done"
+                          :disable="!isOffboardingActive || Employee.lifecycleActionLoading"
+                          @update:model-value="(val) => toggleOffboardingTask(task, val)"
+                        />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label :class="{ 'text-strike text-grey-6': task.is_done }">{{ task.title }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </template>
+              </template>
+
+              <q-separator class="q-my-md" />
+
+              <!-- DISCIPLINARY (sensitive - pedido secção 41/59, only shown when the API actually returns data for it) -->
+              <template v-if="Employee.disciplinaryCases.length || canAddDisciplinaryCase">
+                <div class="row items-center q-mb-sm">
+                  <div class="text-subtitle2 col">
+                    <q-icon name="gavel" class="q-mr-xs" />{{ tdc('Disciplinary') }}
+                  </div>
+                  <div class="col-auto">
+                    <s-btn dense flat color="negative" icon="add" :label="tdc('Open case')" @click="openDisciplinaryDialog" />
+                  </div>
+                </div>
+
+                <q-list v-if="Employee.disciplinaryCases.length" bordered separator>
+                  <q-item v-for="c in Employee.disciplinaryCases" :key="'case-' + c.id">
+                    <q-item-section>
+                      <q-item-label>{{ c.case_type?.label || c.case_type }}</q-item-label>
+                      <q-item-label caption>{{ c.description }}</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-badge :color="disciplinaryStatusColor(c.status)">{{ c.status?.label || c.status }}</q-badge>
+                    </q-item-section>
+                    <q-item-section side>
+                      <s-btn dense flat icon="add_comment" @click="openDisciplinaryActionDialog(c)">
+                        <q-tooltip>{{ tdc('Add action') }}</q-tooltip>
+                      </s-btn>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </template>
+            </template>
+          </q-tab-panel>
         </q-tab-panels>
       </s-card>
     </template>
@@ -681,6 +845,167 @@
             :loading="Employee.onboardingActionLoading"
             @click="doStartOnboarding"
           />
+        </q-card-actions>
+      </s-card>
+    </q-dialog>
+
+    <!-- PROMOTION DIALOG -->
+    <q-dialog v-model="promotionDialog">
+      <s-card style="width: min(460px, 92vw);">
+        <q-card-section>
+          <div class="text-subtitle1">{{ tdc('Promote employee') }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-gutter-md">
+          <s-select
+            v-model="promotionForm.new_position"
+            :options="jobPositionOptions"
+            emit-value map-options outlined
+            :label="tdc('New position')"
+          />
+          <s-select
+            v-model="promotionForm.new_job_grade"
+            :options="jobGradeOptions"
+            emit-value map-options outlined clearable
+            :label="tdc('New job grade (optional)')"
+          />
+          <q-input v-model="promotionForm.effective_date" type="date" outlined :label="tdc('Effective date')" />
+          <q-input v-model="promotionForm.reason" type="textarea" outlined :label="tdc('Reason')" />
+          <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <s-btn flat :label="tdc('Cancel')" v-close-popup />
+          <s-btn color="primary" :label="tdc('Promote')" :loading="Employee.lifecycleActionLoading" @click="submitPromotion" />
+        </q-card-actions>
+      </s-card>
+    </q-dialog>
+
+    <!-- TRANSFER DIALOG -->
+    <q-dialog v-model="transferDialog">
+      <s-card style="width: min(460px, 92vw);">
+        <q-card-section>
+          <div class="text-subtitle1">{{ tdc('Transfer employee') }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-gutter-md">
+          <s-select
+            v-model="transferForm.to_branch"
+            :options="branchOptions"
+            emit-value map-options outlined
+            :label="tdc('To branch')"
+          />
+          <s-select
+            v-model="transferForm.to_position"
+            :options="jobPositionOptions"
+            emit-value map-options outlined clearable
+            :label="tdc('To position (optional)')"
+          />
+          <q-input v-model="transferForm.effective_date" type="date" outlined :label="tdc('Effective date')" />
+          <q-input v-model="transferForm.reason" type="textarea" outlined :label="tdc('Reason')" />
+          <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <s-btn flat :label="tdc('Cancel')" v-close-popup />
+          <s-btn color="primary" :label="tdc('Transfer')" :loading="Employee.lifecycleActionLoading" @click="submitTransfer" />
+        </q-card-actions>
+      </s-card>
+    </q-dialog>
+
+    <!-- RESIGNATION DIALOG -->
+    <q-dialog v-model="resignationDialog">
+      <s-card style="width: min(420px, 92vw);">
+        <q-card-section>
+          <div class="text-subtitle1">{{ tdc('Submit resignation') }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-gutter-md">
+          <q-input v-model="resignationForm.resignation_date" type="date" outlined :label="tdc('Resignation date')" />
+          <q-input v-model="resignationForm.last_working_date" type="date" outlined :label="tdc('Last working date')" />
+          <q-input v-model="resignationForm.reason" type="textarea" outlined :label="tdc('Reason')" />
+          <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <s-btn flat :label="tdc('Cancel')" v-close-popup />
+          <s-btn color="primary" :label="tdc('Submit')" :loading="Employee.lifecycleActionLoading" @click="submitResignation" />
+        </q-card-actions>
+      </s-card>
+    </q-dialog>
+
+    <!-- TERMINATION DIALOG -->
+    <q-dialog v-model="terminationDialog">
+      <s-card style="width: min(420px, 92vw);">
+        <q-card-section>
+          <div class="text-subtitle1">{{ tdc('Terminate employee') }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-gutter-md">
+          <s-select
+            v-model="terminationForm.termination_type"
+            :options="terminationTypeOptions"
+            emit-value map-options outlined
+            :label="tdc('Termination type')"
+          />
+          <q-input v-model="terminationForm.termination_date" type="date" outlined :label="tdc('Termination date')" />
+          <q-input v-model="terminationForm.reason" type="textarea" outlined :label="tdc('Reason')" />
+          <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <s-btn flat :label="tdc('Cancel')" v-close-popup />
+          <s-btn color="negative" :label="tdc('Terminate')" :loading="Employee.lifecycleActionLoading" @click="submitTermination" />
+        </q-card-actions>
+      </s-card>
+    </q-dialog>
+
+    <!-- DISCIPLINARY CASE DIALOG -->
+    <q-dialog v-model="disciplinaryDialog">
+      <s-card style="width: min(460px, 92vw);">
+        <q-card-section>
+          <div class="text-subtitle1">{{ tdc('Open disciplinary case') }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-gutter-md">
+          <s-select
+            v-model="disciplinaryForm.case_type"
+            :options="disciplinaryCaseTypeOptions"
+            emit-value map-options outlined
+            :label="tdc('Case type')"
+          />
+          <s-select
+            v-model="disciplinaryForm.severity"
+            :options="disciplinarySeverityOptions"
+            emit-value map-options outlined clearable
+            :label="tdc('Severity (optional)')"
+          />
+          <q-input v-model="disciplinaryForm.description" type="textarea" outlined :label="tdc('Description')" />
+          <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <s-btn flat :label="tdc('Cancel')" v-close-popup />
+          <s-btn color="negative" :label="tdc('Open case')" :loading="Employee.lifecycleActionLoading" @click="submitDisciplinaryCase" />
+        </q-card-actions>
+      </s-card>
+    </q-dialog>
+
+    <!-- DISCIPLINARY ACTION DIALOG -->
+    <q-dialog v-model="disciplinaryActionDialog">
+      <s-card style="width: min(420px, 92vw);">
+        <q-card-section>
+          <div class="text-subtitle1">{{ tdc('Add disciplinary action') }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-gutter-md">
+          <s-select
+            v-model="disciplinaryActionForm.action_type"
+            :options="disciplinaryActionTypeOptions"
+            emit-value map-options outlined
+            :label="tdc('Action type')"
+          />
+          <q-input v-model="disciplinaryActionForm.notes" type="textarea" outlined :label="tdc('Notes')" />
+          <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <s-btn flat :label="tdc('Cancel')" v-close-popup />
+          <s-btn color="primary" :label="tdc('Add')" :loading="Employee.lifecycleActionLoading" @click="submitDisciplinaryAction" />
         </q-card-actions>
       </s-card>
     </q-dialog>
@@ -762,12 +1087,18 @@ import { useRoute } from 'vue-router'
 import { useEmployeeStore } from '../../../stores/EmployeeStore'
 import { useLeaveTypeStore } from '../../../stores/LeaveTypeStore'
 import { useOnboardingTemplateStore } from '../../../stores/OnboardingTemplateStore'
+import { useJobPositionStore } from '../../../stores/JobPositionStore'
+import { useJobGradeStore } from '../../../stores/JobGradeStore'
+import { useBranchStore } from '../../../stores/BranchStore'
 import { tdc } from '../../../services/translation'
 
 const route = useRoute()
 const Employee = useEmployeeStore()
 const LeaveType = useLeaveTypeStore()
 const OnboardingTemplate = useOnboardingTemplateStore()
+const JobPosition = useJobPositionStore()
+const JobGrade = useJobGradeStore()
+const Branch = useBranchStore()
 
 const tab = ref('personal')
 
@@ -825,6 +1156,10 @@ const statusColor = computed(() => {
     default: return 'primary'
   }
 })
+
+const isEmployeeActive = computed(() =>
+  ['active', 'probation', 'suspended'].includes(statusValue.value)
+)
 
 const contracts = computed(() => Employee.contracts || [])
 const attendances = computed(() => Employee.attendances || [])
@@ -992,6 +1327,279 @@ async function doCancelOnboarding() {
   }
 }
 
+// ---------------- HISTORY (Fase 9: Employee Lifecycle) ----------------
+const lifecycleError = ref('')
+
+const jobPositionOptions = computed(() =>
+  (JobPosition.rows || []).map((row) => ({ label: row.title, value: row.id }))
+)
+const jobGradeOptions = computed(() =>
+  (JobGrade.rows || []).map((row) => ({ label: row.name, value: row.id }))
+)
+const branchOptions = computed(() =>
+  (Branch.rows || []).map((row) => ({ label: row.name, value: row.id }))
+)
+
+const terminationTypeOptions = [
+  { label: tdc('Voluntary'), value: 'voluntary' },
+  { label: tdc('Involuntary'), value: 'involuntary' },
+  { label: tdc('Retirement'), value: 'retirement' },
+  { label: tdc('End of contract'), value: 'end_of_contract' },
+]
+
+const disciplinaryCaseTypeOptions = [
+  { label: tdc('Misconduct'), value: 'misconduct' },
+  { label: tdc('Attendance'), value: 'attendance' },
+  { label: tdc('Performance'), value: 'performance' },
+  { label: tdc('Policy violation'), value: 'policy_violation' },
+  { label: tdc('Other'), value: 'other' },
+]
+
+const disciplinarySeverityOptions = [
+  { label: tdc('Low'), value: 'low' },
+  { label: tdc('Medium'), value: 'medium' },
+  { label: tdc('High'), value: 'high' },
+]
+
+const disciplinaryActionTypeOptions = [
+  { label: tdc('Verbal warning'), value: 'verbal_warning' },
+  { label: tdc('Written warning'), value: 'written_warning' },
+  { label: tdc('Suspension'), value: 'suspension' },
+  { label: tdc('Termination recommendation'), value: 'termination_recommendation' },
+  { label: tdc('Other'), value: 'other' },
+]
+
+// Always offered - if the viewer actually lacks add_disciplinarycase the
+// backend rejects the POST with 403 and lifecycleError surfaces it (pedido
+// secção 59: backend decides, frontend never gates on a guess).
+const canAddDisciplinaryCase = computed(() => true)
+
+function resignationStatusColor(status) {
+  const value = status?.value || status
+  switch (value) {
+    case 'accepted': return 'grey-7'
+    case 'withdrawn': return 'positive'
+    default: return 'warning'
+  }
+}
+
+function disciplinaryStatusColor(status) {
+  const value = status?.value || status
+  switch (value) {
+    case 'resolved': return 'positive'
+    case 'dismissed': return 'grey-7'
+    case 'under_review': return 'warning'
+    default: return 'negative'
+  }
+}
+
+const isOffboardingActive = computed(() => {
+  const value = Employee.offboarding?.status?.value || Employee.offboarding?.status
+  return value === 'in_progress'
+})
+
+// ---- Promotion ----
+const promotionDialog = ref(false)
+const promotionForm = reactive({ new_position: null, new_job_grade: null, effective_date: '', reason: '' })
+
+async function openPromotionDialog() {
+  lifecycleError.value = ''
+  Object.assign(promotionForm, { new_position: null, new_job_grade: null, effective_date: '', reason: '' })
+
+  if (!JobPosition.rows?.length) await JobPosition.loadData({ page_size: 200 })
+  if (!JobGrade.rows?.length) await JobGrade.loadData({ page_size: 200 })
+
+  promotionDialog.value = true
+}
+
+async function submitPromotion() {
+  lifecycleError.value = ''
+
+  try {
+    await Employee.applyPromotion(employee.value.id, { ...promotionForm })
+    promotionDialog.value = false
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not apply this promotion.')
+  }
+}
+
+// ---- Transfer ----
+const transferDialog = ref(false)
+const transferForm = reactive({ to_branch: null, to_position: null, effective_date: '', reason: '' })
+
+async function openTransferDialog() {
+  lifecycleError.value = ''
+  Object.assign(transferForm, { to_branch: null, to_position: null, effective_date: '', reason: '' })
+
+  if (!Branch.rows?.length) await Branch.loadData({ page_size: 200 })
+  if (!JobPosition.rows?.length) await JobPosition.loadData({ page_size: 200 })
+
+  transferDialog.value = true
+}
+
+async function submitTransfer() {
+  lifecycleError.value = ''
+
+  try {
+    await Employee.applyTransfer(employee.value.id, { ...transferForm })
+    transferDialog.value = false
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not apply this transfer.')
+  }
+}
+
+// ---- Resignation ----
+const resignationDialog = ref(false)
+const resignationForm = reactive({ resignation_date: '', last_working_date: '', reason: '' })
+
+function openResignationDialog() {
+  lifecycleError.value = ''
+  Object.assign(resignationForm, { resignation_date: '', last_working_date: '', reason: '' })
+  resignationDialog.value = true
+}
+
+async function submitResignation() {
+  lifecycleError.value = ''
+
+  try {
+    await Employee.submitResignation(employee.value.id, { ...resignationForm })
+    resignationDialog.value = false
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not submit this resignation.')
+  }
+}
+
+async function acceptResignation(resignationId) {
+  lifecycleError.value = ''
+
+  try {
+    await Employee.acceptResignation(employee.value.id, resignationId)
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not accept this resignation.')
+  }
+}
+
+async function withdrawResignation(resignationId) {
+  lifecycleError.value = ''
+
+  try {
+    await Employee.withdrawResignation(employee.value.id, resignationId)
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not withdraw this resignation.')
+  }
+}
+
+// ---- Termination ----
+const terminationDialog = ref(false)
+const terminationForm = reactive({ termination_type: null, termination_date: '', reason: '' })
+
+function openTerminationDialog() {
+  lifecycleError.value = ''
+  Object.assign(terminationForm, { termination_type: null, termination_date: '', reason: '' })
+  terminationDialog.value = true
+}
+
+async function submitTermination() {
+  lifecycleError.value = ''
+
+  try {
+    await Employee.terminateEmployee(employee.value.id, { ...terminationForm })
+    terminationDialog.value = false
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not terminate this employee.')
+  }
+}
+
+// ---- Offboarding ----
+async function doStartOffboarding() {
+  lifecycleError.value = ''
+
+  try {
+    await Employee.startOffboarding(employee.value.id)
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not start offboarding.')
+  }
+}
+
+async function toggleOffboardingTask(task, done) {
+  lifecycleError.value = ''
+
+  try {
+    if (done) {
+      await Employee.completeOffboardingTask(employee.value.id, task.id)
+    } else {
+      await Employee.reopenOffboardingTask(employee.value.id, task.id)
+    }
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not update this task.')
+  }
+}
+
+async function doCompleteOffboarding() {
+  lifecycleError.value = ''
+
+  try {
+    await Employee.completeOffboarding(employee.value.id, Employee.offboarding.id)
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not complete this offboarding.')
+  }
+}
+
+async function doCancelOffboarding() {
+  lifecycleError.value = ''
+
+  try {
+    await Employee.cancelOffboarding(employee.value.id, Employee.offboarding.id)
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not cancel this offboarding.')
+  }
+}
+
+// ---- Disciplinary ----
+const disciplinaryDialog = ref(false)
+const disciplinaryForm = reactive({ case_type: 'other', severity: null, description: '' })
+
+function openDisciplinaryDialog() {
+  lifecycleError.value = ''
+  Object.assign(disciplinaryForm, { case_type: 'other', severity: null, description: '' })
+  disciplinaryDialog.value = true
+}
+
+async function submitDisciplinaryCase() {
+  lifecycleError.value = ''
+
+  try {
+    await Employee.addDisciplinaryCase(employee.value.id, { ...disciplinaryForm })
+    disciplinaryDialog.value = false
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not open this case.')
+  }
+}
+
+const disciplinaryActionDialog = ref(false)
+const disciplinaryActionForm = reactive({ action_type: 'verbal_warning', notes: '' })
+const selectedDisciplinaryCaseId = ref(null)
+
+function openDisciplinaryActionDialog(disciplinaryCase) {
+  lifecycleError.value = ''
+  selectedDisciplinaryCaseId.value = disciplinaryCase.id
+  Object.assign(disciplinaryActionForm, { action_type: 'verbal_warning', notes: '' })
+  disciplinaryActionDialog.value = true
+}
+
+async function submitDisciplinaryAction() {
+  lifecycleError.value = ''
+
+  try {
+    await Employee.addDisciplinaryAction(
+      employee.value.id, selectedDisciplinaryCaseId.value, { ...disciplinaryActionForm }
+    )
+    disciplinaryActionDialog.value = false
+  } catch (err) {
+    lifecycleError.value = err?.response?.data?.detail || tdc('Could not add this action.')
+  }
+}
+
 // ---------------- PERFORMANCE ----------------
 function goalStatusColor(status) {
   const value = status?.value || status
@@ -1154,6 +1762,10 @@ watch(tab, (value) => {
 
   if (value === 'payroll' && employee.value?.id) {
     Employee.loadPayroll(employee.value.id)
+  }
+
+  if (value === 'history' && employee.value?.id) {
+    Employee.loadHistory(employee.value.id)
   }
 })
 

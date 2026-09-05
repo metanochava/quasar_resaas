@@ -41,6 +41,12 @@ import { employee_goalRoutes } from '../pages/hr/employee_goal/employee_goalRout
 import { performance_reviewRoutes } from '../pages/hr/performance_review/performance_reviewRoute'
 import { courseRoutes } from '../pages/hr/course/courseRoute'
 import { training_sessionRoutes } from '../pages/hr/training_session/training_sessionRoute'
+import { promotionRoutes } from '../pages/hr/promotion/promotionRoute'
+import { transferRoutes } from '../pages/hr/transfer/transferRoute'
+import { disciplinary_caseRoutes } from '../pages/hr/disciplinary_case/disciplinary_caseRoute'
+import { resignationRoutes } from '../pages/hr/resignation/resignationRoute'
+import { terminationRoutes } from '../pages/hr/termination/terminationRoute'
+import { employee_offboardingRoutes } from '../pages/hr/employee_offboarding/employee_offboardingRoute'
 import { tdc } from '../services/translation'
 
 
@@ -159,5 +165,11 @@ export let restRoutes = [
   ...performance_reviewRoutes,
   ...courseRoutes,
   ...training_sessionRoutes,
+  ...promotionRoutes,
+  ...transferRoutes,
+  ...disciplinary_caseRoutes,
+  ...resignationRoutes,
+  ...terminationRoutes,
+  ...employee_offboardingRoutes,
 ]
 

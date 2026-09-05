@@ -42,6 +42,17 @@ export const useEmployeeStore = createBaseStore(
       payrolls: [],
       currentSalary: null,
       loadingPayroll: false,
+      // Fase 9 (Employee Lifecycle) - History tab.
+      promotions: [],
+      transfers: [],
+      resignations: [],
+      terminations: [],
+      disciplinaryCases: [],
+      // Most recent EmployeeOffboarding, same "only one active at a time"
+      // reasoning as `onboarding` above.
+      offboarding: null,
+      loadingHistory: false,
+      lifecycleActionLoading: false,
     }),
 
     getters: {
@@ -424,6 +435,234 @@ export const useEmployeeStore = createBaseStore(
           this.currentSalary = salaries[0] || null
         } finally {
           this.loadingPayroll = false
+        }
+      },
+
+      // =========================
+      // LIFECYCLE (Fase 9) - History tab
+      // =========================
+      // Loaded on demand by EmployeeProfilePage's History tab, same
+      // on-demand pattern as every other tab above. DisciplinaryCase is
+      // sensitive (pedido secção 41) - a 403 here (viewer lacks
+      // view_disciplinarycase, even though they can see the Employee
+      // itself) is expected and just leaves the list empty, never surfaced
+      // as an error to the viewer.
+      async loadHistory(employeeId) {
+        if (!employeeId) return
+
+        this.loadingHistory = true
+
+        try {
+          const [promotionsRes, transfersRes, resignationsRes, terminationsRes, offboardingRes] =
+            await Promise.all([
+              HTTPAuth.get(url({ type: 'u', url: 'hr/promotions/', params: { employee: employeeId } })),
+              HTTPAuth.get(url({ type: 'u', url: 'hr/transfers/', params: { employee: employeeId } })),
+              HTTPAuth.get(url({ type: 'u', url: 'hr/resignations/', params: { employee: employeeId } })),
+              HTTPAuth.get(url({ type: 'u', url: 'hr/terminations/', params: { employee: employeeId } })),
+              HTTPAuth.get(url({
+                type: 'u', url: 'hr/employeeoffboardings/', params: { employee: employeeId, page_size: 1 },
+              })),
+            ])
+
+          this.promotions = promotionsRes.data?.results ?? promotionsRes.data ?? []
+          this.transfers = transfersRes.data?.results ?? transfersRes.data ?? []
+          this.resignations = resignationsRes.data?.results ?? resignationsRes.data ?? []
+          this.terminations = terminationsRes.data?.results ?? terminationsRes.data ?? []
+
+          const offboardingRows = offboardingRes.data?.results ?? offboardingRes.data ?? []
+          this.offboarding = offboardingRows[0] || null
+
+          try {
+            const { data } = await HTTPAuth.get(url({
+              type: 'u', url: 'hr/disciplinarycases/', params: { employee: employeeId },
+            }))
+            this.disciplinaryCases = data?.results ?? data ?? []
+          } catch (e) {
+            // Sensitive endpoint - a 403 here just means this viewer has no
+            // access to disciplinary records, not an error worth surfacing.
+            this.disciplinaryCases = []
+          }
+        } finally {
+          this.loadingHistory = false
+        }
+      },
+
+      async applyPromotion(employeeId, payload) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/employees/${employeeId}/apply_promotion/` }),
+            payload
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      async applyTransfer(employeeId, payload) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/employees/${employeeId}/apply_transfer/` }),
+            payload
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      // Submitting is plain CRUD create (hr/models/resignation.py) - only
+      // accept/withdraw below are workflow actions.
+      async submitResignation(employeeId, payload) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: 'hr/resignations/' }),
+            { ...payload, employee: employeeId }
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      async acceptResignation(employeeId, resignationId) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/resignations/${resignationId}/accept/` })
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      async withdrawResignation(employeeId, resignationId) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/resignations/${resignationId}/withdraw/` })
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      async terminateEmployee(employeeId, payload) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/employees/${employeeId}/terminate_employee/` }),
+            payload
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      async startOffboarding(employeeId) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/employees/${employeeId}/start_offboarding/` })
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      async completeOffboardingTask(employeeId, taskId) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/employeeoffboardingtasks/${taskId}/complete/` })
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      async reopenOffboardingTask(employeeId, taskId) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/employeeoffboardingtasks/${taskId}/reopen/` })
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      async completeOffboarding(employeeId, offboardingId) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/employeeoffboardings/${offboardingId}/complete/` })
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      async cancelOffboarding(employeeId, offboardingId) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: `hr/employeeoffboardings/${offboardingId}/cancel/` })
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      // Disciplinary is sensitive (pedido secção 41/59) - kept out of the
+      // generic AutoCrud surface, only reachable from this tab.
+      async addDisciplinaryCase(employeeId, payload) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: 'hr/disciplinarycases/' }),
+            { ...payload, employee: employeeId }
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
+        }
+      },
+
+      async addDisciplinaryAction(employeeId, caseId, payload) {
+        this.lifecycleActionLoading = true
+
+        try {
+          await HTTPAuth.post(
+            url({ type: 'u', url: 'hr/disciplinaryactions/' }),
+            { ...payload, case: caseId }
+          )
+          await this.loadHistory(employeeId)
+        } finally {
+          this.lifecycleActionLoading = false
         }
       },
     }
