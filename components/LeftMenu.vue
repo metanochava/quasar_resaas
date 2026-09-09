@@ -31,21 +31,45 @@
         >
           <q-menu fit>
 
-            <q-list dense>
+           
 
-              <q-item
-                v-for="group in User.Groups"
-                :key="group.id"
-                clickable
-                @click="User.selectGroup(group)"
+            <q-list
+                dense
+                class="group-list rounded-borders"
               >
-                <q-item-section>
-                  {{ group.name }}
-                </q-item-section>
 
-              </q-item>
+                <q-item
+                  v-for="group in User?.Groups || []"
+                  :key="group?.id"
+                  clickable
+                  v-close-popup
+                  v-ripple
+                  @click="Group.select(group)"
+                >
 
-            </q-list>
+                  <q-item-section
+                    class="item-content"
+                  >
+
+                    <q-item-label
+                      overline
+                      class="ellipsis"
+                    >
+                      {{
+                        tdc(
+                          profileSplint(
+                            group?.name ||
+                            group?.label
+                          )
+                        )
+                      }}
+                    </q-item-label>
+
+                  </q-item-section>
+
+                </q-item>
+
+              </q-list>
 
           </q-menu>
 
@@ -85,6 +109,8 @@ import SearchMenu from './SearchMenu.vue'
 import { defineComponent } from 'vue'
 import { tdc } from '../services/translation'
 import { useUserStore } from '../stores/UserStore'
+import { useGroupStore } from '../stores/GroupStore.js'
+
 
 export default defineComponent({
   components: {
@@ -93,10 +119,12 @@ export default defineComponent({
   },
   setup () {
     const User = useUserStore()
+    const Group = useGroupStore()
     return {
       User,
       barStyle,
-      thumbStyle
+      thumbStyle,
+      Group
     }
   },
 
