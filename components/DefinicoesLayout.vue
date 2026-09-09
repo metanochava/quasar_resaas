@@ -35,6 +35,7 @@
             <q-tab name="font" icon="font_download" label="Font" />
             <q-tab name="layout" icon="dashboard_customize" label="Layout" />
             <q-tab name="animation" icon="animation" label="Animation" />
+            <q-tab name="areas" icon="web" label="Header/Footer/Login" />
           </q-tabs>
 
           <q-separator />
@@ -371,6 +372,44 @@
                 </q-card-section>
               </s-card>
             </q-tab-panel>
+
+            <!-- HEADER / FOOTER / LOGIN -->
+            <q-tab-panel name="areas">
+              <div class="text-caption text-grey-7 q-mb-md">
+                Backgrounds for the header, footer and login page - color, gradient,
+                image or transparent. Leave the type empty to inherit from the
+                entity type.
+              </div>
+
+              <VisualAreaEditor
+                v-model="areaForms.header"
+                label="Header"
+              />
+
+              <VisualAreaEditor
+                v-model="areaForms.footer"
+                label="Footer"
+              />
+
+              <s-card bordered class="q-pa-md">
+                <div class="text-subtitle1 q-mb-sm">Login page</div>
+
+                <s-select
+                  v-model="areaForms.login.position"
+                  :options="loginPositionOptions"
+                  emit-value map-options
+                  label="Form position"
+                  dense outlined
+                  class="q-mb-sm"
+                />
+
+                <VisualAreaEditor
+                  v-model="areaForms.login"
+                  label="Background"
+                  :show-text-color="false"
+                />
+              </s-card>
+            </q-tab-panel>
           </q-tab-panels>
         </div>
 
@@ -389,7 +428,7 @@
               style="height: 800px"
               class="preview-layout"
             >
-              <q-header bordered class="bg-primary text-white">
+              <q-header bordered class="bg-primary text-white" :style="headerPreviewStyle">
                 <q-toolbar
                   :dense="previewState.layout.toolbar_dense"
                   :class="previewState.layout.toolbar_elevated ? 'shadow-2' : ''"
@@ -566,6 +605,14 @@
                   </q-page>
                 </transition>
               </q-page-container>
+
+              <q-footer bordered class="bg-primary text-white" :style="footerPreviewStyle">
+                <q-toolbar>
+                  <q-toolbar-title class="text-caption">
+                    &copy; {{ new Date().getFullYear() }} - Preview footer
+                  </q-toolbar-title>
+                </q-toolbar>
+              </q-footer>
             </q-layout>
           </div>
         </div>
@@ -604,11 +651,27 @@ import { defineComponent, h } from "vue"
 import { Dark, setCssVar, QBtn, QInput, QCard, QDrawer } from "quasar"
 import { HTTPAuth, url } from "../services/api"
 import { useUserStore } from "../stores/UserStore"
+import { buildRequestPayload } from "../base/base_store"
+import { backgroundConfigToStyle, interfaceConfigToStyle } from "../utils/visualArea"
+import VisualAreaEditor from "./theme/VisualAreaEditor.vue"
+
+function emptyAreaForm() {
+  return {
+    background_type: null,
+    background_color: "#1976D2",
+    background_gradient: "",
+    background_image: null,
+    background_overlay: 0,
+    text_color: "#FFFFFF",
+  }
+}
 
 export default defineComponent({
   name: "ThemeStudioEngine",
 
   components: {
+    VisualAreaEditor,
+
     TBtn: defineComponent({
       name: "TBtn",
       inheritAttrs: false,
@@ -792,7 +855,26 @@ export default defineComponent({
         "Source Sans Pro"
       ],
       buttonStyleOptions: ["flat", "outline", "unelevated", "push"],
-      inputStyleOptions: ["outlined", "filled", "standout"]
+      inputStyleOptions: ["outlined", "filled", "standout"],
+
+      loginPositionOptions: [
+        { label: "Top left", value: "top-left" },
+        { label: "Top right", value: "top-right" },
+        { label: "Center", value: "center" },
+        { label: "Bottom left", value: "bottom-left" },
+        { label: "Bottom right", value: "bottom-right" }
+      ],
+
+      // Header/footer/login - fundo cor/gradiente/imagem/transparente
+      // (Entity.header_*/footer_*/login_* - ver
+      // engine/models/mixins/visual_area.py). Não usa User.Theme
+      // porque estes campos vivem directamente em Entity, não em
+      // Theme/LayoutSetting/Typography/AnimationSetting.
+      areaForms: {
+        header: emptyAreaForm(),
+        footer: emptyAreaForm(),
+        login: { ...emptyAreaForm(), position: "center" }
+      }
     }
   },
 
@@ -868,6 +950,14 @@ export default defineComponent({
         return "none"
       }
       return this.previewState.animation.modal_animation || "fade"
+    },
+
+    headerPreviewStyle() {
+      return this.areaStyle(this.areaForms.header)
+    },
+
+    footerPreviewStyle() {
+      return this.areaStyle(this.areaForms.footer)
     }
   },
 
@@ -875,9 +965,87 @@ export default defineComponent({
     this.applyThemeVars()
     this.darkMode = this.$q.dark.isActive
     this.applyTypography()
+    this.initAreaForms()
   },
 
   methods: {
+    // header/footer/login já resolvidos como {type,value} -> style,
+    // reaproveitando o mesmo utilitário do motor de dashboards
+    // (utils/visualArea.js) - nenhuma lógica de cor/gradiente/imagem
+    // duplicada aqui.
+    areaStyle(form) {
+      if (!form?.background_type) return {}
+
+      let background = null
+      if (form.background_type === "color") background = { type: "color", value: form.background_color }
+      if (form.background_type === "gradient") background = { type: "gradient", value: form.background_gradient }
+      if (form.background_type === "image") {
+        const image = form.background_image
+        background = { type: "image", value: image instanceof File ? URL.createObjectURL(image) : image }
+      }
+      if (form.background_type === "transparent") background = { type: "transparent", value: null }
+
+      return interfaceConfigToStyle({
+        background,
+        overlay: form.background_overlay,
+        text_color: form.text_color
+      })
+    },
+
+    initAreaForms() {
+      const entity = this.User.Entity || {}
+
+      const pick = (prefix) => ({
+        background_type: entity[`${prefix}_background_type`] || null,
+        background_color: entity[`${prefix}_background_color`] || "#1976D2",
+        background_gradient: entity[`${prefix}_background_gradient`] || "",
+        background_image: entity[`${prefix}_background_image`] || null,
+        background_overlay: entity[`${prefix}_background_overlay`] ?? 0,
+        text_color: entity[`${prefix}_text_color`] || "#FFFFFF"
+      })
+
+      this.areaForms = {
+        header: pick("header"),
+        footer: pick("footer"),
+        login: {
+          ...pick("login"),
+          position: entity.login_position || "center"
+        }
+      }
+    },
+
+    async saveAreas() {
+      const payload = { login_position: this.areaForms.login.position }
+
+      for (const area of ["header", "footer", "login"]) {
+        const form = this.areaForms[area]
+
+        payload[`${area}_background_type`] = form.background_type || null
+        payload[`${area}_background_color`] = form.background_type === "color" ? form.background_color : null
+        payload[`${area}_background_gradient`] = form.background_type === "gradient" ? form.background_gradient : null
+        payload[`${area}_background_overlay`] =
+          ["gradient", "image"].includes(form.background_type) ? form.background_overlay : null
+
+        if (area !== "login") {
+          payload[`${area}_text_color`] = form.text_color || null
+        }
+
+        // só reenvia o ficheiro quando o utilizador escolheu um novo -
+        // a imagem já guardada (string URL) nunca é reenviada.
+        if (form.background_type === "image" && form.background_image instanceof File) {
+          payload[`${area}_background_image`] = form.background_image
+        }
+      }
+
+      const { data } = await HTTPAuth.patch(
+        url({ type: "u", url: `django_resaas/entitys/${this.User.Entity.id}/` }),
+        buildRequestPayload(payload)
+      )
+
+      this.User.Entity = { ...this.User.Entity, ...data }
+      this.initAreaForms()
+    },
+
     openColor(key) {
       this.selectedKey = key
       this.tempColor = this.User.Theme[key]
@@ -956,6 +1124,8 @@ export default defineComponent({
         }),
         this.User.AnimationSettings
       )
+
+      await this.saveAreas()
     }
   },
 
@@ -964,6 +1134,7 @@ export default defineComponent({
       if (val) {
         this.applyThemeVars()
         this.applyTypography()
+        this.initAreaForms()
       }
     },
 
