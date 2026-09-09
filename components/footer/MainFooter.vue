@@ -4,7 +4,12 @@
     <q-dialog v-model="comment" persistent>
         <Comments />
     </q-dialog>
-    <q-footer v-if=" true" bordered :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
+    <q-footer
+      v-if=" true" bordered
+      :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
+      :style="footerStyle"
+    >
+      <div v-if="footerOverlayStyle" :style="footerOverlayStyle" />
       <q-toolbar>
         <q-toolbar-title>
           <div class="row q-py-sm  justify-between ">
@@ -27,6 +32,7 @@ import { defineComponent } from 'vue'
 import { tdc } from '../../services/translation';
 import {useUserStore } from '../../stores/UserStore';
 import { useLoadStore } from '../../stores/LoadStore';
+import { interfaceConfigToStyle, overlayStyle } from '../../utils/visualArea';
 import Comments from "./Comments.vue";
 
 
@@ -37,7 +43,9 @@ export default defineComponent({
   },
 
   setup () {
-    const User = useUserStore
+    // era `useUserStore` (a própria função factory, nunca chamada) -
+    // por isso User?.Entity?... no template nunca resolvia nada.
+    const User = useUserStore()
     const Load = useLoadStore()
     return {
       User,
@@ -61,6 +69,13 @@ export default defineComponent({
   created () {
   },
   computed: {
+    footerStyle(){
+      return interfaceConfigToStyle(this.User?.data?.interface_config?.footer)
+    },
+
+    footerOverlayStyle(){
+      return overlayStyle(this.User?.data?.interface_config?.footer?.overlay)
+    }
   },
   mounted () {
 

@@ -38,7 +38,12 @@
     </q-dialog>
 
     <!-- -------------------- HEADER -------------------- -->
-    <q-header bordered :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
+    <q-header
+      bordered
+      :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
+      :style="headerStyle"
+    >
+      <div v-if="headerOverlayStyle" :style="headerOverlayStyle" />
       <q-toolbar class="no-wrap q-px-md">
         <!-- Menu Esquerdo -->
         <s-btn dense flat round icon="menu" @click="User.toggleLeftTop()" />
@@ -156,6 +161,7 @@ import Rodape from '../components/footer/MainFooter.vue'
 
 import { defineComponent } from 'vue'
 import { barStyle, thumbStyle } from '../services/app'
+import { interfaceConfigToStyle, overlayStyle } from '../utils/visualArea'
 import UserPermissioes from '../components/UserPermissioes.vue'
 import PagePermissoes from '../components/PagePermissoes.vue'
 import DefinicoesLayout from '../components/DefinicoesLayout.vue'
@@ -208,6 +214,19 @@ export default defineComponent({
   computed:{
     ps(){
       return this.User.ps || {}
+    },
+
+    // Header/footer personalizados - cascata User > Entity >
+    // EntityType > default já resolvida no backend
+    // (InterfaceConfigService, ver /me/'s interface_config). Antes
+    // do primeiro /me/ responder, interface_config ainda não existe
+    // - a classe bg-primary/bg-dark do template cobre esse instante.
+    headerStyle(){
+      return interfaceConfigToStyle(this.User?.data?.interface_config?.header)
+    },
+
+    headerOverlayStyle(){
+      return overlayStyle(this.User?.data?.interface_config?.header?.overlay)
     }
   },
 

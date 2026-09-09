@@ -55,7 +55,7 @@ function toFormData(form) {
   return fd
 }
 
-function buildRequestPayload(form) {
+export function buildRequestPayload(form) {
   return hasFileValue(form) ? toFormData(form) : form
 }
 

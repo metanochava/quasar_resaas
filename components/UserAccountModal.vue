@@ -64,6 +64,7 @@
           <q-tabs v-model="tab" dense align="justify">
             <q-tab name="profile" icon="person" :label="tdc('Profile')" />
             <q-tab name="security" icon="lock" :label="tdc('Security')" />
+            <q-tab name="appearance" icon="palette" :label="tdc('Appearance')" />
           </q-tabs>
 
           <q-separator />
@@ -298,6 +299,85 @@
                 </q-card-actions>
               </s-card>
             </q-tab-panel>
+
+            <!-- APPEARANCE (header/footer - User > Entity > EntityType > default) -->
+            <q-tab-panel name="appearance" class="q-pa-none q-pt-md">
+              <div
+                v-for="area in ['header', 'footer']" :key="area"
+                class="q-mb-lg"
+              >
+                <div class="text-subtitle2 q-mb-sm">
+                  {{ area === 'header' ? tdc('Header') : tdc('Footer') }}
+                </div>
+
+                <s-select
+                  v-model="interfaceForm[area].background_type"
+                  :options="backgroundTypeOptions"
+                  emit-value map-options
+                  :label="tdc('Background type')"
+                  :hint="tdc('Leave empty to inherit from the entity')"
+                  clearable
+                  class="q-mb-sm"
+                />
+
+                <s-input
+                  v-if="interfaceForm[area].background_type === 'color'"
+                  v-model="interfaceForm[area].background_color"
+                  type="color"
+                  :label="tdc('Background color')"
+                  class="q-mb-sm"
+                />
+
+                <s-input
+                  v-if="interfaceForm[area].background_type === 'gradient'"
+                  v-model="interfaceForm[area].background_gradient"
+                  :label="tdc('CSS gradient')"
+                  :hint="'linear-gradient(135deg, #1976d2, #26a69a)'"
+                  class="q-mb-sm"
+                />
+
+                <q-file
+                  v-if="interfaceForm[area].background_type === 'image'"
+                  v-model="interfaceForm[area].background_image"
+                  accept=".png,.jpg,.jpeg,.webp"
+                  :label="tdc('Background image')"
+                  dense outlined
+                  class="q-mb-sm"
+                />
+
+                <div v-if="['gradient', 'image'].includes(interfaceForm[area].background_type)" class="q-mb-sm">
+                  <div class="text-caption text-grey-7">{{ tdc('Dark overlay') }}</div>
+                  <q-slider
+                    v-model="interfaceForm[area].background_overlay"
+                    :min="0" :max="1" :step="0.05" label
+                  />
+                </div>
+
+                <s-input
+                  v-model="interfaceForm[area].text_color"
+                  type="color"
+                  :label="tdc('Text color')"
+                  class="q-mb-sm"
+                />
+
+                <div class="row q-gutter-sm">
+                  <s-btn
+                    color="primary" size="sm"
+                    :label="tdc('Save')"
+                    :loading="savingInterface[area]"
+                    @click="saveInterface(area)"
+                  />
+                  <s-btn
+                    flat size="sm" color="grey-7"
+                    :label="tdc('Reset to entity default')"
+                    :loading="savingInterface[area]"
+                    @click="resetInterfaceArea(area)"
+                  />
+                </div>
+
+                <q-separator v-if="area === 'header'" class="q-mt-lg" />
+              </div>
+            </q-tab-panel>
           </q-tab-panels>
         </div>
       </div>
@@ -314,6 +394,17 @@ import { COUNTRIES, countryLabel } from "../utils/countries"
 import { toE164, isValidE164, splitE164 } from "../utils/phone"
 
 import OtpInput from "./OtpInput.vue"
+
+function emptyInterfaceForm() {
+  return {
+    background_type: null,
+    background_color: "#1976D2",
+    background_gradient: "",
+    background_overlay: 0,
+    text_color: "#FFFFFF",
+    background_image: null
+  }
+}
 
 export default defineComponent({
   name: "UserAccountModal",
@@ -371,14 +462,33 @@ export default defineComponent({
       contactOtp: "",
       contactOtpError: "",
       requestingContactOtp: false,
-      confirmingContactOtp: false
+      confirmingContactOtp: false,
+
+      // Personalização de header/footer - só o que ESTE utilizador
+      // personalizou (background_type null = a herdar de Entity/
+      // EntityType, ver InterfaceConfigService no backend).
+      interfaceForm: {
+        header: emptyInterfaceForm(),
+        footer: emptyInterfaceForm()
+      },
+      savingInterface: { header: false, footer: false }
     }
   },
 
   computed: {
     barTitle() {
       if (this.tab === "security") return "🔒 " + this.tdc("Security")
+      if (this.tab === "appearance") return "🎨 " + this.tdc("Appearance")
       return "👤 " + this.tdc("Profile")
+    },
+
+    backgroundTypeOptions() {
+      return [
+        { label: this.tdc("Color"), value: "color" },
+        { label: this.tdc("Gradient"), value: "gradient" },
+        { label: this.tdc("Image"), value: "image" },
+        { label: this.tdc("Transparent"), value: "transparent" }
+      ]
     },
 
     countryOptions() {
@@ -424,9 +534,65 @@ export default defineComponent({
 
   mounted() {
     this.loadProfile()
+    this.initInterfaceForm("header")
+    this.initInterfaceForm("footer")
   },
 
   methods: {
+    initInterfaceForm(area) {
+      const override = this.User.data?.interface_override?.[area]
+
+      if (!override) {
+        this.interfaceForm[area] = emptyInterfaceForm()
+        return
+      }
+
+      this.interfaceForm[area] = {
+        background_type: override.background?.type || null,
+        background_color: override.background?.type === "color" ? override.background.value : "#1976D2",
+        background_gradient: override.background?.type === "gradient" ? override.background.value : "",
+        background_overlay: override.overlay ?? 0,
+        text_color: override.text_color || "#FFFFFF",
+        background_image: null
+      }
+    },
+
+    async saveInterface(area) {
+      this.savingInterface[area] = true
+
+      try {
+        const form = this.interfaceForm[area]
+
+        const payload = {
+          background_type: form.background_type,
+          background_overlay: form.background_overlay,
+          text_color: form.text_color
+        }
+
+        if (form.background_type === "color") payload.background_color = form.background_color
+        if (form.background_type === "gradient") payload.background_gradient = form.background_gradient
+        if (form.background_type === "image" && form.background_image) {
+          payload.background_image = form.background_image
+        }
+
+        await this.User.updateInterface(area, payload)
+        this.initInterfaceForm(area)
+      } finally {
+        this.savingInterface[area] = false
+      }
+    },
+
+    async resetInterfaceArea(area) {
+      this.savingInterface[area] = true
+
+      try {
+        await this.User.resetInterface(area)
+        this.initInterfaceForm(area)
+      } finally {
+        this.savingInterface[area] = false
+      }
+    },
+
     triggerAvatarPick() {
       this.$refs.avatarInput?.click()
     },

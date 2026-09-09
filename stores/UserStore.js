@@ -3,7 +3,7 @@ import { getStorage, setStorage, deleteStorage } from '../services/storage'
 import { HTTPAuth, HTTPClient, url } from '../services/api'
 import { useLanguageStore } from  './LanguageStore'
 
-import { createBaseStore } from '../base/base_store'
+import { createBaseStore, buildRequestPayload } from '../base/base_store'
 import { setSettings } from '../services/theme'
 import { JSONSafeParse } from '../utils/json'
 
@@ -340,6 +340,32 @@ export const useUserStore = createBaseStore(
       this.data = { ...this.data, ...rsp.data }
       setStorage('l', 'user', JSON.stringify(this.data), 365)
 
+      return rsp
+    },
+
+    // Personalização de header/footer do próprio utilizador -
+    // cascata User > Entity > EntityType > default resolvida no
+    // backend (InterfaceConfigService) - ver /me/'s
+    // interface_config/interface_override.
+    async updateInterface(area, payload) {
+      // buildRequestPayload troca para FormData automaticamente se
+      // payload trouxer um File (background_image) - mesmo helper já
+      // usado por create()/update() para não perder ficheiros em
+      // silêncio (ver base/base_store.js).
+      const rsp = await HTTPAuth.post(
+        url({ type: 'u', url: 'django_resaas/users/update_interface/', params: {} }),
+        buildRequestPayload({ area, ...payload })
+      )
+      this.data = { ...this.data, ...rsp.data }
+      return rsp
+    },
+
+    async resetInterface(area) {
+      const rsp = await HTTPAuth.post(
+        url({ type: 'u', url: 'django_resaas/users/reset_interface/', params: {} }),
+        area ? { area } : {}
+      )
+      this.data = { ...this.data, ...rsp.data }
       return rsp
     },
 
