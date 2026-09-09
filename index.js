@@ -134,6 +134,10 @@ export {
 } from './components/dashboard/DashboardRenderer.vue'
 
 export {
+  default as HomeDashboards
+} from './components/dashboard/HomeDashboards.vue'
+
+export {
   widgetComponents,
   registerWidgetType,
   resolveWidgetComponent,

@@ -70,6 +70,7 @@ import PersonSearch from './../components/person/PersonSearch.vue'
 
 import  SDashboard from "./../components/DashboardComponent.vue"
 import DashboardRenderer from "./../components/dashboard/DashboardRenderer.vue"
+import HomeDashboards from "./../components/dashboard/HomeDashboards.vue"
 
 
 // =========================================================
@@ -87,6 +88,8 @@ export default boot(({ app }) => {
   app.component('s-dashboard',SDashboard)
 
   app.component('s-dashboard-renderer', DashboardRenderer)
+
+  app.component('s-dashboard-home', HomeDashboards)
 
   app.component('s-btn', BtnComponent)
 
