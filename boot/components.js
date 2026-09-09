@@ -69,6 +69,7 @@ import PersonCreateDialog from './../components/person/PersonCreateDialog.vue'
 import PersonSearch from './../components/person/PersonSearch.vue'
 
 import  SDashboard from "./../components/DashboardComponent.vue"
+import DashboardRenderer from "./../components/dashboard/DashboardRenderer.vue"
 
 
 // =========================================================
@@ -84,7 +85,9 @@ export default boot(({ app }) => {
 
 
   app.component('s-dashboard',SDashboard)
-  
+
+  app.component('s-dashboard-renderer', DashboardRenderer)
+
   app.component('s-btn', BtnComponent)
 
   app.component('s-card', CardComponent)

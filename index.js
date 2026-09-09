@@ -35,6 +35,7 @@ export * from './stores/GroupStore.js'
 export * from './stores/LanguageStore.js'
 export * from './stores/LoadStore.js'
 export * from './stores/PermissionStore.js'
+export * from './stores/DashboardStore.js'
 
 
 // =========================================================
@@ -127,5 +128,15 @@ export {
 export {
   default as CrudPage
 } from './pages/CrudPage.vue'
+
+export {
+  default as DashboardRenderer
+} from './components/dashboard/DashboardRenderer.vue'
+
+export {
+  widgetComponents,
+  registerWidgetType,
+  resolveWidgetComponent,
+} from './components/dashboard/registry.js'
 
 
