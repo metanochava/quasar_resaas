@@ -1,10 +1,11 @@
 <script setup>
 import { computed } from 'vue'
-import { useTipoEntidadeStore } from '../../stores/TipoEntidadeStore'
+
+import { useEntityTypeStore } from '../../stores/EntityTypeStore'
 import DashboardRenderer from './DashboardRenderer.vue'
 import DashboardComponent from '../DashboardComponent.vue'
 
-const TipoEntidade = useTipoEntidadeStore()
+const TipoEntidade = useEntityTypeStore()
 const selected = computed(() => TipoEntidade.row?.name?.toLowerCase() || null)
 </script>
 
