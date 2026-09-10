@@ -188,6 +188,8 @@
           <!-- GRUPOS -->
           <!-- ======================================================== -->
 
+
+          <GroupSelector  v-if="User.data" />
           <s-btn
             v-if="User.data"
             dense
@@ -360,12 +362,14 @@ import RegisterEntity from './RegisterEntity.vue'
 
 import { tdc } from '../../services/translation'
 import { profileSplint } from '../../utils/profile.js'
+import GroupSelector from './../GroupSelector.vue'
 
 export default defineComponent({
   name: 'HeaderUser',
 
   components: {
-    RegisterEntity
+    RegisterEntity,
+    GroupSelector
   },
 
   setup () {
@@ -380,7 +384,8 @@ export default defineComponent({
       Group,
       Branch,
       tdc,
-      profileSplint
+      profileSplint,
+      
     }
   },
 

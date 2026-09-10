@@ -23,7 +23,6 @@
         class=" q-pa-0"
         style="
           width: 290;
-
         "
       >
 

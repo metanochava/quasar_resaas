@@ -23,6 +23,7 @@
 
       <!-- 🔥 CENTRO -->
       <div class=" col row items-center">
+        <GroupSelector />
         <s-btn
           flat
           dense
@@ -30,9 +31,6 @@
           class="full-width"
         >
           <q-menu fit>
-
-           
-
             <q-list
                 dense
                 class="group-list rounded-borders"
@@ -110,12 +108,14 @@ import { defineComponent } from 'vue'
 import { tdc } from '../services/translation'
 import { useUserStore } from '../stores/UserStore'
 import { useGroupStore } from '../stores/GroupStore.js'
+import GroupSelector from './GroupSelector.vue'
 
 
 export default defineComponent({
   components: {
     LeftMenuSegundo,
-    SearchMenu
+    SearchMenu,
+    GroupSelector
   },
   setup () {
     const User = useUserStore()
