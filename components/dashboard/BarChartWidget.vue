@@ -1,11 +1,25 @@
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
+import { resolveDashboardAction } from '../../services/dashboardActions'
 
 const props = defineProps({
   widget: { type: Object, required: true },
   data: { type: Object, required: true },
 })
+
+const router = useRouter()
+
+// 'codes' é opcional e paralelo a 'labels' (mesmo índice) - só usado
+// para resolver o placeholder {code} de item_action; sem 'codes' cai
+// para o próprio label, mantendo compatível qualquer provider actual
+// que só devolva {labels, series}.
+function onSegmentClick(label, i) {
+  if (!props.widget.item_action) return
+  const code = props.data.codes?.[i] ?? label
+  resolveDashboardAction(props.widget.item_action, { router, context: { code, label } })
+}
 
 // Sem biblioteca de charting instalada no projecto (nenhuma dependência
 // nova foi adicionada) - mesmo padrão já usado em
@@ -42,6 +56,8 @@ function pct(value) {
       v-for="(label, i) in data.labels"
       :key="label"
       class="q-mb-sm"
+      :class="{ 'cursor-pointer': !!widget.item_action }"
+      @click="onSegmentClick(label, i)"
     >
       <div class="row items-center justify-between text-caption q-mb-xs">
         <span>{{ label }}</span>

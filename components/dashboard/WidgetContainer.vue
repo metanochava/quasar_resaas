@@ -1,7 +1,9 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
 import { useDashboardStore } from '../../stores/DashboardStore'
+import { resolveDashboardAction } from '../../services/dashboardActions'
 import { resolveWidgetComponent } from './registry'
 import WidgetLoading from './WidgetLoading.vue'
 import WidgetEmpty from './WidgetEmpty.vue'
@@ -13,6 +15,7 @@ const props = defineProps({
 })
 
 const Dashboard = useDashboardStore()
+const router = useRouter()
 
 const colClasses = computed(() => {
   const cols = props.widget.cols || {}
@@ -44,17 +47,54 @@ const component = computed(() => resolveWidgetComponent(props.widget.type))
 function reload() {
   Dashboard.reloadWidget(props.widget.name)
 }
+
+const fullscreen = ref(false)
+
+function runAction(action) {
+  resolveDashboardAction(action, {
+    router,
+    context: data.value,
+    onRefresh: reload,
+    onFullscreen: () => { fullscreen.value = true },
+  })
+}
+
+const hasPrimaryAction = computed(() => !!props.widget.primary_action)
+
+function onPrimaryAction() {
+  if (hasPrimaryAction.value) runAction(props.widget.primary_action)
+}
 </script>
 
 <template>
   <div :class="colClasses">
     <s-card flat bordered class="full-height dashboard-widget">
       <q-card-section class="row items-center justify-between q-pb-none">
-        <div>
-          <div class="text-subtitle2 text-weight-medium">{{ tdc(widget.label) }}</div>
-          <div v-if="widget.subtitle" class="text-caption text-grey-6">{{ tdc(widget.subtitle) }}</div>
+        <div
+          :class="{ 'cursor-pointer': hasPrimaryAction }"
+          class="row items-center q-gutter-x-xs"
+          @click="onPrimaryAction"
+        >
+          <div>
+            <div class="text-subtitle2 text-weight-medium">{{ tdc(widget.label) }}</div>
+            <div v-if="widget.subtitle" class="text-caption text-grey-6">{{ tdc(widget.subtitle) }}</div>
+          </div>
+          <q-icon v-if="widget.tooltip" name="info" size="16px" color="grey-6">
+            <q-tooltip>{{ tdc(widget.tooltip) }}</q-tooltip>
+          </q-icon>
         </div>
-        <q-btn flat dense round size="sm" icon="refresh" :disable="loading" @click="reload" />
+
+        <div class="row items-center no-wrap">
+          <q-btn
+            v-for="action in widget.actions || []" :key="action.name"
+            flat dense round size="sm"
+            :icon="action.icon || 'more_horiz'"
+            @click="runAction(action)"
+          >
+            <q-tooltip v-if="action.tooltip">{{ tdc(action.tooltip) }}</q-tooltip>
+          </q-btn>
+          <q-btn flat dense round size="sm" icon="refresh" :disable="loading" @click="reload" />
+        </div>
       </q-card-section>
 
       <q-card-section>
@@ -79,6 +119,25 @@ function reload() {
         />
       </q-card-section>
     </s-card>
+
+    <q-dialog v-model="fullscreen" maximized>
+      <s-card class="dashboard-widget-fullscreen">
+        <q-card-section class="row items-center justify-between">
+          <div class="text-h6">{{ tdc(widget.label) }}</div>
+          <q-btn flat dense round icon="close" v-close-popup />
+        </q-card-section>
+        <q-card-section>
+          <component
+            v-if="component && !isEmpty"
+            :is="component"
+            :widget="widget"
+            :data="data"
+            :loading="loading"
+          />
+          <WidgetEmpty v-else />
+        </q-card-section>
+      </s-card>
+    </q-dialog>
   </div>
 </template>
 

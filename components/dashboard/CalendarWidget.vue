@@ -1,11 +1,19 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
+import { resolveDashboardAction } from '../../services/dashboardActions'
 
 const props = defineProps({
   widget: { type: Object, required: true },
   data: { type: Object, required: true },
 })
+
+const router = useRouter()
+
+function onEventClick(event) {
+  if (props.widget.item_action) resolveDashboardAction(props.widget.item_action, { router, context: event })
+}
 
 // Nenhuma biblioteca de calendário instalada no projecto - reutiliza
 // o QDate nativo do Quasar (já disponível, sem dependência nova),
@@ -57,7 +65,11 @@ const selectedEvents = computed(() => eventsByDate.value[selectedDate.value] || 
         {{ tdc('No events') }}
       </div>
 
-      <q-item v-for="event in selectedEvents" :key="event.id" dense class="q-px-none">
+      <q-item
+        v-for="event in selectedEvents" :key="event.id" dense class="q-px-none"
+        :clickable="!!widget.item_action" v-ripple="!!widget.item_action"
+        @click="onEventClick(event)"
+      >
         <q-item-section>
           <q-item-label>{{ tdc(event.title) }}</q-item-label>
           <q-item-label caption>

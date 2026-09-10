@@ -16,7 +16,11 @@ export const authRoutes = [
     path: '/',
     component: () => import('../layouts/MainLayout.vue'),
     children: [
-      { path: '/welcome', component: () => import('./../pages/WelcomeGuestPage.vue'), name: 'welcome' }
+      { 
+        path: '/welcome', 
+        component: () => import('./../pages/WelcomeGuestPage.vue'), 
+        name: 'welcome'
+      }
     ],
   },
 

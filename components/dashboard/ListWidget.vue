@@ -1,15 +1,24 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
+import { resolveDashboardAction } from '../../services/dashboardActions'
 
-defineProps({
+const props = defineProps({
   widget: { type: Object, required: true },
   data: { type: Object, required: true },
 })
 
 const router = useRouter()
 
+function isClickable(item) {
+  return !!(props.widget.item_action || item.route)
+}
+
 function onClick(item) {
+  if (props.widget.item_action) {
+    resolveDashboardAction(props.widget.item_action, { router, context: item })
+    return
+  }
   if (item.route) router.push({ name: item.route, params: item.route_params })
 }
 </script>
@@ -18,7 +27,7 @@ function onClick(item) {
   <q-list separator dense>
     <q-item
       v-for="item in data.items" :key="item.id ?? item.title"
-      :clickable="!!item.route" v-ripple="!!item.route"
+      :clickable="isClickable(item)" v-ripple="isClickable(item)"
       @click="onClick(item)"
     >
       <q-item-section v-if="item.avatar" avatar>

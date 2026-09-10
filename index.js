@@ -143,4 +143,10 @@ export {
   resolveWidgetComponent,
 } from './components/dashboard/registry.js'
 
+export {
+  resolveDashboardAction,
+  registerActionHandler,
+  resolveTemplate,
+} from './services/dashboardActions.js'
+
 

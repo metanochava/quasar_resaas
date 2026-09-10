@@ -1,11 +1,21 @@
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
+import { resolveDashboardAction } from '../../services/dashboardActions'
 
 const props = defineProps({
   widget: { type: Object, required: true },
   data: { type: Object, required: true },
 })
+
+const router = useRouter()
+
+function onSliceClick(slice, i) {
+  if (!props.widget.item_action) return
+  const code = props.data.codes?.[i] ?? slice.label
+  resolveDashboardAction(props.widget.item_action, { router, context: { code, label: slice.label } })
+}
 
 // Mesmo contrato {labels, series} de bar_chart/line_chart (pedido:
 // "usa estrutura equivalente") - um pie só tem sentido com uma série
@@ -43,7 +53,12 @@ const isDonut = computed(() => props.widget.donut !== false)
     </div>
 
     <div class="col column q-gutter-xs">
-      <div v-for="slice in slices" :key="slice.label" class="row items-center justify-between text-caption">
+      <div
+        v-for="(slice, i) in slices" :key="slice.label"
+        class="row items-center justify-between text-caption"
+        :class="{ 'cursor-pointer': !!widget.item_action }"
+        @click="onSliceClick(slice, i)"
+      >
         <div class="row items-center q-gutter-xs">
           <div class="legend-dot" :style="{ background: slice.color }" />
           <span>{{ tdc(slice.label) }}</span>
