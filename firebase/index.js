@@ -29,7 +29,7 @@ export function initFirebase(config) {
     firebase,
     firebaseApp,
     dataBase,
-    fireDatBase: dataBase,
+    fireDataBase: dataBase,
     firestore,
     fireAuth,
     fireProvider
@@ -47,7 +47,7 @@ export function getFirebase() {
     firebase,
     firebaseApp,
     dataBase,
-    fireDatBase: dataBase,
+    fireDataBase: dataBase,
     firestore,
     fireAuth,
     fireProvider
