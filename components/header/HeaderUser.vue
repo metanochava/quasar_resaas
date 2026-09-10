@@ -190,78 +190,7 @@
 
 
           <GroupSelector  v-if="User.data" />
-          <s-btn
-            v-if="User.data"
-            dense
-            flat
-            color="grey"
-            class="group-button full-width"
-            @click="branchClosed = false"
-          >
-
-            <!-- GRUPO ACTUAL -->
-
-            <span class="ellipsis">
-              {{
-                tdc(
-                  profileSplint(
-                    User?.Group?.name ||
-                    User?.Group?.label
-                  )
-                )
-              }}
-            </span>
-
-
-            <!-- MENU -->
-
-            <q-menu
-              anchor="bottom left"
-              self="top left"
-              fit
-            >
-
-              <q-list
-                dense
-                class="group-list rounded-borders"
-              >
-
-                <q-item
-                  v-for="group in User?.Groups || []"
-                  :key="group?.id"
-                  clickable
-                  v-close-popup
-                  v-ripple
-                  @click="Group.select(group)"
-                >
-
-                  <q-item-section
-                    class="item-content"
-                  >
-
-                    <q-item-label
-                      overline
-                      class="ellipsis"
-                    >
-                      {{
-                        tdc(
-                          profileSplint(
-                            group?.name ||
-                            group?.label
-                          )
-                        )
-                      }}
-                    </q-item-label>
-
-                  </q-item-section>
-
-                </q-item>
-
-              </q-list>
-
-            </q-menu>
-
-          </s-btn>
+          
 
           <q-separator />
           <!-- UTILIZADOR AUTENTICADO -->
