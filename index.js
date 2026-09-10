@@ -150,3 +150,9 @@ export {
 } from './services/dashboardActions.js'
 
 
+export {
+  default as firebase,
+  initFirebase,
+  getFirebase
+} from './firebase/index.js'
+
