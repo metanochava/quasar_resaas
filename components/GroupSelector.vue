@@ -1,10 +1,10 @@
 <script setup>
 import { computed } from 'vue'
-import { tdc } from '../../services/translation'
-import { profileSplint } from '../../services/utils'
+import { tdc } from '../services/translation'
+import { profileSplint } from '../utils/profile'
 
-import { useUserStore } from '../../stores/UserStore'
-import { useGroupStore } from '../../stores/GroupStore'
+import { useUserStore } from '../stores/UserStore'
+import { useGroupStore } from '../stores/GroupStore'
 
 const User = useUserStore()
 const Group = useGroupStore()
