@@ -1,85 +1,85 @@
 <template>
-  <q-form
-    ref="form"
-    @submit.prevent="comentar"
-  >
-    <s-card>
-      <q-bar class="bg-primary text-white">
-        <q-icon name="feedback" />
+  <s-card>
+    <!-- HEADER -->
+    <q-bar class="bg-primary text-white">
+      <q-icon name="feedback" />
 
-        <span class="q-ml-sm">
-          {{ tdc('Send comment or feedback') }}
-        </span>
+      <span class="q-ml-sm">
+        {{ tdc('Send comment or feedback') }}
+      </span>
 
-        <q-space />
+      <q-space />
 
-        <s-btn
-          dense
-          flat
-          round
-          icon="close"
-          v-close-popup
-        >
-          <q-tooltip>
-            {{ tdc('Close') }}
-          </q-tooltip>
-        </s-btn>
-      </q-bar>
+      <s-btn
+        dense
+        flat
+        round
+        icon="close"
+        v-close-popup
+      >
+        <q-tooltip>
+          {{ tdc('Close') }}
+        </q-tooltip>
+      </s-btn>
+    </q-bar>
 
-      <q-card-section>
-        <s-editor
-          v-model="comment_text"
-          outlined
-          dense
-          :disable="loading"
-          :placeholder="
-            tdc(
-              `Have feedback or suggestions? We would be happy to hear from you. Please do not include passwords, sensitive personal data, or confidential organizational information. <br>Need assistance? Visit the Help Center or contact your organization's support team.`
-            )
-          "
-          :rules="[
-            val =>
-              hasContent(val) ||
-              tdc('This field is required.')
-          ]"
-        />
-      </q-card-section>
+    <!-- EDITOR -->
+    <q-card-section>
+      <s-editor
+        v-model="comment_text"
+        outlined
+        dense
+        :placeholder="
+          tdc(
+            `Have feedback or suggestions? We would be happy to hear from you. Please do not include passwords, sensitive personal data, or confidential organizational information. <br>Need assistance? Visit the Help Center or contact your organization's support team.`
+          )
+        "
+      />
 
-      <q-card-section class="q-pt-none">
-        <div
-          class="information-text text-caption text-grey-7"
-          v-html="
-            tdc(
-              'Some account, entity, branch, and system information may be collected and processed to provide support, diagnose and resolve technical issues, maintain security, and improve the quality of our services. This information may be shared with authorized administrators or service providers when necessary, in accordance with the applicable Privacy Policy and Terms of Service. <br><br>We may contact you by email or other authorized communication channels if additional information is required or to provide updates regarding your request. For privacy, data protection, or legal matters, please contact your organization or the appropriate system administrator.'
-            )
-          "
-        />
-      </q-card-section>
+      <div
+        v-if="error"
+        class="text-negative text-caption q-mt-xs"
+      >
+        {{ tdc('This field is required.') }}
+      </div>
+    </q-card-section>
 
-      <q-separator />
+    <!-- INFORMAÇÃO -->
+    <q-card-section class="q-pt-none">
+      <div
+        class="information-text text-caption text-grey-7"
+        v-html="
+          tdc(
+            'Some account, entity, branch, and system information may be collected and processed to provide support, diagnose and resolve technical issues, maintain security, and improve the quality of our services. This information may be shared with authorized administrators or service providers when necessary, in accordance with the applicable Privacy Policy and Terms of Service. <br><br>We may contact you by email or other authorized communication channels if additional information is required or to provide updates regarding your request. For privacy, data protection, or legal matters, please contact your organization or the appropriate system administrator.'
+          )
+        "
+      />
+    </q-card-section>
 
-      <q-card-actions align="right">
-        <s-btn
-          v-close-popup
-          flat
-          color="grey"
-          :disable="loading"
-        >
-          {{ tdc('Cancel') }}
-        </s-btn>
+    <q-separator />
 
-        <s-btn
-          color="primary"
-          type="submit"
-          icon="send"
-          :loading="loading"
-          :disable="loading || !hasContent(comment_text)"
-        >
-          {{ tdc('Send') }}
-        </s-btn>
-      </q-card-actions>
-    </s-card>
-  </q-form>
+    <!-- BOTÕES -->
+    <q-card-actions align="right">
+      <s-btn
+        v-close-popup
+        flat
+        color="grey"
+        :disable="loading"
+      >
+        {{ tdc('Cancel') }}
+      </s-btn>
+
+      <s-btn
+        color="primary"
+        icon="send"
+        :loading="loading"
+        :disable="loading"
+        @click="comentar"
+      >
+        {{ tdc('Send') }}
+      </s-btn>
+    </q-card-actions>
+  </s-card>
 </template>
 
 <script>
@@ -88,7 +88,6 @@ import { Notify } from 'quasar'
 
 import { tdc } from '../../services/translation'
 import { getFirebase } from 'quasar_resaas'
-
 import { useUserStore } from '../../stores/UserStore'
 
 export default defineComponent({
@@ -109,18 +108,34 @@ export default defineComponent({
   data () {
     return {
       tdc,
+
       comment_text: '',
-      loading: false
+
+      loading: false,
+
+      error: false
+    }
+  },
+
+  watch: {
+    comment_text () {
+      if (this.hasContent(this.comment_text)) {
+        this.error = false
+      }
     }
   },
 
   methods: {
     hasContent (value) {
-      if (!value) return false
+      if (!value) {
+        return false
+      }
 
       const text = String(value)
+        .replace(/<br\s*\/?>/gi, '')
+        .replace(/<p><\/p>/gi, '')
         .replace(/<[^>]*>/g, '')
-        .replace(/&nbsp;/g, ' ')
+        .replace(/&nbsp;/gi, ' ')
         .trim()
 
       return text.length > 0
@@ -131,12 +146,18 @@ export default defineComponent({
 
       return {
         user: {
-          id: User?.User?.id || User?.user?.id || null,
+          id:
+            User?.User?.id ||
+            User?.user?.id ||
+            null,
+
           name:
             User?.User?.full_name ||
             User?.User?.name ||
             User?.user?.full_name ||
+            User?.user?.name ||
             null,
+
           email:
             User?.User?.email ||
             User?.user?.email ||
@@ -152,6 +173,7 @@ export default defineComponent({
           name:
             User?.Entity?.name ||
             User?.Entity?.label ||
+            User?.entity?.name ||
             null
         },
 
@@ -164,11 +186,14 @@ export default defineComponent({
           name:
             User?.Branch?.name ||
             User?.Branch?.label ||
+            User?.branch?.name ||
             null
         },
 
         group: {
-          id: User?.Group?.id || null,
+          id:
+            User?.Group?.id ||
+            null,
 
           name:
             User?.Group?.name ||
@@ -179,14 +204,25 @@ export default defineComponent({
     },
 
     async comentar () {
-      if (this.loading) return
-
-      const valid = await this.$refs.form?.validate()
-
-      if (!valid || !this.hasContent(this.comment_text)) {
+      if (this.loading) {
         return
       }
 
+      if (!this.hasContent(this.comment_text)) {
+        this.error = true
+
+        Notify.create({
+          type: 'warning',
+          icon: 'warning',
+          message: tdc(
+            'Please enter your comment or feedback.'
+          )
+        })
+
+        return
+      }
+
+      this.error = false
       this.loading = true
 
       try {
@@ -199,29 +235,31 @@ export default defineComponent({
           .ref('feedback')
           .push()
 
-        const context = this.getContext()
-
         const payload = {
           id: feedbackRef.key,
 
-          comment: this.comment_text.trim(),
+          comment: this.comment_text,
 
           type: 'feedback',
 
           status: 'new',
 
-          ...context,
+          admin_read: false,
+
+          user_read: true,
+
+          ...this.getContext(),
 
           system: {
-            url: window.location.href,
-            path: window.location.pathname,
+            url:
+              window.location.href,
+
+            path:
+              window.location.pathname,
+
             language:
               localStorage.getItem('L') ||
               navigator.language ||
-              null,
-
-            user_agent:
-              navigator.userAgent ||
               null
           },
 
@@ -233,21 +271,21 @@ export default defineComponent({
 
         this.comment_text = ''
 
-        this.$refs.form?.resetValidation()
-
         Notify.create({
           type: 'positive',
           icon: 'check_circle',
-          message: tdc('Feedback sent successfully.')
+          message: tdc(
+            'Feedback sent successfully.'
+          )
         })
 
-        this.$emit('sent', {
-          id: feedbackRef.key,
-          ...payload
-        })
+        this.$emit(
+          'sent',
+          feedbackRef.key
+        )
       } catch (error) {
         console.error(
-          '[CommentFeedback] Firebase:',
+          '[CommentFeedback]',
           error
         )
 
@@ -259,7 +297,10 @@ export default defineComponent({
           )
         })
 
-        this.$emit('error', error)
+        this.$emit(
+          'error',
+          error
+        )
       } finally {
         this.loading = false
       }

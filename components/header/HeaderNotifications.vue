@@ -72,7 +72,7 @@
             round
             dense
             icon="refresh"
-            @click="loadFeedback"
+            @click="reload"
           >
             <q-tooltip>
               {{ tdc('Refresh') }}
@@ -88,7 +88,7 @@
           />
         </q-bar>
 
-        <!-- CONTENT -->
+        <!-- BODY -->
         <div class="chat-body">
           <!-- LISTA -->
           <div
@@ -122,7 +122,10 @@
                   @click="selectFeedback(item)"
                 >
                   <q-item-section avatar>
-                    <q-avatar color="primary" text-color="white">
+                    <q-avatar
+                      color="primary"
+                      text-color="white"
+                    >
                       {{
                         initials(
                           item.user?.name ||
@@ -196,7 +199,7 @@
           <!-- CHAT -->
           <div class="chat-panel">
             <template v-if="selected">
-              <!-- CHAT TOP -->
+              <!-- HEADER CONVERSA -->
               <div
                 class="chat-user-header"
                 :class="
@@ -228,10 +231,7 @@
                   </div>
 
                   <div class="text-caption text-grey">
-                    {{
-                      selected.entity?.name ||
-                      ''
-                    }}
+                    {{ selected.entity?.name || '' }}
 
                     <span v-if="selected.branch?.name">
                       • {{ selected.branch.name }}
@@ -254,12 +254,8 @@
               </div>
 
               <!-- MENSAGENS -->
-              <q-scroll-area
-                ref="chatScroll"
-                class="messages-area"
-              >
+              <q-scroll-area class="messages-area">
                 <div class="q-pa-md">
-                  <!-- MENSAGEM ORIGINAL -->
                   <q-chat-message
                     :name="
                       selected.user?.name ||
@@ -272,25 +268,24 @@
                     text-color="dark"
                   />
 
-                  <!-- RESPOSTAS -->
                   <q-chat-message
-                    v-for="message in messages"
-                    :key="message.id"
-                    :sent="message.sender === 'admin'"
+                    v-for="messageItem in messages"
+                    :key="messageItem.id"
+                    :sent="messageItem.sender === 'admin'"
                     :name="
-                      message.sender === 'admin'
+                      messageItem.sender === 'admin'
                         ? tdc('Support')
                         : selected.user?.name
                     "
-                    :text="[message.message]"
-                    :stamp="formatDate(message.created_at)"
+                    :text="[messageItem.message]"
+                    :stamp="formatDate(messageItem.created_at)"
                     :bg-color="
-                      message.sender === 'admin'
+                      messageItem.sender === 'admin'
                         ? 'primary'
                         : 'grey-3'
                     "
                     :text-color="
-                      message.sender === 'admin'
+                      messageItem.sender === 'admin'
                         ? 'white'
                         : 'dark'
                     "
@@ -326,7 +321,7 @@
                       color="primary"
                       icon="send"
                       :loading="sending"
-                      :disable="!message.trim()"
+                      :disable="!message.trim() || sending"
                       @click="sendMessage"
                     />
                   </template>
@@ -334,7 +329,7 @@
               </div>
             </template>
 
-            <!-- NADA SELECCIONADO -->
+            <!-- SEM SELECÇÃO -->
             <div
               v-else
               class="empty-chat column flex-center"
@@ -385,13 +380,14 @@ export default defineComponent({
       selected: null,
 
       messages: [],
-
       message: '',
-
       sending: false,
 
       feedbackRef: null,
+      feedbackCallback: null,
+
       messagesRef: null,
+      messagesCallback: null,
 
       statusOptions: [
         {
@@ -447,8 +443,16 @@ export default defineComponent({
     }
   },
 
-  mounted () {
-    this.listenFeedback()
+  watch: {
+    open (value) {
+      if (value) {
+        this.listenFeedback()
+      } else {
+        this.selected = null
+        this.messages = []
+        this.stopListeners()
+      }
+    }
   },
 
   beforeUnmount () {
@@ -459,35 +463,54 @@ export default defineComponent({
     listenFeedback () {
       const { fireDatBase } = getFirebase()
 
-      this.feedbackRef = fireDatBase.ref('feedback')
+      this.stopFeedbackListener()
 
-      this.feedbackRef
+      this.feedbackRef = fireDatBase
+        .ref('feedback')
         .orderByChild('created_at')
-        .on('value', snapshot => {
-          const data = snapshot.val() || {}
+        .limitToLast(50)
 
-          this.feedback = Object.entries(data)
-            .map(([id, value]) => ({
-              id,
-              ...value
-            }))
-            .sort(
-              (a, b) =>
-                (b.created_at || 0) -
-                (a.created_at || 0)
-            )
-        })
+      this.feedbackCallback = snapshot => {
+        const data = snapshot.val() || {}
+
+        this.feedback = Object.entries(data)
+          .map(([id, item]) => ({
+            id,
+            ...item
+          }))
+          .sort(
+            (a, b) =>
+              (b.created_at || 0) -
+              (a.created_at || 0)
+          )
+      }
+
+      this.feedbackRef.on(
+        'value',
+        this.feedbackCallback
+      )
     },
 
-    loadFeedback () {
-      this.stopFeedbackListener()
+    reload () {
+      this.stopListeners()
+      this.selected = null
+      this.messages = []
       this.listenFeedback()
     },
 
     async selectFeedback (item) {
-      this.selected = item
+      this.selected = {
+        ...item
+      }
 
-      await this.markAsRead(item)
+      try {
+        await this.markAsRead(item)
+      } catch (error) {
+        console.error(
+          '[NotificationChat] markAsRead:',
+          error
+        )
+      }
 
       this.listenMessages(item.id)
     },
@@ -495,36 +518,42 @@ export default defineComponent({
     listenMessages (feedbackId) {
       const { fireDatBase } = getFirebase()
 
-      if (this.messagesRef) {
-        this.messagesRef.off()
+      this.stopMessagesListener()
+
+      this.messagesRef = fireDatBase
+        .ref(`feedback_messages/${feedbackId}`)
+        .orderByChild('created_at')
+        .limitToLast(100)
+
+      this.messagesCallback = snapshot => {
+        const data = snapshot.val() || {}
+
+        this.messages = Object.entries(data)
+          .map(([id, item]) => ({
+            id,
+            ...item
+          }))
+          .sort(
+            (a, b) =>
+              (a.created_at || 0) -
+              (b.created_at || 0)
+          )
       }
 
-      this.messagesRef = fireDatBase.ref(
-        `feedback/${feedbackId}/messages`
+      this.messagesRef.on(
+        'value',
+        this.messagesCallback
       )
-
-      this.messagesRef
-        .orderByChild('created_at')
-        .on('value', snapshot => {
-          const data = snapshot.val() || {}
-
-          this.messages = Object.entries(data)
-            .map(([id, value]) => ({
-              id,
-              ...value
-            }))
-            .sort(
-              (a, b) =>
-                (a.created_at || 0) -
-                (b.created_at || 0)
-            )
-        })
     },
 
     async sendMessage () {
-      const message = this.message.trim()
+      const message = this.message?.trim()
 
-      if (!message || !this.selected) {
+      if (
+        !message ||
+        !this.selected ||
+        this.sending
+      ) {
         return
       }
 
@@ -536,38 +565,56 @@ export default defineComponent({
           fireDatBase
         } = getFirebase()
 
-        const ref = fireDatBase
+        const timestamp =
+          firebase.database.ServerValue.TIMESTAMP
+
+        const messageRef = fireDatBase
           .ref(
-            `feedback/${this.selected.id}/messages`
+            `feedback_messages/${this.selected.id}`
           )
           .push()
 
-        await ref.set({
-          id: ref.key,
+        const updates = {}
 
+        updates[
+          `feedback_messages/${this.selected.id}/${messageRef.key}`
+        ] = {
+          id: messageRef.key,
           sender: 'admin',
-
           message,
-
           read: false,
+          created_at: timestamp
+        }
 
-          created_at:
-            firebase.database.ServerValue.TIMESTAMP
-        })
+        updates[
+          `feedback/${this.selected.id}/status`
+        ] = 'in_progress'
+
+        updates[
+          `feedback/${this.selected.id}/updated_at`
+        ] = timestamp
+
+        updates[
+          `feedback/${this.selected.id}/last_message`
+        ] = message
+
+        updates[
+          `feedback/${this.selected.id}/last_message_at`
+        ] = timestamp
 
         await fireDatBase
-          .ref(`feedback/${this.selected.id}`)
-          .update({
-            status: 'in_progress',
-
-            updated_at:
-              firebase.database.ServerValue.TIMESTAMP
-          })
+          .ref()
+          .update(updates)
 
         this.message = ''
+
+        if (this.selected) {
+          this.selected.status =
+            'in_progress'
+        }
       } catch (error) {
         console.error(
-          '[NotificationChat]',
+          '[NotificationChat] sendMessage:',
           error
         )
 
@@ -600,6 +647,14 @@ export default defineComponent({
           admin_read_at:
             firebase.database.ServerValue.TIMESTAMP
         })
+
+      item.admin_read = true
+
+      if (
+        this.selected?.id === item.id
+      ) {
+        this.selected.admin_read = true
+      }
     },
 
     async updateStatus (status) {
@@ -607,19 +662,35 @@ export default defineComponent({
         return
       }
 
-      const {
-        firebase,
-        fireDatBase
-      } = getFirebase()
+      try {
+        const {
+          firebase,
+          fireDatBase
+        } = getFirebase()
 
-      await fireDatBase
-        .ref(`feedback/${this.selected.id}`)
-        .update({
-          status,
+        await fireDatBase
+          .ref(`feedback/${this.selected.id}`)
+          .update({
+            status,
 
-          updated_at:
-            firebase.database.ServerValue.TIMESTAMP
+            updated_at:
+              firebase.database.ServerValue.TIMESTAMP
+          })
+
+        this.selected.status = status
+      } catch (error) {
+        console.error(
+          '[NotificationChat] updateStatus:',
+          error
+        )
+
+        Notify.create({
+          type: 'negative',
+          message: tdc(
+            'Unable to update status.'
+          )
         })
+      }
     },
 
     plainText (html) {
@@ -632,9 +703,11 @@ export default defineComponent({
 
       div.innerHTML = html
 
-      return div.textContent ||
+      return (
+        div.textContent ||
         div.innerText ||
         ''
+      ).trim()
     },
 
     initials (name) {
@@ -676,19 +749,38 @@ export default defineComponent({
     },
 
     stopFeedbackListener () {
-      if (this.feedbackRef) {
-        this.feedbackRef.off()
-        this.feedbackRef = null
+      if (
+        this.feedbackRef &&
+        this.feedbackCallback
+      ) {
+        this.feedbackRef.off(
+          'value',
+          this.feedbackCallback
+        )
       }
+
+      this.feedbackRef = null
+      this.feedbackCallback = null
+    },
+
+    stopMessagesListener () {
+      if (
+        this.messagesRef &&
+        this.messagesCallback
+      ) {
+        this.messagesRef.off(
+          'value',
+          this.messagesCallback
+        )
+      }
+
+      this.messagesRef = null
+      this.messagesCallback = null
     },
 
     stopListeners () {
       this.stopFeedbackListener()
-
-      if (this.messagesRef) {
-        this.messagesRef.off()
-        this.messagesRef = null
-      }
+      this.stopMessagesListener()
     }
   }
 })
@@ -696,9 +788,10 @@ export default defineComponent({
 
 <style scoped>
 .notification-chat {
-  width: min(1050px, 100vw);
+  width: min(1100px, 100vw);
   height: 100vh;
   margin-left: auto;
+  overflow: hidden;
 }
 
 .chat-header {
@@ -712,45 +805,55 @@ export default defineComponent({
 
 .chat-body {
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: 350px 1fr;
   height: calc(100vh - 64px);
+  min-height: 0;
 }
 
 .conversation-list {
-  border-right: 1px solid rgba(120, 120, 120, 0.18);
+  min-width: 0;
   overflow: hidden;
+  border-right:
+    1px solid
+    rgba(120, 120, 120, 0.16);
 }
 
 .conversation-scroll {
-  height: calc(100vh - 130px);
+  height: calc(100vh - 129px);
 }
 
 .conversation-active {
-  background: rgba(25, 118, 210, 0.12);
+  background:
+    rgba(25, 118, 210, 0.12);
 }
 
 .chat-panel {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
   height: 100%;
 }
 
 .chat-user-header {
-  min-height: 70px;
   display: flex;
   align-items: center;
+  min-height: 70px;
   padding: 10px 16px;
-  border-bottom: 1px solid rgba(120, 120, 120, 0.15);
+
+  border-bottom:
+    1px solid
+    rgba(120, 120, 120, 0.15);
 }
 
 .messages-area {
   flex: 1;
   min-height: 0;
+
   background:
     linear-gradient(
-      rgba(255, 255, 255, 0.92),
-      rgba(255, 255, 255, 0.92)
+      rgba(245, 245, 245, 0.92),
+      rgba(245, 245, 245, 0.92)
     );
 }
 
@@ -760,17 +863,24 @@ export default defineComponent({
 
 .message-input {
   padding: 12px;
-  border-top: 1px solid rgba(120, 120, 120, 0.15);
+
+  border-top:
+    1px solid
+    rgba(120, 120, 120, 0.15);
 }
 
 .empty-chat {
   flex: 1;
   height: 100%;
-  text-align: center;
   padding: 20px;
+  text-align: center;
 }
 
 @media (max-width: 700px) {
+  .notification-chat {
+    width: 100vw;
+  }
+
   .chat-body {
     grid-template-columns: 1fr;
   }
