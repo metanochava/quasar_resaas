@@ -1,9 +1,8 @@
 import firebase from 'firebase/compat/app'
+
 import 'firebase/compat/database'
 import 'firebase/compat/firestore'
 import 'firebase/compat/auth'
-
-
 
 let firebaseApp = null
 let dataBase = null
@@ -11,9 +10,11 @@ let firestore = null
 let fireAuth = null
 let fireProvider = null
 
-export function initFirebase(config) {
+export function initFirebase (config) {
   if (!config) {
-    throw new Error('[quasar_resaas] Firebase config não definida.')
+    throw new Error(
+      '[quasar_resaas] Firebase config não definida.'
+    )
   }
 
   firebaseApp = firebase.apps.length
@@ -23,20 +24,13 @@ export function initFirebase(config) {
   dataBase = firebaseApp.database()
   firestore = firebaseApp.firestore()
   fireAuth = firebaseApp.auth()
-  fireProvider = new firebase.auth.GoogleAuthProvider()
+  fireProvider =
+    new firebase.auth.GoogleAuthProvider()
 
-  return {
-    firebase,
-    firebaseApp,
-    dataBase,
-    fireDataBase: dataBase,
-    firestore,
-    fireAuth,
-    fireProvider
-  }
+  return getFirebase()
 }
 
-export function getFirebase() {
+export function getFirebase () {
   if (!firebaseApp) {
     throw new Error(
       '[quasar_resaas] Firebase ainda não foi inicializado.'
@@ -46,8 +40,12 @@ export function getFirebase() {
   return {
     firebase,
     firebaseApp,
+
     dataBase,
+
+    // alias
     fireDataBase: dataBase,
+
     firestore,
     fireAuth,
     fireProvider
