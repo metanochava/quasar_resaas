@@ -1,6 +1,5 @@
 <template>
   <s-card>
-    <!-- HEADER -->
     <q-bar class="bg-primary text-white">
       <q-icon name="feedback" />
 
@@ -58,7 +57,7 @@
 
     <q-separator />
 
-    <!-- BOTÕES -->
+    <!-- ACTIONS -->
     <q-card-actions align="right">
       <s-btn
         v-close-popup
@@ -97,13 +96,6 @@ export default defineComponent({
     'sent',
     'error'
   ],
-
-  props: {
-    css: {
-      type: String,
-      default: ''
-    }
-  },
 
   data () {
     return {
@@ -228,10 +220,16 @@ export default defineComponent({
       try {
         const {
           firebase,
-          fireDatBase
+          fireDataBase
         } = getFirebase()
 
-        const feedbackRef = fireDatBase
+        if (!fireDataBase) {
+          throw new Error(
+            'Firebase Realtime Database não disponível.'
+          )
+        }
+
+        const feedbackRef = fireDataBase
           .ref('feedback')
           .push()
 
