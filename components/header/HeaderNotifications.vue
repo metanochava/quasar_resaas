@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- BOTÃO -->
+    <!-- BOTÃO DE NOTIFICAÇÕES -->
     <s-btn
       flat
       round
@@ -82,12 +82,17 @@
             dense
             icon="close"
             v-close-popup
-          />
+          >
+            <q-tooltip>
+              {{ tdc('Close') }}
+            </q-tooltip>
+          </s-btn>
         </q-bar>
 
         <!-- BODY -->
         <div class="chat-body">
-          <!-- CONVERSAS -->
+
+          <!-- LISTA DE CONVERSAS -->
           <div
             class="conversation-list"
             :class="
@@ -96,13 +101,14 @@
                 : 'bg-white'
             "
           >
-            <!-- SEARCH -->
+            <!-- PESQUISA -->
             <div class="q-pa-sm">
               <q-input
                 v-model="search"
                 dense
                 outlined
                 clearable
+                debounce="250"
                 :placeholder="tdc('Search')"
               >
                 <template #prepend>
@@ -119,9 +125,8 @@
                   v-for="item in filteredFeedback"
                   :key="item.id"
                   clickable
-                  :active="
-                    selected?.id === item.id
-                  "
+                  v-ripple
+                  :active="selected?.id === item.id"
                   active-class="conversation-active"
                   @click="selectFeedback(item)"
                 >
@@ -141,7 +146,7 @@
                     </q-avatar>
                   </q-item-section>
 
-                  <!-- INFO -->
+                  <!-- DADOS -->
                   <q-item-section>
                     <q-item-label
                       class="text-weight-medium ellipsis"
@@ -159,7 +164,8 @@
                     >
                       {{
                         item.last_message ||
-                        plainText(item.comment)
+                        item.comment_text ||
+                        ''
                       }}
                     </q-item-label>
 
@@ -177,15 +183,10 @@
                       </span>
 
                       <q-badge
-                        :color="
-                          statusColor(
-                            item.status
-                          )
-                        "
+                        :color="statusColor(item.status)"
                         :label="
                           tdc(
-                            item.status ||
-                            'new'
+                            statusLabel(item.status)
                           )
                         "
                       />
@@ -206,9 +207,7 @@
 
               <!-- EMPTY -->
               <div
-                v-if="
-                  !filteredFeedback.length
-                "
+                v-if="!filteredFeedback.length"
                 class="column flex-center q-pa-xl text-grey"
               >
                 <q-icon
@@ -217,20 +216,17 @@
                 />
 
                 <div class="q-mt-sm">
-                  {{
-                    tdc(
-                      'No conversations'
-                    )
-                  }}
+                  {{ tdc('No conversations') }}
                 </div>
               </div>
             </q-scroll-area>
           </div>
 
-          <!-- CHAT -->
+          <!-- PAINEL DO CHAT -->
           <div class="chat-panel">
             <template v-if="selected">
-              <!-- USER HEADER -->
+
+              <!-- HEADER DO UTILIZADOR -->
               <div
                 class="chat-user-header"
                 :class="
@@ -252,8 +248,8 @@
                   }}
                 </q-avatar>
 
-                <div class="q-ml-sm">
-                  <div class="text-weight-bold">
+                <div class="q-ml-sm overflow-hidden">
+                  <div class="text-weight-bold ellipsis">
                     {{
                       selected.user?.name ||
                       selected.user?.email ||
@@ -261,21 +257,15 @@
                     }}
                   </div>
 
-                  <div class="text-caption text-grey">
-                    {{
-                      selected.entity?.name ||
-                      ''
-                    }}
+                  <div class="text-caption text-grey ellipsis">
+                    {{ selected.entity?.name || '' }}
 
-                    <span
-                      v-if="
-                        selected.branch?.name
-                      "
-                    >
-                      •
-                      {{
-                        selected.branch.name
-                      }}
+                    <span v-if="selected.branch?.name">
+                      • {{ selected.branch.name }}
+                    </span>
+
+                    <span v-if="selected.group?.name">
+                      • {{ selected.group.name }}
                     </span>
                   </div>
                 </div>
@@ -289,19 +279,16 @@
                   emit-value
                   map-options
                   :options="statusOptions"
-                  style="width: 160px"
-                  @update:model-value="
-                    updateStatus
-                  "
+                  style="width: 165px"
+                  @update:model-value="updateStatus"
                 />
               </div>
 
-              <!-- MESSAGES -->
-              <q-scroll-area
-                class="messages-area"
-              >
+              <!-- MENSAGENS -->
+              <q-scroll-area class="messages-area">
                 <div class="q-pa-md">
-                  <!-- ORIGINAL -->
+
+                  <!-- MENSAGEM ORIGINAL -->
                   <q-chat-message
                     :name="
                       selected.user?.name ||
@@ -309,55 +296,40 @@
                       tdc('User')
                     "
                     :text="[
-                      plainText(
-                        selected.comment
-                      )
+                      selected.comment_text ||
+                      plainText(selected.comment)
                     ]"
-                    :stamp="
-                      formatDate(
-                        selected.created_at
-                      )
-                    "
+                    :stamp="formatDate(selected.created_at)"
                     bg-color="grey-3"
                     text-color="dark"
                   />
 
-                  <!-- RESPOSTAS -->
+                  <!-- CONVERSA -->
                   <q-chat-message
-                    v-for="
-                      messageItem
-                      in messages
-                    "
-                    :key="
-                      messageItem.id
-                    "
-                    :sent="
-                      messageItem.sender ===
-                      'admin'
-                    "
+                    v-for="messageItem in messages"
+                    :key="messageItem.id"
+                    :sent="messageItem.sender === 'admin'"
                     :name="
-                      messageItem.sender ===
-                      'admin'
+                      messageItem.sender === 'admin'
                         ? tdc('Support')
-                        : selected.user?.name
+                        : (
+                            selected.user?.name ||
+                            tdc('User')
+                          )
                     "
-                    :text="[
-                      messageItem.message
-                    ]"
+                    :text="[messageItem.message]"
                     :stamp="
                       formatDate(
                         messageItem.created_at
                       )
                     "
                     :bg-color="
-                      messageItem.sender ===
-                      'admin'
+                      messageItem.sender === 'admin'
                         ? 'primary'
                         : 'grey-3'
                     "
                     :text-color="
-                      messageItem.sender ===
-                      'admin'
+                      messageItem.sender === 'admin'
                         ? 'white'
                         : 'dark'
                     "
@@ -379,19 +351,16 @@
                   outlined
                   dense
                   autogrow
+                  maxlength="5000"
                   :placeholder="
-                    tdc(
-                      'Type a message'
-                    )
+                    tdc('Type a message')
                   "
                   @keyup.enter.exact.prevent="
                     sendMessage
                   "
                 >
                   <template #prepend>
-                    <q-icon
-                      name="chat"
-                    />
+                    <q-icon name="chat" />
                   </template>
 
                   <template #append>
@@ -405,16 +374,14 @@
                         !message.trim() ||
                         sending
                       "
-                      @click="
-                        sendMessage
-                      "
+                      @click="sendMessage"
                     />
                   </template>
                 </q-input>
               </div>
             </template>
 
-            <!-- NENHUMA CONVERSA -->
+            <!-- SEM CONVERSA -->
             <div
               v-else
               class="empty-chat column flex-center"
@@ -425,14 +392,8 @@
                 color="grey-5"
               />
 
-              <div
-                class="text-h6 q-mt-md"
-              >
-                {{
-                  tdc(
-                    'Select a conversation'
-                  )
-                }}
+              <div class="text-h6 q-mt-md">
+                {{ tdc('Select a conversation') }}
               </div>
 
               <div class="text-grey">
@@ -457,6 +418,26 @@ import { Notify } from 'quasar'
 import { tdc } from '../../services/translation'
 import { getFirebase } from 'quasar_resaas'
 
+/*
+ * IMPORTANTE:
+ *
+ * Estas referências ficam FORA do data().
+ *
+ * Desta maneira o Vue não transforma Firebase Query / Reference
+ * em Proxy reactivo.
+ *
+ * Isso evita erros internos como:
+ *
+ * newChildren.insert is not a function
+ * newChildren.remove is not a function
+ */
+
+let feedbackRef = null
+let feedbackCallback = null
+
+let messagesRef = null
+let messagesCallback = null
+
 export default defineComponent({
   name: 'NotificationChat',
 
@@ -465,35 +446,35 @@ export default defineComponent({
       tdc,
 
       open: false,
+
       search: '',
 
       feedback: [],
+
       selected: null,
 
       messages: [],
+
       message: '',
 
       sending: false,
-
-      feedbackRef: null,
-      feedbackCallback: null,
-
-      messagesRef: null,
-      messagesCallback: null,
 
       statusOptions: [
         {
           label: tdc('New'),
           value: 'new'
         },
+
         {
           label: tdc('In progress'),
           value: 'in_progress'
         },
+
         {
           label: tdc('Resolved'),
           value: 'resolved'
         },
+
         {
           label: tdc('Closed'),
           value: 'closed'
@@ -511,35 +492,35 @@ export default defineComponent({
 
     filteredFeedback () {
       const search =
-        this.search
-          ?.trim()
+        String(this.search || '')
+          .trim()
           .toLowerCase()
 
       if (!search) {
         return this.feedback
       }
 
-      return this.feedback.filter(
-        item => {
-          const content = [
-            item.user?.name,
-            item.user?.email,
-            item.entity?.name,
-            item.branch?.name,
-            item.last_message,
-            this.plainText(
-              item.comment
-            )
-          ]
-            .filter(Boolean)
-            .join(' ')
-            .toLowerCase()
+      return this.feedback.filter(item => {
+        const content = [
+          item.user?.name,
+          item.user?.email,
 
-          return content.includes(
-            search
-          )
-        }
-      )
+          item.entity?.name,
+
+          item.branch?.name,
+
+          item.group?.name,
+
+          item.last_message,
+
+          item.comment_text
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+
+        return content.includes(search)
+      })
     }
   },
 
@@ -547,12 +528,14 @@ export default defineComponent({
     open (value) {
       if (value) {
         this.listenFeedback()
-      } else {
-        this.selected = null
-        this.messages = []
 
-        this.stopListeners()
+        return
       }
+
+      this.selected = null
+      this.messages = []
+
+      this.stopListeners()
     }
   },
 
@@ -561,6 +544,11 @@ export default defineComponent({
   },
 
   methods: {
+
+    // =====================================================
+    // FIREBASE
+    // =====================================================
+
     getDatabase () {
       const {
         fireDataBase
@@ -568,12 +556,16 @@ export default defineComponent({
 
       if (!fireDataBase) {
         throw new Error(
-          'Firebase Realtime Database não disponível.'
+          '[NotificationChat] Firebase Realtime Database não disponível.'
         )
       }
 
       return fireDataBase
     },
+
+    // =====================================================
+    // FEEDBACK LISTENER
+    // =====================================================
 
     listenFeedback () {
       try {
@@ -582,45 +574,81 @@ export default defineComponent({
 
         this.stopFeedbackListener()
 
-        this.feedbackRef =
+        feedbackRef =
           fireDataBase
             .ref('feedback')
-            .orderByChild(
-              'created_at'
-            )
+            .orderByChild('created_at')
             .limitToLast(50)
 
-        this.feedbackCallback =
+        feedbackCallback =
           snapshot => {
             const data =
               snapshot.val() || {}
 
-            this.feedback =
-              Object.entries(data)
-                .map(
-                  ([id, item]) => ({
-                    id,
-                    ...item
-                  })
-                )
+            const feedback =
+              Object
+                .entries(data)
+                .map(([id, item]) => ({
+                  id,
+
+                  ...item,
+
+                  /*
+                   * Guardamos o texto limpo logo aqui.
+                   *
+                   * Assim não precisamos criar elementos DOM
+                   * repetidamente durante o render.
+                   */
+                  comment_text:
+                    this.plainText(
+                      item?.comment
+                    )
+                }))
                 .sort(
                   (a, b) =>
                     (
                       b.last_message_at ||
+                      b.updated_at ||
                       b.created_at ||
                       0
                     ) -
                     (
                       a.last_message_at ||
+                      a.updated_at ||
                       a.created_at ||
                       0
                     )
                 )
+
+            this.feedback =
+              feedback
+
+            /*
+             * Se a conversa seleccionada recebeu
+             * alguma alteração, actualizamos apenas
+             * os metadados dela.
+             */
+
+            if (this.selected?.id) {
+              const updated =
+                feedback.find(
+                  item =>
+                    item.id ===
+                    this.selected.id
+                )
+
+              if (updated) {
+                this.selected = {
+                  ...this.selected,
+                  ...updated
+                }
+              }
+            }
           }
 
-        this.feedbackRef.on(
+        feedbackRef.on(
           'value',
-          this.feedbackCallback
+          feedbackCallback
         )
       } catch (error) {
         console.error(
@@ -630,18 +658,84 @@ export default defineComponent({
       }
     },
 
-    reload () {
-      this.selected = null
-      this.messages = []
+    // =====================================================
+    // MESSAGES LISTENER
+    // =====================================================
 
-      this.stopListeners()
-      this.listenFeedback()
+    listenMessages (feedbackId) {
+      if (!feedbackId) {
+        return
+      }
+
+      try {
+        const fireDataBase =
+          this.getDatabase()
+
+        this.stopMessagesListener()
+
+        messagesRef =
+          fireDataBase
+            .ref(
+              `feedback_messages/${feedbackId}`
+            )
+            .orderByChild(
+              'created_at'
+            )
+            .limitToLast(100)
+
+        messagesCallback =
+          snapshot => {
+            const data =
+              snapshot.val() || {}
+
+            this.messages =
+              Object
+                .entries(data)
+                .map(
+                  ([id, item]) => ({
+                    id,
+                    ...item
+                  })
+                )
+                .sort(
+                  (a, b) =>
+                    (
+                      a.created_at ||
+                      0
+                    ) -
+                    (
+                      b.created_at ||
+                      0
+                    )
+                )
+          }
+
+        messagesRef.on(
+          'value',
+          messagesCallback
+        )
+      } catch (error) {
+        console.error(
+          '[NotificationChat] listenMessages:',
+          error
+        )
+      }
     },
 
+    // =====================================================
+    // SELECT FEEDBACK
+    // =====================================================
+
     async selectFeedback (item) {
+      if (!item?.id) {
+        return
+      }
+
       this.selected = {
         ...item
       }
+
+      this.messages = []
 
       this.listenMessages(
         item.id
@@ -659,68 +753,19 @@ export default defineComponent({
       }
     },
 
-    listenMessages (feedbackId) {
-      try {
-        const fireDataBase =
-          this.getDatabase()
-
-        this.stopMessagesListener()
-
-        this.messagesRef =
-          fireDataBase
-            .ref(
-              `feedback_messages/${feedbackId}`
-            )
-            .orderByChild(
-              'created_at'
-            )
-            .limitToLast(100)
-
-        this.messagesCallback =
-          snapshot => {
-            const data =
-              snapshot.val() || {}
-
-            this.messages =
-              Object.entries(data)
-                .map(
-                  ([id, item]) => ({
-                    id,
-                    ...item
-                  })
-                )
-                .sort(
-                  (a, b) =>
-                    (
-                      a.created_at ||
-                      0
-                    ) -
-                    (
-                      b.created_at ||
-                      0
-                    )
-                )
-          }
-
-        this.messagesRef.on(
-          'value',
-          this.messagesCallback
-        )
-      } catch (error) {
-        console.error(
-          '[NotificationChat] listenMessages:',
-          error
-        )
-      }
-    },
+    // =====================================================
+    // SEND MESSAGE
+    // =====================================================
 
     async sendMessage () {
       const message =
-        this.message?.trim()
+        String(
+          this.message || ''
+        ).trim()
 
       if (
         !message ||
-        !this.selected ||
+        !this.selected?.id ||
         this.sending
       ) {
         return
@@ -740,10 +785,14 @@ export default defineComponent({
           )
         }
 
-        const timestamp =
-          firebase.database.ServerValue.TIMESTAMP
+        /*
+         * IMPORTANTE:
+         *
+         * Não guardamos messageRef dentro de data().
+         *
+         * Fica somente como variável local.
+         */
 
-        // 1. Criar nova mensagem
         const messageRef =
           fireDataBase
             .ref(
@@ -751,37 +800,68 @@ export default defineComponent({
             )
             .push()
 
-        await messageRef.set({
-          id: messageRef.key,
+        // ---------------------------------------------
+        // 1. Guardar a mensagem
+        // ---------------------------------------------
 
-          sender: 'admin',
+        await messageRef.set({
+          id:
+            messageRef.key,
+
+          sender:
+            'admin',
 
           message,
 
-          read: false,
+          read:
+            false,
 
-          created_at: timestamp
+          created_at:
+            firebase
+              .database
+              .ServerValue
+              .TIMESTAMP
         })
 
-        // 2. Actualizar cabeçalho da conversa
+        // ---------------------------------------------
+        // 2. Actualizar metadados do feedback
+        // ---------------------------------------------
+
         await fireDataBase
           .ref(
             `feedback/${this.selected.id}`
           )
           .update({
-            status: 'in_progress',
+            status:
+              'in_progress',
 
-            last_message: message,
+            last_message:
+              message,
 
-            updated_at: timestamp,
+            updated_at:
+              firebase
+                .database
+                .ServerValue
+                .TIMESTAMP,
 
-            last_message_at: timestamp
+            last_message_at:
+              firebase
+                .database
+                .ServerValue
+                .TIMESTAMP
           })
 
         this.message = ''
 
-        this.selected.status =
-          'in_progress'
+        this.selected = {
+          ...this.selected,
+
+          status:
+            'in_progress',
+
+          last_message:
+            message
+        }
       } catch (error) {
         console.error(
           '[NotificationChat] sendMessage:',
@@ -789,18 +869,31 @@ export default defineComponent({
         )
 
         Notify.create({
-          type: 'negative',
-          message: tdc(
-            'Unable to send message.'
-          )
+          type:
+            'negative',
+
+          icon:
+            'error',
+
+          message:
+            tdc(
+              'Unable to send message.'
+            )
         })
       } finally {
         this.sending = false
       }
     },
 
+    // =====================================================
+    // MARK AS READ
+    // =====================================================
+
     async markAsRead (item) {
-      if (item.admin_read) {
+      if (
+        !item?.id ||
+        item.admin_read
+      ) {
         return
       }
 
@@ -818,7 +911,8 @@ export default defineComponent({
           `feedback/${item.id}`
         )
         .update({
-          admin_read: true,
+          admin_read:
+            true,
 
           admin_read_at:
             firebase
@@ -827,19 +921,40 @@ export default defineComponent({
               .TIMESTAMP
         })
 
-      item.admin_read = true
+      const feedback =
+        this.feedback.find(
+          feedback =>
+            feedback.id ===
+            item.id
+        )
+
+      if (feedback) {
+        feedback.admin_read =
+          true
+      }
 
       if (
         this.selected?.id ===
         item.id
       ) {
-        this.selected.admin_read =
-          true
+        this.selected = {
+          ...this.selected,
+
+          admin_read:
+            true
+        }
       }
     },
 
+    // =====================================================
+    // STATUS
+    // =====================================================
+
     async updateStatus (status) {
-      if (!this.selected) {
+      if (
+        !this.selected?.id ||
+        !status
+      ) {
         return
       }
 
@@ -867,15 +982,60 @@ export default defineComponent({
                 .TIMESTAMP
           })
 
-        this.selected.status =
+        this.selected = {
+          ...this.selected,
+
           status
+        }
+
+        const feedback =
+          this.feedback.find(
+            item =>
+              item.id ===
+              this.selected.id
+          )
+
+        if (feedback) {
+          feedback.status =
+            status
+        }
       } catch (error) {
         console.error(
           '[NotificationChat] updateStatus:',
           error
         )
+
+        Notify.create({
+          type:
+            'negative',
+
+          icon:
+            'error',
+
+          message:
+            tdc(
+              'Unable to update status.'
+            )
+        })
       }
     },
+
+    // =====================================================
+    // REFRESH
+    // =====================================================
+
+    reload () {
+      this.selected = null
+      this.messages = []
+
+      this.stopListeners()
+
+      this.listenFeedback()
+    },
+
+    // =====================================================
+    // HELPERS
+    // =====================================================
 
     plainText (html) {
       if (!html) {
@@ -887,13 +1047,16 @@ export default defineComponent({
           'div'
         )
 
-      div.innerHTML = html
+      div.innerHTML =
+        String(html)
 
-      return (
+      return String(
         div.textContent ||
         div.innerText ||
         ''
-      ).trim()
+      )
+        .replace(/\s+/g, ' ')
+        .trim()
     },
 
     initials (name) {
@@ -902,9 +1065,11 @@ export default defineComponent({
       )
         .trim()
         .split(/\s+/)
+        .filter(Boolean)
         .slice(0, 2)
         .map(
-          item => item[0]
+          item =>
+            item.charAt(0)
         )
         .join('')
         .toUpperCase()
@@ -915,60 +1080,104 @@ export default defineComponent({
         return ''
       }
 
+      const date =
+        new Date(timestamp)
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return ''
+      }
+
       return new Intl
         .DateTimeFormat(
           'pt-PT',
           {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
+            day:
+              '2-digit',
 
-            hour: '2-digit',
-            minute: '2-digit'
+            month:
+              '2-digit',
+
+            year:
+              'numeric',
+
+            hour:
+              '2-digit',
+
+            minute:
+              '2-digit'
           }
         )
-        .format(
-          new Date(timestamp)
-        )
+        .format(date)
+    },
+
+    statusLabel (status) {
+      return {
+        new:
+          'New',
+
+        in_progress:
+          'In progress',
+
+        resolved:
+          'Resolved',
+
+        closed:
+          'Closed'
+      }[status] || 'New'
     },
 
     statusColor (status) {
       return {
-        new: 'red',
-        in_progress: 'orange',
-        resolved: 'positive',
-        closed: 'grey'
+        new:
+          'red',
+
+        in_progress:
+          'orange',
+
+        resolved:
+          'positive',
+
+        closed:
+          'grey'
       }[status] || 'grey'
     },
 
+    // =====================================================
+    // DESTROY LISTENERS
+    // =====================================================
+
     stopFeedbackListener () {
       if (
-        this.feedbackRef &&
-        this.feedbackCallback
+        feedbackRef &&
+        feedbackCallback
       ) {
-        this.feedbackRef.off(
+        feedbackRef.off(
           'value',
-          this.feedbackCallback
+          feedbackCallback
         )
       }
 
-      this.feedbackRef = null
-      this.feedbackCallback = null
+      feedbackRef = null
+      feedbackCallback = null
     },
 
     stopMessagesListener () {
       if (
-        this.messagesRef &&
-        this.messagesCallback
+        messagesRef &&
+        messagesCallback
       ) {
-        this.messagesRef.off(
+        messagesRef.off(
           'value',
-          this.messagesCallback
+          messagesCallback
         )
       }
 
-      this.messagesRef = null
-      this.messagesCallback = null
+      messagesRef = null
+      messagesCallback = null
     },
 
     stopListeners () {
@@ -983,8 +1192,11 @@ export default defineComponent({
 .notification-chat {
   width: min(1100px, 95vw);
   max-width: 1100px;
+
   height: min(850px, 92vh);
+
   overflow: hidden;
+
   border-radius: 12px;
 }
 
@@ -1015,6 +1227,7 @@ export default defineComponent({
 
 .conversation-list {
   min-width: 0;
+
   overflow: hidden;
 
   border-right:
@@ -1031,14 +1244,21 @@ export default defineComponent({
 
 .conversation-active {
   background:
-    rgba(25, 118, 210, 0.12);
+    rgba(
+      25,
+      118,
+      210,
+      0.12
+    );
 }
 
 .chat-panel {
   display: flex;
+
   flex-direction: column;
 
   min-width: 0;
+
   min-height: 0;
 
   height: 100%;
@@ -1046,6 +1266,7 @@ export default defineComponent({
 
 .chat-user-header {
   display: flex;
+
   align-items: center;
 
   min-height: 70px;
@@ -1059,6 +1280,7 @@ export default defineComponent({
 
 .messages-area {
   flex: 1;
+
   min-height: 0;
 
   background:
@@ -1080,6 +1302,7 @@ export default defineComponent({
 
 .empty-chat {
   flex: 1;
+
   height: 100%;
 
   padding: 20px;
@@ -1087,11 +1310,10 @@ export default defineComponent({
   text-align: center;
 }
 
-@media (
-  max-width: 700px
-) {
+@media (max-width: 700px) {
   .notification-chat {
     width: 100vw;
+
     max-width: 100vw;
 
     height: 100vh;
@@ -1105,8 +1327,7 @@ export default defineComponent({
         100vh - 64px
       );
 
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
   .conversation-scroll {
