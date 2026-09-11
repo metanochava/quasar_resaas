@@ -1,6 +1,8 @@
 <template>
-  <div>
-    <!-- BOTÃO DE NOTIFICAÇÕES -->
+  <div class="q-mr-sm">
+    <!-- =====================================================
+         BOTÃO DE NOTIFICAÇÕES
+    ====================================================== -->
     <s-btn
       flat
       round
@@ -28,7 +30,9 @@
       </q-tooltip>
     </s-btn>
 
-    <!-- DIALOG -->
+    <!-- =====================================================
+         DIALOG
+    ====================================================== -->
     <q-dialog
       v-model="open"
       position="right"
@@ -36,6 +40,7 @@
       transition-hide="slide-right"
     >
       <q-card
+        square
         class="notification-chat"
         :class="
           $q.dark.isActive
@@ -43,7 +48,9 @@
             : 'bg-grey-1'
         "
       >
-        <!-- HEADER -->
+        <!-- =================================================
+             HEADER
+        ================================================== -->
         <q-bar class="chat-header text-white">
           <q-avatar
             color="white"
@@ -89,10 +96,14 @@
           </s-btn>
         </q-bar>
 
-        <!-- BODY -->
+        <!-- =================================================
+             BODY
+        ================================================== -->
         <div class="chat-body">
 
-          <!-- LISTA DE CONVERSAS -->
+          <!-- ===============================================
+               LISTA DE CONVERSAS
+          ================================================ -->
           <div
             class="conversation-list"
             :class="
@@ -101,12 +112,13 @@
                 : 'bg-white'
             "
           >
-            <!-- PESQUISA -->
+            <!-- SEARCH -->
             <div class="q-pa-sm">
               <q-input
                 v-model="search"
                 dense
                 outlined
+                square
                 clearable
                 debounce="250"
                 :placeholder="tdc('Search')"
@@ -146,7 +158,7 @@
                     </q-avatar>
                   </q-item-section>
 
-                  <!-- DADOS -->
+                  <!-- INFORMAÇÃO -->
                   <q-item-section>
                     <q-item-label
                       class="text-weight-medium ellipsis"
@@ -222,11 +234,15 @@
             </q-scroll-area>
           </div>
 
-          <!-- PAINEL DO CHAT -->
+          <!-- ===============================================
+               CHAT
+          ================================================ -->
           <div class="chat-panel">
             <template v-if="selected">
 
-              <!-- HEADER DO UTILIZADOR -->
+              <!-- ===========================================
+                   HEADER DA CONVERSA
+              ============================================ -->
               <div
                 class="chat-user-header"
                 :class="
@@ -276,6 +292,7 @@
                   v-model="selected.status"
                   dense
                   outlined
+                  square
                   emit-value
                   map-options
                   :options="statusOptions"
@@ -284,7 +301,9 @@
                 />
               </div>
 
-              <!-- MENSAGENS -->
+              <!-- ===========================================
+                   MENSAGENS
+              ============================================ -->
               <q-scroll-area class="messages-area">
                 <div class="q-pa-md">
 
@@ -299,12 +318,16 @@
                       selected.comment_text ||
                       plainText(selected.comment)
                     ]"
-                    :stamp="formatDate(selected.created_at)"
+                    :stamp="
+                      formatDate(
+                        selected.created_at
+                      )
+                    "
                     bg-color="grey-3"
                     text-color="dark"
                   />
 
-                  <!-- CONVERSA -->
+                  <!-- RESPOSTAS -->
                   <q-chat-message
                     v-for="messageItem in messages"
                     :key="messageItem.id"
@@ -337,7 +360,9 @@
                 </div>
               </q-scroll-area>
 
-              <!-- INPUT -->
+              <!-- ===========================================
+                   INPUT
+              ============================================ -->
               <div
                 class="message-input"
                 :class="
@@ -349,15 +374,12 @@
                 <q-input
                   v-model="message"
                   outlined
+                  square
                   dense
                   autogrow
                   maxlength="5000"
-                  :placeholder="
-                    tdc('Type a message')
-                  "
-                  @keyup.enter.exact.prevent="
-                    sendMessage
-                  "
+                  :placeholder="tdc('Type a message')"
+                  @keyup.enter.exact.prevent="sendMessage"
                 >
                   <template #prepend>
                     <q-icon name="chat" />
@@ -381,7 +403,9 @@
               </div>
             </template>
 
-            <!-- SEM CONVERSA -->
+            <!-- ===============================================
+                 SEM CONVERSA
+            ================================================ -->
             <div
               v-else
               class="empty-chat column flex-center"
@@ -418,25 +442,23 @@ import { Notify } from 'quasar'
 import { tdc } from '../../services/translation'
 import { getFirebase } from 'quasar_resaas'
 
-/*
- * IMPORTANTE:
- *
- * Estas referências ficam FORA do data().
- *
- * Desta maneira o Vue não transforma Firebase Query / Reference
- * em Proxy reactivo.
- *
- * Isso evita erros internos como:
- *
- * newChildren.insert is not a function
- * newChildren.remove is not a function
- */
+
+// =========================================================
+// FIREBASE REFERENCES
+// =========================================================
+//
+// Ficam fora do data() para impedir Vue Proxy.
+//
+
+let unreadRef = null
+let unreadCallback = null
 
 let feedbackRef = null
 let feedbackCallback = null
 
 let messagesRef = null
 let messagesCallback = null
+
 
 export default defineComponent({
   name: 'NotificationChat',
@@ -458,6 +480,8 @@ export default defineComponent({
       message: '',
 
       sending: false,
+
+      unreadTotal: 0,
 
       statusOptions: [
         {
@@ -483,16 +507,21 @@ export default defineComponent({
     }
   },
 
+
+  // =========================================================
+  // COMPUTED
+  // =========================================================
+
   computed: {
     unreadCount () {
-      return this.feedback.filter(
-        item => !item.admin_read
-      ).length
+      return this.unreadTotal
     },
 
     filteredFeedback () {
       const search =
-        String(this.search || '')
+        String(
+          this.search || ''
+        )
           .trim()
           .toLowerCase()
 
@@ -500,29 +529,38 @@ export default defineComponent({
         return this.feedback
       }
 
-      return this.feedback.filter(item => {
-        const content = [
-          item.user?.name,
-          item.user?.email,
+      return this.feedback.filter(
+        item => {
+          const content = [
+            item.user?.name,
+            item.user?.email,
 
-          item.entity?.name,
+            item.entity?.name,
 
-          item.branch?.name,
+            item.branch?.name,
 
-          item.group?.name,
+            item.group?.name,
 
-          item.last_message,
+            item.last_message,
 
-          item.comment_text
-        ]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase()
+            item.comment_text
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase()
 
-        return content.includes(search)
-      })
+          return content.includes(
+            search
+          )
+        }
+      )
     }
   },
+
+
+  // =========================================================
+  // WATCH
+  // =========================================================
 
   watch: {
     open (value) {
@@ -533,20 +571,49 @@ export default defineComponent({
       }
 
       this.selected = null
+
       this.messages = []
 
-      this.stopListeners()
+      /*
+       * Ao fechar:
+       *
+       * parar apenas os listeners pesados.
+       *
+       * O listener unread continua activo.
+       */
+
+      this.stopFeedbackListener()
+
+      this.stopMessagesListener()
     }
   },
 
-  beforeUnmount () {
-    this.stopListeners()
+
+  // =========================================================
+  // LIFECYCLE
+  // =========================================================
+
+  mounted () {
+    /*
+     * Carrega contador imediatamente quando
+     * o componente entra na página.
+     */
+    this.listenUnread()
   },
+
+  beforeUnmount () {
+    this.stopUnreadListener()
+
+    this.stopFeedbackListener()
+
+    this.stopMessagesListener()
+  },
+
 
   methods: {
 
     // =====================================================
-    // FIREBASE
+    // DATABASE
     // =====================================================
 
     getDatabase () {
@@ -563,8 +630,72 @@ export default defineComponent({
       return fireDataBase
     },
 
+
     // =====================================================
-    // FEEDBACK LISTENER
+    // UNREAD
+    // =====================================================
+
+    listenUnread () {
+      try {
+        const fireDataBase =
+          this.getDatabase()
+
+        this.stopUnreadListener()
+
+        /*
+         * Escuta APENAS feedback não lido.
+         *
+         * Este listener fica activo mesmo
+         * quando o dialog está fechado.
+         */
+
+        unreadRef =
+          fireDataBase
+            .ref('feedback')
+            .orderByChild(
+              'admin_read'
+            )
+            .equalTo(false)
+
+        unreadCallback =
+          snapshot => {
+            this.unreadTotal =
+              snapshot.numChildren()
+          }
+
+        unreadRef.on(
+          'value',
+          unreadCallback
+        )
+      } catch (error) {
+        console.error(
+          '[NotificationChat] listenUnread:',
+          error
+        )
+
+        this.unreadTotal = 0
+      }
+    },
+
+    stopUnreadListener () {
+      if (
+        unreadRef &&
+        unreadCallback
+      ) {
+        unreadRef.off(
+          'value',
+          unreadCallback
+        )
+      }
+
+      unreadRef = null
+
+      unreadCallback = null
+    },
+
+
+    // =====================================================
+    // FEEDBACK
     // =====================================================
 
     listenFeedback () {
@@ -577,7 +708,9 @@ export default defineComponent({
         feedbackRef =
           fireDataBase
             .ref('feedback')
-            .orderByChild('created_at')
+            .orderByChild(
+              'created_at'
+            )
             .limitToLast(50)
 
         feedbackCallback =
@@ -588,22 +721,18 @@ export default defineComponent({
             const feedback =
               Object
                 .entries(data)
-                .map(([id, item]) => ({
-                  id,
+                .map(
+                  ([id, item]) => ({
+                    id,
 
-                  ...item,
+                    ...item,
 
-                  /*
-                   * Guardamos o texto limpo logo aqui.
-                   *
-                   * Assim não precisamos criar elementos DOM
-                   * repetidamente durante o render.
-                   */
-                  comment_text:
-                    this.plainText(
-                      item?.comment
-                    )
-                }))
+                    comment_text:
+                      this.plainText(
+                        item?.comment
+                      )
+                  })
+                )
                 .sort(
                   (a, b) =>
                     (
@@ -624,9 +753,8 @@ export default defineComponent({
               feedback
 
             /*
-             * Se a conversa seleccionada recebeu
-             * alguma alteração, actualizamos apenas
-             * os metadados dela.
+             * Mantém conversa seleccionada
+             * sincronizada.
              */
 
             if (this.selected?.id) {
@@ -640,6 +768,7 @@ export default defineComponent({
               if (updated) {
                 this.selected = {
                   ...this.selected,
+
                   ...updated
                 }
               }
@@ -658,8 +787,25 @@ export default defineComponent({
       }
     },
 
+    stopFeedbackListener () {
+      if (
+        feedbackRef &&
+        feedbackCallback
+      ) {
+        feedbackRef.off(
+          'value',
+          feedbackCallback
+        )
+      }
+
+      feedbackRef = null
+
+      feedbackCallback = null
+    },
+
+
     // =====================================================
-    // MESSAGES LISTENER
+    // MESSAGES
     // =====================================================
 
     listenMessages (feedbackId) {
@@ -694,6 +840,7 @@ export default defineComponent({
                 .map(
                   ([id, item]) => ({
                     id,
+
                     ...item
                   })
                 )
@@ -721,6 +868,23 @@ export default defineComponent({
         )
       }
     },
+
+    stopMessagesListener () {
+      if (
+        messagesRef &&
+        messagesCallback
+      ) {
+        messagesRef.off(
+          'value',
+          messagesCallback
+        )
+      }
+
+      messagesRef = null
+
+      messagesCallback = null
+    },
+
 
     // =====================================================
     // SELECT FEEDBACK
@@ -752,6 +916,7 @@ export default defineComponent({
         )
       }
     },
+
 
     // =====================================================
     // SEND MESSAGE
@@ -786,11 +951,9 @@ export default defineComponent({
         }
 
         /*
-         * IMPORTANTE:
+         * REFERÊNCIA LOCAL.
          *
-         * Não guardamos messageRef dentro de data().
-         *
-         * Fica somente como variável local.
+         * Nunca guardar em data().
          */
 
         const messageRef =
@@ -800,9 +963,9 @@ export default defineComponent({
             )
             .push()
 
-        // ---------------------------------------------
-        // 1. Guardar a mensagem
-        // ---------------------------------------------
+        // =================================================
+        // GUARDAR MENSAGEM
+        // =================================================
 
         await messageRef.set({
           id:
@@ -823,9 +986,9 @@ export default defineComponent({
               .TIMESTAMP
         })
 
-        // ---------------------------------------------
-        // 2. Actualizar metadados do feedback
-        // ---------------------------------------------
+        // =================================================
+        // ACTUALIZAR CONVERSA
+        // =================================================
 
         await fireDataBase
           .ref(
@@ -885,6 +1048,7 @@ export default defineComponent({
       }
     },
 
+
     // =====================================================
     // MARK AS READ
     // =====================================================
@@ -921,6 +1085,12 @@ export default defineComponent({
               .TIMESTAMP
         })
 
+      /*
+       * O listener listenUnread()
+       * vai receber automaticamente
+       * esta alteração.
+       */
+
       const feedback =
         this.feedback.find(
           feedback =>
@@ -945,6 +1115,7 @@ export default defineComponent({
         }
       }
     },
+
 
     // =====================================================
     // STATUS
@@ -1020,18 +1191,23 @@ export default defineComponent({
       }
     },
 
+
     // =====================================================
-    // REFRESH
+    // RELOAD
     // =====================================================
 
     reload () {
       this.selected = null
+
       this.messages = []
 
-      this.stopListeners()
+      this.stopFeedbackListener()
+
+      this.stopMessagesListener()
 
       this.listenFeedback()
     },
+
 
     // =====================================================
     // HELPERS
@@ -1055,7 +1231,10 @@ export default defineComponent({
         div.innerText ||
         ''
       )
-        .replace(/\s+/g, ' ')
+        .replace(
+          /\s+/g,
+          ' '
+        )
         .trim()
     },
 
@@ -1144,61 +1323,32 @@ export default defineComponent({
         closed:
           'grey'
       }[status] || 'grey'
-    },
-
-    // =====================================================
-    // DESTROY LISTENERS
-    // =====================================================
-
-    stopFeedbackListener () {
-      if (
-        feedbackRef &&
-        feedbackCallback
-      ) {
-        feedbackRef.off(
-          'value',
-          feedbackCallback
-        )
-      }
-
-      feedbackRef = null
-      feedbackCallback = null
-    },
-
-    stopMessagesListener () {
-      if (
-        messagesRef &&
-        messagesCallback
-      ) {
-        messagesRef.off(
-          'value',
-          messagesCallback
-        )
-      }
-
-      messagesRef = null
-      messagesCallback = null
-    },
-
-    stopListeners () {
-      this.stopFeedbackListener()
-      this.stopMessagesListener()
     }
   }
 })
 </script>
 
 <style scoped>
+/* =========================================================
+   LAYOUT
+========================================================= */
+
 .notification-chat {
   width: min(1100px, 95vw);
+
   max-width: 1100px;
 
   height: min(850px, 92vh);
 
   overflow: hidden;
 
-  border-radius: 12px;
+  border-radius: 0 !important;
 }
+
+
+/* =========================================================
+   HEADER
+========================================================= */
 
 .chat-header {
   height: 64px;
@@ -1210,6 +1360,11 @@ export default defineComponent({
       #075e54
     );
 }
+
+
+/* =========================================================
+   BODY
+========================================================= */
 
 .chat-body {
   display: grid;
@@ -1225,6 +1380,11 @@ export default defineComponent({
   min-height: 0;
 }
 
+
+/* =========================================================
+   LIST
+========================================================= */
+
 .conversation-list {
   min-width: 0;
 
@@ -1232,7 +1392,12 @@ export default defineComponent({
 
   border-right:
     1px solid
-    rgba(120, 120, 120, 0.16);
+    rgba(
+      120,
+      120,
+      120,
+      0.16
+    );
 }
 
 .conversation-scroll {
@@ -1251,6 +1416,11 @@ export default defineComponent({
       0.12
     );
 }
+
+
+/* =========================================================
+   CHAT
+========================================================= */
 
 .chat-panel {
   display: flex;
@@ -1275,8 +1445,18 @@ export default defineComponent({
 
   border-bottom:
     1px solid
-    rgba(120, 120, 120, 0.15);
+    rgba(
+      120,
+      120,
+      120,
+      0.15
+    );
 }
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
 
 .messages-area {
   flex: 1;
@@ -1292,13 +1472,28 @@ export default defineComponent({
     #111b21;
 }
 
+
+/* =========================================================
+   INPUT
+========================================================= */
+
 .message-input {
   padding: 12px;
 
   border-top:
     1px solid
-    rgba(120, 120, 120, 0.15);
+    rgba(
+      120,
+      120,
+      120,
+      0.15
+    );
 }
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
 
 .empty-chat {
   flex: 1;
@@ -1310,6 +1505,11 @@ export default defineComponent({
   text-align: center;
 }
 
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
 @media (max-width: 700px) {
   .notification-chat {
     width: 100vw;
@@ -1318,7 +1518,7 @@ export default defineComponent({
 
     height: 100vh;
 
-    border-radius: 0;
+    border-radius: 0 !important;
   }
 
   .chat-body {
@@ -1327,7 +1527,8 @@ export default defineComponent({
         100vh - 64px
       );
 
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
   }
 
   .conversation-scroll {

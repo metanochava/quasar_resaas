@@ -121,14 +121,6 @@ export function registerDashboard(
       (b.order ?? 999)
   )
 
-
-  console.debug(
-    "[RESAAS Dashboard] Registado:",
-    dashboard.module,
-    dashboard.name,
-    dashboards
-  )
-
 }
 
 
