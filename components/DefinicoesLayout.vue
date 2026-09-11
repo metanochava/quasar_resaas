@@ -647,8 +647,8 @@
 </template>
 
 <script>
-import { defineComponent, h } from "vue"
-import { Dark, setCssVar, QBtn, QInput, QCard, QDrawer } from "quasar"
+import { defineComponent } from "vue"
+import { Dark, setCssVar } from "quasar"
 import { HTTPAuth, url } from "../services/api"
 import { useUserStore } from "../stores/UserStore"
 import { buildRequestPayload } from "../base/base_store"
@@ -670,157 +670,7 @@ export default defineComponent({
   name: "ThemeStudioEngine",
 
   components: {
-    VisualAreaEditor,
-
-    TBtn: defineComponent({
-      name: "TBtn",
-      inheritAttrs: false,
-      setup(props, { attrs, slots }) {
-        const User = useUserStore()
-
-        return () => {
-          const layout = User.LayoutSettings || {}
-          const animation = User.AnimationSettings || {}
-          const enableAnimations = animation.enable_animations !== false
-
-          const classList = [attrs.class]
-
-          if (enableAnimations && animation.hover_effect && animation.hover_style) {
-            classList.push(`hover-${animation.hover_style}`)
-          }
-
-          if (
-            enableAnimations &&
-            animation.button_animation &&
-            animation.button_animation !== "none"
-          ) {
-            classList.push(`btn-anim-${animation.button_animation}`)
-          }
-
-          return h(
-            QBtn,
-            {
-              ...attrs,
-              dense: attrs.dense ?? layout.button_dense,
-              round: attrs.round ?? layout.button_round,
-              rounded: attrs.rounded ?? layout.rounded,
-              square: attrs.square ?? layout.square,
-              flat: attrs.flat ?? layout.button_style === "flat",
-              outline: attrs.outline ?? layout.button_style === "outline",
-              unelevated: attrs.unelevated ?? layout.button_style === "unelevated",
-              push: attrs.push ?? layout.button_style === "push",
-              ripple:
-                attrs.ripple ??
-                (enableAnimations && animation.button_animation === "ripple"),
-              class: classList
-            },
-            slots
-          )
-        }
-      }
-    }),
-
-    TInput: defineComponent({
-      name: "TInput",
-      inheritAttrs: false,
-      props: {
-        modelValue: {
-          type: [String, Number],
-          default: ""
-        }
-      },
-      emits: ["update:modelValue"],
-      setup(props, { attrs, emit, slots }) {
-        const User = useUserStore()
-
-        return () => {
-          const layout = User.LayoutSettings || {}
-
-          return h(
-            QInput,
-            {
-              ...attrs,
-              modelValue: props.modelValue,
-              "onUpdate:modelValue": (val) => emit("update:modelValue", val),
-              dense: attrs.dense ?? layout.input_dense,
-              outlined: attrs.outlined ?? layout.input_style === "outlined",
-              filled: attrs.filled ?? layout.input_style === "filled",
-              standout: attrs.standout ?? layout.input_style === "standout",
-              rounded: attrs.rounded ?? layout.rounded,
-              square: attrs.square ?? layout.square
-            },
-            slots
-          )
-        }
-      }
-    }),
-
-    TCard: defineComponent({
-      name: "TCard",
-      inheritAttrs: false,
-      setup(props, { attrs, slots }) {
-        const User = useUserStore()
-
-        return () => {
-          const layout = User.LayoutSettings || {}
-          const animation = User.AnimationSettings || {}
-          const enableAnimations = animation.enable_animations !== false
-
-          const styleObj = {
-            ...(attrs.style || {})
-          }
-
-          if (layout.square) {
-            styleObj.borderRadius = "0px"
-          } else if (layout.rounded) {
-            styleObj.borderRadius = "16px"
-          } else {
-            styleObj.borderRadius = "4px"
-          }
-
-          const classList = [attrs.class]
-
-          if (
-            enableAnimations &&
-            animation.card_animation &&
-            animation.card_animation !== "none"
-          ) {
-            classList.push(`anim-${animation.card_animation}`)
-          }
-
-          return h(
-            QCard,
-            {
-              ...attrs,
-              flat: attrs.flat ?? layout.card_flat,
-              bordered: attrs.bordered ?? layout.card_bordered,
-              class: classList,
-              style: styleObj
-            },
-            slots
-          )
-        }
-      }
-    }),
-
-    TDrawer: defineComponent({
-      name: "TDrawer",
-      inheritAttrs: false,
-      setup(props, { attrs, slots }) {
-        const User = useUserStore()
-
-        return () =>
-          h(
-            QDrawer,
-            {
-              ...attrs,
-              mini: attrs.mini ?? User.LayoutSettings?.sidebar_mini,
-              width: attrs.width ?? User.LayoutSettings?.sidebar_width
-            },
-            slots
-          )
-      }
-    })
+    VisualAreaEditor
   },
 
   setup() {

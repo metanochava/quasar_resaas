@@ -58,9 +58,9 @@ export default defineComponent({
       default: ''
     },
     accao: {
-      type: Array,
+      type: Object,
       required: false,
-      default: ''
+      default: () => ({})
     }
   },
 

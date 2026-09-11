@@ -464,7 +464,9 @@ function isRelationOrChoice(name, value = null) {
   if (typeof value === 'string') {
     try {
       parsed = JSON.parse(value)
-    } catch {}
+    } catch {
+      // não é JSON - mantém o valor original em `parsed`
+    }
   }
 
   return Boolean(

@@ -68,7 +68,7 @@ function pct(value) {
 
       <div v-if="widget.stacked" class="bar-track row no-wrap">
         <q-tooltip
-          v-for="(s, si) in series" :key="s.name"
+          v-for="s in series" :key="s.name"
         >
           {{ tdc(s.name) }}: {{ s.data[i] }}
         </q-tooltip>
@@ -81,7 +81,7 @@ function pct(value) {
 
       <div v-else class="column q-gutter-xs">
         <q-tooltip
-          v-for="(s, si) in series" :key="s.name"
+          v-for="s in series" :key="s.name"
         >
           {{ tdc(s.name) }}: {{ s.data[i] }}
         </q-tooltip>

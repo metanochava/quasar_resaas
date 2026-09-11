@@ -10,7 +10,7 @@ const slots = useSlots()
 
 const User = useUserStore()
 const router = useRouter()
-const emit = defineEmits(['saved'])
+const emit = defineEmits(['saved', 'save'])
 const props = defineProps({
   store: { type: Object, default: null },
   ignoreFields: { type: Array, default: () => [] },
@@ -18,9 +18,11 @@ const props = defineProps({
   // 🔥 configurable layout
   leftCol: { type: String, default: 'col-3' },
   centerCol: { type: String, default: 'col' },
-  rightCol: { type: String, default: 'col-4' }
+  rightCol: { type: String, default: 'col-4' },
 
-
+  // quando true, save() só emite 'save' (o pai trata da persistência
+  // real) em vez de gravar via formRef internamente
+  externalSave: { type: Boolean, default: false }
 })
 
 const formRef = ref(null)

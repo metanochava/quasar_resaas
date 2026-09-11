@@ -47,13 +47,14 @@ function areaPoints(values) {
 <template>
   <div>
     <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="line-chart">
-      <polygon
-        v-if="widget.area"
-        v-for="(s, si) in series" :key="`area-${s.name}`"
-        :points="areaPoints(s.data)"
-        :fill="chartColors[si % chartColors.length]"
-        opacity="0.15"
-      />
+      <template v-if="widget.area">
+        <polygon
+          v-for="(s, si) in series" :key="`area-${s.name}`"
+          :points="areaPoints(s.data)"
+          :fill="chartColors[si % chartColors.length]"
+          opacity="0.15"
+        />
+      </template>
       <polyline
         v-for="(s, si) in series" :key="s.name"
         :points="points(s.data)"
