@@ -741,11 +741,9 @@ export default defineComponent({
         }
 
         const timestamp =
-          firebase
-            .database
-            .ServerValue
-            .TIMESTAMP
+          firebase.database.ServerValue.TIMESTAMP
 
+        // 1. Criar nova mensagem
         const messageRef =
           fireDataBase
             .ref(
@@ -753,11 +751,7 @@ export default defineComponent({
             )
             .push()
 
-        const updates = {}
-
-        updates[
-          `feedback_messages/${this.selected.id}/${messageRef.key}`
-        ] = {
+        await messageRef.set({
           id: messageRef.key,
 
           sender: 'admin',
@@ -766,29 +760,23 @@ export default defineComponent({
 
           read: false,
 
-          created_at:
-            timestamp
-        }
+          created_at: timestamp
+        })
 
-        updates[
-          `feedback/${this.selected.id}/status`
-        ] = 'in_progress'
-
-        updates[
-          `feedback/${this.selected.id}/updated_at`
-        ] = timestamp
-
-        updates[
-          `feedback/${this.selected.id}/last_message`
-        ] = message
-
-        updates[
-          `feedback/${this.selected.id}/last_message_at`
-        ] = timestamp
-
+        // 2. Actualizar cabeçalho da conversa
         await fireDataBase
-          .ref()
-          .update(updates)
+          .ref(
+            `feedback/${this.selected.id}`
+          )
+          .update({
+            status: 'in_progress',
+
+            last_message: message,
+
+            updated_at: timestamp,
+
+            last_message_at: timestamp
+          })
 
         this.message = ''
 
