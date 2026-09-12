@@ -114,11 +114,23 @@ export const useUserStore = createBaseStore(
 
     can: (state) => (perm) =>
       state.Permissions.has(String(perm).toLowerCase()),
+    // Configuração efectiva User > Entity > EntityType. Preferido:
+    // User.get_ui_config()/get_ui_sources() (django_resaas.saas.
+    // models.user.py), já resolvidos e devolvidos por /api/me/ - ver
+    // data/user/serializers/me.py's ui_config/ui_sources. state.Theme/
+    // LayoutSettings/AnimationSettings/Typography (fetch por
+    // EntityStore/EntityTypeStore.getLayoutSettings(), só Entity >
+    // EntityType) ficam como fallback só até o primeiro /me/ com
+    // contexto de tenant responder.
     ps: (state) => ({
-      'theme': state.Theme,
-      'layout': state.LayoutSettings,
-      'animation': state.AnimationSettings,
-      'typography': state.Typography,
+      'theme': state.data?.ui_config?.theme || state.Theme,
+      'layout': state.data?.ui_config?.layout || state.LayoutSettings,
+      'animation': state.data?.ui_config?.animation || state.AnimationSettings,
+      'typography': state.data?.ui_config?.typography || state.Typography,
+      'layout_source': state.data?.ui_sources?.layout ?? null,
+      'theme_source': state.data?.ui_sources?.theme ?? null,
+      'typography_source': state.data?.ui_sources?.typography ?? null,
+      'animation_source': state.data?.ui_sources?.animation ?? null,
     }),
   },
 
@@ -268,6 +280,25 @@ export const useUserStore = createBaseStore(
       this.Settings = !this.Settings
       setStorage('l', 'settings', this.Settings)
     },
+
+    // Troca menu_rtl (User > Entity > EntityType, ver
+    // LayoutSetting.menu_rtl) - backend cria uma cópia pessoal do
+    // LayoutSetting efectivo na primeira vez (preserva o resto da
+    // configuração herdada) ou só alterna o campo se já existir um
+    // override próprio (UserAPIView.toggle_menu_rtl). Nunca usar
+    // UserThemeOverride nem uma variável local como fonte de verdade -
+    // this.data (via /me/) é sempre reatribuído com a resposta.
+    async toggleMenuRtl() {
+      const rsp = await HTTPAuth.post(
+        url({ type: 'u', url: 'django_resaas/users/toggle_menu_rtl/', params: {} })
+      )
+
+      this.data = { ...this.data, ...rsp.data }
+      setStorage('l', 'user', JSON.stringify(this.data))
+
+      return rsp
+    },
+
     toggleThemeStudio(){
       this.ThemeStudio = !this.ThemeStudio
     },

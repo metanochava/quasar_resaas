@@ -33,10 +33,14 @@
           round
           dense
           flat
-          icon="settings"
+          :icon="User.ps?.layout?.menu_rtl ? 'format_textdirection_r_to_l' : 'format_textdirection_l_to_r'"
           class="text-white"
-          @click="User.toggleSettings()"
-        />
+          @click="User.toggleMenuRtl()"
+        >
+          <q-tooltip>
+            {{ tdc('Toggle menu side') }}
+          </q-tooltip>
+        </s-btn>
 
       </div>
 

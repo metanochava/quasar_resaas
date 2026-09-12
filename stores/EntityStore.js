@@ -587,6 +587,11 @@ export const useEntityStore = createBaseStore(
           group: null
         })
 
+        // /me/ resolve User > Entity > EntityType (ui_config/
+        // ui_sources) - só fica correcto depois do contexto de tenant
+        // acima estar definido (MeSerializer lê request.entity_id).
+        await User.me()
+
         // ÚNICA CORRECÇÃO DE FLUXO:
         await Branch.getUserBranchs_(q)
       },
@@ -619,6 +624,9 @@ export const useEntityStore = createBaseStore(
           branch: null,
           group: null
         })
+
+        // Ver comentário equivalente em select_() acima.
+        await User.me()
 
         await Branch.getUserBranchs()
       },

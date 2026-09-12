@@ -58,7 +58,10 @@
       :style="headerStyle"
     >
       <div v-if="headerOverlayStyle" :style="headerOverlayStyle" />
-      <q-toolbar class="no-wrap q-px-md">
+      <q-toolbar
+        class="no-wrap q-px-md"
+        :class="{ 'menu-ltr': !menuRtl, 'menu-rtl': menuRtl }"
+      >
         <!-- Menu Esquerdo -->
         <s-btn dense flat round icon="menu" @click="User.toggleLeftTop()" />
 
@@ -94,22 +97,15 @@
     </q-header>
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
-    <q-drawer v-model="User.LeftTop" side="left"  :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary bg-saass'">
+    <!-- menu_rtl (LayoutSetting, User > Entity > EntityType) troca o
+         lado do menu - ver User.ps.layout.menu_rtl / menuRtl abaixo. -->
+    <q-drawer v-model="User.LeftTop" :side="menuRtl ? 'right' : 'left'"  :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary bg-saass'">
       <q-bar class="full-height q-pa-0" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
         <LeftMenu />
       </q-bar>
     </q-drawer>
 
-    
-
-    <!-- -------------------- RIGHT DRAWER -------------------- -->
-    <!-- <q-drawer v-model="User.RightTop" side="right" bordered :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary bg-saass'">
-      <q-scroll-area class="fit" :thumb-style="thumbStyle" :bar-style="barStyle">
-        <RightMenu />
-      </q-scroll-area>
-    </q-drawer> -->
-
-    <q-drawer v-model="User.RightTop" side="right"  :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
+    <q-drawer v-model="User.RightTop" :side="menuRtl ? 'left' : 'right'"  :width="300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
       <q-bar class="full-height q-pa-0">
         <q-scroll-area class="fit q-pa-0" :thumb-style="thumbStyle" :bar-style="barStyle">
           <RightMenu />
@@ -237,6 +233,14 @@ export default defineComponent({
       return this.User.ps || {}
     },
 
+    // LayoutSetting.menu_rtl, resolvido User > Entity > EntityType
+    // (User.get_effective_layout(), ver /me/'s ui_config.layout em
+    // User.ps.layout - nunca UserThemeOverride nem outro campo
+    // paralelo). Troca o lado dos drawers e a direcção do header.
+    menuRtl(){
+      return !!this.ps.layout?.menu_rtl
+    },
+
     // Header/footer personalizados - cascata User > Entity >
     // EntityType > default já resolvida no backend
     // (InterfaceConfigService, ver /me/'s interface_config). Antes
@@ -345,6 +349,16 @@ export default defineComponent({
 </script>
 
 <style>
+
+/* menu_rtl (LayoutSetting) - troca a direcção do header; os drawers
+   trocam de lado via :side em vez de CSS (ver menuRtl no script). */
+.menu-rtl {
+  flex-direction: row-reverse;
+}
+
+.menu-ltr {
+  flex-direction: row;
+}
 
 
 
