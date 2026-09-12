@@ -1,25 +1,19 @@
+import { unwrapChoice } from './unwrapChoice.js'
+
 // Aplica a AnimationSetting efectiva globalmente.
 //
-// ATENÇÃO (gap de backend - ver CLAUDE.md secção 84): o modelo
-// `AnimationSetting` é referenciado por User/Entity/EntityType
-// (django_resaas.saas.models.user.py, entity.py, entity_type.py: FK
-// 'django_resaas.AnimationSetting') e tem serializer próprio
-// (data/layout_setting/serializers/layout_setting.py), mas a classe
-// `AnimationSetting` em si já não existe em
-// django_resaas/saas/models/layout_setting.py - só ficaram lá o import
-// e o registo no admin. Isto é um problema do backend (fora da pasta
-// lib) e não foi alterado aqui; esta função é por isso deliberadamente
-// defensiva quanto aos campos que recebe, em vez de assumir uma forma
-// que não se consegue confirmar no modelo actual.
+// django_resaas.saas.models.animation_setting.AnimationSetting.
+// animation_speed é um CharField com choices - unwrapChoice() trata
+// tanto a forma serializada por DRF ({id, value, label}, ver
+// data/layout_setting/serializers/layout_setting.py's
+// AnimationSettingSerializer) como a forma simples devolvida por
+// User.get_ui_config() (via AnimationSetting.to_dict()).
 export function applyAnimation(animation = {}) {
   const root = document.documentElement
+  const speed = unwrapChoice(animation.animation_speed)
 
-  const speed =
-    animation.animation_speed === 'fast'
-      ? '0.2s'
-      : animation.animation_speed === 'slow'
-        ? '0.6s'
-        : '0.35s'
-
-  root.style.setProperty('--anim-speed', speed)
+  root.style.setProperty(
+    '--anim-speed',
+    speed === 'fast' ? '0.2s' : speed === 'slow' ? '0.6s' : '0.35s'
+  )
 }

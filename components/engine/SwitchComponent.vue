@@ -2,7 +2,7 @@
   <q-toggle
     v-model="localValue"
     :label="translatedLabel"
-    :dense="attrs.dense ?? layout.input_dense"
+    :dense="attrs.dense ?? layout.dense"
   />
 </template>
 

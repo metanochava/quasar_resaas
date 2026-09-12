@@ -3,18 +3,15 @@
   <q-btn
     v-bind="btnAttrs"
     :label="translatedLabel"
-    :dense="attrs.dense ?? layout.button_dense"
-    :round="attrs.round ?? layout.button_round"
-    :flat="attrs.flat ?? layout.button_style === 'flat'"
-    :outline="attrs.outline ?? layout.button_style === 'outline'"
-    :unelevated="attrs.unelevated ?? layout.button_style === 'unelevated'"
-    :push="attrs.push ?? layout.button_style === 'push'"
+    :dense="attrs.dense ?? layout.dense"
+    :round="attrs.round ?? false"
+    :unelevated="defaultUnelevated"
     :loading="attrs.loading"
-    :ripple="animation.button_animation === 'ripple'"
+    :ripple="buttonAnimation === 'ripple'"
     :class="[
       attrs.class,
-      animation.hover_effect ? 'hover-' + animation.hover_style : '',
-      animation.button_animation === 'pulse' ? 'btn-anim-pulse' : ''
+      animation.hover_effect ? 'hover-' + hoverStyle : '',
+      buttonAnimation === 'pulse' ? 'btn-anim-pulse' : ''
     ]"
   >
 
@@ -26,8 +23,9 @@
 
 <script>
 
-import { defineComponent, computed, useAttrs, watch } from "vue"
+import { defineComponent, computed, useAttrs } from "vue"
 import { useUserStore } from "../../stores/UserStore"
+import { unwrapChoice } from "../../theme/unwrapChoice.js"
 import { tdc } from "../../services/translation"
 
 
@@ -41,42 +39,27 @@ export default defineComponent({
     const attrs = useAttrs()
     const User = useUserStore()
 
+    // LayoutSetting só expõe `dense`/`rounded` como flags globais de
+    // estilo (django_resaas.saas.models.layout_setting.LayoutSetting) -
+    // já não existem button_dense/button_round/button_style. O raio
+    // global (--s-radius) já é aplicado uma única vez por
+    // theme/applyLayout.js, não aqui por instância de botão.
     const layout = computed(()=>User.ps?.layout || {})
     const animation = computed(()=>User.ps?.animation || {})
 
-    // --------------------------
-    // 🎨 THEME ENGINE (🔥 IGUAL AOS OUTROS)
-    // --------------------------
+    const buttonAnimation = computed(() => unwrapChoice(animation.value.button_animation))
+    const hoverStyle = computed(() => unwrapChoice(animation.value.hover_style))
 
-    const applyTheme = (v) => {
-
-      let radius = "4px"
-
-      if (v?.border_radius) {
-        radius = v.border_radius
-      } else {
-        switch (v?.mode) {
-          case "square":
-            radius = "0px"
-            break
-          case "rounded":
-            radius = "16px"
-            break
-          case "soft":
-            radius = "8px"
-            break
-          case "pill":
-            radius = "999px"
-            break
-          default:
-            radius = "4px"
-        }
-      }
-
-      document.documentElement.style.setProperty("--s-radius", radius)
-    }
-
-    watch(layout, applyTheme, { immediate: true, deep: true })
+    // unelevated é o estilo por omissão (igual ao antigo
+    // LayoutSetting.button_style default "unelevated") - só quando o
+    // chamador não pediu explicitamente flat/outline/push/unelevated.
+    const defaultUnelevated = computed(() =>
+      attrs.unelevated ?? (
+        attrs.flat === undefined &&
+        attrs.outline === undefined &&
+        attrs.push === undefined
+      )
+    )
 
     // --------------------------
     // 🌍 TRANSLATION
@@ -105,6 +88,9 @@ export default defineComponent({
       attrs,
       layout,
       animation,
+      buttonAnimation,
+      hoverStyle,
+      defaultUnelevated,
       translatedLabel,
       btnAttrs
     }

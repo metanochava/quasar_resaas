@@ -4,10 +4,10 @@
     v-bind="attrs"
     :label="translatedLabel"
     :hint="translatedHint"
-    :dense="attrs.dense ?? layout.input_dense"
-    :outlined="attrs.outlined ?? layout.input_style === 'outlined'"
-    :filled="attrs.filled ?? layout.input_style === 'filled'"
-    :standout="attrs.standout ?? layout.input_style === 'standout'"
+    :dense="attrs.dense ?? layout.dense"
+    :outlined="attrs.outlined ?? (attrs.filled === undefined && attrs.standout === undefined)"
+    :filled="attrs.filled"
+    :standout="attrs.standout"
     :style="radiusStyle"
     :rules="computedRules"
   />
@@ -57,11 +57,7 @@ export default defineComponent({
     })
 
     const radiusStyle = computed(() => ({
-      borderRadius: layout.value.square
-        ? "0px"
-        : layout.value.rounded
-          ? "16px"
-          : "4px"
+      borderRadius: layout.value.rounded ? "16px" : "4px"
     }))
 
     return {

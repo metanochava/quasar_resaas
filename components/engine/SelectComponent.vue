@@ -17,10 +17,10 @@
     :label="translatedLabel"
     :placeholder="translatedPlaceholder"
 
-    :dense="attrs.dense ?? layout.input_dense"
+    :dense="attrs.dense ?? layout.dense"
 
-    :outlined="attrs.outlined ?? layout.input_style === 'outlined'"
-    :filled="attrs.filled ?? layout.input_style === 'filled'"
+    :outlined="attrs.outlined ?? attrs.filled === undefined"
+    :filled="attrs.filled"
 
     :class="attrs.class"
 

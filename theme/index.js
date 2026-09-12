@@ -1,4 +1,5 @@
 export { resolveEffectiveConfig, EFFECTIVE_CONFIG_FIELDS } from './resolveEffectiveConfig.js'
+export { unwrapChoice } from './unwrapChoice.js'
 export { surfaceToStyle, surfaceOverlayStyle, surfaceIcon, surfacesToMap, surfacesToList } from './surfaceToStyle.js'
 export { applyTheme } from './applyTheme.js'
 export { applyLayout } from './applyLayout.js'

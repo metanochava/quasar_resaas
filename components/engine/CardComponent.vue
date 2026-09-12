@@ -3,20 +3,16 @@
   <q-card
     v-bind="attrs"
 
-    :flat="attrs.flat ?? layout.card_flat"
-    :bordered="attrs.bordered ?? layout.card_bordered"
+    :flat="attrs.flat ?? false"
+    :bordered="attrs.bordered ?? false"
 
     :style="{
-      borderRadius: layout.square
-        ? '0px'
-        : layout.rounded
-        ? '16px'
-        : '4px'
+      borderRadius: layout.rounded ? '16px' : '4px'
     }"
 
     :class="[
       attrs.class,
-      animation.card_animation ? 'anim-' + animation.card_animation : ''
+      cardAnimation ? 'anim-' + cardAnimation : ''
     ]"
 
   >
@@ -29,7 +25,12 @@
 
 import { defineComponent, computed, useAttrs } from 'vue'
 import { useUserStore } from "../../stores/UserStore"
+import { unwrapChoice } from "../../theme/unwrapChoice.js"
 
+// LayoutSetting já não tem card_flat/card_bordered/square - só
+// `rounded` (django_resaas.saas.models.layout_setting.LayoutSetting) -
+// o raio segue o mesmo valor que theme/applyLayout.js aplica
+// globalmente em --s-radius.
 export default defineComponent({
 
   name:"s-card",
@@ -42,11 +43,13 @@ export default defineComponent({
 
     const layout = computed(()=>User.ps?.layout || {})
     const animation = computed(()=>User.ps?.animation || {})
+    const cardAnimation = computed(() => unwrapChoice(animation.value.card_animation))
 
     return{
       attrs,
       layout,
-      animation
+      animation,
+      cardAnimation
     }
 
   }

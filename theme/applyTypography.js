@@ -1,17 +1,16 @@
+import { unwrapChoice } from './unwrapChoice.js'
+
 // Aplica a Typography efectiva globalmente (fonte, tamanho base,
 // altura de linha, espaçamento) - utilitário centralizado em vez de
 // mexer directamente e de forma dispersa em document.body.style (ver
 // CLAUDE.md secção 9).
 //
-// django_resaas.saas.models.typography.Typography.font_family é hoje
-// uma string simples (CharField com choices) - o `?.label` abaixo é só
-// para tolerar, sem quebrar, uma resposta legada onde a relação ainda
-// viesse expandida como {value, label}.
+// django_resaas.saas.models.typography.Typography.font_family é um
+// CharField com choices - unwrapChoice() trata tanto a forma
+// serializada por DRF ({id, value, label}) como a string simples de
+// User.get_ui_config().
 export function applyTypography(typography = {}) {
-  const font =
-    (typeof typography.font_family === 'object'
-      ? typography.font_family?.label
-      : typography.font_family) || 'Roboto'
+  const font = unwrapChoice(typography.font_family) || 'Roboto'
 
   let link = document.getElementById('dynamic-theme-font')
 

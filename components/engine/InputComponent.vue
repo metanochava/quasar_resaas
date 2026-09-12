@@ -10,10 +10,10 @@
     :error-message="firstError"
     :mask="computedMask"
     :rules="computedRules"
-    :dense="attrs.dense ?? layout.input_dense"
-    :outlined="attrs.outlined ?? layout.input_style === 'outlined'"
-    :filled="attrs.filled ?? layout.input_style === 'filled'"
-    :standout="attrs.standout ?? layout.input_style === 'standout'"
+    :dense="attrs.dense ?? layout.dense"
+    :outlined="attrs.outlined ?? attrs.filled === undefined && attrs.standout === undefined"
+    :filled="attrs.filled"
+    :standout="attrs.standout"
     :class="['s-input', attrs.class]"
   >
     <template v-if="isPassword" #append>
@@ -67,16 +67,6 @@ export default defineComponent({
     const layout = computed(() => User.ps?.layout || {})
     const localValue = ref(props.modelValue)
     const showPassword = ref(false)
-
-    // --------------------------
-    // 🎨 THEME ENGINE (🔥 MESMO DO SELECT)
-    // --------------------------
-
-    const applyTheme = (v) => {
-
-    }
-
-    watch(layout, applyTheme, { immediate: true, deep: true })
 
     // --------------------------
     // 🔁 MODEL

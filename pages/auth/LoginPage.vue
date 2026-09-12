@@ -123,32 +123,11 @@ const entityLoginConfig = computed(() => {
     return {}
   }
 
-
-  // =======================================================
-  // NOVO FORMATO
-  // =======================================================
-
-  if (entity.login_config) {
-    return entity.login_config
-  }
-
-
-  // =======================================================
-  // BACKWARD COMPATIBILITY
-  // =======================================================
-
-  return {
-
-    position:
-      entity.login_position,
-
-    background:
-      entity.login_background,
-
-    overlay:
-      entity.login_background_overlay
-
-  }
+  // EntitySerializer.get_login_config() - resolvido a partir de
+  // ThemeSurface (área 'login') + LayoutSetting.login_position, nunca
+  // dos antigos campos soltos login_position/login_background_* em
+  // Entity (que já não existem no modelo - ver CLAUDE.md secção 21).
+  return entity.login_config || {}
 
 })
 
@@ -166,32 +145,9 @@ const entityTypeLoginConfig = computed(() => {
     return {}
   }
 
-
-  // =======================================================
-  // NOVO FORMATO
-  // =======================================================
-
-  if (entityType.login_config) {
-    return entityType.login_config
-  }
-
-
-  // =======================================================
-  // BACKWARD COMPATIBILITY
-  // =======================================================
-
-  return {
-
-    position:
-      entityType.login_position,
-
-    background:
-      entityType.login_background,
-
-    overlay:
-      entityType.login_background_overlay
-
-  }
+  // EntityTypeSerializer.get_login_config() - mesma resolução que
+  // entityLoginConfig acima (ThemeSurface + LayoutSetting).
+  return entityType.login_config || {}
 
 })
 
@@ -399,55 +355,11 @@ const loginBackgroundStyle = computed(() => {
 
 
   // =======================================================
-  // BACKWARD COMPATIBILITY
-  //
-  // Antigo formato:
-  //
-  // login_background = "#fff"
-  // login_background = "linear-gradient(...)"
-  // login_background = "/media/image.jpg"
-  // =======================================================
-
-  if (
-    typeof background === 'string'
-  ) {
-
-    if (
-      background.startsWith('http://')
-      ||
-      background.startsWith('https://')
-      ||
-      background.startsWith('/')
-    ) {
-
-      return {
-
-        backgroundImage:
-          `url("${background}")`,
-
-        backgroundSize:
-          'cover',
-
-        backgroundPosition:
-          'center',
-
-        backgroundRepeat:
-          'no-repeat'
-
-      }
-
-    }
-
-
-    return {
-      background
-    }
-
-  }
-
-
-  // =======================================================
   // LAST FALLBACK
+  //
+  // EntitySerializer/EntityTypeSerializer.get_login_background()
+  // devolve sempre {type, value} ou None - nunca uma string solta -,
+  // por isso não há aqui um ramo de compatibilidade para strings.
   // =======================================================
 
   return {

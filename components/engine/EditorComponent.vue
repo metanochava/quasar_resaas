@@ -21,7 +21,7 @@
       :min-height="computedMinHeight"
       :max-height="attrs.maxHeight"
       :height="attrs.height"
-      :dense="attrs.dense ?? layout.input_dense"
+      :dense="attrs.dense ?? layout.dense"
       :class="[
         's-editor',
         attrs.class,
