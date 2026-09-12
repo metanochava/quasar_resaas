@@ -16,7 +16,21 @@
 
     <!-- entity-wide layout/branding (Theme Studio) -->
     <q-dialog v-model="User.ThemeStudio" full-width full-height>
-      <DefinicoesLayout />
+      <s-card class="q-pa-md">
+        <ThemeStudioEngine
+          v-model:scope="themeStudioScope"
+          allow-scope-select
+          :entity-type="EntityType.row"
+          :entity="User.Entity"
+          :user="User.data"
+          :entity-type-store="EntityType"
+          :entity-store="Entity"
+          :user-store="User"
+          :themes="Theme.rows"
+          :layouts="LayoutSetting.rows"
+          @saved="Entity.getLayoutSettings(User.Entity?.id)"
+        />
+      </s-card>
     </q-dialog>
 
     <q-dialog v-model="api_retorno_modal" full-width full-height>
@@ -144,6 +158,8 @@
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import { useEntityStore } from '../stores/EntityStore'
+import { useThemeStore } from '../stores/ThemeStore'
+import { useLayoutSettingStore } from '../stores/LayoutSettingStore'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
@@ -164,7 +180,7 @@ import { barStyle, thumbStyle } from '../services/app'
 import { interfaceConfigToStyle, overlayStyle } from '../utils/visualArea'
 import UserPermissioes from '../components/UserPermissioes.vue'
 import PagePermissoes from '../components/PagePermissoes.vue'
-import DefinicoesLayout from '../components/DefinicoesLayout.vue'
+import { ThemeStudioEngine } from '../components/theme/index.js'
 import UserAccountModal from '../components/UserAccountModal.vue'
 
 export default defineComponent({
@@ -182,7 +198,7 @@ export default defineComponent({
     Rodape,
     UserPermissioes,
     PagePermissoes,
-    DefinicoesLayout,
+    ThemeStudioEngine,
     UserAccountModal
   },
 
@@ -190,11 +206,15 @@ export default defineComponent({
     const EntityType = useEntityTypeStore()
     const Entity = useEntityStore()
     const User = useUserStore()
+    const Theme = useThemeStore()
+    const LayoutSetting = useLayoutSettingStore()
 
     return {
       EntityType,
       Entity,
       User,
+      Theme,
+      LayoutSetting,
       barStyle,
       thumbStyle
     }
@@ -207,6 +227,7 @@ export default defineComponent({
       api_retorno_modal: false,
       visibilidadeLoad: false,
       comments: false,
+      themeStudioScope: 'entity',
       miniState: false,
     }
   },
@@ -247,6 +268,36 @@ export default defineComponent({
 
     'User.RightTop'(val) {
       localStorage.setItem('ui_right_menu', JSON.stringify(val))
+    },
+
+    // 🔥 Theme Studio: carrega os catálogos (Theme/LayoutSetting) e o
+    // EntityType actual só quando o dialog abre.
+    //
+    // User.EntityType (singular) nunca é preenchido em lado nenhum da
+    // store (só User.EntityTypes, a lista, é) - o EntityType real da
+    // Entity actual tem de vir de EntityType.getById(), a partir do
+    // FK `entity_type` que já vem em User.Entity (serializado como
+    // {id, value, label} - ver RepresentationMixin no backend, não com
+    // os campos de tema já expandidos).
+    //
+    // typography/animation ainda não têm endpoint de listagem no
+    // backend actual (ver stores/ThemeStore.js e
+    // stores/LayoutSettingStore.js).
+    async 'User.ThemeStudio'(val) {
+      if (!val) return
+
+      try {
+        const entityTypeRef = this.User.Entity?.entity_type
+        const entityTypeId = entityTypeRef?.id || entityTypeRef?.value || entityTypeRef
+
+        await Promise.all([
+          this.Theme.loadData({ page_size: 100 }),
+          this.LayoutSetting.loadData({ page_size: 100 }),
+          entityTypeId ? this.EntityType.getById(entityTypeId) : Promise.resolve()
+        ])
+      } catch (e) {
+        console.error('ThemeStudio catalog load error', e)
+      }
     }
   },
 

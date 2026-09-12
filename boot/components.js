@@ -74,6 +74,16 @@ import HomeDashboards from "./../components/dashboard/HomeDashboards.vue"
 
 
 // =========================================================
+// THEME COMPONENTS
+// =========================================================
+
+import ThemeStudioEngine from './../components/theme/ThemeStudioEngine.vue'
+import VisualAreaEditor from './../components/theme/VisualAreaEditor.vue'
+import ColorField from './../components/theme/ColorField.vue'
+import GradientBuilder from './../components/theme/GradientBuilder.vue'
+
+
+// =========================================================
 // BOOT
 // =========================================================
 
@@ -181,5 +191,18 @@ export default boot(({ app }) => {
   app.component( 's-person-create-dialog', PersonCreateDialog )
 
   app.component( 's-person-search', PersonSearch )
+
+
+  // =======================================================
+  // THEME
+  // =======================================================
+
+  app.component( 's-theme-studio', ThemeStudioEngine )
+
+  app.component( 's-visual-area-editor', VisualAreaEditor )
+
+  app.component( 's-color-field', ColorField )
+
+  app.component( 's-gradient-builder', GradientBuilder )
 
 })

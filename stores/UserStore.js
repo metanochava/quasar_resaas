@@ -41,7 +41,7 @@ export const useUserStore = createBaseStore(
     // ThemeStudio: the entity-wide layout/branding modal. Deliberately
     // separate booleans/dialogs - one is "my account", the other is
     // "how this entity looks for everyone" (see components/
-    // UserAccountModal.vue vs components/DefinicoesLayout.vue).
+    // UserAccountModal.vue vs components/theme/ThemeStudioEngine.vue).
     Settings: false,
     ThemeStudio: false,
     Permissions: new Set(),

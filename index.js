@@ -28,6 +28,9 @@ export * from './stores/BranchStore.js'
 export * from './stores/MenuStore.js'
 export * from './stores/PersonStore.js'
 
+export * from './stores/ThemeStore.js'
+export * from './stores/LayoutSettingStore.js'
+
 export * from './stores/ActionStore.js'
 export * from './stores/AlertStore.js'
 export * from './stores/EmployeeStore.js'
@@ -79,8 +82,22 @@ export * from './services/storage.js'
 // Translation
 export * from './services/translation.js'
 
-// Theme
+// Theme (compat: setSettings) + utilitários organizados em ../theme/
 export * from './services/theme.js'
+
+export {
+  resolveEffectiveConfig,
+  EFFECTIVE_CONFIG_FIELDS,
+  surfaceToStyle,
+  surfaceOverlayStyle,
+  surfaceIcon,
+  surfacesToMap,
+  surfacesToList,
+  applyTheme,
+  applyLayout,
+  applyTypography,
+  applyAnimation,
+} from './theme/index.js'
 
 // Routing
 export * from './services/routing.js'
@@ -136,6 +153,13 @@ export {
 export {
   default as HomeDashboards
 } from './components/dashboard/HomeDashboards.vue'
+
+export {
+  ThemeStudioEngine,
+  VisualAreaEditor,
+  ColorField,
+  GradientBuilder,
+} from './components/theme/index.js'
 
 export {
   widgetComponents,
