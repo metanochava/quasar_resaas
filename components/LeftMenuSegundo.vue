@@ -49,6 +49,9 @@
           "
 
           :expand-icon-class="'text-white'"
+
+          expand-icon="chevron_right"
+
         >
 
           <q-separator />
