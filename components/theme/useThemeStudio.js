@@ -4,6 +4,7 @@ import { Notify } from 'quasar'
 import { tdc } from '../../services/translation'
 import { resolveEffectiveConfig } from '../../theme/resolveEffectiveConfig.js'
 import { surfaceToStyle, surfacesToList } from '../../theme/surfaceToStyle.js'
+import { unwrapChoice } from '../../theme/unwrapChoice.js'
 
 // Estado + lógica do ThemeStudioEngine (ver CLAUDE.md secção 4: o
 // .vue fica só com template/composição, este ficheiro concentra
@@ -324,7 +325,7 @@ export function useThemeStudio(props, emit) {
     if (!typography) return {}
 
     return {
-      fontFamily: typography.font_family || 'inherit',
+      fontFamily: unwrapChoice(typography.font_family) || 'inherit',
       fontSize: `${typography.font_size_base || 16}px`,
       lineHeight: typography.line_height || 1.5,
       letterSpacing: `${typography.letter_spacing || 0}px`,

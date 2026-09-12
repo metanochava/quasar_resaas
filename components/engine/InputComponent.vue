@@ -11,7 +11,7 @@
     :mask="computedMask"
     :rules="computedRules"
     :dense="attrs.dense ?? layout.dense"
-    :outlined="attrs.outlined ?? attrs.filled === undefined && attrs.standout === undefined"
+    :outlined="attrs.outlined ?? (attrs.filled === undefined && attrs.standout === undefined)"
     :filled="attrs.filled"
     :standout="attrs.standout"
     :class="['s-input', attrs.class]"
