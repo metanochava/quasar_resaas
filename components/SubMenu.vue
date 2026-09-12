@@ -35,7 +35,7 @@
 
       <!-- Arrow if has submenu -->
       <q-item-section side v-if="item.submenu?.length">
-        <q-icon name="chevron_right" />
+        <q-icon name="chevron_right" color="white" />
       </q-item-section>
 
       <!-- Recursive submenu -->

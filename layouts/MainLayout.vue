@@ -60,7 +60,7 @@
       <div v-if="headerOverlayStyle" :style="headerOverlayStyle" />
       <q-toolbar
         class="no-wrap q-px-md"
-        :class="{ 'menu-ltr': !menuRtl, 'menu-rtl': menuRtl }"
+        :class="{ 'menu-ltr_': !menuRtl, 'menu-rtl_': menuRtl }"
       >
         <!-- Menu Esquerdo -->
         <s-btn dense flat round icon="menu" @click="User.toggleLeftTop()" />
