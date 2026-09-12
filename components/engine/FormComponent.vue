@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { HTTPAuth, url } from '../../services/api'
+import FormSection from '../auto/FormSection.vue'
 
 
 // ---------------- PROPS ----------------
@@ -57,6 +58,16 @@ const fileFields = computed(() =>
 watch(() => props.store.form, v => {
   form.value = v ? { ...v } : {}
 }, { immediate: true })
+
+// ---------------- RESET ----------------
+// Restores the local working copy back to the last loaded row (or an
+// empty object for a new/unsaved record) - ActionForm's "Reset" button
+// already called this optionally (`props.reform?.resetForm?.()`) from
+// both FormTwo.vue and FormModal.vue, but this method didn't exist yet
+// so Reset silently did nothing to the field values.
+function resetForm() {
+  form.value = props.store.row ? { ...props.store.row } : {}
+}
 
 // ---------------- RULES ----------------
 function resolveRules(rules = []) {
@@ -242,6 +253,7 @@ async function save() {
 // ---------------- EXPOSE ----------------
 defineExpose({
   save,
+  resetForm,
   form,
   saving
 })
@@ -249,13 +261,13 @@ defineExpose({
 
 <template>
   <q-card flat>
-    <q-card-section class="row q-pa-0 ">
-      <!-- NORMAL  -->
-      <div class="row col-12 q-col-gutter-sm">
+    <q-card-section class="q-pa-none">
+      <!-- GENERAL -->
+      <FormSection v-if="generalFields.length" title="General Information">
         <div
-          v-for="f in [...generalFields]"
+          v-for="f in generalFields"
           :key="f.name"
-          class="col-md-4 col-sm-6 col-xs-12"
+          class="col-12 col-sm-6 col-md-4"
         >
           <component
             :is=" f.component"
@@ -265,16 +277,14 @@ defineExpose({
           />
 
         </div>
-      </div>
-
-      <q-separator class="q-my-md"  color="primary" />
+      </FormSection>
 
       <!-- RELATION -->
-      <div class="row col-12 q-col-gutter-sm">
+      <FormSection v-if="relationFields.length" title="Relations">
         <div
-          v-for="f in [...relationFields]"
+          v-for="f in relationFields"
           :key="f.name"
-          class="col-md-4 col-sm-6 col-xs-12"
+          class="col-12 col-sm-6 col-md-4"
         >
           <component
             :is=" f.component"
@@ -283,28 +293,26 @@ defineExpose({
             :rules="resolveRules(f.rules)"
           />
         </div>
-      </div>
-      
-      <q-separator class="q-my-md"  color="primary" />
-      
+      </FormSection>
+
       <!-- FILE -->
-      <div class="row col-12 q-col-gutter-sm">
-        <div v-for="f in fileFields" :key="f.name" class="col-md-4 col-sm-6 col-xs-12">
+      <FormSection v-if="fileFields.length" title="Attachments">
+        <div v-for="f in fileFields" :key="f.name" class="col-12 col-sm-6 col-md-4">
 
           <!-- PREVIEW -->
           <template v-if="previewOf(f)">
             <q-img
               v-if="previewOf(f).type === 'image'"
               :src="previewOf(f).src"
-              style="max-width: 120px; margin-bottom: 8px"
+              class="form-file-preview-image"
             />
 
             <iframe
               v-else-if="previewOf(f).type === 'pdf'"
               :src="previewOf(f).src"
-              style="width: 100%; height: 200px; margin-bottom: 8px"
+              class="form-file-preview-pdf"
             />
-          </template> 
+          </template>
 
           <!-- INPUT -->
 
@@ -316,7 +324,7 @@ defineExpose({
           />
 
         </div>
-      </div>
+      </FormSection>
 
       <!-- PROGRESS -->
       <q-linear-progress
@@ -327,3 +335,18 @@ defineExpose({
     </q-card-section>
   </q-card>
 </template>
+
+<style scoped>
+.form-file-preview-image {
+  max-width: 120px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.form-file-preview-pdf {
+  width: 100%;
+  height: 200px;
+  margin-bottom: 8px;
+  border: none;
+}
+</style>

@@ -168,51 +168,31 @@
           v-if="EntityType.form?.id"
         >
 
-          <s-card
-            class="q-pa-0 q-gutter-sm"
-            flat
-          >
-
-            <!-- APPS -->
-            <s-btn
+          <ManagementPanel>
+            <ManagementItem
               icon="apps"
               :label="tdc('Apps')"
-              color="primary"
-              class="full-width"
               @click="openApps = true"
             />
 
-
-            <!-- MODELS -->
-            <s-btn
+            <ManagementItem
               icon="view_module"
               :label="tdc('Models')"
-              color="primary"
-              class="full-width"
               @click="openModels = true"
             />
 
-
-            <!-- GROUPS -->
-            <s-btn
+            <ManagementItem
               icon="groups"
               :label="tdc('Groups')"
-              color="primary"
-              class="full-width"
               @click="openGroups = true"
             />
 
-
-            <!-- THEME -->
-            <s-btn
+            <ManagementItem
               icon="palette"
               :label="tdc('Theme Management')"
-              color="primary"
-              class="full-width"
               @click="openThemeStudio"
             />
-
-          </s-card>
+          </ManagementPanel>
 
         </template>
 
@@ -267,6 +247,10 @@ import {
 // ===========================================================
 
 import FormTwo from '../../components/auto/FormTwo.vue'
+
+import ManagementPanel from '../../components/auto/ManagementPanel.vue'
+
+import ManagementItem from '../../components/auto/ManagementItem.vue'
 
 import ModelManager from './ModelManager.vue'
 

@@ -34,6 +34,9 @@ import AutoFilter from './../components/auto/AutoFilter.vue'
 import ActionForm from './../components/auto/ActionForm.vue'
 import AutoTable from './../components/auto/AutoTable.vue'
 import AutoCrud from './../components/auto/AutoCrud.vue'
+import FormSection from './../components/auto/FormSection.vue'
+import ManagementPanel from './../components/auto/ManagementPanel.vue'
+import ManagementItem from './../components/auto/ManagementItem.vue'
 
 import ConfirmDeleteDialog from './../components/auto/ConfirmDeleteDialog.vue'
 
@@ -150,6 +153,10 @@ export default boot(({ app }) => {
   app.component('s-auto-table', AutoTable)
 
   app.component('s-auto-crud', AutoCrud)
+
+  app.component('s-form-section', FormSection)
+  app.component('s-management-panel', ManagementPanel)
+  app.component('s-management-item', ManagementItem)
 
 
 

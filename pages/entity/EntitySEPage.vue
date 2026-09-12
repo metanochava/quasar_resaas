@@ -129,39 +129,19 @@
         v-if="Entity.form?.id"
       >
 
-        <s-card
-          class="q-pa-0 q-gutter-sm"
-          flat
-        >
-
-          <!-- GROUPS -->
-          <s-btn
+        <ManagementPanel>
+          <ManagementItem
             icon="groups"
-
             :label="tdc('Groups')"
-
-            color="primary"
-
-            class="full-width"
-
             @click="openGroups = true"
           />
 
-
-          <!-- THEME -->
-          <s-btn
+          <ManagementItem
             icon="palette"
-
             :label="tdc('Theme Management')"
-
-            color="primary"
-
-            class="full-width"
-
             @click="openThemeStudio"
           />
-
-        </s-card>
+        </ManagementPanel>
 
       </template>
 
@@ -202,6 +182,10 @@ import {
 // ===========================================================
 
 import FormTwo from '../../components/auto/FormTwo.vue'
+
+import ManagementPanel from '../../components/auto/ManagementPanel.vue'
+
+import ManagementItem from '../../components/auto/ManagementItem.vue'
 
 import GroupManager from '../group/GroupManagerEntity.vue'
 
