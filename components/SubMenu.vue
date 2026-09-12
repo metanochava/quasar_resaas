@@ -65,7 +65,6 @@
       >
         <q-icon
           name="chevron_right"
-          :color="$q.dark.isActive ? 'white' : 'primary'"
         />
       </q-item-section>
 
