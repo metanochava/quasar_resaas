@@ -1,128 +1,652 @@
 <template>
-  
   <q-page class="q-pa-sm">
 
+    <!-- ===================================================== -->
+    <!-- GROUPS -->
+    <!-- ===================================================== -->
 
-      <q-dialog v-model="openGroups" persistent full-height full-width>
-        <GroupManager  :entityId="Entity.form?.id" />
-      </q-dialog>
+    <q-dialog
+      v-model="openGroups"
+      persistent
+      full-height
+      full-width
+    >
+      <GroupManager
+        :entityId="Entity.form?.id"
+      />
+    </q-dialog>
 
-    <!-- FORM -->
-    <div v-if="Entity.loading" class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
+
+    <!-- ===================================================== -->
+    <!-- THEME STUDIO -->
+    <!-- ===================================================== -->
+
+    <q-dialog
+      v-model="openTheme"
+      persistent
+      full-height
+      full-width
+    >
+
+      <s-card class="q-pa-md">
+
+        <!-- HEADER -->
+        <q-bar
+          :class="
+            $q.dark.isActive
+              ? 'bg-dark text-white'
+              : 'bg-primary text-white'
+          "
+        >
+
+          <q-toolbar-title>
+            {{ tdc('Theme Management') }}
+          </q-toolbar-title>
+
+          <q-space />
+
+          <s-btn
+            dense
+            flat
+            round
+            icon="close"
+            @click="openTheme = false"
+          />
+
+        </q-bar>
+
+
+        <q-separator />
+
+
+        <!-- THEME STUDIO -->
+        <ThemeStudioEngine
+          v-model:scope="themeStudioScope"
+
+          :allow-scope-select="false"
+
+          :entity-type="EntityType.row"
+
+          :entity="Entity.form"
+
+          :user="User.data"
+
+          :entity-type-store="EntityType"
+
+          :entity-store="Entity"
+
+          :user-store="User"
+
+          :themes="Theme.rows"
+
+          :layouts="LayoutSetting.rows"
+
+          @saved="onThemeSaved"
+        />
+
+      </s-card>
+
+    </q-dialog>
+
+
+    <!-- ===================================================== -->
+    <!-- LOADING -->
+    <!-- ===================================================== -->
+
+    <div
+      v-if="Entity.loading"
+      class="flex flex-center q-pa-lg"
+    >
+
+      <q-spinner
+        size="40px"
+        color="primary"
+      />
+
     </div>
+
+
+    <!-- ===================================================== -->
+    <!-- FORM -->
+    <!-- ===================================================== -->
+
     <FormTwo
       v-else
+
       :store="Entity"
+
       :ignore-fields="ignoreFields"
+
       @saved="onSaved"
     >
 
-      <template #right v-if="Entity.form?.id">
-          <s-card class="q-pa-0 q-gutter-sm " flat>
-            <s-btn @click="openGroups = !openGroups" label="Groups" color="primary" class="full-width" />
-          </s-card>
-        </template>
+      <!-- =================================================== -->
+      <!-- RIGHT -->
+      <!-- =================================================== -->
 
-        <template #footer v-if="Entity.form?.id">
-          
-        </template>
+      <template
+        #right
+        v-if="Entity.form?.id"
+      >
+
+        <s-card
+          class="q-pa-0 q-gutter-sm"
+          flat
+        >
+
+          <!-- GROUPS -->
+          <s-btn
+            icon="groups"
+
+            :label="tdc('Groups')"
+
+            color="primary"
+
+            class="full-width"
+
+            @click="openGroups = true"
+          />
+
+
+          <!-- THEME -->
+          <s-btn
+            icon="palette"
+
+            :label="tdc('Theme Management')"
+
+            color="primary"
+
+            class="full-width"
+
+            @click="openThemeStudio"
+          />
+
+        </s-card>
+
+      </template>
+
+
+      <!-- =================================================== -->
+      <!-- FOOTER -->
+      <!-- =================================================== -->
+
+      <template
+        #footer
+        v-if="Entity.form?.id"
+      >
+
+      </template>
 
     </FormTwo>
- 
+
   </q-page>
 </template>
 
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { useEntityStore } from '../../stores/EntityStore'
+
+import {
+  ref,
+  onMounted,
+  watch
+} from 'vue'
+
+
+import {
+  useRoute
+} from 'vue-router'
+
+
+// ===========================================================
+// COMPONENTS
+// ===========================================================
+
 import FormTwo from '../../components/auto/FormTwo.vue'
-
-
 
 import GroupManager from '../group/GroupManagerEntity.vue'
 
+import {
+  ThemeStudioEngine
+} from '../../components/theme/index.js'
 
-// ---------------- ROUTE ----------------
+
+// ===========================================================
+// STORES
+// ===========================================================
+
+import {
+  useEntityStore
+} from '../../stores/EntityStore'
+
+import {
+  useEntityTypeStore
+} from '../../stores/EntityTypeStore'
+
+import {
+  useThemeStore
+} from '../../stores/ThemeStore'
+
+import {
+  useLayoutSettingStore
+} from '../../stores/LayoutSettingStore'
+
+import {
+  useUserStore
+} from '../../stores/UserStore'
+
+
+// ===========================================================
+// SERVICES
+// ===========================================================
+
+import {
+  tdc
+} from '../../services/translation'
+
+
+// ===========================================================
+// ROUTE
+// ===========================================================
+
 const route = useRoute()
 
-// ---------------- STORE ----------------
+
+// ===========================================================
+// STORES
+// ===========================================================
+
 const Entity = useEntityStore()
 
-// ---------------- STATE ----------------
+const EntityType = useEntityTypeStore()
+
+const Theme = useThemeStore()
+
+const LayoutSetting = useLayoutSettingStore()
+
+const User = useUserStore()
+
+
+// ===========================================================
+// STATE
+// ===========================================================
+
 const ready = ref(false)
+
 const openGroups = ref(false)
+
+const openTheme = ref(false)
+
+
+// ===========================================================
+// THEME STUDIO
+// ===========================================================
+
+const themeStudioScope = ref('entity')
+
+
+// ===========================================================
+// IGNORE FIELDS
+// ===========================================================
+
 const ignoreFields = [
+
   'id',
+
   'created_at',
+
   'updated_at',
+
   'created_by',
+
   'updated_by',
+
   'deleted_at'
+
 ]
 
-// ---------------- PERMISSIONS ----------------
+
+// ===========================================================
+// PERMISSIONS
+// ===========================================================
+
 function canDo(perm) {
-  if (!perm) return true
+
+  if (!perm) {
+    return true
+  }
+
   return true
+
 }
 
-// ---------------- LOAD DATA ----------------
+
+// ===========================================================
+// LOAD ENTITY
+// ===========================================================
+
 async function load(id) {
 
   if (!id) {
 
     Entity.resetForm?.()
+
     return
+
   }
 
-  // 🔥 avoids duplicate calls with a safe comparison
-  if (String(Entity.row?.id) === String(id)) {
-    Entity.form = Entity.row 
+
+  // =========================================================
+  // EVITA REQUEST DUPLICADO
+  // =========================================================
+
+  if (
+    String(Entity.row?.id)
+    ===
+    String(id)
+  ) {
+
+    Entity.form = Entity.row
+
     return
+
   }
 
-  Entity.row =  await Entity.getById(id)
+
+  // =========================================================
+  // LOAD
+  // =========================================================
+
+  Entity.row =
+    await Entity.getById(id)
+
+
+  Entity.form =
+    Entity.row
+
 }
 
-// ---------------- INIT ----------------
-async function init() {
+
+// ===========================================================
+// LOAD ENTITY TYPE
+// ===========================================================
+
+async function loadEntityType() {
+
+  const entityTypeRef =
+    Entity.form?.entity_type
+
+
+  const entityTypeId =
+    entityTypeRef?.id
+    ||
+    entityTypeRef?.value
+    ||
+    entityTypeRef
+
+
+  if (!entityTypeId) {
+    return
+  }
+
+
+  // =========================================================
+  // SE JÁ ESTIVER CARREGADO
+  // =========================================================
+
+  if (
+    String(EntityType.row?.id)
+    ===
+    String(entityTypeId)
+  ) {
+    return
+  }
+
+
+  await EntityType.getById(
+    entityTypeId
+  )
+
+}
+
+
+// ===========================================================
+// OPEN THEME STUDIO
+// ===========================================================
+
+async function openThemeStudio() {
+
+  if (!Entity.form?.id) {
+    return
+  }
+
+
   try {
-    ready.value = false
+
+    // =======================================================
+    // Scope fixo desta página
+    // =======================================================
+
+    themeStudioScope.value =
+      'entity'
+
+
+    // =======================================================
+    // Carregar EntityType
+    // =======================================================
+
+    await loadEntityType()
+
+
+    // =======================================================
+    // Catálogos
+    // =======================================================
+
+    await Promise.all([
+
+      Theme.loadData?.({
+        page_size: 100
+      }),
+
+      LayoutSetting.loadData?.({
+        page_size: 100
+      })
+
+    ])
+
+
+    // =======================================================
+    // ABRIR
+    // =======================================================
+
+    openTheme.value =
+      true
+
+  }
+
+  catch (error) {
+
+    console.error(
+      'Error opening Theme Studio:',
+      error
+    )
+
+  }
+
+}
+
+
+// ===========================================================
+// INIT
+// ===========================================================
+
+async function init() {
+
+  try {
+
+    ready.value =
+      false
+
+
+    // =======================================================
+    // STORE INIT
+    // =======================================================
 
     await Entity.init()
 
-    const id = route.params.id
+
+    // =======================================================
+    // ENTITY
+    // =======================================================
+
+    const id =
+      route.params.id
+
+
     await load(id)
 
-    ready.value = true
 
-  } catch (err) {
-    console.error('Error initializing page:', err)
+    // =======================================================
+    // ENTITY TYPE
+    // =======================================================
+
+    await loadEntityType()
+
+
+    ready.value =
+      true
+
   }
+
+  catch (err) {
+
+    console.error(
+      'Error initializing page:',
+      err
+    )
+
+  }
+
 }
 
-// ---------------- WATCH ROUTE (FIXED) ----------------
+
+// ===========================================================
+// WATCH ROUTE
+// ===========================================================
+
 watch(
-  () => route.params,
-  async (params) => {
-    if (!params) return
 
-    const id = params.id
+  () =>
+    route.params.id,
 
-    // 🔥 always reloads when the route changes
+  async (id) => {
+
+    if (!id) {
+      return
+    }
+
+
     await load(id)
-  },
-  { immediate: false } // init already handles the first load
+
+    await loadEntityType()
+
+  }
+
 )
 
-// ---------------- EVENTS ----------------
+
+// ===========================================================
+// FORM SAVED
+// ===========================================================
+
 function onSaved(res) {
-  // console.log('Saved successfully', res)
+
+  if (res) {
+
+    Entity.row =
+      res
+
+    Entity.form =
+      res
+
+  }
+
 }
 
-// ---------------- LIFECYCLE ----------------
+
+// ===========================================================
+// THEME SAVED
+// ===========================================================
+
+async function onThemeSaved() {
+
+  try {
+
+    // =======================================================
+    // RELOAD DA ENTITY
+    // =======================================================
+
+    if (Entity.form?.id) {
+
+      const entity =
+        await Entity.getById(
+          Entity.form.id
+        )
+
+
+      if (entity) {
+
+        Entity.row =
+          entity
+
+        Entity.form =
+          entity
+
+      }
+
+    }
+
+
+    // =======================================================
+    // Se a Entity actual for também a Entity activa do User,
+    // actualiza a configuração efectiva da interface.
+    // =======================================================
+
+    if (
+      String(User?.Entity?.id)
+      ===
+      String(Entity.form?.id)
+    ) {
+
+      if (
+        typeof User.loadEffectiveLayout
+        ===
+        'function'
+      ) {
+
+        await User.loadEffectiveLayout()
+
+      }
+
+    }
+
+  }
+
+  catch (error) {
+
+    console.error(
+      'Error refreshing Theme Studio:',
+      error
+    )
+
+  }
+
+}
+
+
+// ===========================================================
+// LIFECYCLE
+// ===========================================================
+
 onMounted(init)
+
 </script>
