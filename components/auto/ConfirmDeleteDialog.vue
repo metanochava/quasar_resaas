@@ -102,8 +102,7 @@ const props = defineProps({
 
   row: {
     type: Object,
-    default: null,
-    required: true
+    default: null
   },
 
   label: {
