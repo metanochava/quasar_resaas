@@ -179,7 +179,6 @@ function onDelete() {
             ref="formRef"
             :store="store"
             :ignore-fields="ignoreFields"
-            @saved="save"
           />
 
         </div>
