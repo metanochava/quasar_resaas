@@ -9,7 +9,14 @@
       :store="Branch"
       :ignore-fields="ignoreFields"
       @saved="onSaved"
-    />
+    >
+      <template #right>
+        <BranchLocationPicker
+          :model-value="Branch.form.address"
+          @update:model-value="Branch.form.address = $event"
+        />
+      </template>
+    </FormTwo>
 
   </q-page>
 </template>
@@ -20,6 +27,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useBranchStore } from '../../stores/BranchStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
+import BranchLocationPicker from '../../components/branch/BranchLocationPicker.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
