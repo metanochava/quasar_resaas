@@ -293,8 +293,15 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* Regra geral desta página: um "col" dentro de um flex column nunca
+   encolhe abaixo da altura do seu próprio conteúdo por omissão
+   (min-height:auto do flexbox) - sem min-height:0 explícito em CADA
+   nível, o "scroll" (overflow:auto) dos 3 painéis (explorer/editor/
+   inspector) nunca chega a activar-se e é a PÁGINA inteira que cresce
+   e ganha scroll, em vez de cada painel scrollar internamente. */
 .scaffold-ide {
   height: 100%;
+  min-height: 0;
 }
 
 .ide-splitter {
@@ -303,6 +310,11 @@ onMounted(async () => {
 
 .editor-area {
   min-width: 0;
+  min-height: 0;
+}
+
+.editor-area > .col {
+  min-height: 0;
 }
 
 .editor-tabs {

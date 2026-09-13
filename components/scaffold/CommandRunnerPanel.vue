@@ -43,6 +43,10 @@ const emit = defineEmits(['run'])
 </template>
 
 <style scoped>
+.command-runner {
+  min-height: 0;
+}
+
 .command-output {
   margin: 0;
   padding: 8px 12px;
@@ -50,5 +54,7 @@ const emit = defineEmits(['run'])
   font-size: 12px;
   white-space: pre-wrap;
   word-break: break-word;
+  min-height: 0;
+  overflow-y: auto;
 }
 </style>

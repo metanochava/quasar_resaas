@@ -86,6 +86,14 @@ const routes = computed(() => {
 </template>
 
 <style scoped>
+.inspector {
+  min-height: 0;
+}
+
+.inspector > .col.scroll {
+  min-height: 0;
+}
+
 .field-row, .route-row {
   padding: 2px 0;
   font-size: 12px;

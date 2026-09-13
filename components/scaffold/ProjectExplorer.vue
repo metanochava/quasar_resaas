@@ -122,6 +122,18 @@ function onNodeClick(node) {
 </template>
 
 <style scoped>
+/* Sem min-height:0 aqui, um flex item column ("col") nunca encolhe
+   abaixo da altura do seu próprio conteúdo (default do flexbox é
+   min-height:auto) - o "scroll" (overflow:auto) nunca chega a activar-
+   se, a página inteira é que cresce. */
+.explorer {
+  min-height: 0;
+}
+
+.explorer > .col.scroll {
+  min-height: 0;
+}
+
 .explorer-node {
   cursor: pointer;
   padding: 1px 4px;
