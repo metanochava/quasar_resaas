@@ -332,6 +332,13 @@ export const useUserStore = createBaseStore(
         }
         this.loginMsg = 'good'
         this.isLogin = true
+        // Vue watchers only fire on an actual value change - if
+        // isLogout stayed 'true' from a previous session's logout,
+        // the next logout()/401 setting it to 'true' again would be a
+        // same-value no-op and HeaderUser.vue's watcher would never
+        // fire, silently breaking the auto-redirect-to-login until a
+        // full page reload. Reset it here so it can flip again.
+        this.isLogout = false
         await this.me()
       }).catch(err => {
         this.loading = false
@@ -429,7 +436,7 @@ export const useUserStore = createBaseStore(
 
     async logout(x) {
       if (x == 'N') {
-        this.isLogout = !this.isLogout
+        this.isLogout = true
         this.isLogin = false
         return
       }
@@ -481,10 +488,10 @@ export const useUserStore = createBaseStore(
         }
 
         setStorage('l', 'userGroup', this.Group)
-        this.isLogout = !this.isLogout
+        this.isLogout = true
         this.isLogin = false
       }).catch(err => {
-        this.isLogout = !this.isLogout
+        this.isLogout = true
         this.isLogin = false
       })
 
