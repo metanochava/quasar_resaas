@@ -25,7 +25,35 @@
                 @keyup.enter="createApp"
               />
 
-              <div v-if="hasStrippedChars" class="text-caption stripped-warning q-mt-sm">
+              <!-- MÓDULO JÁ EXISTE (nome digitado bate certo com um
+                   MY_APPS já instalado, dot(s) incluído(s) - ex.:
+                   "django_resaas.saas") - mostrar o que já existe em
+                   vez de deixar tentar criar um duplicado sem sentido. -->
+              <div v-if="existingApp" class="existing-app-panel q-mt-sm">
+                <div class="row items-center q-gutter-xs">
+                  <q-icon name="info" size="16px" />
+                  <span class="text-weight-medium">{{ tdc('This module already exists') }}</span>
+                </div>
+                <div class="text-caption q-mt-xs">
+                  {{ existingApp.models || 0 }} {{ tdc(existingApp.models === 1 ? 'model' : 'models') }}
+                </div>
+                <div class="row q-gutter-xs q-mt-sm">
+                  <s-btn flat dense size="sm" icon="table_chart" :label="tdc('View models')" @click="openModels(existingApp)" />
+                  <s-btn
+                    flat dense size="sm" icon="category" :label="tdc('Entity types')"
+                    :disable="!existingAppId"
+                    @click="openEntityTypes(existingApp)"
+                  >
+                    <q-tooltip v-if="!existingAppId">
+                      {{ tdc('This module has no registry entry yet') }}
+                    </q-tooltip>
+                  </s-btn>
+                </div>
+              </div>
+
+              <!-- Só avisa do ponto quando NÃO for um módulo já
+                   existente (esse caso já tem o painel acima). -->
+              <div v-else-if="hasStrippedChars" class="text-caption stripped-warning q-mt-sm">
                 <q-icon name="warning" size="16px" class="q-mr-xs" />
                 {{ tdc('A dot does not create a sub-folder - it will be removed. The folder created will be:') }}
                 <strong>{{ cleanedName || '—' }}</strong>
@@ -37,9 +65,9 @@
                 class="full-width q-mt-md"
                 color="primary"
                 icon="add"
-                :label="tdc('Create')"
+                :label="existingApp ? tdc('Already exists') : tdc('Create')"
                 :loading="loading"
-                :disable="!cleanedName"
+                :disable="!cleanedName || !!existingApp"
                 @click="createApp"
               />
             </div>
@@ -109,9 +137,12 @@
                   dense
                   color="negative"
                   icon="delete"
+                  :disable="isProtected(app.name)"
                   @click="confirmDelete(app.name)"
                 >
-                  <q-tooltip>{{ tdc('Delete') }}</q-tooltip>
+                  <q-tooltip>
+                    {{ isProtected(app.name) ? tdc('Core platform module - cannot be deleted') : tdc('Delete') }}
+                  </q-tooltip>
                 </s-btn>
               </q-card-actions>
 
@@ -180,6 +211,36 @@ const entityTypesOpen = ref(false)
 const cleanedName = computed(() => name.value.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())
 const hasStrippedChars = computed(() => cleanedName.value !== name.value.toLowerCase() && !!name.value)
 
+// ---------------- ALREADY EXISTS ----------------
+// Compara o nome TAL COMO digitado (não a versão limpa) contra os
+// módulos já instalados (settings.MY_APPS, incluindo entradas com
+// ponto como "django_resaas.saas") - criar por cima disso criaria uma
+// pasta nova sem sentido ("django_resaassaas"), nunca o módulo
+// pretendido. Ver AppModelsDialog.vue/AppEntityTypesDialog.vue para o
+// que já existe.
+const existingApp = computed(() => {
+  const typed = name.value.trim().toLowerCase()
+  if (!typed) return null
+  return apps.value.find(a => a.name.toLowerCase() === typed) || null
+})
+
+const existingAppId = computed(() =>
+  existingApp.value ? appIdByName.value[existingApp.value.name.toLowerCase()] : null
+)
+
+// ---------------- PROTECTED (core platform) ----------------
+// Mesma regra do backend (AppSchemaAPIView.destroy() - qualquer
+// "django_resaas" ou "django_resaas.<algo>" é core da própria
+// plataforma, nunca apagável). Um nome com ponto nem sequer consegue
+// chegar a destroy() (ver docstring de test_app_protected_prefix.py -
+// o router trata "." num path segment como separador de format
+// suffix) - desactivar aqui é a única protecção real e visível para
+// esses casos, não só um espelho cosmético do backend.
+function isProtected(name) {
+  const n = (name || '').toLowerCase()
+  return n === 'django_resaas' || n.startsWith('django_resaas.') || n === 'hr'
+}
+
 // ---------------- LOAD ----------------
 async function loadApps () {
   try {
@@ -229,6 +290,8 @@ async function createApp () {
 
 // ---------------- DELETE ----------------
 function confirmDelete(app) {
+  if (isProtected(app)) return
+
   Dialog.create({
     title: tdc('Confirm'),
     message: tdc('Are you sure you want to delete the module "{name}"?').replace('{name}', app),
@@ -291,6 +354,13 @@ onMounted(async () => {
 
 .stripped-warning {
   color: var(--q-warning, #f2c037);
+}
+
+.existing-app-panel {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(25, 118, 210, 0.08);
+  border-left: 3px solid var(--q-primary);
 }
 
 .app-card {

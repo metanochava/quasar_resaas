@@ -3,10 +3,14 @@ import { ref, watch } from 'vue'
 import { tdc } from '../../services/translation'
 import { HTTPAuth, url } from '../../services/api'
 
-// Lista os models Django reais de uma app scaffolded - GET
-// resaasapps/<name>/ (AppSchemaAPIView.retrieve(), backend), que já
-// devolve {models: [ModelName, ...]} via introspecção real
-// (apps.get_models()) - nenhum endpoint novo, só apresentação.
+// Lista os models Django reais de uma app - GET
+// resaasapps/lookup/?app=<name> (AppSchemaAPIView.lookup(), backend),
+// que devolve {models: [ModelName, ...]} via introspecção real
+// (apps.get_models()). Usa query param, não path segment - um nome
+// com ponto (ex.: "django_resaas.saas") nunca chegaria inteiro a
+// retrieve()/<pk>/ (o router trata "." num path segment como
+// separador de format suffix); lookup() existe exactamente para isso,
+// e funciona também para nomes sem ponto.
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   appName: { type: String, default: null },
@@ -27,7 +31,7 @@ async function load() {
 
   try {
     const { data } = await HTTPAuth.get(
-      url({ type: 'u', url: `django_resaas/resaasapps/${props.appName}/` })
+      url({ type: 'u', url: 'django_resaas/resaasapps/lookup/', params: { app: props.appName } })
     )
     models.value = data?.models || []
   } catch (e) {
