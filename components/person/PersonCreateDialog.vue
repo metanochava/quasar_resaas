@@ -35,6 +35,13 @@
 
       <!-- </q-card-section> -->
 
+      <q-card-section>
+        <AddressLocationPicker
+          :model-value="Person.form.address"
+          @update:model-value="Person.form.address = $event"
+        />
+      </q-card-section>
+
       <ActionForm
         :store="Person"
         :buttons="['cancel', 'reset', 'edit','delete', 'save']"
@@ -52,6 +59,7 @@ import { computed, watch } from 'vue'
 
 import  Form  from '../../components/engine/FormComponent.vue'
 import  ActionForm  from '../../components/auto/ActionForm.vue'
+import AddressLocationPicker from '../../components/address/AddressLocationPicker.vue'
 import { usePersonStore }  from '../../stores/PersonStore'
 
 const props = defineProps({

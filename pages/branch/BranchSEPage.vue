@@ -11,7 +11,7 @@
       @saved="onSaved"
     >
       <template #right>
-        <BranchLocationPicker
+        <AddressLocationPicker
           :model-value="Branch.form.address"
           @update:model-value="Branch.form.address = $event"
         />
@@ -27,7 +27,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useBranchStore } from '../../stores/BranchStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
-import BranchLocationPicker from '../../components/branch/BranchLocationPicker.vue'
+import AddressLocationPicker from '../../components/address/AddressLocationPicker.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
