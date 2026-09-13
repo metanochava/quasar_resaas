@@ -90,6 +90,20 @@
 
 
     <!-- ===================================================== -->
+    <!-- NOTIFICATION PROVIDERS -->
+    <!-- ===================================================== -->
+
+    <q-dialog
+      v-model="openNotificationCredentials"
+      persistent
+    >
+      <EntityNotificationCredentials
+        :entity-id="Entity.form?.id"
+      />
+    </q-dialog>
+
+
+    <!-- ===================================================== -->
     <!-- LOADING -->
     <!-- ===================================================== -->
 
@@ -141,6 +155,12 @@
             :label="tdc('Theme Management')"
             @click="openThemeStudio"
           />
+
+          <ManagementItem
+            icon="forum"
+            :label="tdc('Notification Providers')"
+            @click="openNotificationCredentials = true"
+          />
         </ManagementPanel>
 
       </template>
@@ -188,6 +208,8 @@ import ManagementPanel from '../../components/auto/ManagementPanel.vue'
 import ManagementItem from '../../components/auto/ManagementItem.vue'
 
 import GroupManager from '../group/GroupManagerEntity.vue'
+
+import EntityNotificationCredentials from './EntityNotificationCredentials.vue'
 
 import {
   ThemeStudioEngine
@@ -259,6 +281,8 @@ const ready = ref(false)
 const openGroups = ref(false)
 
 const openTheme = ref(false)
+
+const openNotificationCredentials = ref(false)
 
 
 // ===========================================================
