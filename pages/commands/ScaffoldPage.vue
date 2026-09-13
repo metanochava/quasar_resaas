@@ -1,987 +1,328 @@
 <template>
-  <q-page class=" q-pa-sm">
+  <q-page class="scaffold-ide column no-wrap">
 
-    <q-dialog v-model="model_action" persistent full-width full-height>
-      <ModelAction :app="form.app" :model="form.model"  :accao="accao" />
+    <ScaffoldToolbar
+      :apps="apps"
+      :selected-app="ide.schemaApp"
+      :models="models"
+      :selected-model="ide.schemaModel"
+      :active-file="ide.activeFile"
+      :error-count="ide.errorCount"
+      :dirty-count="ide.dirtyFiles.length"
+      :saving="!!ide.activeFile?.saving"
+      @update:selected-app="onSelectApp"
+      @update:selected-model="onSelectModel"
+      @validate="validateActive"
+      @save="saveActive"
+      @discard="discardActive"
+      @refresh="refreshAll"
+      @toggle-generator="showGenerator = !showGenerator"
+    />
+
+    <!-- MOBILE: explorer/inspector become drawers -->
+    <div class="row items-center q-gutter-xs q-px-sm q-py-xs gt-xs-hide lt-md" v-if="$q.screen.lt.md">
+      <s-btn flat dense icon="folder" :label="tdc('Explorer')" @click="leftDrawer = true" />
+      <s-btn flat dense icon="info" :label="tdc('Inspector')" @click="rightDrawer = true" />
+    </div>
+
+    <q-splitter v-model="verticalSplit" horizontal class="col ide-splitter" :limits="[30, 85]">
+      <template #before>
+        <q-splitter v-model="horizontalSplit" class="full-height" :limits="[0, 40]">
+          <template #before>
+            <ProjectExplorer
+              v-if="$q.screen.gt.sm"
+              class="full-height"
+              :roots="ide.roots"
+              :selected-root="selectedRoot"
+              :tree="ide.tree[selectedRoot] || []"
+              :loading="ide.loadingTree"
+              :active-path="ide.activeFilePath"
+              @update:selected-root="onSelectRoot"
+              @open="openFile"
+            />
+          </template>
+
+          <template #after>
+            <q-splitter v-model="editorSplit" reverse class="full-height" :limits="[0, 40]">
+              <template #before>
+                <div class="column full-height editor-area">
+                  <q-tabs
+                    v-if="ide.openFiles.length"
+                    v-model="ide.activeFilePath"
+                    dense inline-label align="left" class="editor-tabs"
+                  >
+                    <q-tab
+                      v-for="f in ide.openFiles" :key="f.path" :name="f.path"
+                      class="editor-tab"
+                    >
+                      <div class="row items-center no-wrap q-gutter-xs">
+                        <span class="ellipsis" style="max-width: 140px">{{ fileLabel(f.path) }}</span>
+                        <span v-if="f.dirty" class="dirty-dot">●</span>
+                        <q-icon name="close" size="14px" @click.stop="requestClose(f.path)" />
+                      </div>
+                    </q-tab>
+                  </q-tabs>
+
+                  <q-separator v-if="ide.openFiles.length" />
+
+                  <CodeEditor
+                    v-if="ide.activeFile"
+                    class="col"
+                    :model-value="ide.activeFile.currentContent"
+                    :language="ide.activeFile.language || 'plaintext'"
+                    :read-only="ide.activeFile.readOnly"
+                    :diagnostics="[...(ide.activeFile.validation?.errors || []), ...(ide.activeFile.validation?.warnings || [])]"
+                    @update:model-value="v => ide.setContent(ide.activeFile.path, v)"
+                  />
+
+                  <div v-else class="col flex flex-center text-grey editor-empty">
+                    <div class="text-center">
+                      <q-icon name="description" size="48px" />
+                      <div class="q-mt-sm">{{ tdc('Select a file or generate a scaffold') }}</div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <template #after>
+                <SchemaInspector
+                  v-if="$q.screen.gt.sm"
+                  class="full-height"
+                  :schema="ide.schema"
+                  :loading="ide.loadingSchema"
+                />
+              </template>
+            </q-splitter>
+          </template>
+        </q-splitter>
+      </template>
+
+      <template #after>
+        <q-tabs v-model="bottomTab" dense align="left">
+          <q-tab name="problems" :label="`${tdc('Problems')} (${ide.problems.length})`" />
+          <q-tab name="commands" :label="tdc('Commands')" />
+        </q-tabs>
+        <q-separator />
+        <q-tab-panels v-model="bottomTab" class="bottom-panels">
+          <q-tab-panel name="problems" class="q-pa-none">
+            <ProblemsPanel :problems="ide.problems" @open="onOpenProblem" />
+          </q-tab-panel>
+          <q-tab-panel name="commands" class="q-pa-none full-height">
+            <CommandRunnerPanel
+              :commands="ide.commands" :output="ide.output" :running="ide.running"
+              @run="ide.runCommand"
+            />
+          </q-tab-panel>
+        </q-tab-panels>
+      </template>
+    </q-splitter>
+
+    <!-- MOBILE DRAWERS -->
+    <q-drawer v-model="leftDrawer" side="left" overlay>
+      <ProjectExplorer
+        :roots="ide.roots" :selected-root="selectedRoot" :tree="ide.tree[selectedRoot] || []"
+        :loading="ide.loadingTree" :active-path="ide.activeFilePath"
+        @update:selected-root="onSelectRoot"
+        @open="(p) => { openFile(p); leftDrawer = false }"
+      />
+    </q-drawer>
+
+    <q-drawer v-model="rightDrawer" side="right" overlay>
+      <SchemaInspector :schema="ide.schema" :loading="ide.loadingSchema" />
+    </q-drawer>
+
+    <!-- GENERATOR -->
+    <q-dialog v-model="showGenerator" maximized>
+      <GeneratorPanel @close="showGenerator = false" @applied="onGenerated" />
     </q-dialog>
 
-    <!-- HEADER -->
-    
-    <div class="row">
-      <s-card flat bordered class="col">
-
-        <q-card-section class="text-subtitle1" dense>
-          <div class="row items-center  sticky-header">
-            <div class="text-h5"> ⚡ {{tdc(' Scaffold Command Wizard')}}</div>
-            <q-space/>
-            <s-btn flat icon="visibility" label="Preview" @click="generatePreview" />
-            <s-btn color="primary" icon="save" label="Create / Update" @click="submit" />
-          </div>
-        </q-card-section>
-
-        <q-separator/>
-
-        <q-card-section>
-
-          <div class="row  q-col-gutter-md ">
-            <div class="col">
-              <s-select
-                v-model="form.app"
-                :options="apps"
-                label="App"
-                outlined
-                dense 
-                map-options
-                emit-value
-                option-value="name"
-                option-label="name"
-                @update:model-value="loadModelsSchema(form.app)"
-              />
-            </div>
-
-            <div class="col">
-              <s-input dense
-                v-model="form.model"
-                label="Model Name"
-                outlined
-
-                @keyup="accaoTeste = false"
-              />
-            </div>
-
-             <div class="col">
-              <s-switch
-                v-model="form.crud"
-                label="Crudeble"
-                dense
-                outlined
-              >
-              </s-switch>
-            </div>
-
-            <div class="col">
-              <s-select
-                v-model="form.icon"
-                :options="ICONS"
-                label="Icon"
-                use-input
-                dense
-                outlined
-              >
-
-                <!-- SELECTED ITEM -->
-                <template v-slot:selected-item="scope">
-                  <div class="row items-center q-gutter-sm">
-                    <q-icon :name="scope.opt" />
-                    <span>{{ scope.opt }}</span>
-                  </div>
-                </template>
-
-                <!-- OPTIONS LIST -->
-                <template v-slot:option="scope">
-                  <q-item v-bind="scope.itemProps">
-                    <q-item-section avatar>
-                      <q-icon :name="scope.opt" />
-                    </q-item-section>
-
-                    <q-item-section>
-                      {{ scope.opt }}
-                    </q-item-section>
-                  </q-item>
-                </template>
-
-              </s-select>
-            </div>
-
-           
-
-
-
-            <div class="col" v-if="models.includes(form.model)">
-              <s-btn class="full-width" color="primary" icon="refresh"  label="Reload Model" @click="reloadModelShema" />
-            </div>
-          </div>
-        </q-card-section>
-      </s-card>
-    </div>
-    <div class="row q-col-gutter-md">
-
-      <!-- ================= LEFT (COMMAND STYLE FORM) ================= -->
-      <div class="col-4">
-        <!-- ================= FIELDS ================= -->
-        <s-card flat bordered class=" q-mt-md" dense>
-
-          <q-card-section class="row items-center" dense>
-            <div class="text-subtitle1" dense>📋 Fields</div>
-            <q-space/>
-            <s-btn dense icon="add" @click="addField" />
-          </q-card-section>
-
-          <q-separator/>
-
-          <q-list bordered dense >
-            <q-expansion-item
-              dense
-              v-for="(f, i) in form.fields"
-              :key="i"
-              :label="f.name || 'new_field'"
-              group="fields"
-              :model-value="i === form.fields.length - 1"
-              expand-separator
-            
-            >
-
-
-              <div class="q-pa-sm  q-gutter-sm">
-
-                <div class="row q-gutter-sm q-col-gutter-sm">
-                  <div class="col">
-                    <s-input dense v-model="f.name" label="name" outlined />
-                  </div>
-                  <div class="col-7">
-                    <s-select
-                      dense
-                      v-model="f.type"
-                      :options="filteredTypes"
-                      label="type"
-                      outlined
-                      use-input
-                      @filter="filterTypes"
-                    >
-                      <template v-slot:no-option>
-                      <q-item>
-                        <q-item-section class="text-grey">
-                        {{st('No results')}}
-                        </q-item-section>
-                      </q-item>
-                      </template>
-                    </s-select>
-
-                  </div> 
-                </div>
-
-                <div class="row q-gutter-sm q-col-gutter-sm">
-                  <div class="col">
-                    <s-input dense v-model="f.verbose_name" label="Verbose name" outlined />
-                  </div>
-
-                  <div class="col-7 q-pr-sm">
-                    <s-input dense v-model="f.help_text" label="Help text" outlined />
-                  </div>
-                </div>
-
-                <div class="row q-gutter-sm  q-mt-md">
-                  <div class="col">
-                    <s-switch v-model="f.required" label="required" />
-                  </div>
-                  <div class="col">
-                    <s-switch v-model="f.unique" label="unique" />
-                  </div>
-                  <div class="col" v-if="!(['ForeignKey','OneToOneField','ManyToManyField'].includes(f.type))">
-                    <s-input dense v-model="f.default" label="default" outlined />
-                  </div>
-                </div>
-
-                <div  v-if="isChar(f) " class="row q-gutter-sm q-col-gutter-sm q-mt-md">
-                  <div class="col">
-                    <s-input dense v-model="f.min_length" type="number" label="min length" outlined/>
-                  </div>
-                  <div class="col">
-                    <s-input  dense v-model="f.max_length" type="number" label="max length" outlined/>
-                  </div>
-                </div>
-
-
-                <div  v-if="isDecimalOrMoney(f) " class="row q-gutter-sm q-col-gutter-sm q-mt-md">
-                  <div class="col">
-                    <s-input dense v-model="f.max_digits" type="number" label="max digits" outlined/>
-                  </div>
-                  <div class="col">
-                    <s-input  dense v-model="f.decimal_places" type="number" label="decimal places" outlined/>
-                  </div>
-                  <div class="col">
-                    <s-select
-                      dense
-                      v-model="f.default_currency"
-                      :options="filteredMoneys"
-                      label="type"
-                      outlined
-                      use-input
-                      @filter="filterMoneys"
-                    >
-                      <template v-slot:no-option>
-                      <q-item>
-                        <q-item-section class="text-grey">
-                        {{st('No results')}}
-                        </q-item-section>
-                      </q-item>
-                      </template>
-                    </s-select>
-                  </div>
-                </div>
-
-                <div  v-if="isInteger(f) " class="row q-gutter-sm q-col-gutter-sm q-mt-md">
-                  <div class="col">
-                    <s-input dense v-model="f.min" type="number" label="min" outlined/>
-                  </div>
-                  <div class="col">
-                    <s-input  dense v-model="f.max" type="number" label="max" outlined/>
-                  </div>
-                </div>
-
-                <div  v-if="isFile(f) " class="row q-gutter-sm q-col-gutter-sm q-mt-md">
-                  <div class="col">
-                    <s-input dense v-model="f.width_field" type="number" label="width_field" outlined/>
-                  </div>
-                  <div class="col">
-                    <s-input  dense v-model="f.height_field" type="number" label="height_field" outlined/>
-                  </div>
-                </div>
-
-                <div  v-if="isDate(f) " class="row q-gutter-sm q-col-gutter-sm q-mt-md">
-                  <div class="col">
-                    <s-switch dense v-model="f.auto_now_add"  label="Auto Now Add" outlined/>
-                  </div>
-                  <div class="col">
-                    <s-switch  dense v-model="f.auto_now"  label="Auto Now" outlined/>
-                  </div>
-                </div>
-                
-              
-                <s-card flat bordered class=" q-mt-md"  v-if="!(['ForeignKey','OneToOneField','ManyToManyField','FileField', 'ImageField', 'TextField'].includes(f.type))" >
-                  <q-card-section>
-                    ♋️ Choices
-                    <div class="row q-col-gutter-sm q-pa-0">
-                      <div class="col">
-                        <s-input
-                          v-model="newChoice.key"
-                          label="Key"
-                          outlined
-                          dense
-                          @keyup.enter="addChoice(f)"
-                        />
-                      </div>
-
-                      <div class="col">
-                        <s-input
-                          v-model="newChoice.label"
-                          label="Label"
-                          outlined
-                          dense
-                          @keyup.enter="addChoice(f)"
-                        />
-                      </div>
-                    </div>
-
-                    <div v-if="f?.choices?.length === 0" class="text-grey">
-                      No choice added
-                    </div>
-
-                    <q-list bordered v-else>
-                      <q-item
-                        v-for="(choice, index) in f?.choices"
-                        :key="index"
-                      >
-                        <q-item-section>
-                          <q-item-label>
-                            Key:{{ choice?.key }}
-                          </q-item-label>
-                          <q-item-label caption>
-                            Label: {{ choice?.label }}
-                          </q-item-label>
-                        </q-item-section>
-
-                        <q-item-section side>
-                          <s-btn
-                            icon="delete"
-                            color="negative"
-                            flat
-                            dense
-                            round
-                            @click="removeChoice(f, index)"
-                          />
-                        </q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-card-section>
-                </s-card>
-                
-                <!-- RELATION -->
-                <div v-if="isRelation(f)">
-
-                  <div class="row q-col-gutter-sm q-pa-0">
-                    <div class="col">
-                      <s-select
-                        v-model="f.relApp"
-                        :options="apps"
-                        label="app"
-                        outlined
-                        dense 
-                        map-options
-                        emit-value
-                        option-value="name"
-                        option-label="name"
-                        @update:model-value="loadModelsRelation(f)"
-                      />
-                    </div>
-
-                    <div class="col">
-                      <s-select
-                        v-model="f.relation"
-                        :options="f?.models"
-                        label="model"
-                        outlined
-                        dense 
-                      />
-                    </div>
-
-                    <div class="col" v-if="f.type !== 'ManyToManyField'">
-                      <s-select
-                        v-model="f.on_delete"
-                        :options="onDeletes"
-                        label="on_delete"
-                        dense
-                        outlined
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                <s-btn flat color="negative" label="remove" @click="removeField(i)" dense/>
-
-              </div>
-
-            </q-expansion-item>
-
-          </q-list>
-        </s-card>
-
-        <!-- ================= actions ================= -->
-        <s-card flat bordered class="q-mt-md" v-if="accaoTeste">
-          <q-card-section class="row q-col-gutter-sm q-gutter-s">
-            <div class="text-h6 text-grey col-12">🔐 Extra actions of {{ form.app }}.{{form.model}}</div>
-            <div class="col-12">
-              <s-select
-                v-model="accao.icon"
-                :options="ICONS"
-                label="Icon"
-                use-input
-                dense
-                outlined
-              >
-
-                <!-- SELECTED ITEM -->
-                <template v-slot:selected-item="scope">
-                  <div class="row items-center q-gutter-sm">
-                    <q-icon :name="scope.opt" />
-                    <span>{{ scope.opt }}</span>
-                  </div>
-                </template>
-
-                <!-- OPTIONS LIST -->
-                <template v-slot:option="scope">
-                  <q-item v-bind="scope.itemProps">
-                    <q-item-section avatar>
-                      <q-icon :name="scope.opt" />
-                    </q-item-section>
-
-                    <q-item-section>
-                      {{ scope.opt }}
-                    </q-item-section>
-                  </q-item>
-                </template>
-
-              </s-select>
-            </div>
-
-            <s-select
-              class="col"
-              v-model="accao.method"
-              :options="['get', 'post', 'put', 'delete']"
-              label="method"
-              outlined
-              dense 
-            />
-            <s-switch class="col" v-model="accao.details" label="Details" outlined dense />
-            <s-switch class="col" v-model="accao.visible" label="Visible" outlined dense />
-            <s-switch class="col" v-model="accao.autorequest" label="Auto request" outlined dense />
-
-            <s-select
-              class="col"
-              v-model="accao.position"
-              :options="['l','r','t','m','b']"
-              label="Position"
-              outlined
-              dense
-            />
-
-            <s-input class="col" dense v-model.number="accao.order" type="number" label="Order" outlined />
-            <s-input class="col-6" dense v-model="accao.action" label="Action" outlined />
-            <s-input class="col-6" dense v-model="accao.label" label="Label" outlined />
-            <s-input class="col-12" dense v-model="accao.tooltip" label="Tooltip" outlined />
-            <s-input class="col-6" dense v-model="accao.permission" @keyup.enter="addPerm" outlined label="Permission" />
-            <s-input class="col-6" dense v-model="accao.url" @keyup.enter="addPerm" outlined label="URL path" />
-
-            <s-btn v-if="form.model" class=" col-12" flat icon="arrow_upward" color="success" :label="'Permissions Updade' + ' '+ form.model" @click="permissionUpdade" />
-
-            <q-chip
-              @dblclick="accaoMetodo(p)"
-              :icon="p.icon"
-              :class="{
-                'bg-green text-white': p.method === 'get',
-                'bg-blue text-white': p.method === 'post',
-                'bg-orange text-white': p.method ==='put',
-                'bg-red text-white': p.method === 'delete'
-              }"
-              v-for="(p,i) in form?.actions"
-              :key="i"
-              removable
-              @remove="form?.actions.splice(i,1)"
-            >
-              {{ (p.label || p.action || p.permission) + ' [' + p.method + ']' }}
-              <q-tooltip class="bg-primary text-white">
-                url = {{p.url}}<br />
-                details = {{p.details}}<br />
-                position = {{p.position}}<br />
-                visible = {{p.visible}}<br />
-                autorequest = {{p.autorequest}}
-              </q-tooltip>
-            </q-chip>
-            
-          </q-card-section>
-          
-        </s-card>
-
-      </div>
-
-      <!-- ================= RIGHT (PREVIEW CODE) ================= -->
-      
-      <div class="col-8">
-        <div class="row" >
-          <s-btn v-if="form.app" class=" col" flat icon="refresh" color="accent" :label="'Migrate' + ' '+ form.app" @click="generateMigrate" />
-        </div>
-        <div class="col" v-if="out">
-          <br>
-          <pre  class="code">{{ out }}</pre>
-        </div>
-
-        <q-tabs v-model="tab" dense  v-if="!out" >
-
-          <q-tab name="model" label="Model"/>
-          <q-tab name="serializer" label="Serializer"/>
-          <q-tab name="view" label="View"/>
-
-        </q-tabs>
-
-        <q-separator  v-if="!out"/>
-
-        <q-tab-panels  v-if="!out" v-model="tab" animated>
-
-          <q-tab-panel name="model">
-            <pre class="code">{{ preview?.model }}</pre>
-          </q-tab-panel>
-
-          <q-tab-panel name="serializer">
-            <pre class="code">{{ preview?.serializer }}</pre>
-          </q-tab-panel>
-
-          <q-tab-panel name="view">
-            <pre class="code">{{ preview?.view }}</pre>
-          </q-tab-panel>
-
-        </q-tab-panels>
-      </div>
-    </div>
   </q-page>
 </template>
 
-<script>
-
-
-
-import ModelAction from './ModelAction.vue';
-import { HTTPAuth } from '../../services/api.js';
-import { useUserStore } from '../../stores/UserStore.js';
-import { AlertError } from '../../boot/alerts.js';
-import { buildFormFromSchema } from '../../utils/autoForm.js';
-import { tdc } from '../../services/translation';
-
-
-
-
-export default {
-
-  name: 'ScaffoldCommandWizard',
-
-  components:{
-    ModelAction
-  },
-
-  setup () {
-    const User = useUserStore()
-    return {
-      User,
-      tdc
-    }
-  },
-
-  data () {
-    return {
-
-      tab: 'model',
-      model_action: false,
-      out: null,
-
-      accaoTeste: false,
-
-      accao:{
-        action: '',
-        label: '',
-        icon: 'list',
-        tooltip: '',
-        method: 'get',
-        details: true,
-        url: '',
-        position: 'm',
-        order: 0,
-        visible: true,
-        autorequest: false,
-        permission: ''
-      },
-
-
-
-      newChoice :{
-        label: '',
-        key: ''
-      },
-
-      apps: [],
-      icons: [],
-      models: [],
-      filteredTypes: [],
-      filteredMoneys: [],
-      rawMoneys : [
-        'MZN',
-        'USD',
-        '...',
-      ],
-
-      ICONS: [
-        "menu",
-        "add","add_circle","add_box","add_link",
-        "edit","edit_note","edit_square",
-        "delete","delete_forever","delete_outline",
-        "visibility","visibility_off",
-        "search","filter_alt","filter_list",
-        "download","upload","file_upload","file_download",
-        "save","save_alt",
-        "refresh","restart_alt","autorenew",
-        "home","dashboard","space_dashboard",
-        "settings","settings_applications","tune",
-        "person","group","groups","badge",
-        "account_circle","supervisor_account",
-        "lock","lock_open","vpn_key",
-        "email","mail","mark_email_read",
-        "phone","call","contacts",
-        "calendar_today","event","schedule",
-        "image","photo","photo_camera",
-        "folder","folder_open","drive_folder_upload",
-        "attach_file","attachment",
-        "list","view_list","table_view","dataset",
-        "inventory","inventory_2","storage",
-        "widgets","apps","extension",
-        "construction","build","engineering","architecture",
-        "shopping_cart","payments","credit_card",
-        "receipt","point_of_sale","request_quote",
-        "bar_chart","pie_chart","analytics","timeline",
-        "trending_up","trending_down",
-        "print","picture_as_pdf","description",
-        "article","note","notes",
-        "map","location_on","place",
-        "public","language",
-        "notifications","notifications_active",
-        "help","help_outline","info","info_outline",
-        "warning","error","check","check_circle",
-        "cancel","close","done","done_all",
-        "arrow_back","arrow_forward","arrow_upward","arrow_downward",
-        "expand_more","expand_less",
-        "chevron_left","chevron_right",
-        "fullscreen","fullscreen_exit",
-        "zoom_in","zoom_out",
-        "play_arrow","pause","stop",
-        "mic","mic_off","volume_up","volume_off",
-        "favorite","favorite_border","star","star_border",
-        "share","link","content_copy",
-        "cloud","cloud_upload","cloud_download",
-        "wifi","bluetooth","battery_full",
-        "desktop_windows","laptop","phone_android",
-        "security","verified","shield",
-        "bug_report","report","report_problem",
-        "code","terminal","data_object",
-        "api","integration_instructions"
-      ],
-
-
-      rawTypes : [
-
-        //  # TEXT
-        'CharField',
-        'TextField',
-        'EmailField',
-        'SlugField',
-        'URLField',
-        'UUIDField',
-
-        //  # NUMBERS
-        'IntegerField',
-        'BigIntegerField',
-        'SmallIntegerField',
-        'PositiveIntegerField',
-        'PositiveBigIntegerField',
-        'FloatField',
-        'DecimalField',
-
-        //  # BOOLEAN
-        'BooleanField',
-
-        //  # DATE
-        'DateField',
-        'DateTimeField',
-        'TimeField',
-        'DurationField',
-
-        //  # FILES
-        'FileField',
-        'ImageField',
-
-        //  # DATA
-        'JSONField',
-        'BinaryField',
-
-        //  # RELATIONS
-        'ForeignKey',
-        'OneToOneField',
-        'ManyToManyField',
-
-        //  # MONEY
-        'MoneyField',
-
-      ],
-
-
-      onDeletes: ['CASCADE','PROTECT','SET_NULL','SET_DEFAULT','DO_NOTHING','RESTRICT'],
-
-      form: {
-        app: '',
-        model: '',
-        icon: 'list',
-        crud: false,
-        fields: [],
-        actions: []
-      },
-
-      preview: {
-        model: '',
-        serializer: '',
-        view: '',
-      }
-
-    }
-  },
-
-  mounted(){
-    this.loadApps()
-    this.filteredTypes = this.rawTypes
-    this.filteredMoneys = this.rawMoneys
-  },
-
-
-  methods: {
-
-     filterTypes (val, update) {
-      if (val === '') {
-        update(() => {
-          this.filteredTypes = this.rawTypes
-        })
-        return
-      }
-
-      update(() => {
-        const needle = val.toLowerCase()
-        this.filteredTypes = this.rawTypes
-          .filter((v) => v.toLowerCase().indexOf(needle) > -1)
-      })
-    },
-
-    filterMoneys (val, update) {
-      if (val === '') {
-        update(() => {
-          this.filteredMoneys = this.rawMoneys
-        })
-        return
-      }
-
-      update(() => {
-        const needle = val.toLowerCase()
-        this.filteredMoneys = this.rawMoneys
-          .filter((v) => v.toLowerCase().indexOf(needle) > -1)
-      })
-    },
-
-
-    addField () {
-      this.form.fields.push({
-        name: '',
-        type: '',
-        required: true, 
-        help_text: '',
-        unique: false, 
-        choices: [],
-      })
-    },
-
-    removeField (i) {
-      this.form.fields.splice(i,1)
-    },
-
-    addChoice(f){
-      if (!Array.isArray(f.choices)) {
-        f.choices = []
-      }
-
-      if (this.newChoice.key!== '' && this.newChoice.label !== '' ){
-        f.choices.push({ ...this.newChoice })
-        this.newChoice.label = ''
-        this.newChoice.key = ''
-      }else{
-        AlertError('Label, Key, or both are empty!')
-      }
-    },
-
-    removeChoice (f, index){
-      f.choices.splice(index, 1)
-    },
-
-    addPerm () {
-      if (!this.accao.action && !this.accao.permission) return
-      if (!this.accao.method) return
-
-      const action = String(this.accao.action || this.accao.permission || '').trim().toLowerCase()
-      const permission = String(this.accao.permission || `${action}_${this.form.model || ''}`).trim().toLowerCase()
-
-      this.form.actions.push({
-        action,
-        label: this.accao.label || action.replaceAll('_', ' '),
-        icon: this.accao.icon || 'list',
-        tooltip: this.accao.tooltip || '',
-        method: this.accao.method,
-        details: Boolean(this.accao.details),
-        url: this.accao.url || action,
-        position: this.accao.position || 'm',
-        order: Number(this.accao.order || 0),
-        visible: this.accao.visible !== false,
-        autorequest: this.accao.autorequest === true,
-        permission
-      })
-
-      this.accao = {
-        action: '',
-        label: '',
-        icon: 'list',
-        tooltip: '',
-        method: 'get',
-        details: true,
-        url: '',
-        position: 'm',
-        order: 0,
-        visible: true,
-        autorequest: false,
-        permission: ''
-      }
-    },
-
-    accaoMetodo (p) {
-      this.model_action = true
-      this.accao = { ...p }
-    },
-
-    isRelation (f) {
-      return ['ForeignKey','OneToOneField','ManyToManyField'].includes(f.type)
-    },
-
-    isFile (f) {
-      return ['FileField','ImageField'].includes(f.type)
-    },
-
-    isDate (f) {
-      return ['DateField', 'DuractionField','DateTimeField'].includes(f.type)
-    },
-
-    isChar (f) {
-      return f.type === 'CharField'
-    },
-
-    isInteger (f) {
-      return f.type === 'IntegerField'
-    },
-
-    isDecimalOrMoney (f) {
-      return ['MoneyField', 'DecimalField'].includes(f.type)
-    },
-
-    normalizeFields(fields) {
-      return fields.map(f => {
-        const field = {
-          name: f.name,
-          type: f.type,
-          verbose_name: f.verbose_name,
-          help_text: f.help_text,
-          null: f.null,
-          blank: f.blank,
-          default: f.default,
-          choices: f.choices,
-          on_delete: f.on_delete,
-          min: f.min,
-          max: f.max,
-          min_length: f.min_length,
-          max_length: f.max_length,
-          max_digits: f.max_digits,
-          decimal_places: f.decimal_places,
-          default_currency: f.default_currency,
-          auto_now_add: f.auto_now_add,
-          auto_now: f.auto_now,
-          width_field: f.width_field,
-          height_field: f.height_field,
-        }
-
-        // RELATION
-        if (f.relApp && f.relation) {
-          field.relation = `${f.relApp}.${f.relation}`
-        }
-
-        return field
-      })
-    },
-
-
-    async generatePreview () {
-      this.out=null
-      const payload = {
-        ...this.form,
-        fields: this.normalizeFields(this.form.fields),
-        actions: this.form.actions,
-      }
-      const { data } = await HTTPAuth.post('django_resaas/scaffolds/preview/', payload)
-
-      this.preview = data.data || data || {
-        model:'',
-        serializer:'',
-        view:'',
-      }
-    },
-
-    async generateMigrate () {
-      this.out=null
-      const payload = {
-        app: this.form.app,
-      }
-      const { data } = await HTTPAuth.post('django_resaas/scaffolds/migrate/', payload)
-      this.out = data.out 
-    },
-
-    async permissionUpdade () {
-      this.out=null
-      const payload = {
-        app: this.form.app,
-        model: this.form.model,
-        actions: this.form.actions,
-      }
-      const { data } = await HTTPAuth.post('django_resaas/scaffolds/permissions/', payload)
-      this.out = data.out 
-    },
-
-    async reloadModelShema(){
-      if (!this.form.app || !this.form.model) return
-
-      this.accaoTeste = false
-
-      const data = await buildFormFromSchema({
-        app: this.form.app,
-        model: this.form.model
-      })
-
-      this.form.fields = (data.fields || []).filter(f =>
-        !['id','created_at','is_deleted','updated_at','state','created_by','updated_by','deleted_at','entity','branch'].includes(f?.name)
-      )
-
-      this.form.actions = (data.actions || []).map(a => ({ ...a }))
-      this.form.crud = data.schema?.ui?.crud ?? data.config?.crud ?? this.form.crud
-      this.form.icon = data.schema?.ui?.icon ?? this.form.icon
-
-      this.accaoTeste = true
-    },
-
-    async submit () {
-      this.out = 'response...'
-      const payload = {
-        ...this.form,
-        fields: this.normalizeFields(this.form.fields)
-      }
-      const {data} = await HTTPAuth.post( url({ type: 'u', url: 'django_resaas/scaffolds/', params: {} }), payload)
-      this.out = data.out
-    },
-
-    async loadApps() {
-      const { data } = await HTTPAuth.get(
-        url({ type: 'u', url: 'django_resaas/resaasapps/', params: {} })
-      )
-      this.apps = data?.apps || []
-    },
-
-    async loadModelsRelation(f){
-      if (!f?.relApp) return
-      const { data } = await HTTPAuth.get(
-        url({ type: 'u', url: `django_resaas/resaasapps/${f.relApp}/`, params: {} })
-      )
-      f.models = data?.models || []
-    },
-
-    async loadModelsSchema(app){
-      this.models = []
-      this.form.model = ''
-      this.form.fields = []
-      this.form.actions = []
-      this.accaoTeste = false
-
-      if (!app) return
-
-      const { data } = await HTTPAuth.get(
-        url({ type: 'u', url: `django_resaas/resaasapps/${app}/`, params: {} })
-      )
-
-      this.models = data?.models || []
-    },
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue'
+import { Dialog } from 'quasar'
+import { tdc } from '../../services/translation'
+import { HTTPAuth, url } from '../../services/api'
+import { useScaffoldIDEStore } from '../../stores/ScaffoldIDEStore'
+
+import ScaffoldToolbar from '../../components/scaffold/ScaffoldToolbar.vue'
+import ProjectExplorer from '../../components/scaffold/ProjectExplorer.vue'
+import SchemaInspector from '../../components/scaffold/SchemaInspector.vue'
+import ProblemsPanel from '../../components/scaffold/ProblemsPanel.vue'
+import CommandRunnerPanel from '../../components/scaffold/CommandRunnerPanel.vue'
+import CodeEditor from '../../components/scaffold/CodeEditor.vue'
+import GeneratorPanel from '../../components/scaffold/GeneratorPanel.vue'
+
+// Scaffold IDE (mega-prompt: "ScaffoldPage.vue deve deixar de ser
+// apenas uma página de comandos e passar a funcionar como um IDE
+// integrado"). Composition-only - every real capability (tree/read/
+// validate/write/apply/commands, schema, generator form) lives in
+// ScaffoldIDEStore + components/scaffold/* (mega-prompt secção 70:
+// "não colocar tudo em ScaffoldPage.vue").
+const ide = useScaffoldIDEStore()
+
+const apps = ref([])
+const models = ref([])
+const selectedRoot = ref(null)
+
+const verticalSplit = ref(78)
+const horizontalSplit = ref(18)
+const editorSplit = ref(22)
+const bottomTab = ref('problems')
+
+const leftDrawer = ref(false)
+const rightDrawer = ref(false)
+const showGenerator = ref(false)
+
+function fileLabel(path) {
+  return path.split('/').pop()
+}
+
+async function loadApps() {
+  const { data } = await HTTPAuth.get(url({ type: 'u', url: 'django_resaas/resaasapps/', params: {} }))
+  apps.value = data?.apps || []
+}
+
+async function onSelectRoot(root) {
+  selectedRoot.value = root
+  await ide.loadTree(root)
+}
+
+async function onSelectApp(app) {
+  ide.schemaApp = app
+  models.value = []
+  ide.schemaModel = null
+  ide.schema = null
+
+  if (!app) return
+
+  const { data } = await HTTPAuth.get(url({ type: 'u', url: `django_resaas/resaasapps/${app}/`, params: {} }))
+  models.value = data?.models || []
+
+  // Se este app também for um workspace root válido, já mostra a
+  // árvore de ficheiros correspondente - poupa um segundo clique.
+  if (ide.roots.some(r => r.key === app)) {
+    onSelectRoot(app)
   }
 }
+
+async function onSelectModel(model) {
+  ide.schemaModel = model
+  if (ide.schemaApp && model) {
+    await ide.loadSchema(ide.schemaApp, model)
+  }
+}
+
+async function openFile(path) {
+  if (!selectedRoot.value) return
+  await ide.openFile(selectedRoot.value, path)
+}
+
+function requestClose(path) {
+  const file = ide.openFiles.find(f => f.path === path)
+  if (!file) return
+
+  if (!file.dirty) {
+    ide.closeFile(path)
+    return
+  }
+
+  Dialog.create({
+    title: tdc('Unsaved changes'),
+    message: tdc('"{name}" has unsaved changes.').replace('{name}', fileLabel(path)),
+    cancel: true,
+    persistent: true,
+    options: {
+      type: 'radio',
+      model: 'save',
+      items: [
+        { label: tdc('Save'), value: 'save' },
+        { label: tdc('Discard'), value: 'discard' },
+      ],
+    },
+  }).onOk(async (choice) => {
+    if (choice === 'save') {
+      const result = await ide.saveFile(path)
+      if (!result.ok) return
+    }
+    ide.closeFile(path)
+  })
+}
+
+async function validateActive() {
+  if (ide.activeFilePath) await ide.validateFile(ide.activeFilePath)
+}
+
+async function saveActive() {
+  if (!ide.activeFilePath) return
+  await ide.validateFile(ide.activeFilePath)
+  if (ide.errorCount > 0) return
+  await ide.saveFile(ide.activeFilePath)
+}
+
+function discardActive() {
+  if (ide.activeFilePath) ide.discardFile(ide.activeFilePath)
+}
+
+function onOpenProblem(path) {
+  ide.activeFilePath = path
+}
+
+async function refreshAll() {
+  if (selectedRoot.value) await ide.loadTree(selectedRoot.value)
+  if (ide.schemaApp && ide.schemaModel) await ide.loadSchema(ide.schemaApp, ide.schemaModel)
+}
+
+async function onGenerated({ app }) {
+  showGenerator.value = false
+  if (selectedRoot.value === app) {
+    await ide.loadTree(app)
+  }
+}
+
+// Validação ao vivo do ficheiro activo enquanto se escreve seria
+// "validar em cada tecla" (mega-prompt secção 22 explicitamente contra
+// isso) - por isso não há um watch aqui a chamar validateFile() a cada
+// alteração; validação corre em Validate/Save (ver toolbar) e,
+// automaticamente, dentro de saveActive() antes de gravar.
+
+onMounted(async () => {
+  await Promise.all([loadApps(), ide.loadRoots(), ide.loadCommands()])
+})
 </script>
 
-
-
 <style scoped>
-.code{
-  padding:16px;
-  border-radius:8px;
-  font-size:12px;
-  overflow:auto;
+.scaffold-ide {
+  height: 100%;
 }
-.sticky-header{
-  position:sticky;
-  top:0;
-  z-index:5;
-  /* background:#121212; */
-} 
+
+.ide-splitter {
+  min-height: 0;
+}
+
+.editor-area {
+  min-width: 0;
+}
+
+.editor-tabs {
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.editor-tab {
+  text-transform: none;
+}
+
+.dirty-dot {
+  color: var(--q-warning, #f2c037);
+  font-size: 10px;
+}
+
+.editor-empty {
+  height: 100%;
+}
+
+.bottom-panels {
+  height: calc(100% - 36px);
+}
 </style>
-
-
-
