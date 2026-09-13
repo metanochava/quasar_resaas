@@ -163,6 +163,11 @@
           />
         </ManagementPanel>
 
+        <div class="q-mt-md q-gutter-md">
+          <EntityBranchesPanel :entity-id="Entity.form?.id" />
+          <EntityStoragePanel :entity-id="Entity.form?.id" />
+        </div>
+
       </template>
 
 
@@ -210,6 +215,10 @@ import ManagementItem from '../../components/auto/ManagementItem.vue'
 import GroupManager from '../group/GroupManagerEntity.vue'
 
 import EntityNotificationCredentials from './EntityNotificationCredentials.vue'
+
+import EntityBranchesPanel from './EntityBranchesPanel.vue'
+
+import EntityStoragePanel from './EntityStoragePanel.vue'
 
 import {
   ThemeStudioEngine
