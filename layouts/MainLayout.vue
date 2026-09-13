@@ -173,7 +173,7 @@ import Rodape from '../components/footer/MainFooter.vue'
 
 import { defineComponent } from 'vue'
 import { barStyle, thumbStyle } from '../services/app'
-import { interfaceConfigToStyle, overlayStyle } from '../utils/visualArea'
+import { surfaceToStyle, surfaceOverlayStyle } from '../theme/surfaceToStyle'
 import UserPermissioes from '../components/UserPermissioes.vue'
 import PagePermissoes from '../components/PagePermissoes.vue'
 import { ThemeStudioEngine } from '../components/theme/index.js'
@@ -241,17 +241,24 @@ export default defineComponent({
       return !!this.ps.layout?.menu_rtl
     },
 
-    // Header/footer personalizados - cascata User > Entity >
-    // EntityType > default já resolvida no backend
-    // (InterfaceConfigService, ver /me/'s interface_config). Antes
-    // do primeiro /me/ responder, interface_config ainda não existe
-    // - a classe bg-primary/bg-dark do template cobre esse instante.
+    // Header personalizado - fonte única de aparência de área agora é
+    // theme.surfaces.header (ThemeSurface), já resolvido User > Entity
+    // > EntityType em User.ps.theme (HeaderVisualFields/
+    // InterfaceConfigService foram removidos - CLAUDE.md secção 5/21).
+    // Antes do primeiro /me/ responder, ps.theme ainda não existe - a
+    // classe bg-primary/bg-dark do template cobre esse instante.
     headerStyle(){
-      return interfaceConfigToStyle(this.User?.data?.interface_config?.header)
+      const style = surfaceToStyle(this.ps.theme?.surfaces?.header)
+
+      if (this.ps.theme?.header_text) {
+        style.color = this.ps.theme.header_text
+      }
+
+      return style
     },
 
     headerOverlayStyle(){
-      return overlayStyle(this.User?.data?.interface_config?.header?.overlay)
+      return surfaceOverlayStyle(this.ps.theme?.surfaces?.header)
     }
   },
 

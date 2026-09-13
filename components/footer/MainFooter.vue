@@ -32,7 +32,7 @@ import { defineComponent } from 'vue'
 import { tdc } from '../../services/translation';
 import {useUserStore } from '../../stores/UserStore';
 import { useLoadStore } from '../../stores/LoadStore';
-import { interfaceConfigToStyle, overlayStyle } from '../../utils/visualArea';
+import { surfaceToStyle, surfaceOverlayStyle } from '../../theme/surfaceToStyle';
 import Comments from "./Comments.vue";
 
 
@@ -69,12 +69,26 @@ export default defineComponent({
   created () {
   },
   computed: {
+    // Fonte única de aparência de área é theme.surfaces.footer
+    // (ThemeSurface), já resolvido User > Entity > EntityType em
+    // User.ps.theme (HeaderVisualFields/FooterVisualFields/
+    // InterfaceConfigService foram removidos - CLAUDE.md secção 5/21).
+    ps() {
+      return this.User?.ps || {}
+    },
+
     footerStyle(){
-      return interfaceConfigToStyle(this.User?.data?.interface_config?.footer)
+      const style = surfaceToStyle(this.ps.theme?.surfaces?.footer)
+
+      if (this.ps.theme?.footer_text) {
+        style.color = this.ps.theme.footer_text
+      }
+
+      return style
     },
 
     footerOverlayStyle(){
-      return overlayStyle(this.User?.data?.interface_config?.footer?.overlay)
+      return surfaceOverlayStyle(this.ps.theme?.surfaces?.footer)
     }
   },
   mounted () {
