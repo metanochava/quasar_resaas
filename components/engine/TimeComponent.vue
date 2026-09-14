@@ -69,6 +69,18 @@ export default defineComponent({
 
     required: Boolean,
 
+    // Backend validation error for this field (BaseStore.errors[name],
+    // see parseFieldErrors in boot/alerts.js) - matches Quasar's own
+    // :error/:error-message convention.
+    error: {
+      type: [Boolean, String],
+      default: false
+    },
+    errorMessage: {
+      type: String,
+      default: ''
+    },
+
     validators: {
       type: Array,
       default: () => []
@@ -134,8 +146,10 @@ export default defineComponent({
         : undefined
     )
 
-    const hasError = ref(false)
-    const firstError = ref("")
+    const hasError = computed(() => !!props.error)
+    const firstError = computed(() =>
+      (typeof props.error === "string" && props.error) || props.errorMessage || ""
+    )
 
     const inputAttrs = computed(() => {
       const { class: klass, ...rest } = attrs

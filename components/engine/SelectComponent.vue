@@ -17,6 +17,9 @@
     :label="translatedLabel"
     :placeholder="translatedPlaceholder"
 
+    :error="hasError"
+    :error-message="firstError"
+
     :dense="attrs.dense ?? layout.dense"
 
     :outlined="attrs.outlined ?? attrs.filled === undefined"
@@ -73,6 +76,18 @@ export default defineComponent({
     pageSize: {
       type: Number,
       default: null
+    },
+
+    // Backend validation error for this field (BaseStore.errors[name],
+    // see parseFieldErrors in boot/alerts.js) - matches Quasar's own
+    // :error/:error-message convention.
+    error: {
+      type: [Boolean, String],
+      default: false
+    },
+    errorMessage: {
+      type: String,
+      default: ''
     }
 
   },
@@ -576,6 +591,11 @@ export default defineComponent({
         }
       )
 
+    const hasError = computed(() => !!props.error)
+    const firstError = computed(() =>
+      (typeof props.error === "string" && props.error) || props.errorMessage || ""
+    )
+
     return {
 
       attrs,
@@ -593,6 +613,10 @@ export default defineComponent({
       translatedPlaceholder,
 
       selectAttrs,
+
+      hasError,
+
+      firstError,
 
       onFilter,
 

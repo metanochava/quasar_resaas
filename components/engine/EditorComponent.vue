@@ -83,6 +83,18 @@ export default defineComponent({
     minHeight: {
       type: String,
       default: "180px"
+    },
+
+    // Backend validation error for this field (BaseStore.errors[name],
+    // see parseFieldErrors in boot/alerts.js) - shown alongside (not
+    // instead of) the local client-side validators below.
+    error: {
+      type: [Boolean, String],
+      default: false
+    },
+    errorMessage: {
+      type: String,
+      default: ''
     }
   },
 
@@ -96,8 +108,21 @@ export default defineComponent({
 
     const localValue = ref(props.modelValue || "")
 
-    const hasError = ref(false)
-    const firstError = ref("")
+    // Local client-side validators (required/custom) run on every
+    // change; an external backend error (props.error/errorMessage,
+    // from BaseStore.errors[name]) is shown alongside them - whichever
+    // is set wins the display, local validation taking priority since
+    // it's the more current signal once the user starts typing again.
+    const localHasError = ref(false)
+    const localFirstError = ref("")
+
+    const hasError = computed(() => localHasError.value || !!props.error)
+    const firstError = computed(() =>
+      localFirstError.value ||
+      (typeof props.error === "string" && props.error) ||
+      props.errorMessage ||
+      ""
+    )
 
     watch(
       () => props.modelValue,
@@ -178,14 +203,14 @@ export default defineComponent({
         const result = rule(value)
 
         if (result !== true) {
-          hasError.value = true
-          firstError.value = result
+          localHasError.value = true
+          localFirstError.value = result
           return false
         }
       }
 
-      hasError.value = false
-      firstError.value = ""
+      localHasError.value = false
+      localFirstError.value = ""
       return true
     }
 

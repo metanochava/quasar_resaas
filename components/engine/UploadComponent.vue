@@ -1,13 +1,16 @@
 <template>
   <q-file
     v-model="localValue"
-    v-bind="attrs"
+    v-bind="fileAttrs"
     :label="translatedLabel"
     :hint="translatedHint"
+    :error="hasError"
+    :error-message="firstError"
     :dense="attrs.dense ?? layout.dense"
     :outlined="attrs.outlined ?? (attrs.filled === undefined && attrs.standout === undefined)"
     :filled="attrs.filled"
     :standout="attrs.standout"
+    :class="attrs.class"
     :style="radiusStyle"
     :rules="computedRules"
   />
@@ -26,7 +29,19 @@ export default defineComponent({
     modelValue: [Object, Array, File, null],
     label: String,
     hint: String,
-    required: Boolean
+    required: Boolean,
+
+    // Backend validation error for this field (BaseStore.errors[name],
+    // see parseFieldErrors in boot/alerts.js) - matches Quasar's own
+    // :error/:error-message convention.
+    error: {
+      type: [Boolean, String],
+      default: false
+    },
+    errorMessage: {
+      type: String,
+      default: ''
+    }
   },
 
   emits: ["update:modelValue"],
@@ -60,6 +75,16 @@ export default defineComponent({
       borderRadius: layout.value.rounded ? "16px" : "4px"
     }))
 
+    const hasError = computed(() => !!props.error)
+    const firstError = computed(() =>
+      (typeof props.error === "string" && props.error) || props.errorMessage || ""
+    )
+
+    const fileAttrs = computed(() => {
+      const { class: klass, ...rest } = attrs
+      return rest
+    })
+
     return {
       attrs,
       layout,
@@ -67,7 +92,10 @@ export default defineComponent({
       translatedLabel,
       translatedHint,
       computedRules,
-      radiusStyle
+      radiusStyle,
+      hasError,
+      firstError,
+      fileAttrs
     }
   }
 })

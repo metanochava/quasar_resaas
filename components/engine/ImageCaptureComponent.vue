@@ -36,6 +36,10 @@
       </div>
     </div>
 
+    <div v-if="hasError" class="text-negative text-caption">
+      {{ firstError }}
+    </div>
+
     <input
       ref="fileInputEl"
       type="file"
@@ -129,6 +133,18 @@ const props = defineProps({
   modelValue: [Object, File, String, null],
   label: { type: String, default: "Foto" },
   required: Boolean,
+
+  // Backend validation error for this field (BaseStore.errors[name],
+  // see parseFieldErrors in boot/alerts.js) - this component has no
+  // underlying QField, so the message renders as plain caption text.
+  error: {
+    type: [Boolean, String],
+    default: false
+  },
+  errorMessage: {
+    type: String,
+    default: ''
+  }
 })
 
 const emit = defineEmits(["update:modelValue"])
@@ -149,6 +165,11 @@ const capturedPreviewUrl = ref(null)
 let stream = null
 
 const translatedLabel = computed(() => tdc(props.label))
+
+const hasError = computed(() => !!props.error)
+const firstError = computed(() =>
+  (typeof props.error === "string" && props.error) || props.errorMessage || ""
+)
 
 const deviceOptions = computed(() =>
   videoDevices.value.map((device, index) => ({
