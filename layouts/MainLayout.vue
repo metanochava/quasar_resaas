@@ -325,12 +325,7 @@ export default defineComponent({
       this.$router.replace(lastRoute)
     }
 
-    // 🔥 RESTORE MENUS
-    const left = localStorage.getItem('ui_left_menu')
-    const right = localStorage.getItem('ui_right_menu')
 
-    if (left !== null) this.User.LeftTop = JSON.parse(left)
-    if (right !== null) this.User.RightTop = JSON.parse(right)
 
     // 🔥 RESTORE SCROLL
     const scroll = localStorage.getItem('scroll_position')
@@ -343,6 +338,13 @@ export default defineComponent({
     // 🔥 your original behavior
     if (['authwelcome','welcome'].includes(this.$route.name)){
       this.User.LeftTop = false
+    }else{
+      // 🔥 RESTORE MENUS
+      const left = localStorage.getItem('ui_left_menu')
+      const right = localStorage.getItem('ui_right_menu')
+
+      if (left !== null) this.User.LeftTop = JSON.parse(left)
+      if (right !== null) this.User.RightTop = JSON.parse(right)
     }
 
     // 🔥 SAVE SCROLL ON EXIT
