@@ -18,10 +18,12 @@
           :label="tdc('Sign In')"
           icon="login"
           class="q-px-lg"
-          @click="$router.push('/login')"
+          @click="$router.push({name:'login'})"
         />
 
-        <s-btn flat color="secondary" :label="tdc('Create Account')" class="q-ml-md" />
+        <s-btn flat color="secondary" :label="tdc('Create Account')" class="q-ml-md"
+          @click="$router.push({name:'registarUser'})"
+        />
       </q-card-section>
     </s-card>
   </q-page>
