@@ -2,6 +2,28 @@
   <q-page class="q-pa-sm">
 
     <!-- ===================================================== -->
+    <!-- APPS -->
+    <!-- ===================================================== -->
+
+    <EntityAppsDialog
+      v-model="openApps"
+      :entity-id="Entity.form?.id"
+      :entity-type-id="entityTypeId"
+    />
+
+
+    <!-- ===================================================== -->
+    <!-- MODELS -->
+    <!-- ===================================================== -->
+
+    <EntityModelsDialog
+      v-model="openModels"
+      :entity-id="Entity.form?.id"
+      :entity-type-id="entityTypeId"
+    />
+
+
+    <!-- ===================================================== -->
     <!-- GROUPS -->
     <!-- ===================================================== -->
 
@@ -145,6 +167,18 @@
 
         <ManagementPanel>
           <ManagementItem
+            icon="extension"
+            :label="tdc('Apps')"
+            @click="openApps = true"
+          />
+
+          <ManagementItem
+            icon="table_chart"
+            :label="tdc('Models')"
+            @click="openModels = true"
+          />
+
+          <ManagementItem
             icon="groups"
             :label="tdc('Groups')"
             @click="openGroups = true"
@@ -192,6 +226,7 @@
 
 import {
   ref,
+  computed,
   onMounted,
   watch
 } from 'vue'
@@ -213,6 +248,10 @@ import ManagementPanel from '../../components/auto/ManagementPanel.vue'
 import ManagementItem from '../../components/auto/ManagementItem.vue'
 
 import GroupManager from '../group/GroupManagerEntity.vue'
+
+import EntityAppsDialog from './EntityAppsDialog.vue'
+
+import EntityModelsDialog from './EntityModelsDialog.vue'
 
 import EntityNotificationCredentials from './EntityNotificationCredentials.vue'
 
@@ -287,11 +326,29 @@ const User = useUserStore()
 
 const ready = ref(false)
 
+const openApps = ref(false)
+
+const openModels = ref(false)
+
 const openGroups = ref(false)
 
 const openTheme = ref(false)
 
 const openNotificationCredentials = ref(false)
+
+
+// ===========================================================
+// ENTITY TYPE ID
+// ===========================================================
+
+// Mesma resolução (id/{value}/id-cru) já usada por loadEntityType() -
+// EntityAppsDialog/EntityModelsDialog precisam do id do EntityType
+// para saberem que apps/models a Entity pode escolher (EntityTypeApp/
+// EntityTypeModel), nunca o universo global.
+const entityTypeId = computed(() => {
+  const entityTypeRef = Entity.form?.entity_type
+  return entityTypeRef?.id || entityTypeRef?.value || entityTypeRef || null
+})
 
 
 // ===========================================================
