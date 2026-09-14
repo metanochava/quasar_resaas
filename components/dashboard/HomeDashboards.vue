@@ -1,8 +1,9 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 
 import { useUserStore } from '../../stores/UserStore'
 import { useEntityTypeStore } from '../../stores/EntityTypeStore'
+import { useDashboardStore } from '../../stores/DashboardStore'
 import DashboardRenderer from './DashboardRenderer.vue'
 import DashboardComponent from '../DashboardComponent.vue'
 
@@ -21,16 +22,38 @@ import DashboardComponent from '../DashboardComponent.vue'
 // contexto (marca da página de login antes de autenticar).
 const User = useUserStore()
 const TipoEntidade = useEntityTypeStore()
+const Dashboard = useDashboardStore()
 
-const selected = computed(() => {
+const entityTypeName = computed(() => {
   const fromEntity = User.Entity?.entity_type?.label || User.Entity?.entity_type?.name
   const fromCrudRow = TipoEntidade.row?.name
 
   return (fromEntity || fromCrudRow || '').toLowerCase() || null
 })
+
+// Not every EntityType has its own <app>/dashboard.py (e.g. the
+// generic/base "saas" tenant type) - rendering DashboardRenderer
+// unconditionally by name sent a request straight into a backend
+// dashboard_not_found error for any of those. Only use the dynamic
+// engine when a dashboard actually exists (and is authorized) for
+// this EntityType; DashboardComponent (the older custom-widget
+// registry) stays the fallback otherwise, same as before this had a
+// matching dashboard to render at all.
+const selected = computed(() => {
+  if (!entityTypeName.value) return null
+  const exists = Dashboard.dashboards.some((d) => d.name === entityTypeName.value)
+  return exists ? entityTypeName.value : null
+})
+
+onMounted(() => {
+  if (!Dashboard.dashboards.length) Dashboard.loadDashboardList()
+})
 </script>
 
 <template>
-  <DashboardRenderer v-if="selected" :name="selected" />
+  <div v-if="Dashboard.dashboardsLoading" class="flex flex-center q-pa-xl">
+    <q-spinner color="primary" size="48px" />
+  </div>
+  <DashboardRenderer v-else-if="selected" :name="selected" />
   <DashboardComponent v-else />
 </template>
