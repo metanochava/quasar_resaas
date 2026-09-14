@@ -24,19 +24,17 @@
       <q-separator />
 
       <div class="col relative-position">
-        <div v-if="loading" class="absolute-full flex flex-center">
-          <q-spinner size="48px" color="primary" />
-        </div>
+        <div v-if="hasMapsKey" ref="mapEl" class="absolute-full" />
 
-        <div v-else-if="!hasMapsKey" class="absolute-full column items-center justify-center q-pa-lg">
+        <div v-else class="absolute-full column items-center justify-center q-pa-lg">
           <q-icon name="map" size="48px" color="grey-5" class="q-mb-md" />
           <div class="text-subtitle1 text-grey-7">
             {{ tdc('Interactive map not configured for this deployment.') }}
           </div>
           <q-list bordered separator class="fallback-list q-mt-md" v-if="located.length">
             <q-item v-for="b in located" :key="b.id">
-              <q-item-section avatar v-if="b.photo">
-                <q-avatar square size="40px"><img :src="b.photo"></q-avatar>
+              <q-item-section avatar v-if="b.photo?.url">
+                <q-avatar square size="40px"><img :src="b.photo.url"></q-avatar>
               </q-item-section>
               <q-item-section>
                 <q-item-label>{{ b.name }}</q-item-label>
@@ -46,7 +44,9 @@
           </q-list>
         </div>
 
-        <div v-else ref="mapEl" class="absolute-full" />
+        <div v-if="loading" class="absolute-full flex flex-center map-loading-overlay">
+          <q-spinner size="48px" color="primary" />
+        </div>
       </div>
     </s-card>
   </q-dialog>
@@ -113,9 +113,9 @@ function buildCardContent(branch) {
   const wrapper = document.createElement('div')
   wrapper.style.cssText = 'max-width:220px;font-family:inherit;'
 
-  if (branch.photo) {
+  if (branch.photo?.url) {
     const img = document.createElement('img')
-    img.src = branch.photo
+    img.src = branch.photo.url
     img.style.cssText = 'width:100%;max-height:120px;object-fit:cover;border-radius:6px;margin-bottom:6px;'
     wrapper.appendChild(img)
   }
@@ -209,5 +209,14 @@ const DARK_MAP_STYLE = [
 .fallback-list {
   width: 100%;
   max-width: 480px;
+}
+
+.map-loading-overlay {
+  background: var(--q-dark, #1d1d1d);
+  opacity: 0.6;
+}
+
+body.body--light .map-loading-overlay {
+  background: #fff;
 }
 </style>
