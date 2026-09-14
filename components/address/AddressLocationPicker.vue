@@ -256,13 +256,21 @@ const formattedCoordinates = computed(() => {
 function emitUpdate() {
   if (suppressWatch) return
 
-  // Never send an explicit null for a field the user hasn't touched -
-  // Address.country/country_code (and others) have model-level
-  // defaults but no null=True, so an explicit null fails validation
-  // ("may not be null") even though omitting the key entirely is
-  // perfectly fine and lets the backend default apply.
+  // Only the fields AddressSerializer actually accepts as input - an
+  // existing address's API response (loaded via hydrateFrom) also
+  // carries id/coordinates/full_address (read-only), which
+  // Object.assign(form, ..., value) happily copies onto `form` too.
+  // Emitting those back is worse than pointless: FormComponent's
+  // generic normalizeValue() treats any object with an `id` key as a
+  // relation reference and collapses it down to just that id string,
+  // which is exactly the "expected a dictionary, got str" error this
+  // fixes. Never send an explicit null for an untouched field either -
+  // country/country_code have model-level defaults but no null=True,
+  // so omitting the key (letting the default apply) is required, not
+  // just tidier.
   const payload = {}
-  for (const [key, value] of Object.entries(form)) {
+  for (const key of Object.keys(EMPTY_ADDRESS)) {
+    const value = form[key]
     if (value !== null && value !== undefined && value !== '') {
       payload[key] = value
     }
