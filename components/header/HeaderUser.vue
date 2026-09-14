@@ -396,13 +396,14 @@ export default defineComponent({
       this.pergunta = false
       this.User.logout('x')
     },
+ 
 
     startSessionWatcher () {
       this.stopSessionWatcher()
 
       this.sessionInterval = setInterval(() => {
         this.User.checkSession()
-      }, 60000)
+      }, 30000)
     },
 
     stopSessionWatcher () {
