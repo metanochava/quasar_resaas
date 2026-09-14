@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { buildFormFromSchema } from './../utils/autoForm'
 import { HTTPAuth, url, HTTPAuthBlob } from '../services/api'
+import { parseFieldErrors } from '../boot/alerts'
 
 // Mesma normalização de FormComponent.vue's normalizeValue() - uma
 // relação já resolvida no form como {id, ...}/{value, ...} tem de
@@ -99,6 +100,12 @@ export function createBaseStore(name, config, extend = {}) {
         pdf: null,
         row: null,
         form: {},
+
+        // Backend validation errors from the last failed create/update,
+        // as {field: "message"} (see parseFieldErrors in boot/alerts.js)
+        // - ready to bind straight onto an s-input's :error-message,
+        // never the raw DRF {field: [...]} shape.
+        errors: {},
 
         actions: [],
         config: {},
@@ -397,6 +404,7 @@ export function createBaseStore(name, config, extend = {}) {
         await this.runHook('beforeCreate', this.form)
 
         this.loading = true
+        this.errors = {}
 
         try {
           const { data } = await HTTPAuth.post(
@@ -416,6 +424,10 @@ export function createBaseStore(name, config, extend = {}) {
           await this.runHook('afterCreate', data)
 
           return data
+
+        } catch (error) {
+          this.errors = parseFieldErrors(error?.response?.data)
+          throw error
 
         } finally {
           this.loading = false
@@ -439,6 +451,7 @@ export function createBaseStore(name, config, extend = {}) {
         await this.runHook('beforeUpdate', this.form)
 
         this.saving = true
+        this.errors = {}
 
         try {
           const httpMethod = method === 'put' ? 'put' : 'patch'
@@ -457,6 +470,10 @@ export function createBaseStore(name, config, extend = {}) {
           await this.runHook('afterUpdate', data)
 
           return data
+
+        } catch (error) {
+          this.errors = parseFieldErrors(error?.response?.data)
+          throw error
 
         } finally {
           this.saving = false
@@ -554,6 +571,8 @@ export function createBaseStore(name, config, extend = {}) {
       // RESET FORM INTELIGENTE
       // =========================
       resetForm() {
+        this.errors = {}
+
         if (!this.fields?.length) {
           this.form = {}
           this.row = null

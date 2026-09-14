@@ -209,9 +209,9 @@ const deleteRecord = async () => {
     await props.reform.delete()
 
   }
-  else if (props.store?.delete) {
+  else if (props.store?.remove) {
 
-    await props.store.delete()
+    await props.store.remove()
 
   }
 

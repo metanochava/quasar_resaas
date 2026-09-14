@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { HTTPAuth, url } from '../../services/api'
+import { parseFieldErrors } from '../../boot/alerts'
 import FormSection from '../auto/FormSection.vue'
 
 
@@ -16,6 +17,12 @@ const emit = defineEmits(['saved'])
 const form = ref({})
 const saving = ref(false)
 const uploadProgress = ref(0)
+
+// Backend validation errors from the last failed save, as
+// {field: "message"} - this form does its own direct HTTPAuth calls
+// (see save() below) rather than going through BaseStore.create()/
+// update(), so it needs its own copy of the same error handling.
+const errors = ref({})
 
 const ignoreSet = computed(() => new Set(props.ignoreFields || []))
 
@@ -222,6 +229,7 @@ function buildPayload() {
 async function save() {
   saving.value = true
   uploadProgress.value = 0
+  errors.value = {}
 
   try {
     const api = `${props.store.app}/${props.store.model.toLowerCase()}s/`
@@ -240,10 +248,16 @@ async function save() {
         data,
         config
       )
-      
+
     }
 
     emit('saved', dados.data )
+
+    return dados.data
+
+  } catch (error) {
+    errors.value = parseFieldErrors(error?.response?.data)
+    throw error
 
   } finally {
     saving.value = false
@@ -274,6 +288,8 @@ defineExpose({
             v-model="form[f.name]"
             v-bind="f.props"
             :rules="resolveRules(f.rules)"
+            :error="!!errors[f.name]"
+            :error-message="errors[f.name] || ''"
           />
 
         </div>
@@ -291,6 +307,8 @@ defineExpose({
             v-model="form[f.name]"
             v-bind="f.props"
             :rules="resolveRules(f.rules)"
+            :error="!!errors[f.name]"
+            :error-message="errors[f.name] || ''"
           />
         </div>
       </FormSection>
@@ -321,6 +339,8 @@ defineExpose({
             v-model="form[f.name]"
             v-bind="f.props"
             :rules="resolveRules(f.rules)"
+            :error="!!errors[f.name]"
+            :error-message="errors[f.name] || ''"
           />
 
         </div>

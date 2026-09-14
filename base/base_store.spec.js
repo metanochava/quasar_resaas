@@ -743,6 +743,28 @@ describe('createBaseStore - HTTP error resilience (FASE 3 - P2.8/P2.9/P2.10)', (
     expect(store.loading).toBe(false)
     expect(store.rows).toEqual([{ id: 'existing' }])
     expect(store.pagination.rowsNumber).toBe(1)
+    // field-level errors, ready for an s-input's :error-message - never
+    // the raw ["This field is required."] array from DRF
+    expect(store.errors).toEqual({ name: 'This field is required.' })
+  })
+
+  it('create() clears errors left over from a previous failed attempt once it succeeds', async () => {
+    const useOrderStore = createBaseStore('order-error-create-then-success', {
+      app: 'sales', model: 'Order',
+    })
+    const store = useOrderStore()
+    store.form = { name: 'Bad' }
+
+    httpPost.mockRejectedValueOnce(httpError(400, { name: ['This field is required.'] }))
+    await expect(store.create()).rejects.toThrow()
+    expect(store.errors).toEqual({ name: 'This field is required.' })
+
+    httpPost.mockResolvedValueOnce({ data: { id: '1', name: 'Good' } })
+    httpGet.mockResolvedValueOnce({ data: { results: [{ id: '1' }], count: 1 } })
+    store.form = { name: 'Good' }
+    await store.create()
+
+    expect(store.errors).toEqual({})
   })
 
   it('update() resets saving to false and does NOT pretend the backend accepted the change', async () => {
@@ -761,6 +783,38 @@ describe('createBaseStore - HTTP error resilience (FASE 3 - P2.8/P2.9/P2.10)', (
     // store.row still reflects the last CONFIRMED server state, not the
     // optimistic edit that was rejected
     expect(store.row.status).toBe('draft')
+  })
+
+  it('update() captures field-level errors from a validation failure', async () => {
+    const useOrderStore = createBaseStore('order-error-update-fields', {
+      app: 'sales', model: 'Order',
+    })
+    const store = useOrderStore()
+    store.form = { id: '1', email: 'bad' }
+
+    httpPatch.mockRejectedValueOnce(
+      httpError(400, { email: ['Enter a valid email address.'] })
+    )
+
+    await expect(store.update()).rejects.toThrow()
+
+    expect(store.errors).toEqual({ email: 'Enter a valid email address.' })
+  })
+
+  it('resetForm() clears any errors left over from a previous failed save', async () => {
+    const useOrderStore = createBaseStore('order-error-resetform', {
+      app: 'sales', model: 'Order',
+    })
+    const store = useOrderStore()
+    store.form = { name: 'Bad' }
+
+    httpPost.mockRejectedValueOnce(httpError(400, { name: ['Required.'] }))
+    await expect(store.create()).rejects.toThrow()
+    expect(store.errors).toEqual({ name: 'Required.' })
+
+    store.resetForm()
+
+    expect(store.errors).toEqual({})
   })
 
   it('remove() resets saving to false and leaves rows untouched on failure', async () => {

@@ -97,7 +97,7 @@ function goBack() {
 // moment either button is clicked). Fixed by passing the actual Form
 // ref (now exposing resetForm(), see FormComponent.vue) and defining
 // both handlers - delete already happens inside ActionForm itself
-// (store.delete()); going back afterwards matches Cancel's behaviour.
+// (store.remove()); going back afterwards matches Cancel's behaviour.
 function onReset() {}
 
 function onDelete() {
