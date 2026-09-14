@@ -164,7 +164,7 @@
 
 
 <script setup>
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 
 import { tdc } from '../../services/translation'
@@ -172,7 +172,15 @@ import { hasGoogleMapsKey, loadGoogleMaps } from '../../services/googleMaps'
 import { COUNTRIES } from '../../utils/countries'
 
 const props = defineProps({
-  modelValue: { type: Object, default: null }
+  modelValue: { type: Object, default: null },
+
+  // Optional - shown on the marker's InfoWindow card when both (or
+  // either) are provided. `cardImage` accepts a plain URL string or
+  // anything File-shaped with a browser-usable URL (an unsaved
+  // upload) - see resolvedCardImage below.
+  cardTitle: { type: String, default: null },
+  cardImage: { type: [String, Object, File], default: null },
+  cardText: { type: String, default: null }
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -189,6 +197,7 @@ const searchInputEl = ref(null)
 
 let map = null
 let marker = null
+let infoWindow = null
 let autocomplete = null
 let geocoder = null
 let suppressWatch = false
@@ -252,6 +261,87 @@ const formattedCoordinates = computed(() => {
   if (!hasCoordinates.value) return ''
   return `${Number(form.latitude).toFixed(6)}, ${Number(form.longitude).toFixed(6)}`
 })
+
+// A plain URL string (already-saved photo) or a File (just picked,
+// not uploaded yet) - either way, something the <img> tag can load.
+let objectUrl = null
+const resolvedCardImage = computed(() => {
+  if (props.cardImage instanceof File) {
+    if (objectUrl) URL.revokeObjectURL(objectUrl)
+    objectUrl = URL.createObjectURL(props.cardImage)
+    return objectUrl
+  }
+  if (props.cardImage && typeof props.cardImage === 'object') {
+    return props.cardImage.url || null
+  }
+  return props.cardImage || null
+})
+
+const hasCard = computed(() =>
+  !!(props.cardTitle || resolvedCardImage.value || props.cardText)
+)
+
+// Built with real DOM nodes (not an HTML string) so cardText/cardTitle
+// - free-typed, user-editable fields - can never be interpreted as
+// markup by the InfoWindow.
+function buildCardContent() {
+  const wrapper = document.createElement('div')
+  wrapper.style.cssText = 'max-width:220px;font-family:inherit;'
+
+  if (resolvedCardImage.value) {
+    const img = document.createElement('img')
+    img.src = resolvedCardImage.value
+    img.style.cssText = 'width:100%;max-height:120px;object-fit:cover;border-radius:6px;margin-bottom:6px;'
+    wrapper.appendChild(img)
+  }
+
+  if (props.cardTitle) {
+    const title = document.createElement('div')
+    title.textContent = props.cardTitle
+    title.style.cssText = 'font-weight:600;font-size:14px;margin-bottom:2px;'
+    wrapper.appendChild(title)
+  }
+
+  if (props.cardText) {
+    const text = document.createElement('div')
+    text.textContent = props.cardText
+    text.style.cssText = 'font-size:12px;color:#555;'
+    wrapper.appendChild(text)
+  }
+
+  return wrapper
+}
+
+let infoWindowOpen = false
+
+function refreshInfoWindow() {
+  if (!mapsReady.value || !map || !marker) return
+
+  if (!hasCard.value) {
+    infoWindow?.close()
+    return
+  }
+
+  if (!infoWindow) {
+    infoWindow = new window.google.maps.InfoWindow()
+    infoWindow.addListener('closeclick', () => { infoWindowOpen = false })
+    marker.addListener('click', () => {
+      infoWindowOpen = true
+      infoWindow.open({ anchor: marker, map })
+    })
+  }
+
+  infoWindow.setContent(buildCardContent())
+
+  // Shows on its own the moment there's something to show, not only
+  // after the marker is clicked - matches "vai aparecer no carde".
+  if (!infoWindowOpen) {
+    infoWindowOpen = true
+    infoWindow.open({ anchor: marker, map })
+  }
+}
+
+watch(() => [props.cardTitle, resolvedCardImage.value, props.cardText], refreshInfoWindow)
 
 function emitUpdate() {
   if (suppressWatch) return
@@ -346,6 +436,8 @@ async function initMap() {
       })
     }
   }
+
+  refreshInfoWindow()
 }
 
 function syncMapFromForm() {
@@ -475,6 +567,10 @@ const DARK_MAP_STYLE = [
 ]
 
 onMounted(initMap)
+
+onBeforeUnmount(() => {
+  if (objectUrl) URL.revokeObjectURL(objectUrl)
+})
 </script>
 
 

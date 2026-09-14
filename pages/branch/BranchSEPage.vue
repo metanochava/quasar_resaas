@@ -13,6 +13,9 @@
       <template #right>
         <AddressLocationPicker
           :model-value="Branch.form.address"
+          :card-title="Branch.form.name"
+          :card-image="Branch.form.photo"
+          :card-text="Branch.form.description"
           @update:model-value="Branch.form = { ...Branch.form, address: $event }"
         />
       </template>
