@@ -37,9 +37,9 @@
           class="text-white"
           @click="User.toggleMenuRtl()"
         >
-          <q-tooltip>
+          <s-tooltip>
             {{ tdc('Toggle menu side') }}
-          </q-tooltip>
+          </s-tooltip>
         </s-btn>
 
       </div>

@@ -4,11 +4,9 @@
     :icon="$q.dark.isActive ? 'mdi-weather-night' : 'mdi-white-balance-sunny'"
     @click="toggleDark"
   >
-    <q-tooltip
-      :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
-    >
+    <s-tooltip>
       {{ $q.dark.isActive ? tdc('Click for light mode') : tdc('Click for dark mode') }}
-    </q-tooltip>
+    </s-tooltip>
   </s-btn>
 </template>
 

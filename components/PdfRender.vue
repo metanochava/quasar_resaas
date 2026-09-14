@@ -26,7 +26,7 @@
           icon="download"
           @click="downloadPdf"
         >
-          <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{ tdc('Download') }}</q-tooltip>
+          <s-tooltip>{{ tdc('Download') }}</s-tooltip>
 
         </s-btn>
 

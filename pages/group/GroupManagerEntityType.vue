@@ -45,7 +45,7 @@
       </q-badge>
 
       <s-btn v-close-popup dense flat icon="close">
-        <q-tooltip>Close</q-tooltip>
+        <s-tooltip>Close</s-tooltip>
       </s-btn>
     </q-bar>
 

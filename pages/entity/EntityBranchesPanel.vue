@@ -21,7 +21,7 @@
         icon="map"
         @click="showMap = true"
       >
-        <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{ tdc('Show all branches on the map') }}</q-tooltip>
+        <s-tooltip>{{ tdc('Show all branches on the map') }}</s-tooltip>
       </s-btn>
     </div>
 
@@ -74,7 +74,7 @@
             icon="edit"
             @click.stop="goToBranch(branch.id)"
           >
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{ tdc('Edit branch') }}</q-tooltip>
+            <s-tooltip>{{ tdc('Edit branch') }}</s-tooltip>
           </s-btn>
         </q-item-section>
       </q-item>

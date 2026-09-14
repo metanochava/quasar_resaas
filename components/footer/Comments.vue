@@ -16,9 +16,9 @@
         icon="close"
         v-close-popup
       >
-        <q-tooltip>
+        <s-tooltip>
           {{ tdc('Close') }}
-        </q-tooltip>
+        </s-tooltip>
       </s-btn>
     </q-bar>
 

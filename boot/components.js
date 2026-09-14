@@ -7,6 +7,7 @@ import { boot } from 'quasar/wrappers'
 
 import BtnComponent from './../components/engine/BtnComponent.vue'
 import CardComponent from './../components/engine/CardComponent.vue'
+import TooltipComponent from './../components/engine/TooltipComponent.vue'
 import InputComponent from './../components/engine/InputComponent.vue'
 import DateComponent from './../components/engine/DateComponent.vue'
 import TimeComponent from './../components/engine/TimeComponent.vue'
@@ -107,6 +108,8 @@ export default boot(({ app }) => {
   app.component('s-btn', BtnComponent)
 
   app.component('s-card', CardComponent)
+
+  app.component('s-tooltip', TooltipComponent)
 
   app.component('s-input', InputComponent)
 

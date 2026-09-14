@@ -123,14 +123,14 @@
                     :loading="TrainingSession.enrollmentActionLoading"
                     @click="doMarkCompleted(enrollment)"
                   >
-                    <q-tooltip>{{ tdc('Mark completed') }}</q-tooltip>
+                    <s-tooltip>{{ tdc('Mark completed') }}</s-tooltip>
                   </s-btn>
                   <s-btn
                     flat dense round icon="cancel" color="negative"
                     :loading="TrainingSession.enrollmentActionLoading"
                     @click="doMarkFailed(enrollment)"
                   >
-                    <q-tooltip>{{ tdc('Mark failed') }}</q-tooltip>
+                    <s-tooltip>{{ tdc('Mark failed') }}</s-tooltip>
                   </s-btn>
                 </template>
               </div>

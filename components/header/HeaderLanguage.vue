@@ -25,15 +25,9 @@
       </q-list>
     </q-menu>
 
-    <q-tooltip
-      :class="
-        $q.dark.isActive
-          ? 'bg-dark text-white'
-          : 'bg-primary text-white'
-      "
-    >
+    <s-tooltip>
       {{ Language.current?.name }}
-    </q-tooltip>
+    </s-tooltip>
 
   </s-btn>
 </template>

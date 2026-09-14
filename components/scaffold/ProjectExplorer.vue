@@ -109,7 +109,7 @@ function onNodeClick(node) {
           >
             <q-icon :name="scope.node.icon" size="16px" />
             <span>{{ scope.node.label }}</span>
-            <q-tooltip v-if="scope.node.denied">{{ tdc('This file cannot be opened by the IDE') }}</q-tooltip>
+            <s-tooltip v-if="scope.node.denied">{{ tdc('This file cannot be opened by the IDE') }}</s-tooltip>
           </div>
         </template>
       </q-tree>

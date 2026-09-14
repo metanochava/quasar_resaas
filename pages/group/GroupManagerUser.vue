@@ -19,7 +19,7 @@
       </q-badge>
 
       <s-btn dense flat icon="close" v-close-popup>
-        <q-tooltip>Close</q-tooltip>
+        <s-tooltip>Close</s-tooltip>
       </s-btn>
     </q-bar>
 

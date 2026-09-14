@@ -16,7 +16,7 @@
       <q-space />
 
       <s-btn v-close-popup dense flat icon="close">
-        <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{ tdc('Close') }}</q-tooltip>
+        <s-tooltip>{{ tdc('Close') }}</s-tooltip>
       </s-btn>
     </q-bar>
 

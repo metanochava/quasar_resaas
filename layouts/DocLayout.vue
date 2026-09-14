@@ -6,7 +6,7 @@
     >
       <q-toolbar>
         <s-btn dense flat round icon="arrow_back" to="/">
-          <q-tooltip>{{ tdc('Back to app') }}</q-tooltip>
+          <s-tooltip>{{ tdc('Back to app') }}</s-tooltip>
         </s-btn>
 
         <q-icon name="menu_book" size="24px" class="q-mx-sm" />

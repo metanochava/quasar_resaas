@@ -44,9 +44,9 @@
                     :disable="!existingAppId"
                     @click="openEntityTypes(existingApp)"
                   >
-                    <q-tooltip v-if="!existingAppId">
+                    <s-tooltip v-if="!existingAppId">
                       {{ tdc('This module has no registry entry yet') }}
-                    </q-tooltip>
+                    </s-tooltip>
                   </s-btn>
                 </div>
               </div>
@@ -114,9 +114,9 @@
                   :disable="!appIdByName[app.name.toLowerCase()]"
                   @click="openEntityTypes(app)"
                 >
-                  <q-tooltip v-if="!appIdByName[app.name.toLowerCase()]">
+                  <s-tooltip v-if="!appIdByName[app.name.toLowerCase()]">
                     {{ tdc('This module has no registry entry yet') }}
-                  </q-tooltip>
+                  </s-tooltip>
                 </s-btn>
               </q-card-section>
 
@@ -140,9 +140,9 @@
                   :disable="isProtected(app.name)"
                   @click="confirmDelete(app.name)"
                 >
-                  <q-tooltip>
+                  <s-tooltip>
                     {{ isProtected(app.name) ? tdc('Core platform module - cannot be deleted') : tdc('Delete') }}
-                  </q-tooltip>
+                  </s-tooltip>
                 </s-btn>
               </q-card-actions>
 

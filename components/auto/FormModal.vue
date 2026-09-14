@@ -103,7 +103,7 @@ function onSaved() {
         <q-space />
 
         <s-btn flat round dense icon="close" @click="close">
-          <q-tooltip>{{ tdc('Close') }}</q-tooltip>
+          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
         </s-btn>
       </q-bar>
 

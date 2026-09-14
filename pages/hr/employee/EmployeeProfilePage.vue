@@ -39,7 +39,7 @@
               icon="edit"
               :to="{ name: 'change_employee', params: { id: employee.id } }"
             >
-              <q-tooltip>{{ tdc('Edit') }}</q-tooltip>
+              <s-tooltip>{{ tdc('Edit') }}</s-tooltip>
             </s-btn>
           </div>
         </q-card-section>
@@ -296,7 +296,7 @@
                       :loading="Employee.requestingLeave"
                       @click="cancelLeaveRequest(request.id)"
                     >
-                      <q-tooltip>{{ tdc('Cancel') }}</q-tooltip>
+                      <s-tooltip>{{ tdc('Cancel') }}</s-tooltip>
                     </s-btn>
                   </div>
                 </q-item-section>
@@ -611,7 +611,7 @@
                       :href="payslipPdfUrl(payroll)"
                       target="_blank"
                     >
-                      <q-tooltip>{{ tdc('View payslip PDF') }}</q-tooltip>
+                      <s-tooltip>{{ tdc('View payslip PDF') }}</s-tooltip>
                     </s-btn>
                   </q-item-section>
                 </q-item>
@@ -685,10 +685,10 @@
                   <q-item-section side v-if="(r.status?.value || r.status) === 'submitted'">
                     <div class="q-gutter-xs">
                       <s-btn dense flat color="positive" icon="check" :loading="Employee.lifecycleActionLoading" @click="acceptResignation(r.id)">
-                        <q-tooltip>{{ tdc('Accept') }}</q-tooltip>
+                        <s-tooltip>{{ tdc('Accept') }}</s-tooltip>
                       </s-btn>
                       <s-btn dense flat color="grey-7" icon="undo" :loading="Employee.lifecycleActionLoading" @click="withdrawResignation(r.id)">
-                        <q-tooltip>{{ tdc('Withdraw') }}</q-tooltip>
+                        <s-tooltip>{{ tdc('Withdraw') }}</s-tooltip>
                       </s-btn>
                     </div>
                   </q-item-section>
@@ -773,7 +773,7 @@
                     </q-item-section>
                     <q-item-section side>
                       <s-btn dense flat icon="add_comment" @click="openDisciplinaryActionDialog(c)">
-                        <q-tooltip>{{ tdc('Add action') }}</q-tooltip>
+                        <s-tooltip>{{ tdc('Add action') }}</s-tooltip>
                       </s-btn>
                     </q-item-section>
                   </q-item>

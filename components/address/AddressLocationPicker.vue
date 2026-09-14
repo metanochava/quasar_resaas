@@ -50,7 +50,7 @@
             :loading="locating"
             @click="useMyLocation"
           >
-            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{ tdc('Use my current location') }}</q-tooltip>
+            <s-tooltip>{{ tdc('Use my current location') }}</s-tooltip>
           </s-btn>
         </div>
       </div>

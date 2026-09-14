@@ -547,9 +547,9 @@
                 :icon="previewDark ? 'mdi-weather-night' : 'mdi-white-balance-sunny'"
                 @click="previewDark = !previewDark"
               >
-                <q-tooltip>
+                <s-tooltip>
                   {{ previewDark ? tdc('Preview in light mode') : tdc('Preview in dark mode') }}
-                </q-tooltip>
+                </s-tooltip>
               </q-btn>
 
             </div>

@@ -2,9 +2,9 @@
   <s-btn flat dense round
     :icon="fullscreen ? 'fullscreen_exit' : 'fullscreen'"
     @click="toggleFullScreen" >
-    <q-tooltip :class="$q.dark.isActive ? 'bg-transparent' : 'bg-primary'">
+    <s-tooltip>
       {{ fullscreen ? tdc('Click to exit fullscreen'): tdc('Click to enter fullscreen') }}
-    </q-tooltip>
+    </s-tooltip>
   </s-btn>
 </template>
 

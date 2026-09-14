@@ -3,7 +3,7 @@
   <q-card
     v-bind="attrs"
 
-    :flat="attrs.flat ?? false"
+    :flat="attrs.flat ?? true"
     :bordered="attrs.bordered ?? false"
 
     :style="{
@@ -31,6 +31,10 @@ import { unwrapChoice } from "../../theme/unwrapChoice.js"
 // `rounded` (django_resaas.saas.models.layout_setting.LayoutSetting) -
 // o raio segue o mesmo valor que theme/applyLayout.js aplica
 // globalmente em --s-radius.
+//
+// flat=true por omissão (sem sombra) - qualquer chamada pode continuar
+// a passar :flat="false" explicitamente para um card específico que
+// precise de elevação; isto é só a base visual da app.
 export default defineComponent({
 
   name:"s-card",

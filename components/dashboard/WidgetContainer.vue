@@ -80,7 +80,7 @@ function onPrimaryAction() {
             <div v-if="widget.subtitle" class="text-caption text-grey-6">{{ tdc(widget.subtitle) }}</div>
           </div>
           <q-icon v-if="widget.tooltip" name="info" size="16px" color="grey-6">
-            <q-tooltip>{{ tdc(widget.tooltip) }}</q-tooltip>
+            <s-tooltip>{{ tdc(widget.tooltip) }}</s-tooltip>
           </q-icon>
         </div>
 
@@ -91,7 +91,7 @@ function onPrimaryAction() {
             :icon="action.icon || 'more_horiz'"
             @click="runAction(action)"
           >
-            <q-tooltip v-if="action.tooltip">{{ tdc(action.tooltip) }}</q-tooltip>
+            <s-tooltip v-if="action.tooltip">{{ tdc(action.tooltip) }}</s-tooltip>
           </q-btn>
           <q-btn flat dense round size="sm" icon="refresh" :disable="loading" @click="reload" />
         </div>

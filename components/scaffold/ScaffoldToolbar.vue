@@ -87,7 +87,7 @@ function saveLabel() {
         :disable="!activeFile.dirty || errorCount > 0"
         @click="emit('save')"
       >
-        <q-tooltip v-if="errorCount > 0">{{ tdc('Fix validation errors before saving') }}</q-tooltip>
+        <s-tooltip v-if="errorCount > 0">{{ tdc('Fix validation errors before saving') }}</s-tooltip>
       </s-btn>
 
       <q-badge v-if="dirtyCount > 0" color="warning" text-color="dark">
@@ -95,7 +95,7 @@ function saveLabel() {
       </q-badge>
 
       <s-btn flat dense round icon="refresh" @click="emit('refresh')">
-        <q-tooltip>{{ tdc('Refresh') }}</q-tooltip>
+        <s-tooltip>{{ tdc('Refresh') }}</s-tooltip>
       </s-btn>
     </div>
   </s-card>

@@ -17,7 +17,7 @@
           <div class="ellipsis">{{ contactOtpIdentifier }}</div>
           <q-space />
           <s-btn dense flat icon="close" :disable="confirmingContactOtp" v-close-popup @click="contactOtpDialog = false">
-            <q-tooltip>{{ tdc('Close') }}</q-tooltip>
+            <s-tooltip>{{ tdc('Close') }}</s-tooltip>
           </s-btn>
         </q-bar>
 
@@ -125,7 +125,7 @@
                         :loading="requestingContactOtp && contactOtpChannel === 'email'"
                         @click="requestContactOtp('email', profileForm.email)"
                       >
-                        <q-tooltip>{{ tdc('Verify and update email') }}</q-tooltip>
+                        <s-tooltip>{{ tdc('Verify and update email') }}</s-tooltip>
                       </s-btn>
                     </template>
                   </s-input>

@@ -657,13 +657,9 @@ function filteredItems(row, field) {
               @click="emit('create')"
               v-show="schemaUi.crud && can(permissions.add)"
             >
-              <q-tooltip
-                :class="$q.dark.isActive
-                  ? 'bg-dark text-white'
-                  : 'bg-primary text-white'"
-              >
+              <s-tooltip>
                 {{ tdc('Default') }}
-              </q-tooltip>
+              </s-tooltip>
             </s-btn>
 
 
@@ -680,13 +676,9 @@ function filteredItems(row, field) {
                 props.config?.routes?.add
               "
             >
-              <q-tooltip
-                :class="$q.dark.isActive
-                  ? 'bg-dark text-white'
-                  : 'bg-primary text-white'"
-              >
+              <s-tooltip>
                 {{ tdc('Custom') }}
-              </q-tooltip>
+              </s-tooltip>
             </s-btn>
 
 
@@ -704,13 +696,9 @@ function filteredItems(row, field) {
                 can(schemaPdf.list_permission)
               "
             >
-              <q-tooltip
-                :class="$q.dark.isActive
-                  ? 'bg-dark text-white'
-                  : 'bg-primary text-white'"
-              >
+              <s-tooltip>
                 {{ tdc('Download data list as PDF') }}
-              </q-tooltip>
+              </s-tooltip>
             </s-btn>
 
           </div>
@@ -743,39 +731,27 @@ function filteredItems(row, field) {
               <!-- ACTIVE -->
 
               <template #alive>
-                <q-tooltip
-                  :class="$q.dark.isActive
-                    ? 'bg-dark text-white'
-                    : 'bg-primary text-white'"
-                >
+                <s-tooltip>
                   {{ tdc('Show active') }}
-                </q-tooltip>
+                </s-tooltip>
               </template>
 
 
               <!-- DELETED -->
 
               <template #deleted>
-                <q-tooltip
-                  :class="$q.dark.isActive
-                    ? 'bg-dark text-white'
-                    : 'bg-primary text-white'"
-                >
+                <s-tooltip>
                   {{ tdc('Show deleted') }}
-                </q-tooltip>
+                </s-tooltip>
               </template>
 
 
               <!-- ALL -->
 
               <template #all>
-                <q-tooltip
-                  :class="$q.dark.isActive
-                    ? 'bg-dark text-white'
-                    : 'bg-primary text-white'"
-                >
+                <s-tooltip>
                   {{ tdc('Show all') }}
-                </q-tooltip>
+                </s-tooltip>
               </template>
 
             </q-btn-toggle>
@@ -793,13 +769,9 @@ function filteredItems(row, field) {
               icon="view_column"
             >
 
-              <q-tooltip
-                :class="$q.dark.isActive
-                  ? 'bg-dark text-white'
-                  : 'bg-primary text-white'"
-              >
+              <s-tooltip>
                 {{ tdc('Select visible columns') }}
-              </q-tooltip>
+              </s-tooltip>
 
 
               <q-menu>
@@ -884,13 +856,9 @@ function filteredItems(row, field) {
               @click="emit('refresh')"
             >
 
-              <q-tooltip
-                :class="$q.dark.isActive
-                  ? 'bg-dark text-white'
-                  : 'bg-primary text-white'"
-              >
+              <s-tooltip>
                 {{ tdc('Reload data') }}
-              </q-tooltip>
+              </s-tooltip>
 
             </s-btn>
 
@@ -904,13 +872,9 @@ function filteredItems(row, field) {
               @click="show_filter = !show_filter"
             >
 
-              <q-tooltip
-                :class="$q.dark.isActive
-                  ? 'bg-dark text-white'
-                  : 'bg-primary text-white'"
-              >
+              <s-tooltip>
                 {{ tdc('Show more options') }}
-              </q-tooltip>
+              </s-tooltip>
 
             </s-btn>
             <span>
@@ -953,26 +917,17 @@ function filteredItems(row, field) {
                       {{ tdc(a.label || a.action) }}
                     </q-item-section>
 
-                    <q-tooltip
-                      v-show="a.tooltip"
-                      :class="$q.dark.isActive
-                        ? 'bg-dark text-white'
-                        : 'bg-primary text-white'"
-                    >
+                    <s-tooltip v-show="a.tooltip">
                       {{ tdc(a.tooltip) || '.' }}
-                    </q-tooltip>
+                    </s-tooltip>
 
                   </q-item> 
                 </q-list>
 
               </q-btn-dropdown>
-              <q-tooltip
-                :class="$q.dark.isActive
-                  ? 'bg-dark text-white'
-                  : 'bg-primary text-white'"
-              >
+              <s-tooltip>
                 {{ tdc('More actions') }}
-              </q-tooltip>
+              </s-tooltip>
             </span>
             
 
@@ -1015,13 +970,9 @@ function filteredItems(row, field) {
                   @click="emit('filter')"
                 >
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc('Show filters') }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </s-btn>
 
@@ -1114,13 +1065,9 @@ function filteredItems(row, field) {
                     {{ tdc(actionStore.getAction('pdf').label) }}
                   </q-item-section>
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc(actionStore.getAction('pdf').label) }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1177,13 +1124,9 @@ function filteredItems(row, field) {
                   </q-item-section>
 
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc(actionStore.getAction('edit').label) }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1214,13 +1157,9 @@ function filteredItems(row, field) {
                     {{ tdc(actionStore.getAction('delete').label) }}
                   </q-item-section>
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc(actionStore.getAction('delete').label) }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1249,13 +1188,9 @@ function filteredItems(row, field) {
                     {{ tdc('Delete permanently') }}
                   </q-item-section>
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc('Delete permanently') }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1286,13 +1221,9 @@ function filteredItems(row, field) {
                     {{ tdc('Restore') }}
                   </q-item-section>
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc('Restore') }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1330,13 +1261,9 @@ function filteredItems(row, field) {
                     {{ tdc(a.label || a.action) }}
                   </q-item-section>
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc(a.tooltip || a.label || a.action) }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1345,13 +1272,9 @@ function filteredItems(row, field) {
             </q-menu>
 
 
-            <q-tooltip
-              :class="$q.dark.isActive
-                ? 'bg-dark text-white'
-                : 'bg-primary text-white'"
-            >
+            <s-tooltip>
               {{ tdc('Click to see more options') }}
-            </q-tooltip>
+            </s-tooltip>
 
           </s-btn>
 
@@ -1370,14 +1293,9 @@ function filteredItems(row, field) {
             :icon="a.icon"
             @click="runAction(a, slotRow.row)"
           >
-            <q-tooltip
-              v-show="a.tooltip"
-              :class="$q.dark.isActive
-                ? 'bg-dark text-white'
-                : 'bg-primary text-white'"
-            >
+            <s-tooltip v-show="a.tooltip">
               {{ tdc(a.tooltip)+ " left" }}
-            </q-tooltip>
+            </s-tooltip>
           </s-btn>
         </template>
 
@@ -1399,14 +1317,9 @@ function filteredItems(row, field) {
             :icon="a.icon"
           >
 
-            <q-tooltip
-              v-show="a.tooltip"
-              :class="$q.dark.isActive
-                ? 'bg-dark text-white'
-                : 'bg-primary text-white'"
-            >
+            <s-tooltip v-show="a.tooltip">
               {{ tdc(a.tooltip) || '.' }}
-            </q-tooltip>
+            </s-tooltip>
 
           </s-btn>
 
@@ -1456,13 +1369,9 @@ function filteredItems(row, field) {
                     {{ tdc(actionStore.getAction('pdf').label) }}
                   </q-item-section>
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc(actionStore.getAction('pdf').label) }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1519,13 +1428,9 @@ function filteredItems(row, field) {
                   </q-item-section>
 
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc(actionStore.getAction('edit').label) }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1556,13 +1461,9 @@ function filteredItems(row, field) {
                     {{ tdc(actionStore.getAction('delete').label) }}
                   </q-item-section>
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc(actionStore.getAction('delete').label) }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1591,13 +1492,9 @@ function filteredItems(row, field) {
                     {{ tdc('Delete permanently') }}
                   </q-item-section>
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc('Delete permanently') }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1628,13 +1525,9 @@ function filteredItems(row, field) {
                     {{ tdc('Restore') }}
                   </q-item-section>
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc('Restore') }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1672,13 +1565,9 @@ function filteredItems(row, field) {
                     {{ tdc(a.label || a.action) }}
                   </q-item-section>
 
-                  <q-tooltip
-                    :class="$q.dark.isActive
-                      ? 'bg-dark text-white'
-                      : 'bg-primary text-white'"
-                  >
+                  <s-tooltip>
                     {{ tdc(a.tooltip || a.label || a.action) }}
-                  </q-tooltip>
+                  </s-tooltip>
 
                 </q-item>
 
@@ -1687,13 +1576,9 @@ function filteredItems(row, field) {
             </q-menu>
 
 
-            <q-tooltip
-              :class="$q.dark.isActive
-                ? 'bg-dark text-white'
-                : 'bg-primary text-white'"
-            >
+            <s-tooltip>
               {{ tdc('Click to see more options') }}
-            </q-tooltip>
+            </s-tooltip>
 
           </s-btn>
         </template>
@@ -1723,13 +1608,9 @@ function filteredItems(row, field) {
             @click="() => goToRoute(props.row.id)"
           >
 
-            <q-tooltip
-              :class="$q.dark.isActive
-                ? 'bg-dark text-white'
-                : 'bg-primary text-white'"
-            >
+            <s-tooltip>
               {{ props.row.id }}
-            </q-tooltip>
+            </s-tooltip>
 
           </s-btn>
 
@@ -1942,11 +1823,7 @@ function filteredItems(row, field) {
             @click="() => toggleEstado(props.row)"
           >
 
-            <q-tooltip
-              :class="$q.dark.isActive
-                ? 'bg-dark text-white'
-                : 'bg-primary text-white'"
-            >
+            <s-tooltip>
               {{
                 tdc(
                   props.row.state.value == 'Active'
@@ -1954,7 +1831,7 @@ function filteredItems(row, field) {
                     : 'Activate'
                 )
               }}
-            </q-tooltip>
+            </s-tooltip>
 
           </s-btn>
 

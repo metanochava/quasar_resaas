@@ -10,7 +10,7 @@
           <div class="ellipsis">{{ identifier }}</div>
           <q-space />
           <s-btn dense flat icon="close" :disable="loading" v-close-popup @click="showOtpDialog = false">
-            <q-tooltip>{{ tdc('Close') }}</q-tooltip>
+            <s-tooltip>{{ tdc('Close') }}</s-tooltip>
           </s-btn>
         </q-bar>
 

@@ -9,14 +9,11 @@
       <label v-if="User?.Entity">
         {{ tdc(User?.Entity?.name) }}
 
-        <q-tooltip
+        <s-tooltip
           v-if="User?.Branch?.name"
-          :class="$q.dark.isActive
-            ? 'bg-dark text-white text-subtitle1'
-            : 'bg-primary text-white text-subtitle1'"
         >
           {{ tdc(User?.Branch?.name) }}
-        </q-tooltip>
+        </s-tooltip>
       </label>
       <label v-else >{{tdc( User.EntityType?.name )}}</label>
     </div>

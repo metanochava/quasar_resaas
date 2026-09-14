@@ -91,7 +91,7 @@ watch(() => [props.modelValue, props.appId], ([open]) => {
         </div>
         <q-space />
         <s-btn dense flat round icon="close" v-close-popup>
-          <q-tooltip>{{ tdc('Close') }}</q-tooltip>
+          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
         </s-btn>
       </q-bar>
 
@@ -124,7 +124,7 @@ watch(() => [props.modelValue, props.appId], ([open]) => {
             </q-item-section>
             <q-item-section side>
               <s-btn flat round dense icon="close" color="negative" @click="removeEntityType(et)">
-                <q-tooltip>{{ tdc('Remove') }}</q-tooltip>
+                <s-tooltip>{{ tdc('Remove') }}</s-tooltip>
               </s-btn>
             </q-item-section>
           </q-item>

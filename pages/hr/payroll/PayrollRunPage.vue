@@ -92,7 +92,7 @@
                 :loading="Payroll.actionLoading"
                 @click="doAction(row, 'cancel')"
               >
-                <q-tooltip>{{ tdc('Cancel') }}</q-tooltip>
+                <s-tooltip>{{ tdc('Cancel') }}</s-tooltip>
               </s-btn>
               <s-btn
                 v-if="row.payslip_id"
@@ -100,7 +100,7 @@
                 :href="payslipPdfUrl(row)"
                 target="_blank"
               >
-                <q-tooltip>{{ tdc('Payslip PDF') }}</q-tooltip>
+                <s-tooltip>{{ tdc('Payslip PDF') }}</s-tooltip>
               </s-btn>
             </div>
           </q-item-section>

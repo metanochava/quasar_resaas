@@ -71,15 +71,9 @@
         />
       </q-avatar>
 
-      <q-tooltip
-        :class="
-          $q.dark.isActive
-            ? 'bg-dark text-white'
-            : 'bg-primary text-white'
-        "
-      >
+      <s-tooltip>
         {{ User?.username || tdc('Guest') }}
-      </q-tooltip>
+      </s-tooltip>
 
       <!-- MENU -->
       <q-menu
@@ -208,9 +202,9 @@
               v-close-popup
               @click="User.toggleSettings()"
             >
-              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              <s-tooltip>
                 {{ tdc('Settings') }}
-              </q-tooltip>
+              </s-tooltip>
 
             </s-btn>
 
@@ -222,9 +216,9 @@
               v-close-popup
               @click="User.toggleThemeStudio()"
             >
-              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              <s-tooltip>
                 {{ tdc('Appearance') }}
-              </q-tooltip>
+              </s-tooltip>
             </s-btn>
 
             <s-btn
@@ -235,9 +229,9 @@
               color="red"
               @click="pergunta = true"
             >
-              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              <s-tooltip>
                 {{ tdc('Logout') }}
-              </q-tooltip>
+              </s-tooltip>
             </s-btn>
           </q-card-actions>
 
@@ -255,9 +249,9 @@
               color="primary"
               :to="{ name: 'registarUser' }"
             >
-              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              <s-tooltip>
                 {{ tdc('Register') }}
-              </q-tooltip>
+              </s-tooltip>
             </s-btn>
 
             <s-btn
@@ -268,9 +262,9 @@
               color="secondary"
               :to="{ name: 'login' }"
             >
-              <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white ' : 'bg-primary text-white '">
+              <s-tooltip>
                 {{ tdc('Login') }}
-              </q-tooltip>
+              </s-tooltip>
             </s-btn>
           </q-card-actions>
         </s-card>

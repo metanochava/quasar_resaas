@@ -25,9 +25,9 @@
         {{ unreadCount > 99 ? '99+' : unreadCount }}
       </q-badge>
 
-      <q-tooltip>
+      <s-tooltip>
         {{ tdc('View notifications') }}
-      </q-tooltip>
+      </s-tooltip>
     </s-btn>
 
     <!-- =====================================================
@@ -78,9 +78,9 @@
             icon="refresh"
             @click="reload"
           >
-            <q-tooltip>
+            <s-tooltip>
               {{ tdc('Refresh') }}
-            </q-tooltip>
+            </s-tooltip>
           </s-btn>
 
           <s-btn
@@ -90,9 +90,9 @@
             icon="close"
             v-close-popup
           >
-            <q-tooltip>
+            <s-tooltip>
               {{ tdc('Close') }}
-            </q-tooltip>
+            </s-tooltip>
           </s-btn>
         </q-bar>
 

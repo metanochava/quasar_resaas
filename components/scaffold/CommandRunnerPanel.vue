@@ -28,7 +28,7 @@ const emit = defineEmits(['run'])
         :disable="running"
         @click="emit('run', cmd.key)"
       >
-        <q-tooltip>{{ cmd.description }}</q-tooltip>
+        <s-tooltip>{{ cmd.description }}</s-tooltip>
       </s-btn>
 
       <div v-if="!commands.length" class="text-caption text-grey q-pa-sm">

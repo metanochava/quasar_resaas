@@ -79,7 +79,7 @@ function onRequest(evt) {
           :icon="action.icon || 'chevron_right'"
           @click="runRowAction(action, cellProps.row)"
         >
-          <q-tooltip v-if="action.tooltip">{{ tdc(action.tooltip) }}</q-tooltip>
+          <s-tooltip v-if="action.tooltip">{{ tdc(action.tooltip) }}</s-tooltip>
         </q-btn>
       </q-td>
     </template>
