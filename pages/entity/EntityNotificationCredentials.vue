@@ -1,5 +1,5 @@
 <template>
-  <s-card class="column full-height notification-credentials-card">
+  <s-card flat class="column full-height notification-credentials-card">
     <q-bar
       :class="
         $q.dark.isActive
@@ -16,7 +16,7 @@
       <q-space />
 
       <s-btn v-close-popup dense flat icon="close">
-        <q-tooltip>{{ tdc('Close') }}</q-tooltip>
+        <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{ tdc('Close') }}</q-tooltip>
       </s-btn>
     </q-bar>
 

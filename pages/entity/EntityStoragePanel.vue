@@ -1,5 +1,5 @@
 <template>
-  <s-card class="entity-panel storage-panel">
+  <s-card flat class="entity-panel storage-panel">
     <div
       class="panel-header"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'"

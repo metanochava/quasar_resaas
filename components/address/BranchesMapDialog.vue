@@ -6,7 +6,7 @@
     full-height
     @update:model-value="emit('update:modelValue', $event)"
   >
-    <s-card class="column no-wrap full-height branches-map-card">
+    <s-card flat class="column no-wrap full-height branches-map-card">
       <q-bar
         :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
       >

@@ -1,5 +1,5 @@
 <template>
-  <s-card class="location-picker">
+  <s-card flat class="location-picker">
     <div
       class="location-header"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'"
@@ -50,7 +50,7 @@
             :loading="locating"
             @click="useMyLocation"
           >
-            <q-tooltip>{{ tdc('Use my current location') }}</q-tooltip>
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{ tdc('Use my current location') }}</q-tooltip>
           </s-btn>
         </div>
       </div>

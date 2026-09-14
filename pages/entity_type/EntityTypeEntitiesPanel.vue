@@ -1,5 +1,5 @@
 <template>
-  <s-card class="entity-type-panel">
+  <s-card flat class="entity-type-panel">
     <div
       class="panel-header"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'"
@@ -21,7 +21,7 @@
         icon="map"
         @click="showMap = true"
       >
-        <q-tooltip>{{ tdc('Show all branches of this entity type on the map') }}</q-tooltip>
+        <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{ tdc('Show all branches of this entity type on the map') }}</q-tooltip>
       </s-btn>
     </div>
 
@@ -61,7 +61,7 @@
             icon="edit"
             @click.stop="goToEntity(entity.id)"
           >
-            <q-tooltip>{{ tdc('Edit entity') }}</q-tooltip>
+            <q-tooltip :class="$q.dark.isActive ? 'bg-dark text-white text-14' : 'bg-primary text-white text-14'">{{ tdc('Edit entity') }}</q-tooltip>
           </s-btn>
         </q-item-section>
       </q-item>

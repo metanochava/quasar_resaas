@@ -21,7 +21,7 @@
       </q-item-section>
     </template>
 
-    <q-card>
+    <s-card flat>
       <q-card-section class="q-gutter-sm">
         <div
           v-if="credential"
@@ -45,7 +45,11 @@
           />
         </div>
 
-        <q-banner v-if="credential" dense class="bg-grey-2 text-caption">
+        <q-banner
+          v-if="credential"
+          dense
+          :class="$q.dark.isActive ? 'bg-grey-9 text-white text-caption' : 'bg-grey-2 text-caption'"
+        >
           {{ tdc('For security, existing values are never shown here - enter new ones below only to replace them.') }}
         </q-banner>
 
@@ -88,7 +92,7 @@
           />
         </div>
       </q-card-section>
-    </q-card>
+    </s-card>
   </q-expansion-item>
 </template>
 
