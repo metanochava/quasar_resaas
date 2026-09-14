@@ -1,19 +1,19 @@
 <template>
-  <s-card class="entity-panel">
+  <s-card class="entity-type-panel">
     <div
       class="panel-header"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'"
     >
-      <q-icon name="store" size="20px" color="white" />
+      <q-icon name="business" size="20px" color="white" />
       <div class="text-subtitle1 text-weight-bold text-white q-ml-sm">
-        {{ tdc('Branches') }}
+        {{ tdc('Entities') }}
       </div>
       <q-space />
       <q-badge color="white" text-color="primary" class="q-px-sm q-mr-sm">
-        {{ branches.length }}
+        {{ entities.length }}
       </q-badge>
       <s-btn
-        v-if="branches.length"
+        v-if="entities.length"
         round
         dense
         flat
@@ -21,48 +21,35 @@
         icon="map"
         @click="showMap = true"
       >
-        <q-tooltip>{{ tdc('Show all branches on the map') }}</q-tooltip>
+        <q-tooltip>{{ tdc('Show all branches of this entity type on the map') }}</q-tooltip>
       </s-btn>
     </div>
 
     <BranchesMapDialog
       v-model="showMap"
       :title="tdc('Branches')"
-      :fetch-url="`${Entity.safeUrl}/${entityId}/branchs/`"
+      :fetch-url="`${EntityType.safeUrl}/${entityTypeId}/branches_map/`"
     />
 
     <div v-if="loading" class="flex flex-center q-pa-lg">
       <q-spinner size="32px" color="primary" />
     </div>
 
-    <q-list v-else-if="branches.length" separator>
+    <q-list v-else-if="entities.length" separator>
       <q-item
-        v-for="branch in branches"
-        :key="branch.id"
+        v-for="entity in entities"
+        :key="entity.id"
         clickable
-        @click="goToBranch(branch.id)"
+        @click="goToEntity(entity.id)"
       >
         <q-item-section avatar>
-          <q-avatar
-            :color="branch.state === 'Active' ? 'primary' : 'grey-5'"
-            text-color="white"
-            size="36px"
-          >
-            <q-icon name="store" size="18px" />
+          <q-avatar color="primary" text-color="white" size="36px">
+            <q-icon name="business" size="18px" />
           </q-avatar>
         </q-item-section>
 
         <q-item-section>
-          <q-item-label class="text-weight-medium">{{ branch.name }}</q-item-label>
-          <q-item-label caption>
-            <q-badge
-              :color="branch.state === 'Active' ? 'positive' : 'grey-6'"
-              text-color="white"
-              rounded
-            >
-              {{ branch.state }}
-            </q-badge>
-          </q-item-label>
+          <q-item-label class="text-weight-medium">{{ entity.name }}</q-item-label>
         </q-item-section>
 
         <q-item-section side>
@@ -72,17 +59,17 @@
             flat
             color="primary"
             icon="edit"
-            @click.stop="goToBranch(branch.id)"
+            @click.stop="goToEntity(entity.id)"
           >
-            <q-tooltip>{{ tdc('Edit branch') }}</q-tooltip>
+            <q-tooltip>{{ tdc('Edit entity') }}</q-tooltip>
           </s-btn>
         </q-item-section>
       </q-item>
     </q-list>
 
     <div v-else class="text-center text-caption text-grey q-pa-lg">
-      <q-icon name="store_mall_directory" size="32px" class="q-mb-xs" />
-      <div>{{ tdc('No branches yet.') }}</div>
+      <q-icon name="business" size="32px" class="q-mb-xs" />
+      <div>{{ tdc('No entities yet.') }}</div>
     </div>
   </s-card>
 </template>
@@ -92,25 +79,25 @@
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { useEntityStore } from '../../stores/EntityStore'
+import { useEntityTypeStore } from '../../stores/EntityTypeStore'
 import { HTTPAuth, url } from '../../services/api'
 import { tdc } from '../../services/translation'
 import BranchesMapDialog from '../../components/address/BranchesMapDialog.vue'
 
 const props = defineProps({
-  entityId: [String, Number]
+  entityTypeId: [String, Number]
 })
 
 const router = useRouter()
-const Entity = useEntityStore()
+const EntityType = useEntityTypeStore()
 
-const branches = ref([])
+const entities = ref([])
 const loading = ref(false)
 const showMap = ref(false)
 
 async function load() {
-  if (!props.entityId) {
-    branches.value = []
+  if (!props.entityTypeId) {
+    entities.value = []
     return
   }
 
@@ -118,25 +105,25 @@ async function load() {
 
   try {
     const { data } = await HTTPAuth.get(
-      url({ type: 'u', url: `${Entity.safeUrl}/${props.entityId}/branchs/` })
+      url({ type: 'u', url: `${EntityType.safeUrl}/${props.entityTypeId}/entitys/` })
     )
-    branches.value = data || []
+    entities.value = data || []
   } finally {
     loading.value = false
   }
 }
 
-function goToBranch(id) {
-  router.push({ name: 'change_branch', params: { id } })
+function goToEntity(id) {
+  router.push({ name: 'change_entity', params: { id } })
 }
 
-watch(() => props.entityId, load)
+watch(() => props.entityTypeId, load)
 onMounted(load)
 </script>
 
 
 <style scoped>
-.entity-panel {
+.entity-type-panel {
   overflow: hidden;
 }
 

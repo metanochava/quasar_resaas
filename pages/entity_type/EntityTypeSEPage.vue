@@ -194,6 +194,10 @@
             />
           </ManagementPanel>
 
+          <div class="q-mt-md">
+            <EntityTypeEntitiesPanel :entity-type-id="EntityType.form?.id" />
+          </div>
+
         </template>
 
 
@@ -257,6 +261,8 @@ import ModelManager from './ModelManager.vue'
 import AppManager from './AppManager.vue'
 
 import GroupManager from '../group/GroupManagerEntityType.vue'
+
+import EntityTypeEntitiesPanel from './EntityTypeEntitiesPanel.vue'
 
 import {
   ThemeStudioEngine
