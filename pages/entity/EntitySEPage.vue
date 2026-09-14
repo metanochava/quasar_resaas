@@ -5,22 +5,34 @@
     <!-- APPS -->
     <!-- ===================================================== -->
 
-    <EntityAppsDialog
+    <q-dialog
       v-model="openApps"
-      :entity-id="Entity.form?.id"
-      :entity-type-id="entityTypeId"
-    />
+      persistent
+      full-height
+      full-width
+    >
+      <EntityAppsDialog
+        :entity-id="Entity.form?.id"
+        :entity-type-id="entityTypeId"
+      />
+    </q-dialog>
 
 
     <!-- ===================================================== -->
     <!-- MODELS -->
     <!-- ===================================================== -->
 
-    <EntityModelsDialog
+    <q-dialog
       v-model="openModels"
-      :entity-id="Entity.form?.id"
-      :entity-type-id="entityTypeId"
-    />
+      persistent
+      full-height
+      full-width
+    >
+      <EntityModelsDialog
+        :entity-id="Entity.form?.id"
+        :entity-type-id="entityTypeId"
+      />
+    </q-dialog>
 
 
     <!-- ===================================================== -->

@@ -4,16 +4,19 @@ import { tdc } from '../../services/translation'
 import { HTTPAuth, url } from '../../services/api'
 
 // Modelos activos para esta Entity (EntityModel) - só entre os que já
-// fazem parte do seu EntityType (EntityTypeModel), mesma regra e
-// mesmo padrão de EntityAppsDialog.vue (ver ali para o porquê -
-// backend valida o mesmo em EntityAPIView.addModel).
+// fazem parte do seu EntityType (EntityTypeModel), mesma regra de
+// EntityAppsDialog.vue (backend valida o mesmo em
+// EntityAPIView.addModel).
+//
+// Mesmo layout/estrutura de ModelManager.vue (entity_type) - agrupado
+// por app_label via q-expansion-item, com checkbox "seleccionar
+// tudo" por grupo - o <q-dialog persistent full-height full-width>
+// fica na página que usa este componente, não aqui (mesma divisão de
+// EntityTypeSEPage.vue).
 const props = defineProps({
-  modelValue: { type: Boolean, default: false },
   entityId: { type: [String, Number], default: null },
   entityTypeId: { type: [String, Number], default: null },
 })
-
-const emit = defineEmits(['update:modelValue'])
 
 const loading = ref(false)
 const toggling = ref(null)
@@ -22,37 +25,39 @@ const search = ref('')
 const available = ref([])
 const linked = ref([])
 
-const modelLabel = (m) => `${m.app_label}.${m.model}`
+const isSelected = computed(() => (id) => linked.value.some(m => String(m.id) === String(id)))
 
-const hasModel = computed(() => (id) => linked.value.some(m => String(m.id) === String(id)))
+function formatName(value) {
+  return (value || '')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, l => l.toUpperCase())
+}
 
 const filteredModels = computed(() => {
   const s = search.value.toLowerCase().trim()
   if (!s) return available.value
-  return available.value.filter(m => modelLabel(m).toLowerCase().includes(s))
+  return available.value.filter(m =>
+    `${m.app_label}.${m.model}`.toLowerCase().includes(s)
+  )
 })
 
-async function load() {
-  if (!props.entityId || !props.entityTypeId) return
-
-  loading.value = true
-
-  try {
-    const [entityTypeModels, entityModels] = await Promise.all([
-      HTTPAuth.get(url({ type: 'u', url: `django_resaas/entitytypes/${props.entityTypeId}/models/` })),
-      HTTPAuth.get(url({ type: 'u', url: `django_resaas/entitys/${props.entityId}/models/` })),
-    ])
-
-    available.value = entityTypeModels.data || []
-    linked.value = entityModels.data || []
-  } finally {
-    loading.value = false
+const groupedModels = computed(() => {
+  const groups = {}
+  for (const model of filteredModels.value) {
+    const key = model.app_label || ''
+    if (!groups[key]) groups[key] = []
+    groups[key].push(model)
   }
+  return groups
+})
+
+function allSelected(models) {
+  return models.every(m => isSelected.value(m.id))
 }
 
 async function toggleModel(model) {
   toggling.value = model.id
-  const wasLinked = hasModel.value(model.id)
+  const wasLinked = isSelected.value(model.id)
   const old = [...linked.value]
 
   // optimistic UI
@@ -75,94 +80,157 @@ async function toggleModel(model) {
   }
 }
 
-watch(() => [props.modelValue, props.entityId, props.entityTypeId], ([open]) => {
-  if (open) load()
-})
+function toggleGroup(models, checked) {
+  models.forEach(item => {
+    const exists = isSelected.value(item.id)
+    if (checked && !exists) toggleModel(item)
+    if (!checked && exists) toggleModel(item)
+  })
+}
+
+async function load() {
+  if (!props.entityId || !props.entityTypeId) return
+
+  loading.value = true
+
+  try {
+    const [entityTypeModels, entityModels] = await Promise.all([
+      HTTPAuth.get(url({ type: 'u', url: `django_resaas/entitytypes/${props.entityTypeId}/models/` })),
+      HTTPAuth.get(url({ type: 'u', url: `django_resaas/entitys/${props.entityId}/models/` })),
+    ])
+
+    available.value = entityTypeModels.data || []
+    linked.value = entityModels.data || []
+  } finally {
+    loading.value = false
+  }
+}
+
+watch(() => [props.entityId, props.entityTypeId], load, { immediate: true })
 </script>
 
 <template>
-  <q-dialog
-    :model-value="modelValue"
-    @update:model-value="v => emit('update:modelValue', v)"
-  >
-    <s-card class="entity-models-dialog-card column no-wrap">
-      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-        <q-icon name="table_chart" class="q-mr-sm" />
-        <div class="text-subtitle1 text-weight-bold">{{ tdc('Models') }}</div>
-        <q-space />
-        <q-badge color="white" text-color="primary">{{ linked.length }} {{ tdc('active') }}</q-badge>
-        <s-btn dense flat round icon="close" class="q-ml-sm" v-close-popup>
-          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-        </s-btn>
-      </q-bar>
+  <s-card class="column full-height">
 
-      <q-separator />
-
-      <div class="q-pa-sm">
-        <s-input v-model="search" dense outlined clearable :placeholder="tdc('Search model...')">
-          <template #prepend><q-icon name="search" /></template>
-        </s-input>
+    <!-- ================= FIXED HEADER ================= -->
+    <q-bar class="row items-center" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
+      <div class="text-h6">
+        {{ tdc('Models Management') }}
       </div>
 
-      <q-card-section class="col entity-models-dialog-body">
-        <div v-if="loading" class="flex flex-center q-pa-xl">
-          <q-spinner size="36px" color="primary" />
-        </div>
+      <q-space />
 
-        <q-list v-else-if="filteredModels.length" separator bordered>
+      <q-badge color="white" text-color="primary">
+        {{ linked.length }} {{ tdc('active') }}
+      </q-badge>
+
+      <s-btn dense flat icon="close" v-close-popup>
+        <s-tooltip>{{ tdc('Close') }}</s-tooltip>
+      </s-btn>
+    </q-bar>
+
+    <q-separator />
+
+    <!-- ================= FIXED SEARCH ================= -->
+    <q-card-section>
+      <q-input
+        v-model="search"
+        outlined
+        dense
+        clearable
+        :label="tdc('Search')"
+      >
+        <template #prepend>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+    </q-card-section>
+
+    <q-separator />
+
+    <!-- ================= SCROLL (HERE ONLY) ================= -->
+    <q-card-section class="col scroll">
+
+      <div v-if="loading" class="flex flex-center q-pa-xl">
+        <q-spinner size="40px" />
+      </div>
+
+      <q-list v-else separator>
+        <q-expansion-item
+          v-for="(models, app) in groupedModels"
+          :key="app"
+          expand-separator
+          icon="table_chart"
+        >
+
+          <!-- HEADER -->
+          <template #header>
+            <q-item-section avatar>
+              <q-icon name="table_chart" color="primary" />
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label class="text-weight-bold">
+                {{ formatName(app) }}
+              </q-item-label>
+              <q-item-label caption>
+                {{ models.length }} {{ tdc('models') }}
+              </q-item-label>
+            </q-item-section>
+
+            <q-item-section side>
+              <q-checkbox
+                :model-value="allSelected(models)"
+                @click.stop
+                @update:model-value="val => toggleGroup(models, val)"
+              />
+            </q-item-section>
+          </template>
+
+          <!-- ITEMS -->
           <q-item
-            v-for="model in filteredModels" :key="model.id"
-            clickable v-ripple
-            :class="{ 'model-active': hasModel(model.id) }"
-            @click="toggleModel(model)"
+            v-for="item in models"
+            :key="item.id"
+            clickable
+            v-ripple
+            @click="toggleModel(item)"
           >
             <q-item-section avatar>
-              <q-avatar
-                :color="hasModel(model.id) ? 'primary' : 'grey-4'"
-                :text-color="hasModel(model.id) ? 'white' : 'dark'"
-                icon="table_chart"
+              <q-checkbox
+                :model-value="isSelected(item.id)"
+                :disable="toggling === item.id"
+                @click.stop
+                @update:model-value="() => toggleModel(item)"
               />
             </q-item-section>
 
             <q-item-section>
-              <q-item-label class="text-weight-medium">{{ modelLabel(model) }}</q-item-label>
+              <q-item-label>
+                {{ formatName(item.model) }}
+              </q-item-label>
+              <q-item-label caption>
+                {{ item.app_label }}
+              </q-item-label>
             </q-item-section>
 
             <q-item-section side>
-              <div class="row items-center q-gutter-sm">
-                <q-chip dense size="sm" :color="hasModel(model.id) ? 'primary' : 'grey-5'" text-color="white">
-                  {{ hasModel(model.id) ? tdc('Active') : tdc('Inactive') }}
-                </q-chip>
-                <q-checkbox
-                  :model-value="hasModel(model.id)"
-                  :disable="toggling === model.id"
-                  @click.stop
-                  @update:model-value="() => toggleModel(model)"
-                />
-              </div>
+              <q-badge
+                :color="isSelected(item.id) ? 'primary' : 'grey'"
+                outline
+              >
+                {{ isSelected(item.id) ? tdc('Active') : tdc('Inactive') }}
+              </q-badge>
             </q-item-section>
           </q-item>
-        </q-list>
 
-        <div v-else class="text-center text-grey q-pa-md">
-          {{ tdc("This entity's EntityType has no models yet") }}
-        </div>
-      </q-card-section>
-    </s-card>
-  </q-dialog>
+        </q-expansion-item>
+      </q-list>
+
+      <div v-if="!loading && !filteredModels.length" class="text-center text-grey q-pa-md">
+        {{ tdc("This entity's EntityType has no models yet") }}
+      </div>
+
+    </q-card-section>
+
+  </s-card>
 </template>
-
-<style scoped>
-.entity-models-dialog-card {
-  width: min(480px, 92vw);
-  max-height: 80vh;
-}
-
-.entity-models-dialog-body {
-  overflow-y: auto;
-}
-
-.model-active {
-  background: rgba(25, 118, 210, 0.08);
-}
-</style>

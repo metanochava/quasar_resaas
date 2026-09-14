@@ -10,13 +10,16 @@ import { HTTPAuth, url } from '../../services/api'
 // se escolhe dentro do que o EntityType já disponibiliza). Backend
 // valida o mesmo (EntityAPIView.addApp rejeita 400 fora do
 // EntityTypeApp), este ecrã só reflecte essa regra.
+//
+// Mesmo layout/estrutura de AppManager.vue (entity_type) - card
+// full-height com header fixo, pesquisa fixa, lista com scroll - o
+// próprio <q-dialog persistent full-height full-width> fica na
+// página que usa este componente, não aqui (mesma divisão de
+// responsabilidade de AppManager.vue/EntityTypeSEPage.vue).
 const props = defineProps({
-  modelValue: { type: Boolean, default: false },
   entityId: { type: [String, Number], default: null },
   entityTypeId: { type: [String, Number], default: null },
 })
-
-const emit = defineEmits(['update:modelValue'])
 
 const loading = ref(false)
 const toggling = ref(null)
@@ -76,94 +79,111 @@ async function toggleApp(app) {
   }
 }
 
-watch(() => [props.modelValue, props.entityId, props.entityTypeId], ([open]) => {
-  if (open) load()
-})
+watch(() => [props.entityId, props.entityTypeId], load, { immediate: true })
 </script>
 
 <template>
-  <q-dialog
-    :model-value="modelValue"
-    @update:model-value="v => emit('update:modelValue', v)"
-  >
-    <s-card class="entity-apps-dialog-card column no-wrap">
-      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-        <q-icon name="extension" class="q-mr-sm" />
-        <div class="text-subtitle1 text-weight-bold">{{ tdc('Apps') }}</div>
-        <q-space />
-        <q-badge color="white" text-color="primary">{{ linked.length }} {{ tdc('active') }}</q-badge>
-        <s-btn dense flat round icon="close" class="q-ml-sm" v-close-popup>
-          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-        </s-btn>
-      </q-bar>
+  <s-card class="column full-height">
 
-      <q-separator />
-
-      <div class="q-pa-sm">
-        <s-input v-model="search" dense outlined clearable :placeholder="tdc('Search app...')">
-          <template #prepend><q-icon name="search" /></template>
-        </s-input>
+    <!-- ================= FIXED HEADER ================= -->
+    <q-bar class="row items-center" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
+      <div class="text-h6">
+        {{ tdc('Apps Management') }}
       </div>
 
-      <q-card-section class="col entity-apps-dialog-body">
-        <div v-if="loading" class="flex flex-center q-pa-xl">
-          <q-spinner size="36px" color="primary" />
-        </div>
+      <q-space />
 
-        <q-list v-else-if="filteredApps.length" separator bordered>
-          <q-item
-            v-for="app in filteredApps" :key="app.id"
-            clickable v-ripple
-            :class="{ 'app-active': hasApp(app.id) }"
-            @click="toggleApp(app)"
-          >
-            <q-item-section avatar>
-              <q-avatar
-                :color="hasApp(app.id) ? 'primary' : 'grey-4'"
-                :text-color="hasApp(app.id) ? 'white' : 'dark'"
-                icon="extension"
+      <q-badge color="white" text-color="primary">
+        {{ linked.length }} {{ tdc('active') }}
+      </q-badge>
+
+      <s-btn dense flat icon="close" v-close-popup>
+        <s-tooltip>{{ tdc('Close') }}</s-tooltip>
+      </s-btn>
+    </q-bar>
+
+    <q-separator />
+
+    <!-- ================= FIXED SEARCH ================= -->
+    <q-card-section>
+      <q-input
+        v-model="search"
+        outlined
+        dense
+        clearable
+        :label="tdc('Search')"
+      >
+        <template #prepend>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+    </q-card-section>
+
+    <q-separator />
+
+    <!-- ================= SCROLL (HERE ONLY) ================= -->
+    <q-card-section class="col scroll">
+
+      <div v-if="loading" class="flex flex-center q-pa-xl">
+        <q-spinner size="40px" />
+      </div>
+
+      <q-list v-else separator bordered>
+        <q-item
+          v-for="app in filteredApps" :key="app.id"
+          clickable
+          v-ripple
+          class="app-item"
+          :class="{ 'app-active': hasApp(app.id) }"
+          @click="toggleApp(app)"
+        >
+          <q-item-section avatar>
+            <q-avatar
+              :color="hasApp(app.id) ? 'primary' : 'grey-4'"
+              :text-color="hasApp(app.id) ? 'white' : 'dark'"
+              icon="extension"
+            />
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label class="text-weight-medium">
+              {{ app.name }}
+            </q-item-label>
+          </q-item-section>
+
+          <q-item-section side>
+            <div class="row items-center q-gutter-sm">
+              <q-chip dense size="sm" :color="hasApp(app.id) ? 'primary' : 'grey-5'" text-color="white">
+                {{ hasApp(app.id) ? tdc('Active') : tdc('Inactive') }}
+              </q-chip>
+              <q-checkbox
+                :model-value="hasApp(app.id)"
+                :disable="toggling === app.id"
+                @click.stop
+                @update:model-value="() => toggleApp(app)"
               />
-            </q-item-section>
+            </div>
+          </q-item-section>
+        </q-item>
+      </q-list>
 
-            <q-item-section>
-              <q-item-label class="text-weight-medium">{{ app.name }}</q-item-label>
-            </q-item-section>
+      <div v-if="!loading && !filteredApps.length" class="text-center text-grey q-pa-md">
+        {{ tdc("This entity's EntityType has no apps yet") }}
+      </div>
 
-            <q-item-section side>
-              <div class="row items-center q-gutter-sm">
-                <q-chip dense size="sm" :color="hasApp(app.id) ? 'primary' : 'grey-5'" text-color="white">
-                  {{ hasApp(app.id) ? tdc('Active') : tdc('Inactive') }}
-                </q-chip>
-                <q-checkbox
-                  :model-value="hasApp(app.id)"
-                  :disable="toggling === app.id"
-                  @click.stop
-                  @update:model-value="() => toggleApp(app)"
-                />
-              </div>
-            </q-item-section>
-          </q-item>
-        </q-list>
+    </q-card-section>
 
-        <div v-else class="text-center text-grey q-pa-md">
-          {{ tdc("This entity's EntityType has no apps yet") }}
-        </div>
-      </q-card-section>
-    </s-card>
-  </q-dialog>
+  </s-card>
 </template>
 
 <style scoped>
-.entity-apps-dialog-card {
-  width: min(480px, 92vw);
-  max-height: 80vh;
-}
-
-.entity-apps-dialog-body {
-  overflow-y: auto;
+.app-item {
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
 }
 
 .app-active {
   background: rgba(25, 118, 210, 0.08);
+  border-left-color: var(--q-primary);
 }
 </style>
