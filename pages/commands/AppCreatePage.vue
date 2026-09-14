@@ -96,6 +96,15 @@
                     {{ app.models || 0 }} {{ tdc(app.models === 1 ? 'model' : 'models') }}
                   </div>
                 </div>
+
+                <q-chip
+                  v-if="appIdByName[app.name.toLowerCase()]"
+                  dense
+                  square
+                  :color="isAppActive(app) ? 'positive' : 'grey-6'"
+                  text-color="white"
+                  :label="isAppActive(app) ? tdc('Active') : tdc('Inactive')"
+                />
               </q-card-section>
 
               <q-separator />
@@ -130,6 +139,25 @@
                   :label="tdc('Open')"
                   @click="openScaffold(app.name)"
                 />
+
+                <s-btn
+                  flat
+                  round
+                  dense
+                  :color="isAppActive(app) ? 'positive' : 'grey-6'"
+                  :icon="isAppActive(app) ? 'toggle_on' : 'toggle_off'"
+                  :loading="togglingApp === app.name.toLowerCase()"
+                  :disable="!appIdByName[app.name.toLowerCase()]"
+                  @click="toggleAppState(app)"
+                >
+                  <s-tooltip>
+                    {{
+                      !appIdByName[app.name.toLowerCase()]
+                        ? tdc('This module has no registry entry yet')
+                        : (isAppActive(app) ? tdc('Deactivate') : tdc('Activate'))
+                    }}
+                  </s-tooltip>
+                </s-btn>
 
                 <s-btn
                   flat
@@ -197,6 +225,15 @@ const apps = ref([])
 // nesse caso o botão "Entity Types" fica desactivado (ver template).
 const appIdByName = ref({})
 
+// name (lowercase) -> App.state ("Active"/"Inactive", TimeModel's own
+// field - already set by bootstrap_service.py/app_service.py/
+// create_root.py on registration, now exposed by AppSerializer). A
+// module with no App row (see appIdByName above) has no state to
+// read at all - isAppActive() treats that as not active, and the
+// toggle button stays disabled (nothing to PATCH).
+const appStateByName = ref({})
+const togglingApp = ref(null)
+
 const activeApp = ref(null)
 const modelsOpen = ref(false)
 const entityTypesOpen = ref(false)
@@ -254,13 +291,50 @@ async function loadApps () {
 async function loadAppRegistry () {
   try {
     const { data } = await HTTPAuth.get(url({ type: 'u', url: 'django_resaas/apps/', params: {} }))
-    const map = {}
+    const idMap = {}
+    const stateMap = {}
     for (const row of data || []) {
-      map[(row.name || '').toLowerCase()] = row.id
+      const key = (row.name || '').toLowerCase()
+      idMap[key] = row.id
+      // BaseSerializer represents a choice field as {id,value,label}
+      // on read (same convention as Branch.state elsewhere - see
+      // AutoTable.vue's toggleEstado()), even though it still accepts
+      // a plain string on write (see toggleAppState() below).
+      stateMap[key] = row.state?.value
     }
-    appIdByName.value = map
+    appIdByName.value = idMap
+    appStateByName.value = stateMap
   } catch (e) {
     console.error(e)
+  }
+}
+
+// ---------------- ACTIVATE / DEACTIVATE ----------------
+function isAppActive(app) {
+  return appStateByName.value[app.name.toLowerCase()] === 'Active'
+}
+
+async function toggleAppState(app) {
+  const key = app.name.toLowerCase()
+  const id = appIdByName.value[key]
+  if (!id) return
+
+  const previous = appStateByName.value[key]
+  const newState = previous === 'Active' ? 'Inactive' : 'Active'
+
+  togglingApp.value = key
+  // optimistic UI - reverted in the catch if the PATCH fails
+  appStateByName.value = { ...appStateByName.value, [key]: newState }
+
+  try {
+    await HTTPAuth.patch(
+      url({ type: 'u', url: `django_resaas/apps/${id}/`, params: {} }),
+      { state: newState }
+    )
+  } catch (e) {
+    appStateByName.value = { ...appStateByName.value, [key]: previous }
+  } finally {
+    togglingApp.value = null
   }
 }
 
