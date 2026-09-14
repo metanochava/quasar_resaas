@@ -105,6 +105,7 @@ const AlertSuccess = (data) => {
   if (typeof data === 'object' && data !== null) {
 
     // status codes
+    if (data?.status === 200) { sms = 'Created successfully!'; go = false }
     if (data?.status === 201) { sms = 'Created successfully!'; go = true }
     if (data?.status === 202) { sms = 'Processed successfully!'; go = true }
     if (data?.status === 203) { sms = 'Modified successfully!'; go = true }
@@ -141,8 +142,9 @@ const AlertSuccess = (data) => {
       go = true
     }
   }
-
-  if (go) pushAlert(sms, tipo)
+  if (data?.status !== 200) { 
+    if (go) pushAlert(sms, tipo)
+  }
 }
 
 /* =========================
