@@ -38,7 +38,7 @@
       <q-card-section>
         <AddressLocationPicker
           :model-value="Person.form.address"
-          @update:model-value="Person.form.address = $event"
+          @update:model-value="Person.form = { ...Person.form, address: $event }"
         />
       </q-card-section>
 

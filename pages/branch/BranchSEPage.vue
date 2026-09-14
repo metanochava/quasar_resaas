@@ -13,7 +13,7 @@
       <template #right>
         <AddressLocationPicker
           :model-value="Branch.form.address"
-          @update:model-value="Branch.form.address = $event"
+          @update:model-value="Branch.form = { ...Branch.form, address: $event }"
         />
       </template>
     </FormTwo>
