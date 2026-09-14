@@ -74,11 +74,9 @@
             <q-icon name="location_on" size="46px" color="primary" />
           </div>
           <div class="text-caption text-grey q-mt-sm text-center">
-            {{
-              hasCoordinates
-                ? tdc('Interactive map unavailable - showing the coordinates below.')
-                : tdc('Use your location or enter coordinates manually below.')
-            }}
+            {{ tdc('Interactive map not configured for this deployment.') }}
+            <br>
+            {{ tdc('Use your location or enter coordinates manually below.') }}
           </div>
         </div>
 
@@ -146,7 +144,16 @@
               <s-input v-model="form.postal_code" dense outlined label="Postal code" @update:model-value="emitUpdate" />
             </div>
             <div class="col-6">
-              <s-input v-model="form.country" dense outlined label="Country" @update:model-value="emitUpdate" />
+              <s-select
+                :model-value="form.country_code"
+                dense
+                outlined
+                :emit-value="true"
+                :map-options="true"
+                :options="countryOptions"
+                label="Country"
+                @update:model-value="onCountrySelected"
+              />
             </div>
           </div>
         </div>
@@ -162,6 +169,7 @@ import { useQuasar } from 'quasar'
 
 import { tdc } from '../../services/translation'
 import { hasGoogleMapsKey, loadGoogleMaps } from '../../services/googleMaps'
+import { COUNTRIES } from '../../utils/countries'
 
 const props = defineProps({
   modelValue: { type: Object, default: null }
@@ -185,7 +193,10 @@ let autocomplete = null
 let geocoder = null
 let suppressWatch = false
 
-const form = reactive({
+// Matches Address model's own defaults (country="Mozambique",
+// country_code="MZ") - a brand new address starts consistent with
+// what the backend would assume anyway, instead of blank/null.
+const EMPTY_ADDRESS = {
   place_id: null,
   latitude: null,
   longitude: null,
@@ -201,33 +212,25 @@ const form = reactive({
   administrative_area_level_2: null,
   administrative_area_level_3: null,
   postal_code: null,
-  country: null,
-  country_code: null,
+  country: 'Mozambique',
+  country_code: 'MZ',
   complement: null
-})
+}
+
+const form = reactive({ ...EMPTY_ADDRESS })
+
+const countryOptions = COUNTRIES.map(c => ({ label: c.name, value: c.iso2 }))
+
+function onCountrySelected(iso2) {
+  const country = COUNTRIES.find(c => c.iso2 === iso2)
+  form.country = country?.name || null
+  form.country_code = iso2
+  emitUpdate()
+}
 
 function hydrateFrom(value) {
   suppressWatch = true
-  Object.assign(form, {
-    place_id: null,
-    latitude: null,
-    longitude: null,
-    formatted_address: null,
-    street_number: null,
-    route: null,
-    premise: null,
-    subpremise: null,
-    neighborhood: null,
-    sublocality: null,
-    locality: null,
-    administrative_area_level_1: null,
-    administrative_area_level_2: null,
-    administrative_area_level_3: null,
-    postal_code: null,
-    country: null,
-    country_code: null,
-    complement: null
-  }, value || {})
+  Object.assign(form, EMPTY_ADDRESS, value || {})
 
   searchText.value = form.formatted_address || ''
   nextTick(() => { suppressWatch = false })
@@ -252,7 +255,20 @@ const formattedCoordinates = computed(() => {
 
 function emitUpdate() {
   if (suppressWatch) return
-  emit('update:modelValue', { ...form })
+
+  // Never send an explicit null for a field the user hasn't touched -
+  // Address.country/country_code (and others) have model-level
+  // defaults but no null=True, so an explicit null fails validation
+  // ("may not be null") even though omitting the key entirely is
+  // perfectly fine and lets the backend default apply.
+  const payload = {}
+  for (const [key, value] of Object.entries(form)) {
+    if (value !== null && value !== undefined && value !== '') {
+      payload[key] = value
+    }
+  }
+
+  emit('update:modelValue', payload)
 }
 
 // ===========================================================
