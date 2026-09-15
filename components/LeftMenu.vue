@@ -41,17 +41,14 @@
             {{ tdc('Toggle menu side') }}
           </s-tooltip>
         </s-btn>
-
       </div>
-
     </q-item>
-
-  </s-card>
     <div class="q-pa-sm" :class="$q.dark.isActive ? 'bg-dark ' : 'bg-transparent' "  >
       <search-menu size="100%" />
     </div>
+  </s-card>
 
-    <LeftMenuSegundo  style="margin-top:95px" />
+  <LeftMenuSegundo  style="margin-top:95px" />
 
 </template>
 <script >
