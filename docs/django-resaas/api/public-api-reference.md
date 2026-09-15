@@ -60,7 +60,7 @@ delete/restore/hard delete). Também neste módulo:
   `branch_id`, `group_id`, `lang_id`), depois verifica numa única query se o `BranchUserGroup` do
   utilizador concede uma permissão com esse codename para a branch/entity/entity_type atuais.
 - `hasApp(codigo)` — decorator de método; devolve 403 a menos que a app `codigo` dada esteja ativa
-  (`EntityApp`, `state=1`) para a entidade do pedido.
+  (`EntityApp`, `state='Active'`) para a entidade do pedido.
 
   > [!WARNING]
   > Problema conhecido: filtra por `app__codigo`, mas `django_resaas.models.app.App` não tem

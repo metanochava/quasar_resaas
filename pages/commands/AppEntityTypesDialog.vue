@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { Dialog } from 'quasar'
 import { tdc } from '../../services/translation'
 import { HTTPAuth, url } from '../../services/api'
 
@@ -57,6 +58,15 @@ async function addEntityType(entityType) {
     adding.value = false
     pickerValue.value = null
   }
+}
+
+function confirmRemoveEntityType(entityType) {
+  Dialog.create({
+    title: tdc('Confirm'),
+    message: tdc('Remove this entity type from "{name}"?').replace('{name}', props.appName),
+    cancel: true,
+    persistent: true,
+  }).onOk(() => removeEntityType(entityType))
 }
 
 async function removeEntityType(entityType) {
@@ -123,7 +133,7 @@ watch(() => [props.modelValue, props.appId], ([open]) => {
               <q-item-label class="text-weight-medium">{{ et.name }}</q-item-label>
             </q-item-section>
             <q-item-section side>
-              <s-btn flat round dense icon="close" color="negative" @click="removeEntityType(et)">
+              <s-btn flat round dense icon="close" color="negative" @click="confirmRemoveEntityType(et)">
                 <s-tooltip>{{ tdc('Remove') }}</s-tooltip>
               </s-btn>
             </q-item-section>
