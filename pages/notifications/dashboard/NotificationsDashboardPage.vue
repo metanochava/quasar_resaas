@@ -19,7 +19,7 @@
           <div class="col-6 col-md-3">
             <s-card flat bordered>
               <q-card-section>
-                <div class="text-caption text-grey-6">{{ tdc('Outbox Total') }}</div>
+                <div class="text-caption text-grey-6">{{ tdc('Total in Outbox') }}</div>
                 <div class="text-h5 text-weight-bold">{{ data.total_outbox }}</div>
               </q-card-section>
             </s-card>
@@ -27,7 +27,7 @@
           <div class="col-6 col-md-3">
             <s-card flat bordered>
               <q-card-section>
-                <div class="text-caption text-grey-6">{{ tdc('Regras Activas') }}</div>
+                <div class="text-caption text-grey-6">{{ tdc('Active Rules') }}</div>
                 <div class="text-h5 text-weight-bold">
                   {{ data.active_rules_count }} / {{ data.total_rules_count }}
                 </div>
@@ -37,7 +37,7 @@
           <div class="col-6 col-md-3">
             <s-card flat bordered>
               <q-card-section>
-                <div class="text-caption text-grey-6">{{ tdc('Tentativas de Entrega') }}</div>
+                <div class="text-caption text-grey-6">{{ tdc('Delivery Attempts') }}</div>
                 <div class="text-h5 text-weight-bold">{{ data.total_delivery_attempts }}</div>
               </q-card-section>
             </s-card>
@@ -48,7 +48,7 @@
               :class="successRateClass"
             >
               <q-card-section>
-                <div class="text-caption text-grey-6">{{ tdc('Taxa de Sucesso') }}</div>
+                <div class="text-caption text-grey-6">{{ tdc('Success Rate') }}</div>
                 <div class="text-h5 text-weight-bold" :class="successRateTextClass">
                   {{ data.delivery_success_rate !== null ? data.delivery_success_rate + '%' : '—' }}
                 </div>
@@ -60,10 +60,10 @@
         <q-card-section class="row q-col-gutter-md">
           <div class="col-12 col-md-6">
             <div class="text-subtitle2 text-weight-medium q-mb-sm">
-              {{ tdc('Outbox por Estado') }}
+              {{ tdc('Outbox by Status') }}
             </div>
             <div v-if="!data.by_status.length" class="text-caption text-grey-6">
-              {{ tdc('Sem dados') }}
+              {{ tdc('No data') }}
             </div>
             <div v-else class="row q-gutter-sm">
               <q-badge
@@ -77,10 +77,10 @@
           </div>
           <div class="col-12 col-md-6">
             <div class="text-subtitle2 text-weight-medium q-mb-sm">
-              {{ tdc('Outbox por Canal') }}
+              {{ tdc('Outbox by Channel') }}
             </div>
             <div v-if="!data.by_channel.length" class="text-caption text-grey-6">
-              {{ tdc('Sem dados') }}
+              {{ tdc('No data') }}
             </div>
             <div v-else class="row q-gutter-sm">
               <q-badge
@@ -96,10 +96,10 @@
 
         <q-card-section>
           <div class="text-subtitle2 text-weight-medium q-mb-sm">
-            {{ tdc('Falhas Recentes') }}
+            {{ tdc('Recent Failures') }}
           </div>
           <div v-if="!data.recent_failures.length" class="text-caption text-grey-6">
-            {{ tdc('Sem falhas registadas') }}
+            {{ tdc('No failures recorded') }}
           </div>
           <q-list v-else separator>
             <q-item v-for="item in data.recent_failures" :key="item.id">
