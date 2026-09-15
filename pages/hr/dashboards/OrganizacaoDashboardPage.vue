@@ -4,7 +4,7 @@
       <q-card-section>
         <div class="text-h6">
           <q-icon name="corporate_fare" class="q-mr-xs" />
-          {{ tdc('Organização') }}
+          {{ tdc('Organization') }}
         </div>
       </q-card-section>
 
@@ -27,7 +27,7 @@
           <div class="col-6 col-md-4">
             <s-card flat bordered class="border-warning">
               <q-card-section>
-                <div class="text-caption text-grey-6">{{ tdc('Contratos a expirar (30 dias)') }}</div>
+                <div class="text-caption text-grey-6">{{ tdc('Contracts Expiring (30 days)') }}</div>
                 <div class="text-h5 text-weight-bold text-warning">{{ data.contracts_expiring_soon }}</div>
               </q-card-section>
             </s-card>
@@ -37,24 +37,24 @@
         <q-card-section class="row q-col-gutter-md">
           <div class="col-12 col-md-6">
             <div class="text-subtitle2 text-weight-medium q-mb-sm">
-              {{ tdc('Headcount por Departamento') }}
+              {{ tdc('Headcount by Department') }}
             </div>
             <div v-if="!data.headcount_by_department.length" class="text-caption text-grey-6">
-              {{ tdc('Sem dados') }}
+              {{ tdc('No data') }}
             </div>
             <q-list v-else separator>
               <q-item v-for="item in data.headcount_by_department" :key="item.position__department__name">
-                <q-item-section>{{ item.position__department__name || tdc('Sem departamento') }}</q-item-section>
+                <q-item-section>{{ item.position__department__name || tdc('No Department') }}</q-item-section>
                 <q-item-section side><q-badge color="primary">{{ item.total }}</q-badge></q-item-section>
               </q-item>
             </q-list>
           </div>
           <div class="col-12 col-md-6">
             <div class="text-subtitle2 text-weight-medium q-mb-sm">
-              {{ tdc('Distribuição por Especialidade') }}
+              {{ tdc('Distribution by Specialty') }}
             </div>
             <div v-if="!data.by_specialty.length" class="text-caption text-grey-6">
-              {{ tdc('Sem dados') }}
+              {{ tdc('No data') }}
             </div>
             <q-list v-else separator>
               <q-item v-for="item in data.by_specialty" :key="item.specialty__title">

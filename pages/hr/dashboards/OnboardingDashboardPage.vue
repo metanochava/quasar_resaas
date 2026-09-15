@@ -18,7 +18,7 @@
         <div class="col-6">
           <s-card flat bordered>
             <q-card-section>
-              <div class="text-caption text-grey-6">{{ tdc('Em Progresso') }}</div>
+              <div class="text-caption text-grey-6">{{ tdc('In Progress') }}</div>
               <div class="text-h5 text-weight-bold">{{ data.onboardings_in_progress }}</div>
             </q-card-section>
           </s-card>
@@ -26,7 +26,7 @@
         <div class="col-6">
           <s-card flat bordered>
             <q-card-section>
-              <div class="text-caption text-grey-6">{{ tdc('Concluídos este Mês') }}</div>
+              <div class="text-caption text-grey-6">{{ tdc('Completed This Month') }}</div>
               <div class="text-h5 text-weight-bold">{{ data.onboardings_completed_this_month }}</div>
             </q-card-section>
           </s-card>

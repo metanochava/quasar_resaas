@@ -4,7 +4,7 @@
       <q-card-section>
         <div class="text-h6">
           <q-icon name="compare_arrows" class="q-mr-xs" />
-          {{ tdc('Ciclo de Vida do Colaborador') }}
+          {{ tdc('Employee Lifecycle') }}
         </div>
       </q-card-section>
 
@@ -18,7 +18,7 @@
         <div class="col-6 col-md-3">
           <s-card flat bordered>
             <q-card-section>
-              <div class="text-caption text-grey-6">{{ tdc('Promoções') }}</div>
+              <div class="text-caption text-grey-6">{{ tdc('Promotions') }}</div>
               <div class="text-h5 text-weight-bold">{{ data.promotions_this_period }}</div>
             </q-card-section>
           </s-card>
@@ -26,7 +26,7 @@
         <div class="col-6 col-md-3">
           <s-card flat bordered>
             <q-card-section>
-              <div class="text-caption text-grey-6">{{ tdc('Demissões') }}</div>
+              <div class="text-caption text-grey-6">{{ tdc('Resignations') }}</div>
               <div class="text-h5 text-weight-bold">{{ data.resignations_this_period }}</div>
             </q-card-section>
           </s-card>
@@ -34,7 +34,7 @@
         <div class="col-6 col-md-3">
           <s-card flat bordered>
             <q-card-section>
-              <div class="text-caption text-grey-6">{{ tdc('Rescisões') }}</div>
+              <div class="text-caption text-grey-6">{{ tdc('Contract Terminations') }}</div>
               <div class="text-h5 text-weight-bold">{{ data.terminations_this_period }}</div>
             </q-card-section>
           </s-card>
@@ -42,7 +42,7 @@
         <div class="col-6 col-md-3">
           <s-card flat bordered class="border-negative">
             <q-card-section>
-              <div class="text-caption text-grey-6">{{ tdc('Casos Disciplinares Activos') }}</div>
+              <div class="text-caption text-grey-6">{{ tdc('Active Disciplinary Cases') }}</div>
               <div class="text-h5 text-weight-bold text-negative">{{ data.active_disciplinary_cases }}</div>
             </q-card-section>
           </s-card>
@@ -50,7 +50,7 @@
         <div class="col-6 col-md-3">
           <s-card flat bordered>
             <q-card-section>
-              <div class="text-caption text-grey-6">{{ tdc('Offboarding em Curso') }}</div>
+              <div class="text-caption text-grey-6">{{ tdc('Offboarding In Progress') }}</div>
               <div class="text-h5 text-weight-bold">{{ data.offboarding_in_progress }}</div>
             </q-card-section>
           </s-card>

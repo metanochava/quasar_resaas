@@ -4,7 +4,7 @@
       <q-card-section>
         <div class="text-h6">
           <q-icon name="school" class="q-mr-xs" />
-          {{ tdc('Formação') }}
+          {{ tdc('Training') }}
         </div>
       </q-card-section>
 
@@ -18,7 +18,7 @@
         <div class="col-6">
           <s-card flat bordered>
             <q-card-section>
-              <div class="text-caption text-grey-6">{{ tdc('Sessões (30 dias)') }}</div>
+              <div class="text-caption text-grey-6">{{ tdc('Sessions (30 days)') }}</div>
               <div class="text-h5 text-weight-bold">{{ data.upcoming_sessions_count }}</div>
             </q-card-section>
           </s-card>
@@ -26,7 +26,7 @@
         <div class="col-6">
           <s-card flat bordered>
             <q-card-section>
-              <div class="text-caption text-grey-6">{{ tdc('Inscrições') }}</div>
+              <div class="text-caption text-grey-6">{{ tdc('Enrollments') }}</div>
               <div class="text-h5 text-weight-bold">{{ data.upcoming_sessions_enrollments }}</div>
             </q-card-section>
           </s-card>

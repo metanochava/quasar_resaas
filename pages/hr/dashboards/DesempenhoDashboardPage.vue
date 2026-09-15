@@ -4,7 +4,7 @@
       <q-card-section>
         <div class="text-h6">
           <q-icon name="trending_up" class="q-mr-xs" />
-          {{ tdc('Desempenho') }}
+          {{ tdc('Performance') }}
         </div>
       </q-card-section>
 
@@ -19,15 +19,15 @@
           <div class="col-6">
             <s-card flat bordered>
               <q-card-section>
-                <div class="text-caption text-grey-6">{{ tdc('Ciclo Activo') }}</div>
-                <div class="text-h6 text-weight-bold">{{ data.active_cycle?.name || tdc('Nenhum') }}</div>
+                <div class="text-caption text-grey-6">{{ tdc('Active Cycle') }}</div>
+                <div class="text-h6 text-weight-bold">{{ data.active_cycle?.name || tdc('None') }}</div>
               </q-card-section>
             </s-card>
           </div>
           <div class="col-6">
             <s-card flat bordered class="border-warning">
               <q-card-section>
-                <div class="text-caption text-grey-6">{{ tdc('Reviews Pendentes') }}</div>
+                <div class="text-caption text-grey-6">{{ tdc('Pending Reviews') }}</div>
                 <div class="text-h5 text-weight-bold text-warning">{{ data.pending_reviews }}</div>
               </q-card-section>
             </s-card>
@@ -36,10 +36,10 @@
 
         <q-card-section>
           <div class="text-subtitle2 text-weight-medium q-mb-sm">
-            {{ tdc('Objectivos por Estado') }}
+            {{ tdc('Goals by Status') }}
           </div>
           <div v-if="!data.goals_by_status.length" class="text-caption text-grey-6">
-            {{ tdc('Sem dados') }}
+            {{ tdc('No data') }}
           </div>
           <div v-else class="row q-gutter-sm">
             <q-badge v-for="item in data.goals_by_status" :key="item.status" color="primary" class="q-pa-sm">

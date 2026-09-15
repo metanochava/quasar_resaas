@@ -4,7 +4,7 @@
       <q-card-section>
         <div class="text-h6">
           <q-icon name="schedule" class="q-mr-xs" />
-          {{ tdc('Tempo & Presença') }}
+          {{ tdc('Time & Attendance') }}
         </div>
       </q-card-section>
 
@@ -19,7 +19,7 @@
           <div class="col-6">
             <s-card flat bordered>
               <q-card-section>
-                <div class="text-caption text-grey-6">{{ tdc('Presenças Hoje') }}</div>
+                <div class="text-caption text-grey-6">{{ tdc('Present Today') }}</div>
                 <div class="text-h5 text-weight-bold">{{ data.today_attendance_count }}</div>
               </q-card-section>
             </s-card>
@@ -27,7 +27,7 @@
           <div class="col-6">
             <s-card flat bordered>
               <q-card-section>
-                <div class="text-caption text-grey-6">{{ tdc('Em Turno Hoje') }}</div>
+                <div class="text-caption text-grey-6">{{ tdc('On Shift Today') }}</div>
                 <div class="text-h5 text-weight-bold">{{ data.employees_on_shift_today }}</div>
               </q-card-section>
             </s-card>
@@ -36,10 +36,10 @@
 
         <q-card-section>
           <div class="text-subtitle2 text-weight-medium q-mb-sm">
-            {{ tdc('Próximos Feriados') }}
+            {{ tdc('Upcoming Holidays') }}
           </div>
           <div v-if="!data.upcoming_holidays.length" class="text-caption text-grey-6">
-            {{ tdc('Sem feriados nos próximos 30 dias') }}
+            {{ tdc('No holidays in the next 30 days') }}
           </div>
           <q-list v-else separator>
             <q-item v-for="item in data.upcoming_holidays" :key="item.id">

@@ -4,7 +4,7 @@
       <q-card-section>
         <div class="text-h6">
           <q-icon name="beach_access" class="q-mr-xs" />
-          {{ tdc('Ausências') }}
+          {{ tdc('Absences') }}
         </div>
       </q-card-section>
 
@@ -19,7 +19,7 @@
           <div class="col-6">
             <s-card flat bordered class="border-warning">
               <q-card-section>
-                <div class="text-caption text-grey-6">{{ tdc('Aprovações Pendentes') }}</div>
+                <div class="text-caption text-grey-6">{{ tdc('Pending Approvals') }}</div>
                 <div class="text-h5 text-weight-bold text-warning">{{ data.pending_approvals }}</div>
               </q-card-section>
             </s-card>
@@ -27,7 +27,7 @@
           <div class="col-6">
             <s-card flat bordered>
               <q-card-section>
-                <div class="text-caption text-grey-6">{{ tdc('Pedidos este Mês') }}</div>
+                <div class="text-caption text-grey-6">{{ tdc('Requests This Month') }}</div>
                 <div class="text-h5 text-weight-bold">{{ data.leave_requests_this_month }}</div>
               </q-card-section>
             </s-card>
@@ -36,10 +36,10 @@
 
         <q-card-section>
           <div class="text-subtitle2 text-weight-medium q-mb-sm">
-            {{ tdc('Saldos Mais Baixos') }}
+            {{ tdc('Lowest Balances') }}
           </div>
           <div v-if="!data.lowest_balances.length" class="text-caption text-grey-6">
-            {{ tdc('Sem dados') }}
+            {{ tdc('No data') }}
           </div>
           <q-list v-else separator>
             <q-item v-for="item in data.lowest_balances" :key="item.employee_id">
