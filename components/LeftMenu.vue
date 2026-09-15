@@ -45,10 +45,11 @@
       </div>
 
     </q-item>
-    <div class="q-pa-sm"  >
+
+  </s-card>
+    <div class="q-pa-sm" :class="$q.dark.isActive ? 'bg-dark ' : 'bg-transparent' "  >
       <search-menu size="100%" />
     </div>
-  </s-card>
 
     <LeftMenuSegundo  style="margin-top:95px" />
 
