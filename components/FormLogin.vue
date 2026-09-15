@@ -1,12 +1,12 @@
 <template>
-  <div class="row items-center justify-evenly bg-transparent">
-    <s-card flat square class="text-center bg-transparent login-card">
+  <div class="row items-center justify-evenly " :class="$q.dark.isActive ? 'bg-dark  ' : 'bg-transparent ' ">
+    <s-card flat square class="text-center bg-transparent login-card" :class="$q.dark.isActive ? 'bg-dark  ' : 'bg-transparent ' ">
       <AllLogo v-if="showLoginLogo" />
 
       <q-card-section class="text-left">
         <s-card
           v-if="User.loginMsg === 'error'"
-          class="bg-red text-white"
+          class="bg-red text-white" 
         >
           <q-card-section>
             <div class="text-subtitle2">
