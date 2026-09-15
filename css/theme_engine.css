@@ -1,3 +1,12 @@
+/* SCROLLBAR (q-scroll-area thumb/bar - ver services/app.js) */
+:root {
+  --scrollbar-accent: var(--q-primary);
+}
+
+body.body--dark {
+  --scrollbar-accent: #ffffff;
+}
+
 /* HOVER */
 .insize{
   display: block;

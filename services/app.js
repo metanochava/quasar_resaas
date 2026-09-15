@@ -2,10 +2,17 @@
 
 
 export const apiBaseUrl =  process.env.API_BASE_URL
+
+// --scrollbar-accent: var(--q-primary) por padrão (light), sobreposta
+// para dark mode em css/theme_engine.css (body.body--dark). Como é
+// referenciado via var(), o browser recalcula a cor sozinho quando o
+// Dark plugin do Quasar troca a classe do body - nenhum destes 4
+// componentes (MainLayout/LeftMenu/LeftMenuSegundo/HeaderServices)
+// precisa de reagir a $q.dark.isActive.
 export const thumbStyle = {
   right: '5px',
   borderRadius: '8px',
-  backgroundColor: 'var(--q-primary)',
+  backgroundColor: 'var(--scrollbar-accent)',
   width: '8px',
   opacity: 0.75,
   zIndex: 9999 // 🔥 here
@@ -14,7 +21,7 @@ export const thumbStyle = {
 export const barStyle = {
   right: '2px',
   borderRadius: '14px',
-  backgroundColor: 'var(--q-primary)',
+  backgroundColor: 'var(--scrollbar-accent)',
   width: '14px',
   opacity: 0.2,
   marginTop: '-3px',
