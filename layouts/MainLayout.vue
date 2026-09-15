@@ -100,7 +100,7 @@
     <!-- menu_rtl (LayoutSetting, User > Entity > EntityType) troca o
          lado do menu - ver User.ps.layout.menu_rtl / menuRtl abaixo. -->
     <q-drawer v-model="User.LeftTop" :side="menuRtl ? 'right' : 'left'"  :width="User.ps?.layout?.sidebar_width || 300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
-      <q-bar class="full-height q-pa-0" >.
+      <q-bar class="full-height q-pa-0" >
         <LeftMenu />
       </q-bar>
     </q-drawer>
