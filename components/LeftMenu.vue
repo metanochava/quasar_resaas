@@ -1,6 +1,6 @@
 
 <template>
-  <s-card  square flat :class="$q.dark.isActive ? 'bg-dark  fixed-top   header-fixed' : 'bg-transparent   fixed-top header-fixed' ">
+  <s-card  square flat :class="$q.dark.isActive ? 'bg-transparent  fixed-top   header-fixed' : 'bg-transparent   fixed-top header-fixed' ">
     <q-item 
       class="row items-center justify-between  "
       :class="$q.dark.isActive
@@ -43,7 +43,7 @@
         </s-btn>
       </div>
     </q-item>
-    <div class="q-pa-sm" :class="$q.dark.isActive ? 'bg-dark ' : 'bg-transparent' "  >
+    <div class="q-pa-sm"   >
       <search-menu size="100%" />
     </div>
   </s-card>
