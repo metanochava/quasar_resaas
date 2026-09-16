@@ -73,6 +73,8 @@ onMounted(() => {
   </div>
 
   <div v-else class="flex flex-center q-pa-xs">
+
+  {{ Entidade.row }}
     <DashboardRenderer v-show="Entidade.row?.dashboard?.value=='Auto'" :name="selected" />
     <DashboardComponent v-show="Entidade.row?.dashboard?.value=='Manual'" />
   </div>
