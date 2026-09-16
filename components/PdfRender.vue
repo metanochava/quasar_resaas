@@ -92,6 +92,10 @@ watch(() => props.modelValue, (val) => {
 <style scoped>
 /* optional: smooth scroll */
 iframe {
+  background: #fff;
+}
+
+body.body--dark iframe {
   background: #1e1e1e;
 }
 

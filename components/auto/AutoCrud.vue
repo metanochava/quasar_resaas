@@ -185,10 +185,21 @@ function showPdfBlob(data) {
 async function init() {
   if (!props.app || !props.model) return
 
-  const data = await buildFormFromSchema({
-    app: props.app,
-    model: props.model
-  })
+  let data
+  try {
+    data = await buildFormFromSchema({
+      app: props.app,
+      model: props.model
+    })
+  } catch (e) {
+    // A schema-fetch failure the HTTPAuth interceptor doesn't silently
+    // recover from (see loadData()'s own catch for the same reasoning)
+    // otherwise left this watcher effect thrown and unresolved -
+    // schema.value/fields.value never get set, so the table never even
+    // gets its columns, let alone rows, with no visible sign why.
+    console.error('AutoCrud init error', e)
+    return
+  }
 
   schema.value = data.schema
   fields.value = data.fields
@@ -228,6 +239,21 @@ async function loadData(token = null) {
 
     rows.value = data?.results || data || []
     pagination.value.rowsNumber = data?.count ?? rows.value.length
+  } catch (e) {
+    // Without this, a request that fails for a reason the HTTPAuth
+    // interceptor doesn't silently retry (services/api.js only retries
+    // an expired access token or RESAAS context) left rows/pagination
+    // at whatever they were before - the table renders its columns but
+    // stays permanently empty, with only a transient Alert() toast
+    // (easy to miss) as any indication something went wrong. Reset to
+    // an explicit empty state so it's visibly "no data", not a table
+    // that silently never populated.
+    console.error('AutoCrud loadData error', e)
+
+    if (!token || token === lastToken) {
+      rows.value = []
+      pagination.value.rowsNumber = 0
+    }
   } finally {
     if (!token || token === lastToken) loading.value = false
   }

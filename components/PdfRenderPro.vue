@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="dialog" maximized>
-    <q-card class="bg-grey-10 text-white">
+    <q-card :class="$q.dark.isActive ? 'bg-grey-10 text-white' : 'bg-grey-3 text-dark'">
 
       <!-- TOOLBAR -->
       <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
