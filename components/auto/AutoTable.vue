@@ -319,7 +319,8 @@ function isEditable(name) {
 // 🔥 TOGGLE STATE (NEW)
 function toggleEstado(row) {
   if (!can(permissions.value.change)) return
-  const newValue = row.state.value == 'Active' ? 'Inactive' : 'Active'
+  if (!row.state) return
+  const newValue = row.state.value === 'Active' ? 'Inactive' : 'Active'
 
   emit('inline-patch', {
     id: row.id,
@@ -1805,18 +1806,28 @@ function filteredItems(row, field) {
 
         <!-- STATE -->
 
-        <template v-else-if="props.col.name === 'state'">
+        <!--
+          The schema lists 'state' whenever the MODEL has that field,
+          but a serializer can legitimately leave it out of its own
+          Meta.fields (e.g. UserSerializer - state is neither read nor
+          writable there) - props.row.state is then undefined even
+          though this column exists, and toggleEstado()'s PATCH would
+          be a silent no-op anyway since the serializer ignores it.
+          Fall back to a plain, non-interactive label instead of a
+          toggle button that can't actually do anything.
+        -->
+        <template v-else-if="props.col.name === 'state' && props.row.state">
 
           <s-btn
             dense
             size="sm"
             :color="
-              props.row.state.value == 'Active'
+              props.row.state?.value === 'Active'
                 ? 'positive'
                 : 'negative'
             "
             :label="
-              props.row.state.value == 'Active'
+              props.row.state?.value === 'Active'
                 ? tdc('Active')
                 : tdc('Inactive')
             "
@@ -1826,7 +1837,7 @@ function filteredItems(row, field) {
             <s-tooltip>
               {{
                 tdc(
-                  props.row.state.value == 'Active'
+                  props.row.state?.value === 'Active'
                     ? 'Deactivate'
                     : 'Activate'
                 )
@@ -1835,6 +1846,10 @@ function filteredItems(row, field) {
 
           </s-btn>
 
+        </template>
+
+        <template v-else-if="props.col.name === 'state'">
+          <span class="text-grey-6">—</span>
         </template>
 
 
