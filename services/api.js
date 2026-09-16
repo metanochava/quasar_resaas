@@ -11,6 +11,20 @@ import { safeParse } from '../utils/json'
 const apiPrefix = process.env.API_PREFIX
 const apiBaseUrl = `${process.env.API}/${apiPrefix}`
 
+// Shared across every client instance (module-level, not per-
+// createClient()) so concurrent 401s from HTTPAuth AND HTTPAuthBlob
+// during the same expiry reuse one in-flight refresh instead of each
+// firing their own refresh_token/ call.
+let refreshPromise = null
+
+function refreshAccessToken() {
+  if (!refreshPromise) {
+    refreshPromise = useUserStore().refreshToken()
+      .finally(() => { refreshPromise = null })
+  }
+  return refreshPromise
+}
+
 export const url = (payload = { type: 'u', url: '', params: {} }) => {
   const entityType = useUserStore()?.EntityType?.name?.toLowerCase()
   let finalUrl = apiBaseUrl
@@ -93,11 +107,48 @@ const createClient = (auth = false, blob = false) => {
       Alert(response)
       return response
     },
-    error => {
+    async error => {
       useLoadStore().dec()
+
+      const status = error?.response?.status
+      const originalRequest = error?.config
+
+      // Silent refresh-and-retry: an expired ACCESS token is routine
+      // (short TTL, expected mid-session) and the REFRESH token is
+      // valid for a day - retry once with a fresh access token
+      // instead of forcing the user to log back in on every access-
+      // token expiry. Skip it for the refresh_token/ call itself
+      // (its own 401 means the refresh token is genuinely dead, not
+      // something another refresh could fix) and only ever retry a
+      // given request once.
+      if (
+        auth && status === 401 && originalRequest &&
+        !originalRequest._retried &&
+        !String(originalRequest.url || '').includes('refresh_token/')
+      ) {
+        const User = useUserStore()
+        const refreshToken = User.refresh || getStorage('l', 'refresh')
+
+        if (!User.isTokenExpired(refreshToken)) {
+          User.refresh = refreshToken
+          originalRequest._retried = true
+
+          try {
+            await refreshAccessToken()
+            originalRequest.headers = {
+              ...originalRequest.headers,
+              Authorization: `Bearer ${User.access}`
+            }
+            return instance(originalRequest)
+          } catch (refreshError) {
+            // refresh token itself was rejected - fall through to Alert/logout below
+          }
+        }
+      }
+
       Alert(error?.response)
 
-      if (error?.response?.status === 401)
+      if (status === 401)
         useUserStore().logout('N')
 
       return Promise.reject(error)
