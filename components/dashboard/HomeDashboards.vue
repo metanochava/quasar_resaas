@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue'
 
 import { useUserStore } from '../../stores/UserStore'
 import { useEntityTypeStore } from '../../stores/EntityTypeStore'
+import { useEntityStore } from '../../stores/EntityStore'
 import { useDashboardStore } from '../../stores/DashboardStore'
 import DashboardRenderer from './DashboardRenderer.vue'
 import DashboardComponent from '../DashboardComponent.vue'
@@ -22,6 +23,7 @@ import DashboardComponent from '../DashboardComponent.vue'
 // contexto (marca da página de login antes de autenticar).
 const User = useUserStore()
 const TipoEntidade = useEntityTypeStore()
+const Entidade = useEntityStore()
 const Dashboard = useDashboardStore()
 
 const entityTypeName = computed(() => {
@@ -71,8 +73,8 @@ onMounted(() => {
   </div>
 
   <div v-else class="flex flex-center q-pa-xs">
-    <DashboardRenderer v-show="TipoEntidade.row?.dashboard?.value=='Auto'" :name="selected" />
-    <DashboardComponent v-show="TipoEntidade.row?.dashboard?.value=='Manual'" />
+    <DashboardRenderer v-show="Entidade.row?.dashboard?.value=='Auto'" :name="selected" />
+    <DashboardComponent v-show="Entidade.row?.dashboard?.value=='Manual'" />
   </div>
   
 </template>
