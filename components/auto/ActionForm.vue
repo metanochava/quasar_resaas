@@ -101,14 +101,15 @@
 
     </div>
 
+    <s-confirm-delete
+      v-model="showConfirmDelete"
+      type="delete"
+      :row="store?.form"
+      @confirm="deleteRecord"
+    />
+
   </s-card>
 
-  <s-confirm-delete
-    v-model="showConfirmDelete"
-    type="delete"
-    :row="store?.form"
-    @confirm="deleteRecord"
-  />
 
 </template>
 

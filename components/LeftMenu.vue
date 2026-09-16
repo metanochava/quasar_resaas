@@ -14,10 +14,25 @@
         <s-btn
           flat
           round
+          v-show="!User.ps?.layout?.menu_rtl "
           dense
           icon="home"
           @click="$router.push({ name: 'home' })"
         />
+
+        <s-btn
+          round
+          dense
+          v-show="User.ps?.layout?.menu_rtl "
+          flat
+          :icon="User.ps?.layout?.menu_rtl ? 'format_textdirection_r_to_l' : 'format_textdirection_l_to_r'"
+          class="text-white"
+          @click="User.toggleMenuRtl()"
+        >
+          <s-tooltip>
+            {{ tdc('Toggle menu side') }}
+          </s-tooltip>
+        </s-btn>
 
       </div>
 
@@ -30,9 +45,19 @@
       <div class="row items-center">
 
         <s-btn
+          flat
+          round
+          dense
+          v-show="User.ps?.layout?.menu_rtl "
+          icon="home"
+          @click="$router.push({ name: 'home' })"
+        />
+
+        <s-btn
           round
           dense
           flat
+          v-show="!User.ps?.layout?.menu_rtl "
           :icon="User.ps?.layout?.menu_rtl ? 'format_textdirection_r_to_l' : 'format_textdirection_l_to_r'"
           class="text-white"
           @click="User.toggleMenuRtl()"
