@@ -69,6 +69,10 @@ onMounted(() => {
   <div v-if="Dashboard.dashboardsLoading" class="flex flex-center q-pa-xl">
     <q-spinner color="primary" size="48px" />
   </div>
-  <DashboardRenderer v-else-if="selected" :name="selected" />
-  <DashboardComponent v-else />
+
+  <div v-else class="flex flex-center q-pa-xs">
+    <DashboardRenderer v-show="TipoEntidade.row?.dashboard=='Auto'" :name="selected" />
+    <DashboardComponent v-show="TipoEntidade.row?.dashboard=='Manual'" />
+  </div>
+  
 </template>
