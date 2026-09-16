@@ -56,7 +56,18 @@ watch(dashboardName, load)
 // Group.select() changes User.Group without navigating away from
 // here, so the config/widgets already shown must be reloaded too, not
 // just re-fetched from scratch on a fresh mount.
-watch(() => User.Group?.id, load)
+//
+// Watching User.Group?.id directly fires too early: Group.select() ->
+// User.selectContext() sets User.Group synchronously FIRST, then only
+// afterwards awaits refreshResaasContext() -> createResaasContext(),
+// which POSTs resaas/context/ and only once THAT resolves calls
+// setResaasContext() (services/tenantContext.js) to write the new
+// signed token services/api.js's request interceptor actually reads
+// (X-RESAAS-Context header) for every subsequent request. Firing load()
+// on the Group?.id change would send its requests with the OLD
+// context - watch User.ResaasContext (the token itself) instead, so
+// load() only runs once the new context is the one actually sent.
+watch(() => User.ResaasContext, load)
 
 onMounted(load)
 onUnmounted(() => Dashboard.reset())

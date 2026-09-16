@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted } from 'vue'
 
 import { useUserStore } from '../../stores/UserStore'
 import { useEntityTypeStore } from '../../stores/EntityTypeStore'
@@ -55,18 +55,14 @@ onMounted(() => {
   Dashboard.loadDashboardList()
 })
 
-// DashboardListAPIView filters by DashboardPermissionService against the
-// CURRENT effective Group's permissions (see its own docstring) -
-// switching profile via GroupSelector.vue's Group.select() changes
-// User.Group without any navigation/remount, so which dashboards are
-// even authorized (and therefore `selected` below) must be re-fetched
-// on that change too, not just on mount.
-watch(
-  () => User.Group?.id,
-  () => {
-    Dashboard.loadDashboardList()
-  }
-)
+// Switching profile via GroupSelector.vue's Group.select() only changes
+// User.Group's permissions, never User.Entity/entity_type - so
+// `selected` (which dashboard MODULE applies) never changes on that
+// switch, only what's authorized WITHIN it. Re-fetching the list here
+// would call django_resaas/dashboards/ (no module) on every profile
+// switch for no reason - DashboardRenderer.vue's own watch on
+// User.Group already reloads the actual per-module endpoint
+// (django_resaas/dashboard/<modulo>/) that matters.
 </script>
 
 <template>
