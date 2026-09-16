@@ -25,6 +25,21 @@ function refreshAccessToken() {
   return refreshPromise
 }
 
+// Same dedup pattern as refreshAccessToken() above, for the SEPARATE
+// RESAAS-context token (X-RESAAS-Context - its own TTL, shorter-lived
+// than the refresh token but independent of the access-token expiry
+// handled above; see saas/core/tenant/context.py's
+// ResaasContextService.get_ttl(), default 1h).
+let contextRefreshPromise = null
+
+function refreshResaasContext() {
+  if (!contextRefreshPromise) {
+    contextRefreshPromise = useUserStore().refreshResaasContext()
+      .finally(() => { contextRefreshPromise = null })
+  }
+  return contextRefreshPromise
+}
+
 export const url = (payload = { type: 'u', url: '', params: {} }) => {
   const entityType = useUserStore()?.EntityType?.name?.toLowerCase()
   let finalUrl = apiBaseUrl
@@ -143,6 +158,32 @@ const createClient = (auth = false, blob = false) => {
           } catch (refreshError) {
             // refresh token itself was rejected - fall through to Alert/logout below
           }
+        }
+      }
+
+      // Same silent refresh-and-retry idea, for the RESAAS-context
+      // token instead of the JWT access token: ResaasContextService.
+      // decode() raises PermissionDenied("RESAAS context has
+      // expired.") -> 403 once its own (shorter) TTL passes, even
+      // while the access/refresh tokens are still perfectly valid.
+      // Re-issue it from the entity/branch/group already held in
+      // UserStore and retry once, silently.
+      if (
+        auth && status === 403 && originalRequest &&
+        !originalRequest._retriedContext &&
+        error?.response?.data?.detail === 'RESAAS context has expired.'
+      ) {
+        originalRequest._retriedContext = true
+
+        try {
+          await refreshResaasContext()
+
+          if (useUserStore().ResaasContext) {
+            return instance(originalRequest)
+          }
+        } catch (contextRefreshError) {
+          // no Entity to rebuild the context from, or the re-issue
+          // request itself failed - fall through to Alert below
         }
       }
 

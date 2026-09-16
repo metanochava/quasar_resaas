@@ -8,10 +8,14 @@ process.env.API_PREFIX = 'v1'
 vi.mock('../boot/alerts', () => ({ Alert: () => {} }))
 vi.mock('./storage', () => ({ getStorage: () => null }))
 
-const userState = { access: 'old-access', refresh: 'valid-refresh' }
+const userState = { access: 'old-access', refresh: 'valid-refresh', ResaasContext: 'old-context' }
 const refreshToken = vi.fn(async () => {
   userState.access = 'new-access'
   return { data: { access: 'new-access' } }
+})
+const refreshResaasContext = vi.fn(async () => {
+  userState.ResaasContext = 'new-context'
+  return { token: 'new-context' }
 })
 const logout = vi.fn()
 
@@ -21,8 +25,11 @@ vi.mock('../stores/UserStore', () => ({
     set access(v) { userState.access = v },
     get refresh() { return userState.refresh },
     set refresh(v) { userState.refresh = v },
+    get ResaasContext() { return userState.ResaasContext },
+    set ResaasContext(v) { userState.ResaasContext = v },
     isTokenExpired: (token) => token === 'expired-refresh' || !token,
     refreshToken,
+    refreshResaasContext,
     logout,
   }),
 }))
@@ -63,7 +70,9 @@ beforeEach(async () => {
   created.length = 0
   userState.access = 'old-access'
   userState.refresh = 'valid-refresh'
+  userState.ResaasContext = 'old-context'
   refreshToken.mockClear()
+  refreshResaasContext.mockClear()
   logout.mockClear()
 
   await import('./api')
@@ -74,6 +83,13 @@ beforeEach(async () => {
 function fake401(url = 'demo/products/') {
   return {
     response: { status: 401, data: { detail: 'Given token not valid for any token type' } },
+    config: { url, headers: {} },
+  }
+}
+
+function fake403ContextExpired(url = 'demo/products/') {
+  return {
+    response: { status: 403, data: { detail: 'RESAAS context has expired.' } },
     config: { url, headers: {} },
   }
 }
@@ -122,5 +138,54 @@ describe('HTTPAuth 401 handling', () => {
 
     expect(refreshToken).toHaveBeenCalledTimes(1)
     expect(logout).toHaveBeenCalledWith('N')
+  })
+})
+
+describe('HTTPAuth "RESAAS context has expired." handling', () => {
+  it('silently re-issues the context and retries once', async () => {
+    const result = await HTTPAuthEntry.rejected(fake403ContextExpired())
+
+    expect(refreshResaasContext).toHaveBeenCalledTimes(1)
+    expect(logout).not.toHaveBeenCalled()
+    expect(HTTPAuthEntry.instance).toHaveBeenCalledTimes(1)
+    expect(result).toEqual({ data: 'retried-ok' })
+  })
+
+  it('never retries the same request twice', async () => {
+    const error = fake403ContextExpired()
+    error.config._retriedContext = true
+
+    await expect(HTTPAuthEntry.rejected(error)).rejects.toBeTruthy()
+
+    expect(refreshResaasContext).not.toHaveBeenCalled()
+  })
+
+  it('does not retry a 403 with a different detail message', async () => {
+    const error = { response: { status: 403, data: { detail: 'Something else' } }, config: { url: 'x/', headers: {} } }
+
+    await expect(HTTPAuthEntry.rejected(error)).rejects.toBeTruthy()
+
+    expect(refreshResaasContext).not.toHaveBeenCalled()
+  })
+
+  it('does not retry when refreshResaasContext() cannot rebuild a context (no Entity)', async () => {
+    refreshResaasContext.mockImplementationOnce(async () => {
+      userState.ResaasContext = null
+      return null
+    })
+
+    await expect(HTTPAuthEntry.rejected(fake403ContextExpired())).rejects.toBeTruthy()
+
+    expect(refreshResaasContext).toHaveBeenCalledTimes(1)
+    expect(HTTPAuthEntry.instance).not.toHaveBeenCalled()
+  })
+
+  it('does not retry when refreshResaasContext() itself rejects', async () => {
+    refreshResaasContext.mockRejectedValueOnce(new Error('context refresh failed'))
+
+    await expect(HTTPAuthEntry.rejected(fake403ContextExpired())).rejects.toBeTruthy()
+
+    expect(refreshResaasContext).toHaveBeenCalledTimes(1)
+    expect(HTTPAuthEntry.instance).not.toHaveBeenCalled()
   })
 })
