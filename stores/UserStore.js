@@ -360,7 +360,7 @@ export const useUserStore = createBaseStore(
 
     async refreshToken() {
       const data = {refresh: this.refresh }
-      const rsp = await HTTPAuth.post(url({type: "u", url: "refresh_token/", params: {}}), data )
+      const rsp = await HTTPClient.post(url({type: "u", url: "refresh_token/", params: {}}), data )
       this.access = rsp.data.access
       setStorage('l', 'access', this.access,  365)
       return rsp

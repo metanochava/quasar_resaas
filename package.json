@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.1265",
+  "version": "0.0.1266",
   "description": "Quasar rest SaaS",
   "keywords": [
     "quasar",

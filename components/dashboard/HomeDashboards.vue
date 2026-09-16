@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 
 import { useUserStore } from '../../stores/UserStore'
 import { useEntityTypeStore } from '../../stores/EntityTypeStore'
@@ -54,6 +54,19 @@ const selected = computed(() => {
 onMounted(() => {
   Dashboard.loadDashboardList()
 })
+
+// DashboardListAPIView filters by DashboardPermissionService against the
+// CURRENT effective Group's permissions (see its own docstring) -
+// switching profile via GroupSelector.vue's Group.select() changes
+// User.Group without any navigation/remount, so which dashboards are
+// even authorized (and therefore `selected` below) must be re-fetched
+// on that change too, not just on mount.
+watch(
+  () => User.Group?.id,
+  () => {
+    Dashboard.loadDashboardList()
+  }
+)
 </script>
 
 <template>

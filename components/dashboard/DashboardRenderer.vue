@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { tdc } from '../../services/translation'
 import { useDashboardStore } from '../../stores/DashboardStore'
+import { useUserStore } from '../../stores/UserStore'
 import DashboardHeader from './DashboardHeader.vue'
 import DashboardFilters from './DashboardFilters.vue'
 import WidgetContainer from './WidgetContainer.vue'
@@ -17,6 +18,7 @@ const props = defineProps({
 
 const route = useRoute()
 const Dashboard = useDashboardStore()
+const User = useUserStore()
 
 const dashboardName = computed(() =>
   props.name || route.params.dashboardName || route.meta?.dashboardName
@@ -47,6 +49,14 @@ async function load() {
 }
 
 watch(dashboardName, load)
+
+// DashboardDetailAPIView/widget endpoints filter by
+// DashboardPermissionService against the CURRENT effective Group's
+// permissions - switching profile via GroupSelector.vue's
+// Group.select() changes User.Group without navigating away from
+// here, so the config/widgets already shown must be reloaded too, not
+// just re-fetched from scratch on a fresh mount.
+watch(() => User.Group?.id, load)
 
 onMounted(load)
 onUnmounted(() => Dashboard.reset())
