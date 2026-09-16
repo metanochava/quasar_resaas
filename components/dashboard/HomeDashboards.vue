@@ -70,7 +70,7 @@ onMounted(() => {
 <template>
     
   <div v-if="Dashboard.dashboardsLoading" class="flex flex-center q-pa-xl">
-    <q-spinner color="primary" size="48px" />
+    <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px"  />
   </div>
 
   <div v-else class="flex flex-center q-pa-xs">
