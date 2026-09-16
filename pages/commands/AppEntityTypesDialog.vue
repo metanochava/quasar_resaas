@@ -121,7 +121,7 @@ watch(() => [props.modelValue, props.appId], ([open]) => {
 
       <q-card-section class="et-dialog-body">
         <div v-if="loading" class="flex flex-center q-pa-xl">
-          <q-spinner size="36px" color="primary" />
+          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
         </div>
 
         <q-list v-else-if="linked.length" separator bordered>

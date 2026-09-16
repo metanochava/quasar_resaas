@@ -119,7 +119,7 @@ function apply() {
       <q-separator />
 
       <q-card-section v-if="!fields.length" class="flex flex-center">
-        <q-spinner />
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </q-card-section>
 
       <q-card-section v-else-if="!filterEnabled" class="text-center text-grey">

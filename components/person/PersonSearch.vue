@@ -56,10 +56,7 @@
           v-if="Person.loading"
           class="flex flex-center q-pa-lg"
         >
-          <q-spinner
-            color="primary"
-            size="35px"
-          />
+          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
         </div>
 
         <!-- RESULTS -->

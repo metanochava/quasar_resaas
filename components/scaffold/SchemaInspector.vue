@@ -34,7 +34,7 @@ const routes = computed(() => {
 
     <div class="col scroll q-pa-sm">
       <div v-if="loading" class="flex flex-center q-pa-lg">
-        <q-spinner size="28px" color="primary" />
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </div>
 
       <div v-else-if="!schema" class="text-caption text-grey q-pa-md">

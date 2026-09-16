@@ -16,7 +16,7 @@
 
       <q-card-section class="modal-body">
         <div v-if="!ready" class="flex flex-center q-pa-lg">
-          <q-spinner size="40px" color="primary" />
+          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
         </div>
 
         <PermissionManager
@@ -105,7 +105,7 @@
         v-if="EntityType.loadingGroups"
         class="flex flex-center q-pa-xl"
       >
-        <q-spinner color="primary" size="42px" />
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </div>
 
       <q-list v-else separator>

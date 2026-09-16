@@ -114,7 +114,7 @@ function onSaved() {
           v-if="!store?.fields?.length"
           class="flex flex-center q-pa-lg"
         >
-          <q-spinner size="30px" color="primary" />
+          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
         </div>
 
         <div v-else>

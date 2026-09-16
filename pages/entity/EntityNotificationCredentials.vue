@@ -36,7 +36,7 @@
       class="col scroll q-pa-md"
     >
       <div v-if="loading" class="flex flex-center q-pa-lg">
-        <q-spinner size="40px" color="primary" />
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </div>
 
       <q-list v-else bordered separator>

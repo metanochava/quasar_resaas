@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-sm">
     <div v-if="Application.loading" class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
+      <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
     <!-- status/employee are read_only (workflow-controlled - see
     RecruitmentPipelinePage.vue) so FormTwo only ever shows job_opening/

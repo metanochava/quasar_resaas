@@ -162,7 +162,7 @@ async function save() {
 
       <!-- BODY -->
       <q-card-section v-if="!schema.length">
-        <q-spinner />
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </q-card-section>
 
       <q-card-section v-else class="row q-col-gutter-sm">

@@ -76,7 +76,7 @@ onUnmounted(() => Dashboard.reset())
 <template>
   <q-page class="q-pa-sm">
     <div v-if="Dashboard.dashboardLoading" class="flex flex-center q-pa-xl">
-      <q-spinner color="primary" size="48px" />
+      <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
 
     <div v-else-if="Dashboard.dashboardError" class="column flex-center q-pa-xl text-negative">

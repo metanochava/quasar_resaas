@@ -31,7 +31,7 @@
     </div>
 
     <div v-else-if="Application.loadingPipeline" class="flex flex-center q-pa-xl">
-      <q-spinner color="primary" size="42px" />
+      <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
 
     <div v-else class="row q-col-gutter-sm pipeline-board">

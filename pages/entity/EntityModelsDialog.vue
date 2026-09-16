@@ -152,7 +152,7 @@ watch(() => [props.entityId, props.entityTypeId], load, { immediate: true })
     <q-card-section class="col scroll">
 
       <div v-if="loading" class="flex flex-center q-pa-xl">
-        <q-spinner size="40px" />
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </div>
 
       <q-list v-else separator>

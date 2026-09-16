@@ -32,7 +32,7 @@
     />
 
     <div v-if="loading" class="flex flex-center q-pa-lg">
-      <q-spinner size="32px" color="primary" />
+      <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
 
     <q-list v-else-if="branches.length" separator>

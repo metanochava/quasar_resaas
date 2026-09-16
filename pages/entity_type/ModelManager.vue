@@ -100,7 +100,7 @@ function toggleGroup(models, checked) {
     <q-card-section class="col scroll">
 
       <div v-if="EntityType.models.loadingModels" class="flex flex-center q-pa-xl">
-        <q-spinner size="40px" />
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </div>
 
       <q-list v-else separator>

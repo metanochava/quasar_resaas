@@ -16,7 +16,7 @@
       <q-separator />
 
       <div v-if="TrainingSession.loading" class="flex flex-center q-pa-lg">
-        <q-spinner size="40px" color="primary" />
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </div>
 
       <div v-else-if="!TrainingSession.rows?.length" class="text-grey-6 q-pa-md">
@@ -96,7 +96,7 @@
         <q-separator />
 
         <div v-if="TrainingSession.loadingEnrollments" class="flex flex-center q-pa-lg">
-          <q-spinner size="30px" color="primary" />
+          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
         </div>
 
         <div v-else-if="!TrainingSession.enrollments.length" class="text-grey-6 q-pa-md">

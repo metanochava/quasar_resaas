@@ -13,7 +13,7 @@
 
       <q-card-section>
         <div v-if="Promotion.loading" class="flex flex-center q-pa-lg">
-          <q-spinner size="40px" color="primary" />
+          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
         </div>
 
         <div v-else-if="!Promotion.rows?.length" class="text-grey-6 q-pa-md">

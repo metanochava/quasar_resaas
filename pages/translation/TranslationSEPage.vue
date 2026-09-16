@@ -2,7 +2,7 @@
   <q-page class="q-pa-sm">
     <!-- FORM -->
     <div v-if="Translation.loading" class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
+      <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
     <FormTwo
       v-else
@@ -14,7 +14,7 @@
     />
 
     <div v-if="!ready" class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
+      <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
   </q-page>
 </template>

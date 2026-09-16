@@ -45,7 +45,7 @@
         </div>
 
         <div v-if="loading" class="absolute-full flex flex-center map-loading-overlay">
-          <q-spinner size="48px" color="primary" />
+          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
         </div>
       </div>
     </s-card>

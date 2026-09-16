@@ -3,7 +3,7 @@
 
     <!-- LOADING -->
     <div v-if="loading" class="q-pa-md">
-      <q-spinner size="40px" />
+      <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
 
     <!-- LOGO -->

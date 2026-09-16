@@ -15,7 +15,7 @@
       <q-separator />
 
       <div v-if="LeaveRequest.loadingPending" class="flex flex-center q-pa-xl">
-        <q-spinner color="primary" size="42px" />
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </div>
 
       <div v-else-if="!LeaveRequest.pending.length" class="text-grey-6 q-pa-lg text-center">

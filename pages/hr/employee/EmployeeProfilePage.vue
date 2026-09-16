@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-sm">
     <div v-if="Employee.loading" class="flex flex-center q-pa-lg">
-      <q-spinner size="40px" color="primary" />
+      <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
 
     <template v-else-if="employee">
@@ -148,7 +148,7 @@
           <!-- CONTRACT -->
           <q-tab-panel name="contract">
             <div v-if="Employee.loadingContracts" class="flex flex-center q-pa-lg">
-              <q-spinner size="30px" color="primary" />
+              <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
             </div>
 
             <div v-else-if="!contracts.length" class="text-grey-6 q-pa-md">
@@ -200,7 +200,7 @@
             </div>
 
             <div v-if="Employee.loadingAttendances" class="flex flex-center q-pa-lg">
-              <q-spinner size="30px" color="primary" />
+              <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
             </div>
 
             <div v-else-if="!attendances.length" class="text-grey-6 q-pa-md">
@@ -260,7 +260,7 @@
             </div>
 
             <div v-if="Employee.loadingLeave" class="flex flex-center q-pa-lg">
-              <q-spinner size="30px" color="primary" />
+              <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
             </div>
 
             <div v-else-if="!Employee.leaveRequests.length" class="text-grey-6 q-pa-md">
@@ -307,7 +307,7 @@
           <!-- ONBOARDING -->
           <q-tab-panel name="onboarding">
             <div v-if="Employee.loadingOnboarding" class="flex flex-center q-pa-lg">
-              <q-spinner size="30px" color="primary" />
+              <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
             </div>
 
             <!-- NO ACTIVE/PAST ONBOARDING - offer to start one -->
@@ -407,7 +407,7 @@
           <!-- PERFORMANCE -->
           <q-tab-panel name="performance">
             <div v-if="Employee.loadingPerformance" class="flex flex-center q-pa-lg">
-              <q-spinner size="30px" color="primary" />
+              <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
             </div>
 
             <template v-else>
@@ -497,7 +497,7 @@
           <!-- TRAINING -->
           <q-tab-panel name="training">
             <div v-if="Employee.loadingTraining" class="flex flex-center q-pa-lg">
-              <q-spinner size="30px" color="primary" />
+              <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
             </div>
 
             <template v-else>
@@ -560,7 +560,7 @@
           <!-- PAYROLL -->
           <q-tab-panel name="payroll">
             <div v-if="Employee.loadingPayroll" class="flex flex-center q-pa-lg">
-              <q-spinner size="30px" color="primary" />
+              <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
             </div>
 
             <template v-else>
@@ -622,7 +622,7 @@
           <!-- HISTORY (Fase 9: Employee Lifecycle) -->
           <q-tab-panel name="history">
             <div v-if="Employee.loadingHistory" class="flex flex-center q-pa-lg">
-              <q-spinner size="30px" color="primary" />
+              <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
             </div>
 
             <template v-else>

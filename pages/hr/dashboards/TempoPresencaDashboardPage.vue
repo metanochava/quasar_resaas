@@ -11,7 +11,7 @@
       <q-separator />
 
       <div v-if="loading" class="flex flex-center q-pa-xl">
-        <q-spinner size="40px" color="primary" />
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </div>
 
       <template v-else>
