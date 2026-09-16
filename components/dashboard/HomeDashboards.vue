@@ -68,15 +68,16 @@ onMounted(() => {
 </script>
 
 <template>
+    {{ User.Entidade}}
   <div v-if="Dashboard.dashboardsLoading" class="flex flex-center q-pa-xl">
     <q-spinner color="primary" size="48px" />
   </div>
 
   <div v-else class="flex flex-center q-pa-xs">
 
-  {{ Entidade.row }}
-    <DashboardRenderer v-show="Entidade.row?.dashboard?.value=='Auto'" :name="selected" />
-    <DashboardComponent v-show="Entidade.row?.dashboard?.value=='Manual'" />
+
+    <DashboardRenderer v-show="User.Entidade.row?.dashboard?.value=='Auto'" :name="selected" />
+    <DashboardComponent v-show="User.Entidade.row?.dashboard?.value=='Manual'" />
   </div>
   
 </template>
