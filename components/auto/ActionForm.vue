@@ -28,7 +28,7 @@
           icon="delete"
           :loading="store.saving"
           :label="tdc('Delete')"
-          @click="deleteRecord"
+          @click="showConfirmDelete = true"
         />
 
       </div>
@@ -103,11 +103,18 @@
 
   </s-card>
 
+  <s-confirm-delete
+    v-model="showConfirmDelete"
+    type="delete"
+    :row="store?.form"
+    @confirm="deleteRecord"
+  />
+
 </template>
 
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useUserStore } from '../../stores/UserStore'
@@ -160,6 +167,8 @@ const emit = defineEmits([
 // =============================================
 
 const User = useUserStore()
+
+const showConfirmDelete = ref(false)
 
 
 // =============================================
@@ -214,6 +223,8 @@ const deleteRecord = async () => {
     await props.store.remove()
 
   }
+
+  showConfirmDelete.value = false
 
   emit('delete', obj)
 
