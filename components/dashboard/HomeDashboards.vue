@@ -45,8 +45,14 @@ const selected = computed(() => {
   return exists ? entityTypeName.value : null
 })
 
+// Always reload on mount - this only ever mounts on the 'home' route
+// (<s-dashboard-home/> in IndexPage.vue), and the previous
+// !Dashboard.dashboards.length guard meant the list (and by extension
+// which dashboard - engine vs legacy registry - gets selected below)
+// was only ever fetched once per SPA session, going stale on every
+// subsequent visit to home after leaving and coming back.
 onMounted(() => {
-  if (!Dashboard.dashboards.length) Dashboard.loadDashboardList()
+  Dashboard.loadDashboardList()
 })
 </script>
 

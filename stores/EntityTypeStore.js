@@ -99,7 +99,12 @@ export const useEntityTypeStore = createBaseStore(
           const [all, selected] = await Promise.all([
             HTTPClient.get(url({
               type: 'u',
-              url: 'django_resaas/apps/'
+              // This picker needs every app to render its checkboxes,
+              // not one page at a time - page_size=0 (ResaasPagination)
+              // opts out of the pagination now in place on
+              // django_resaas/apps/ (AppAPIView).
+              url: 'django_resaas/apps/',
+              params: { page_size: 0 }
             })),
             HTTPClient.get(url({
               type: 'u',
@@ -107,7 +112,7 @@ export const useEntityTypeStore = createBaseStore(
             }))
           ])
 
-          this.apps = all.data || []
+          this.apps = all.data?.results || []
           this.selectedApps = selected.data || []
 
         } finally {
@@ -232,7 +237,10 @@ export const useEntityTypeStore = createBaseStore(
           const [all, selected] = await Promise.all([
             HTTPClient.get(url({
               type: 'u',
-              url: 'auth/groups/'
+              // Same as loadApps() above - this picker needs every
+              // group, page_size=0 opts out of GroupAPIView's pagination.
+              url: 'auth/groups/',
+              params: { page_size: 0 }
             })),
             HTTPClient.get(url({
               type: 'u',
@@ -240,7 +248,7 @@ export const useEntityTypeStore = createBaseStore(
             }))
           ])
 
-          this.groups = (all.data || []).sort((a, b) =>
+          this.groups = (all.data?.results || []).sort((a, b) =>
             String(a.name || '').localeCompare(String(b.name || ''))
           )
 

@@ -7,6 +7,8 @@ import { employeeRoutes } from '../pages/hr/employee/employeeRoute'
 import { groupRoutes } from '../pages/group/groupRoute'
 import { branchRoutes } from '../pages/branch/branchRoute'
 import { permissionRoutes } from '../pages/permission/permissionRoute'
+import { fileRoutes } from '../pages/file/fileRoute'
+import { translationRoutes } from '../pages/translation/translationRoute'
 import { departmentRoutes } from '../pages/hr/department/departmentRoute'
 import { job_positionRoutes } from '../pages/hr/job_position/job_positionRoute'
 import { job_gradeRoutes } from '../pages/hr/job_grade/job_gradeRoute'
@@ -78,16 +80,35 @@ export let restRoutes = [
         requiredRole: 'view_crud'
       } 
     },
-  { 
-    path: '/add_app', 
-    name: 'add_app', 
-    component: () => import('../pages/commands/AppCreatePage.vue'), 
-    meta: { 
+  {
+    // App.RESAAS.routes (django_resaas.saas.models.app.App) declares
+    // list_app/view_app/change_app/add_app - AppCreatePage.vue's
+    // "Modules" workspace already IS the full list+manage experience
+    // (cards for every module, activate/deactivate, models, entity
+    // types, delete), so all four names point at the same page instead
+    // of duplicating it behind a second, plain generic AutoCrud list -
+    // creating/editing an App has real side effects (folder scaffolding,
+    // protected-name checks) a generic form would bypass.
+    path: '/list_app',
+    name: 'list_app',
+    component: () => import('../pages/commands/AppCreatePage.vue'),
+    meta: {
+      title: tdc('View of') + ' ' + tdc('App'),
+      requiresAuth: true,
+      icon: 'inventory_2',
+      requiredRole: 'list_app'
+    }
+  },
+  {
+    path: '/add_app',
+    name: 'add_app',
+    component: () => import('../pages/commands/AppCreatePage.vue'),
+    meta: {
       title: tdc('Add') + ' ' + tdc('App'),
-      requiresAuth: true, 
+      requiresAuth: true,
       icon: 'inventory_2',
       requiredRole: 'add_app'
-    } 
+    }
   },
   {
     path: '/view_hr_dashboard',
@@ -246,6 +267,8 @@ export let restRoutes = [
   ...branchRoutes,
   ...userRoutes,
   ...permissionRoutes,
+  ...fileRoutes,
+  ...translationRoutes,
   ...employeeRoutes,
   ...departmentRoutes,
   ...job_positionRoutes,

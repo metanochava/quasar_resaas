@@ -89,12 +89,15 @@ async function init() {
     const id = route.params.id
     await load(id)
 
-    // 🔥 FIRST: fetch permissions
+    // 🔥 FIRST: fetch permissions - PermissionManager needs the full
+    // list to render its checkbox tree, not one page at a time -
+    // page_size=0 (ResaasPagination) opts out of the pagination now in
+    // place on auth/permissions/ (PermissionAPIView).
     const { data: all } = await HTTPAuth.get(
-      url({ type: 'u', url: 'auth/permissions/' })
+      url({ type: 'u', url: 'auth/permissions/', params: { page_size: 0 } })
     )
 
-    permissions.value = all || []
+    permissions.value = all?.results || []
 
     // 🔥 ONLY THEN release the UI
     ready.value = true

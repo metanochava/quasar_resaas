@@ -290,10 +290,13 @@ async function loadApps () {
 
 async function loadAppRegistry () {
   try {
-    const { data } = await HTTPAuth.get(url({ type: 'u', url: 'django_resaas/apps/', params: {} }))
+    // This page needs the full registry to build its name -> id/state
+    // maps, not one page at a time - page_size=0 (ResaasPagination)
+    // opts out of the pagination now in place on django_resaas/apps/.
+    const { data } = await HTTPAuth.get(url({ type: 'u', url: 'django_resaas/apps/', params: { page_size: 0 } }))
     const idMap = {}
     const stateMap = {}
-    for (const row of data || []) {
+    for (const row of data?.results || []) {
       const key = (row.name || '').toLowerCase()
       idMap[key] = row.id
       // BaseSerializer represents a choice field as {id,value,label}
