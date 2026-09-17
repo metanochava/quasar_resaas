@@ -46,6 +46,8 @@
               : 'bg-primary text-white'
           "
 
+          :header-style="isMini ? { padding: '0', justifyContent: 'center' } : {}"
+
           :expand-icon-class="isMini ? 'mini-expand-icon' : 'text-white'"
 
           expand-icon="chevron_right"

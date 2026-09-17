@@ -68,7 +68,7 @@
         </s-btn>
       </div>
     </q-item>
-    <div class="q-pa-sm"   >
+    <div v-if="!isSidebarMini" class="q-pa-sm">
       <search-menu size="100%" />
     </div>
   </s-card>
