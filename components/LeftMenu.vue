@@ -74,7 +74,7 @@
   </s-card>
 
 
-    <LeftMenuSegundo style="margin-left:-2px;" />
+    <LeftMenuSegundo style="margin-left:-0px;" />
 
 
   <s-btn
@@ -82,7 +82,7 @@
      style="margin-left:-1px;"
     class="footer-fixed text-white full-widht" :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'"
     flat
-    :icon="isSidebarMini ?  User.ps?.layout?.menu_rtl ?  'chevron_right' : 'chevron_left' : User.ps?.layout?.menu_rtl ?  'chevron_left' : 'chevron_right'"
+    :icon="isSidebarMini ?  User.ps?.layout?.menu_rtl ?   'chevron_left' : 'chevron_right' : User.ps?.layout?.menu_rtl ? 'chevron_right' : 'chevron_left' "
     @click="User.toggleSidebarMini()"
   >
     <s-tooltip>
