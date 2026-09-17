@@ -6,7 +6,7 @@
       width: sidebarWidth + 'px',
       marginTop: '94px',
       marginLeft: '-2px',
-      height: 'calc(100vh - 205px)'
+      height: 'calc(100vh - 255px)'
     }"
   >
 
@@ -14,7 +14,7 @@
       :thumb-style="thumbStyle"
       :bar-style="barStyle"
       style="
-        height: calc(100vh - 205px);
+        height: calc(100vh - 255px);
         width: 100%;
       "
     >
@@ -125,8 +125,8 @@ export default defineComponent({
 
     sidebarWidth () {
       return this.isMini
-        ? (this.User.ps?.layout?.sidebar?.mini_width || 70)
-        : (this.User.ps?.layout?.sidebar?.width || 300)
+        ? (80)
+        : ( 320)
     }
   },
   watch: {
