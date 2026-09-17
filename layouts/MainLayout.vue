@@ -116,7 +116,6 @@
       :mini="!!User.ps?.layout?.sidebar?.mini"
       :mini-width="User.ps?.layout?.sidebar?.mini_width || 70"
       :class="[
-        'q-pa-none',
         $q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary'
       ]"
     >
