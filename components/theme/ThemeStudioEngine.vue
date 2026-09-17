@@ -337,7 +337,6 @@
                     icon="view_sidebar"
                     :title="tdc('Sidebar')"
                     :items="[
-                      { label: tdc('Position'), value: selectedLayout.sidebar_position || selectedLayout.sidebar?.position },
                       { label: tdc('Width'), value: selectedLayout.sidebar_width || selectedLayout.sidebar?.width },
                       { label: tdc('Mini'), value: boolLabel(selectedLayout.sidebar_mini ?? selectedLayout.sidebar?.mini) },
                     ]"

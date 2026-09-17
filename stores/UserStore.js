@@ -321,6 +321,20 @@ export const useUserStore = createBaseStore(
       return rsp
     },
 
+    // Same mechanism as toggleMenuRtl() above, for sidebar_mini instead
+    // (UserAPIView.toggle_sidebar_mini, shares the exact same
+    // _toggle_personal_layout_field() helper server-side).
+    async toggleSidebarMini() {
+      const rsp = await HTTPAuth.post(
+        url({ type: 'u', url: 'django_resaas/users/toggle_sidebar_mini/', params: {} })
+      )
+
+      this.data = { ...this.data, ...rsp.data }
+      setStorage('l', 'user', JSON.stringify(this.data))
+
+      return rsp
+    },
+
     toggleThemeStudio(){
       this.ThemeStudio = !this.ThemeStudio
     },

@@ -75,6 +75,26 @@
 
   <LeftMenuSegundo  style="margin-top:95px" />
 
+  <!-- 🔥 SIDEBAR MINI TOGGLE - fixed at the bottom of the drawer, same
+       reasoning as .header-fixed above but pinned to the bottom instead,
+       so it stays put while LeftMenuSegundo's own nav list scrolls. -->
+  <s-card square flat class="footer-fixed" :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'">
+    <q-item class="row items-center justify-center">
+      <s-btn
+        flat
+        round
+        dense
+        :icon="isSidebarMini ? 'chevron_right' : 'chevron_left'"
+        class="text-white"
+        @click="User.toggleSidebarMini()"
+      >
+        <s-tooltip>
+          {{ tdc(isSidebarMini ? 'Expand sidebar' : 'Collapse sidebar') }}
+        </s-tooltip>
+      </s-btn>
+    </q-item>
+  </s-card>
+
 </template>
 <script >
 
@@ -116,6 +136,9 @@ export default defineComponent({
   created () {
   },
   computed: {
+    isSidebarMini () {
+      return !!this.User.ps?.layout?.sidebar?.mini
+    }
   },
 
   mounted () {
@@ -136,6 +159,13 @@ export default defineComponent({
 .header-fixed {
   position: fixed;
   top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+.footer-fixed {
+  position: fixed;
+  bottom: 0;
   left: 0;
   width: 100%;
   z-index: 1000;
