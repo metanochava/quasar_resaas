@@ -98,15 +98,32 @@
 
     <!-- -------------------- LEFT DRAWER -------------------- -->
     <!-- menu_rtl (LayoutSetting, User > Entity > EntityType) troca o
-         lado do menu - ver User.ps.layout.menu_rtl / menuRtl abaixo. -->
-    <q-drawer v-model="User.LeftTop" :side="menuRtl ? 'right' : 'left'"  :width="User.ps?.layout?.sidebar_width || 300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
+         lado do menu - ver User.ps.layout.menu_rtl / menuRtl abaixo.
+         sidebar_mini/sidebar_mini_width (LayoutSetting.to_dict()'s
+         nested "sidebar" object, saas/models/layout_setting.py) drive
+         QDrawer's own native mini-drawer mode (icon-only rail) - a
+         tenant-wide layout choice, same category as menu_rtl/
+         header_position/content_width, not a personal runtime toggle
+         (no toggle_sidebar_mini action exists server-side, unlike
+         toggle_menu_rtl). LeftMenuSegundo.vue reads the same
+         User.ps.layout.sidebar to match its own width and hide labels
+         when mini, since QDrawer's mini mode only resizes the drawer
+         itself, not arbitrary content inside it. -->
+    <q-drawer
+      v-model="User.LeftTop"
+      :side="menuRtl ? 'right' : 'left'"
+      :width="User.ps?.layout?.sidebar?.width || 300"
+      :mini="!!User.ps?.layout?.sidebar?.mini"
+      :mini-width="User.ps?.layout?.sidebar?.mini_width || 70"
+      :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '"
+    >
       <q-bar class="full-height q-pa-0" >
         <LeftMenu />
       </q-bar>
     </q-drawer>
- 
-    
-    <q-drawer v-model="User.RightTop" :side="menuRtl ? 'left' : 'right'"  :width="User.ps?.layout?.sidebar_width || 300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
+
+
+    <q-drawer v-model="User.RightTop" :side="menuRtl ? 'left' : 'right'"  :width="User.ps?.layout?.sidebar?.width || 300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
       <q-bar class="full-height q-pa-0">
         <q-scroll-area class="fit q-pa-0" :thumb-style="thumbStyle" :bar-style="barStyle">
           <RightMenu />

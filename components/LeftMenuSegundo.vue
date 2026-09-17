@@ -2,12 +2,12 @@
   <div
     class="overflow-hidden q-pa-0"
     :class="$q.dark.isActive ? 'bg-transparent  text-white ' : 'bg-transparent text-white  '"
-    style="
-      width: 300px;
-      margin-top: 94px;
-      margin-left: -2px;
-      height: calc(100vh - 205px);
-    "
+    :style="{
+      width: sidebarWidth + 'px',
+      marginTop: '94px',
+      marginLeft: '-2px',
+      height: 'calc(100vh - 205px)'
+    }"
   >
 
     <q-scroll-area
@@ -21,9 +21,7 @@
 
       <q-list
         class=" q-pa-0"
-        style="
-          width: 290;
-        "
+        :style="{ width: sidebarWidth - 10 + 'px' }"
       >
 
         <q-expansion-item
@@ -40,7 +38,7 @@
           :icon="App.icon"
           dense
 
-          :label="tdc(App.menu)"
+          :label="isMini ? '' : tdc(App.menu)"
 
           :header-class="
             $q.dark.isActive
@@ -48,7 +46,7 @@
               : 'bg-primary text-white'
           "
 
-          :expand-icon-class="'text-white'"
+          :expand-icon-class="isMini ? 'mini-expand-icon' : 'text-white'"
 
           expand-icon="chevron_right"
 
@@ -98,7 +96,20 @@ export default defineComponent({
     }
   },
   computed: {
+    // Mirrors the same User.ps.layout.sidebar QDrawer itself reads in
+    // MainLayout.vue (layout_setting.py's to_dict()) - QDrawer's own
+    // `mini` prop only resizes the drawer shell, it doesn't know this
+    // component exists, so its width/labels have to follow the same
+    // source independently.
+    isMini () {
+      return !!this.User.ps?.layout?.sidebar?.mini
+    },
 
+    sidebarWidth () {
+      return this.isMini
+        ? (this.User.ps?.layout?.sidebar?.mini_width || 70)
+        : (this.User.ps?.layout?.sidebar?.width || 300)
+    }
   },
   watch: {
 
@@ -111,3 +122,13 @@ export default defineComponent({
   }
 })
 </script>
+
+<style>
+/* Deliberately global (not scoped) - expand-icon-class is applied by
+   q-expansion-item onto an icon element it renders internally, which a
+   scoped style's data-v-xxxx attribute selector would never match.
+   Quasar ships no plain .hidden utility, hence a real class here. */
+.mini-expand-icon {
+  display: none;
+}
+</style>
