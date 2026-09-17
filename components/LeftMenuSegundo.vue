@@ -43,6 +43,7 @@
 
             <!-- Tooltip -->
             <s-tooltip
+              class="text-h6"
               anchor="center right"
               self="center left"
             >
@@ -119,7 +120,7 @@
             <template #header>
 
               <q-item-section avatar>
-                <q-icon :name="App.icon" />
+                <q-icon :name="App.icon"  color=""/>
               </q-item-section>
 
               <q-item-section>
