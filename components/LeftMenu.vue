@@ -82,7 +82,7 @@
   <s-btn
     square 
      
-    class="footer-fixed text-white full-widht" :class="$q.dark.isActive ? 'bg-transparent' : 'bg-transparent'"
+    class="footer-fixed text-white full-widht" :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'"
     flat
     :icon="isSidebarMini ? 'chevron_right' : 'chevron_left'"
     @click="User.toggleSidebarMini()"
