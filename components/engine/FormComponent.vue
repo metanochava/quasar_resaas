@@ -232,7 +232,14 @@ async function save() {
   errors.value = {}
 
   try {
-    const api = `${props.store.app}/${props.store.model.toLowerCase()}s/`
+    // props.store.safeUrl prefers the schema's own RESAAS.endpoint-
+    // resolved endpoint (set once loadSchema() runs) over guessing
+    // "app/models/" - a related model registered under a custom
+    // endpoint (e.g. NotificationPreference -> notifications/
+    // preferences/, see notifications/models/preference.py) would
+    // otherwise 404 here, same class of bug already fixed for the
+    // schema itself in app_schema.py's build_model().
+    const api = `${props.store.safeUrl}/`
     const { data, config } = buildPayload()
     let dados = null
 

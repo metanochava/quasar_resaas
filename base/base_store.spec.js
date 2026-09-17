@@ -817,6 +817,22 @@ describe('createBaseStore - HTTP error resilience (FASE 3 - P2.8/P2.9/P2.10)', (
     expect(store.errors).toEqual({})
   })
 
+  it('resetForm() prefills a new field from initial, falling back to default, then null', () => {
+    const useOrderStore = createBaseStore('order-resetform-defaults', {
+      app: 'sales', model: 'Order',
+    })
+    const store = useOrderStore()
+    store.fields = [
+      { name: 'status', initial: 'draft', default: 'pending' },
+      { name: 'priority', default: 'normal' },
+      { name: 'note' },
+    ]
+
+    store.resetForm()
+
+    expect(store.form).toEqual({ status: 'draft', priority: 'normal', note: null })
+  })
+
   it('remove() resets saving to false and leaves rows untouched on failure', async () => {
     const useOrderStore = createBaseStore('order-error-remove', {
       app: 'sales', model: 'Order',

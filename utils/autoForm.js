@@ -81,7 +81,13 @@ function buildRulesFromSchemaField(f) {
   const rules = []
   const label = tdc(String(f.verbose_name || f.label || f.name || 'field'))
 
-  if (f.required) {
+  // A read_only field can never be filled in from this form, so
+  // enforcing required here would block submission over something the
+  // user has no way to satisfy - same reasoning (and the same
+  // f.read_only, computed generically by the backend from either
+  // field.editable=False or a RESAAS.fields override) as
+  // app_schema.py's own _build_rules().
+  if (f.required && !f.read_only) {
     rules.push(v => {
       if (v === null || v === undefined) return `${label}: ${tdc('required')}`
       if (Array.isArray(v)) return v.length > 0 || `${label}: ${tdc('required')}`
@@ -135,6 +141,21 @@ function buildRulesFromSchemaField(f) {
   return rules
 }
 
+// The one place a raw relation row (from django_resaas/relations/, or a
+// record a "quick create" dialog just POSTed) turns into the
+// {label, value} shape q-select's v-model actually holds for a
+// relation field (emitValue/mapOptions aren't set for relations, only
+// for choices - see the `choices` branch below) - shared with
+// SelectComponent.vue so a newly-created related record gets the exact
+// same option shape as one fetched normally, instead of a
+// slightly-different one-off.
+export function toRelationOption(r) {
+  return {
+    label: tdc(String(r.label || r.name || r.title || r.id)),
+    value: r.id ?? r.value
+  }
+}
+
 async function defaultFetchRelationOptions(relationStr, search = '') {
   const { data } = await HTTPAuth.get(
     url({
@@ -149,10 +170,7 @@ async function defaultFetchRelationOptions(relationStr, search = '') {
 
   const rows = data?.results || data?.data || data || []
 
-  return rows.map(r => ({
-    label: tdc(String(r.label || r.name || r.title || r.id)),
-    value: r.id ?? r.value
-  }))
+  return rows.map(toRelationOption)
 }
 
 export async function buildFormFromSchema({
@@ -203,6 +221,21 @@ export async function buildFormFromSchema({
       const relationKeyBase = f.relation
 
       props.options = props.options || []
+
+      // Django-Admin-style "add related" - relation_config (app/model/
+      // endpoint/permissions of the RELATED model, see app_schema.py's
+      // _build_relation_config()) flows straight into s-select/
+      // s-multiselect's own explicit prop the same way every other
+      // per-field config already does via v-bind="f.props".
+      props.relationConfig = f.relation_config || null
+
+      // Unlike a text field (clearing it just sends "", always valid
+      // when the field isn't required), clearing a relation select
+      // sends null - only meaningful when the model field actually
+      // allows it (f.allow_null, from field.null). A FK declared
+      // null=False would otherwise let the UI offer a "clear" that the
+      // backend always rejects.
+      props.clearable = !!f.allow_null
 
       props.onFilter = async (val, update, abort) => {
         try {

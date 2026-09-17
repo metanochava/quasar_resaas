@@ -30,8 +30,21 @@
     @filter="onFilter"
     @virtual-scroll="onScroll"
   >
+    <template v-if="canAdd" #after>
+      <s-btn flat round dense icon="add" @click.stop="showCreate = true">
+        <s-tooltip>{{ tdc('Add new') }}</s-tooltip>
+      </s-btn>
+    </template>
+
     <slot />
   </q-select>
+
+  <RelationQuickCreate
+    v-if="relationConfig"
+    v-model="showCreate"
+    :relation-config="relationConfig"
+    @created="onRelationCreated"
+  />
 </template>
 
 <script>
@@ -47,12 +60,18 @@ import {
 import { useUserStore } from "../../stores/UserStore"
 import { tdc } from "../../services/translation"
 import { HTTPAuth } from "../../services/api"
+import { toRelationOption } from "../../utils/autoForm"
+import RelationQuickCreate from "./RelationQuickCreate.vue"
 
 export default defineComponent({
 
   name: "s-select",
 
   inheritAttrs: false,
+
+  components: {
+    RelationQuickCreate
+  },
 
   props: {
 
@@ -75,6 +94,15 @@ export default defineComponent({
 
     pageSize: {
       type: Number,
+      default: null
+    },
+
+    // Django-Admin-style "add related" metadata for this field's
+    // related model (app/model/endpoint/permissions) - see
+    // app_schema.py's _build_relation_config(). null for a plain
+    // (non-relation) select, e.g. one built from `choices`.
+    relationConfig: {
+      type: Object,
       default: null
     },
 
@@ -109,6 +137,41 @@ export default defineComponent({
     const localValue = ref(
       props.modelValue
     )
+
+    // ==========================================================
+    // RELATION "ADD NEW" (Django Admin style)
+    // ==========================================================
+
+    const showCreate = ref(false)
+
+    // Backend is the source of truth for the capability NAME
+    // (relationConfig.permissions.add, computed the exact same way as
+    // the primary model's own top-level schema permissions - see
+    // _build_relation_config()); the frontend only checks it against
+    // the current session's already-loaded effective permission set
+    // (User.can()), the same pattern every other add/change/delete
+    // button in the app already uses (ActionForm.vue, FormTwo.vue).
+    const canAdd = computed(() => {
+      const perm = props.relationConfig?.permissions?.add
+      return !!perm && User.can(perm)
+    })
+
+    function onRelationCreated(record) {
+      const option = toRelationOption(record)
+
+      if (!optionsList.value.some(o => o.value === option.value)) {
+        optionsList.value = [...optionsList.value, option]
+      }
+
+      if (attrs.multiple) {
+        const current = Array.isArray(localValue.value) ? localValue.value : []
+        localValue.value = current.some(v => v?.value === option.value)
+          ? current
+          : [...current, option]
+      } else {
+        localValue.value = option
+      }
+    }
 
     const optionsList = ref([])
 
@@ -620,7 +683,13 @@ export default defineComponent({
 
       onFilter,
 
-      onScroll
+      onScroll,
+
+      showCreate,
+
+      canAdd,
+
+      onRelationCreated
 
     }
 

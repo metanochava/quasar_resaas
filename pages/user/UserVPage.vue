@@ -42,6 +42,10 @@ const UserAdmin = useUserAdminStore()
 // ---------------- STATE ----------------
 const ready = ref(false)
 
+// Same reasoning as UserSEPage.vue: password/email/mobile stay
+// visible but readonly (backend schema, User.RESAAS.fields) - they
+// can only ever be changed by their own owner, never through this
+// generic admin form.
 const ignoreFields = [
   'id',
   'created_at',

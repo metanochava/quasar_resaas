@@ -14,6 +14,7 @@ import TimeComponent from './../components/engine/TimeComponent.vue'
 import DateTimeComponent from './../components/engine/DateTimeComponent.vue'
 import EditorComponent from './../components/engine/EditorComponent.vue'
 import SelectComponent from './../components/engine/SelectComponent.vue'
+import MultiSelectComponent from './../components/engine/MultiSelectComponent.vue'
 import DrawerComponent from './../components/engine/DrawerComponent.vue'
 import FieldComponent from './../components/engine/FieldComponent.vue'
 import UploadComponent from './../components/engine/UploadComponent.vue'
@@ -122,6 +123,8 @@ export default boot(({ app }) => {
   app.component('s-editor', EditorComponent)
 
   app.component('s-select', SelectComponent)
+
+  app.component('s-multiselect', MultiSelectComponent)
 
   app.component('s-drawer', DrawerComponent)
 

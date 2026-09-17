@@ -17,11 +17,12 @@ vi.mock('../services/translation', () => ({
 }))
 
 let buildFormFromSchema
+let toRelationOption
 let resolveActionEndpoint
 let schemaPermission
 
 beforeAll(async () => {
-  ;({ buildFormFromSchema } = await import('./autoForm'))
+  ;({ buildFormFromSchema, toRelationOption } = await import('./autoForm'))
   ;({ resolveActionEndpoint, schemaPermission } = await import('./schema'))
 })
 
@@ -172,5 +173,80 @@ describe('buildFormFromSchema - real Django schema contract', () => {
     expect(resolveActionEndpoint(archive, { id: '42' })).toBe(
       'demo/products/42/archive/'
     )
+  })
+
+  it('a read_only field never gets a blocking required rule, even when required is true', async () => {
+    httpGet.mockResolvedValue({
+      data: {
+        ...REALISTIC_DJANGO_SCHEMA,
+        fields: [
+          { name: 'sku', type: 'CharField', label: 'Sku', required: true, read_only: true },
+        ],
+      },
+    })
+
+    const result = await buildFormFromSchema({ app: 'demo', model: 'Product' })
+    const sku = result.fields.find(f => f.name === 'sku')
+
+    expect(sku.props.rules.every(rule => rule(null) === true)).toBe(true)
+  })
+
+  it('a relation field carries relation_config through to props for s-select/s-multiselect', async () => {
+    const relationConfig = {
+      app: 'demo',
+      model: 'Category',
+      endpoint: 'demo/categorys/',
+      permissions: { add: 'add_category', change: 'change_category', view: 'view_category' },
+    }
+
+    // First call is the schema fetch itself; buildFormFromSchema() then
+    // makes a SECOND httpGet call per relation field (defaultFetchRelationOptions,
+    // django_resaas/relations/) to preload its options - stub that one to an
+    // empty list so this test is only about relation_config propagation.
+    httpGet.mockResolvedValueOnce({
+      data: {
+        ...REALISTIC_DJANGO_SCHEMA,
+        fields: [
+          {
+            name: 'category',
+            type: 'ForeignKey',
+            label: 'Category',
+            required: true,
+            relation: 'demo.Category',
+            relation_config: relationConfig,
+            ui: { isRelation: true },
+          },
+        ],
+      },
+    })
+    httpGet.mockResolvedValueOnce({ data: [] })
+
+    const result = await buildFormFromSchema({ app: 'demo', model: 'Product' })
+    const category = result.fields.find(f => f.name === 'category')
+
+    expect(category.props.relationConfig).toEqual(relationConfig)
+  })
+
+  it('a non-relation field gets relationConfig: null', async () => {
+    httpGet.mockResolvedValue({ data: REALISTIC_DJANGO_SCHEMA })
+
+    const result = await buildFormFromSchema({ app: 'demo', model: 'Product' })
+    const name = result.fields.find(f => f.name === 'name')
+
+    expect(name.props.relationConfig).toBeUndefined()
+  })
+})
+
+describe('toRelationOption', () => {
+  it('prefers label, then name, then title, then id, and reads value from id when value is absent', () => {
+    expect(toRelationOption({ id: 1, label: 'Acme Ltd' })).toEqual({ label: 'Acme Ltd', value: 1 })
+    expect(toRelationOption({ id: 2, name: 'Widget' })).toEqual({ label: 'Widget', value: 2 })
+    expect(toRelationOption({ id: 3, title: 'Draft' })).toEqual({ label: 'Draft', value: 3 })
+    expect(toRelationOption({ id: 4 })).toEqual({ label: '4', value: 4 })
+  })
+
+  it('falls back to value only when id is absent', () => {
+    expect(toRelationOption({ id: 5, value: 'v5', label: 'Five' })).toEqual({ label: 'Five', value: 5 })
+    expect(toRelationOption({ value: 'v6', label: 'Six' })).toEqual({ label: 'Six', value: 'v6' })
   })
 })

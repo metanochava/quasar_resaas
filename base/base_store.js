@@ -582,7 +582,11 @@ export function createBaseStore(name, config, extend = {}) {
         const newForm = {}
 
         this.fields.forEach(field => {
-          newForm[field.name] = field.default ?? null
+          // `initial` is a form-only prefill hint (falls back to
+          // `default` on the backend when a model declares no explicit
+          // override - see app_schema.py's _schema_fields()), so it
+          // takes priority over the raw model/DB default here too.
+          newForm[field.name] = field.initial ?? field.default ?? null
         })
 
         this.form = newForm

@@ -131,13 +131,17 @@ const openGroups = ref(false)
 const openTheme = ref(false)
 const openNotifications = ref(false)
 
-// email/mobile stay editable-looking in this generic form (no
-// disabledFields-style mechanism exists on FormTwo/AutoForm to grey
-// them out without changing that shared component for every model),
-// but UserSerializer marks both read_only - a PATCH from here silently
-// drops any change to them. Changing another user's email/mobile
-// requires their own OTP-verified flow (data/user/views/
-// profile_contact_otp.py), never a plain admin form.
+// password/email/mobile can only ever be changed by their own owner,
+// never by another user editing this form - enforced server-side
+// (UserSerializer: 'password' isn't in Meta.fields at all - create()/
+// update() both go through it, so it can never be set here either;
+// 'email'/'mobile' are explicitly read_only - changing them requires
+// the owner's own OTP-verified flow, data/user/views/
+// profile_contact_otp.py). Kept visible but forced readonly generically
+// by the backend schema (User.RESAAS.fields, see saas/models/user.py),
+// which every field-rendering component already respects, so an admin
+// can still see the current values without being invited to edit a
+// field that would silently no-op on save.
 const ignoreFields = [
   'id',
   'created_at',
