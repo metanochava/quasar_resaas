@@ -38,7 +38,7 @@
 
       <!-- 🔥 CENTRO -->
       <div class=" col row items-center">
-        <GroupSelector />
+        <GroupSelector :minimenu="isSidebarMini" />
       </div>
 
       <!-- 🔥 DIREITA -->

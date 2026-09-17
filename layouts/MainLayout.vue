@@ -119,7 +119,7 @@
         $q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary'
       ]"
     >
-      <q-bar class="full-height" >
+      <q-bar class="full-height q-pa-none q-ma-none"  >
         <LeftMenu />
       </q-bar>
     </q-drawer>

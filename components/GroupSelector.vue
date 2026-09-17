@@ -6,6 +6,13 @@ import { profileSplint } from '../utils/profile'
 import { useUserStore } from '../stores/UserStore'
 import { useGroupStore } from '../stores/GroupStore'
 
+const props = defineProps({
+  minimenu: {
+    type: Boolean,
+    default: false
+  }
+})
+
 const User = useUserStore()
 const Group = useGroupStore()
 
@@ -22,7 +29,8 @@ const select = group => Group.select(group)
   <s-btn
     flat
     dense
-    :label="tdc(label)"
+
+    :label="minimenu ? tdc(label).charAt(0) : tdc(label)"
     class="full-width"
   >
     <q-menu fit>
