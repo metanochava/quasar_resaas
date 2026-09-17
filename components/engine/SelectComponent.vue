@@ -30,8 +30,8 @@
     @filter="onFilter"
     @virtual-scroll="onScroll"
   >
-    <template v-if="canAdd" #after>
-      <s-btn flat round dense color="primary" icon="add" @click.stop="showCreate = true">
+    <template v-if="canAdd" #append>
+      <s-btn  dense size="sm" color="primary" icon="add" @click.stop="showCreate = true">
         <s-tooltip>{{ tdc('Add new') }}</s-tooltip>
       </s-btn>
     </template>

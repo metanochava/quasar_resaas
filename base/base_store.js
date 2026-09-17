@@ -582,6 +582,20 @@ export function createBaseStore(name, config, extend = {}) {
         const newForm = {}
 
         this.fields.forEach(field => {
+          // A read_only field (id, entity/branch, or an explicit
+          // RESAAS.fields override) can never be client-supplied, so it
+          // must stay unset on a brand-new record - prefilling it from
+          // `default` would be actively wrong for id specifically: a
+          // UUIDField's default is Django's own get_default() called
+          // fresh at SCHEMA time (see app_schema.py's
+          // _get_field_default()), a throwaway value with no relation
+          // to whatever id the backend actually assigns at save time.
+          // Setting form.id to that throwaway value made every new/add
+          // form look like an edit of an existing record (isEdit checks
+          // form?.id in ActionForm.vue/FormTwo.vue), hiding the Save
+          // button entirely.
+          if (field.read_only) return
+
           // `initial` is a form-only prefill hint (falls back to
           // `default` on the backend when a model declares no explicit
           // override - see app_schema.py's _schema_fields()), so it

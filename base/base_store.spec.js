@@ -833,6 +833,27 @@ describe('createBaseStore - HTTP error resilience (FASE 3 - P2.8/P2.9/P2.10)', (
     expect(store.form).toEqual({ status: 'draft', priority: 'normal', note: null })
   })
 
+  it('resetForm() never prefills a read_only field, even when it carries a default', () => {
+    // Regression: id is read_only (editable=False) but its default is a
+    // fresh UUID computed at schema-build time (field.get_default(),
+    // see app_schema.py) - prefilling form.id from it made every new
+    // record look already-saved to isEdit checks (ActionForm.vue/
+    // FormTwo.vue: `!!form?.id`), hiding the Save button entirely.
+    const useOrderStore = createBaseStore('order-resetform-readonly-default', {
+      app: 'sales', model: 'Order',
+    })
+    const store = useOrderStore()
+    store.fields = [
+      { name: 'id', read_only: true, default: 'a-fresh-uuid' },
+      { name: 'name', default: 'Untitled' },
+    ]
+
+    store.resetForm()
+
+    expect(store.form).toEqual({ name: 'Untitled' })
+    expect(store.form.id).toBeUndefined()
+  })
+
   it('remove() resets saving to false and leaves rows untouched on failure', async () => {
     const useOrderStore = createBaseStore('order-error-remove', {
       app: 'sales', model: 'Order',
