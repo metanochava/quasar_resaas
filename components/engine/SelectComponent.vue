@@ -166,35 +166,81 @@ export default defineComponent({
     )
 
     // ==========================================================
-    // RELATION "ADD NEW" (Django Admin style)
+    // RELATION ADD/EDIT/VIEW (Django Admin style)
     // ==========================================================
 
-    const showCreate = ref(false)
+    const showDialog = ref(false)
+    const dialogMode = ref('add')
+    const dialogRecordId = ref(null)
 
-    // Backend is the source of truth for the capability NAME
-    // (relationConfig.permissions.add, computed the exact same way as
-    // the primary model's own top-level schema permissions - see
-    // _build_relation_config()); the frontend only checks it against
-    // the current session's already-loaded effective permission set
-    // (User.can()), the same pattern every other add/change/delete
+    // Backend is the source of truth for the capability NAMEs
+    // (relationConfig.permissions.{add,change,view}, computed the exact
+    // same way as the primary model's own top-level schema permissions -
+    // see _build_relation_config()); the frontend only checks them
+    // against the current session's already-loaded effective permission
+    // set (User.can()), the same pattern every other add/change/delete
     // button in the app already uses (ActionForm.vue, FormTwo.vue).
     const canAdd = computed(() => {
       const perm = props.relationConfig?.permissions?.add
       return !!perm && User.can(perm)
     })
 
-    function onRelationCreated(record) {
-      const option = toRelationOption(record)
+    // Editing/viewing only makes unambiguous sense for a single CURRENT
+    // value - a multi-select's several selected values have no single
+    // "the" record this menu item could act on (Django Admin doesn't
+    // offer this for its own M2M widgets either).
+    const hasSingleSelection = computed(() =>
+      !attrs.multiple && !!localValue.value && localValue.value.value != null
+    )
 
-      if (!optionsList.value.some(o => o.value === option.value)) {
-        optionsList.value = [...optionsList.value, option]
-      }
+    const canEdit = computed(() => {
+      const perm = props.relationConfig?.permissions?.change
+      return !!perm && User.can(perm) && hasSingleSelection.value
+    })
+
+    const canView = computed(() => {
+      const perm = props.relationConfig?.permissions?.view
+      return !!perm && User.can(perm) && hasSingleSelection.value
+    })
+
+    function openAdd() {
+      dialogMode.value = 'add'
+      dialogRecordId.value = null
+      showDialog.value = true
+    }
+
+    function openEdit() {
+      if (!hasSingleSelection.value) return
+      dialogMode.value = 'edit'
+      dialogRecordId.value = localValue.value.value
+      showDialog.value = true
+    }
+
+    function openView() {
+      if (!hasSingleSelection.value) return
+      dialogMode.value = 'view'
+      dialogRecordId.value = localValue.value.value
+      showDialog.value = true
+    }
+
+    // Shared by create AND edit - an edited record's label may have
+    // changed too, so its existing option needs replacing, not just a
+    // brand-new one appended.
+    function onDialogSaved(record) {
+      const option = toRelationOption(record)
+      const idx = optionsList.value.findIndex(o => o.value === option.value)
+
+      optionsList.value = idx === -1
+        ? [...optionsList.value, option]
+        : optionsList.value.map((o, i) => (i === idx ? option : o))
 
       if (attrs.multiple) {
         const current = Array.isArray(localValue.value) ? localValue.value : []
-        localValue.value = current.some(v => v?.value === option.value)
-          ? current
-          : [...current, option]
+        const cidx = current.findIndex(v => v?.value === option.value)
+
+        localValue.value = cidx === -1
+          ? [...current, option]
+          : current.map((v, i) => (i === cidx ? option : v))
       } else {
         localValue.value = option
       }
@@ -712,11 +758,25 @@ export default defineComponent({
 
       onScroll,
 
-      showCreate,
+      showDialog,
+
+      dialogMode,
+
+      dialogRecordId,
 
       canAdd,
 
-      onRelationCreated,
+      canEdit,
+
+      canView,
+
+      openAdd,
+
+      openEdit,
+
+      openView,
+
+      onDialogSaved,
 
       tdc
 

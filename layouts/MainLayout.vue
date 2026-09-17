@@ -332,6 +332,28 @@ export default defineComponent({
   async mounted(){
     // 🔥 RESTORE USER + SETTINGS (your original code)
     if(this.User){
+      // The X-RESAAS-Context token (services/tenantContext.js) lives in
+      // sessionStorage, separately from User.Entity/Branch/Group
+      // (localStorage, just restored above in beforeMount()) - it can be
+      // missing/stale independently of them (a new tab, an expired
+      // token, ...), and loadFromStorage() only ever re-reads whatever's
+      // already there, it never re-establishes it. Every page under here
+      // (services/api.js's request interceptor) sends whatever
+      // X-RESAAS-Context is currently set, so a stale/missing one means
+      // every request after a reload goes out with the wrong/no tenant
+      // context - which is exactly why '/home' showed no dashboard after
+      // a hard reload despite User.Entity itself being restored fine.
+      // Group.select()/GroupSelector.vue already re-establish it this
+      // same way (User.selectContext() -> refreshResaasContext()) when
+      // switching profile mid-session - do it once here too, on every
+      // fresh app boot, instead of only on an explicit profile switch.
+      // HomeDashboards.vue/DashboardRenderer.vue already watch
+      // User.ResaasContext and (re)fetch once it resolves to the fresh
+      // token, so this doesn't need to block anything below it.
+      this.User.refreshResaasContext().catch(err => {
+        console.error('refreshResaasContext on boot failed', err)
+      })
+
       await this.Entity.getLayoutSettings(this.User?.Entity?.id)
     }
 
