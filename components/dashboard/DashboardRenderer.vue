@@ -87,7 +87,7 @@ watch(() => User.ResaasContext, load)
 // repeatedly, cascading through every watch(User.ResaasContext) in both
 // files and causing a burst of duplicate loads.
 onMounted(async () => {
-  await User.refreshResaasContext()
+  // await User.refreshResaasContext()
   await load()
 })
 onUnmounted(() => Dashboard.reset())
