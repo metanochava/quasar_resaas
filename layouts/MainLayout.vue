@@ -112,9 +112,9 @@
     <q-drawer
       v-model="User.LeftTop"
       :side="menuRtl ? 'right' : 'left'"
-      :width="User.ps?.layout?.sidebar?.width || 300"
+      :width="User.ps?.layout?.sidebar?.width || 320"
       :mini="!!User.ps?.layout?.sidebar?.mini"
-      :mini-width="User.ps?.layout?.sidebar?.mini_width || 70"
+      :mini-width="User.ps?.layout?.sidebar?.mini_width || 80"
       :class="[
         'q-pa-0',
         $q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary'
@@ -126,7 +126,7 @@
     </q-drawer>
 
 
-    <q-drawer v-model="User.RightTop" :side="menuRtl ? 'left' : 'right'"  :width="User.ps?.layout?.sidebar?.width || 300" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
+    <q-drawer v-model="User.RightTop" :side="menuRtl ? 'left' : 'right'"  :width="User.ps?.layout?.sidebar?.width || 320" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '">
       <q-bar class="full-height ">
         <q-scroll-area class="fit " :thumb-style="thumbStyle" :bar-style="barStyle">
           <RightMenu />

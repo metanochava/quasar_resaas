@@ -4,7 +4,7 @@
       v-model="User.search"
       :style="'height: 30px; line-height: 30px; width: '+size+'; padding: 0 8px;'"
       @input="filterMenus(User.search)"
-      :placeholder=" isSidebarMini? tdc('Sea')+' ...' : tdc('Search')+''"
+      :placeholder=" isSidebarMini? tdc('Sea') : tdc('Search')"
     />
   </div>
 </template>
