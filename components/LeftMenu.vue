@@ -4,8 +4,8 @@
     <q-item 
       class="row items-center justify-between  "
       :class="$q.dark.isActive
-        ? 'bg-dark text-white'
-        : 'bg-primary text-white'"
+        ? 'bg-dark '
+        : 'bg-primary '"
     >
 
       <!-- 🔥 ESQUERDA -->
@@ -26,7 +26,7 @@
           v-show="User.ps?.layout?.menu_rtl "
           flat
           :icon="User.ps?.layout?.menu_rtl ? 'format_textdirection_r_to_l' : 'format_textdirection_l_to_r'"
-          class="text-white"
+          class=""
           @click="User.toggleMenuRtl()"
         >
           <s-tooltip>
@@ -59,7 +59,7 @@
           flat
           v-show="!User.ps?.layout?.menu_rtl "
           :icon="User.ps?.layout?.menu_rtl ? 'format_textdirection_r_to_l' : 'format_textdirection_l_to_r'"
-          class="text-white"
+          class=""
           @click="User.toggleMenuRtl()"
         >
           <s-tooltip>
@@ -80,7 +80,7 @@
   <s-btn
     square 
      style="margin-left:-0px;"
-    class="footer-fixed text-white full-widht" :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'"
+    class="footer-fixed  full-widht" :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'"
     flat
     :icon="isSidebarMini ?  User.ps?.layout?.menu_rtl ?   'chevron_left' : 'chevron_right' : User.ps?.layout?.menu_rtl ? 'chevron_right' : 'chevron_left' "
     @click="User.toggleSidebarMini()"
