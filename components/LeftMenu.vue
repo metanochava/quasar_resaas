@@ -73,7 +73,7 @@
     </div>
   </s-card>
 
-  <LeftMenuSegundo  style="margin-top:95px; margin-bottom:0px" />
+  <LeftMenuSegundo  style="margin-top:95px; margin-bottom:50px;" />
 
   <!-- 🔥 SIDEBAR MINI TOGGLE - fixed at the bottom of the drawer, same
        reasoning as .header-fixed above but pinned to the bottom instead,
@@ -81,7 +81,7 @@
 
   <s-btn
     square 
-     
+     style="margin-left:-1px;"
     class="footer-fixed text-white full-widht" :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'"
     flat
     :icon="isSidebarMini ? 'chevron_right' : 'chevron_left'"
