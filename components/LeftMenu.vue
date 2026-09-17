@@ -78,22 +78,20 @@
   <!-- 🔥 SIDEBAR MINI TOGGLE - fixed at the bottom of the drawer, same
        reasoning as .header-fixed above but pinned to the bottom instead,
        so it stays put while LeftMenuSegundo's own nav list scrolls. -->
-  <s-card square flat class="footer-fixed" :class="$q.dark.isActive ? 'bg-transparent' : 'bg-transparent'">
-    <q-item class="row items-center justify-center">
-      <s-btn
-        flat
-        round
-        dense
-        :icon="isSidebarMini ? 'chevron_right' : 'chevron_left'"
-        class="text-white"
-        @click="User.toggleSidebarMini()"
-      >
-        <s-tooltip>
-          {{ tdc(isSidebarMini ? 'Expand sidebar' : 'Collapse sidebar') }}
-        </s-tooltip>
-      </s-btn>
-    </q-item>
-  </s-card>
+
+  <s-btn
+    square 
+     
+    class="footer-fixed text-white full-widht" :class="$q.dark.isActive ? 'bg-transparent' : 'bg-transparent'"
+    flat
+    :icon="isSidebarMini ? 'chevron_right' : 'chevron_left'"
+    @click="User.toggleSidebarMini()"
+  >
+    <s-tooltip>
+      {{ tdc(isSidebarMini ? 'Expand sidebar' : 'Collapse sidebar') }}
+    </s-tooltip>
+  </s-btn>
+
 
 </template>
 <script >

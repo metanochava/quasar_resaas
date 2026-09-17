@@ -116,10 +116,11 @@
       :mini="!!User.ps?.layout?.sidebar?.mini"
       :mini-width="User.ps?.layout?.sidebar?.mini_width || 70"
       :class="[
+        'q-pa-0',
         $q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary'
       ]"
     >
-      <q-bar class="full-height q-pa-none q-ma-none"  >
+      <q-bar class="full-height q-pa-0 "  >
         <LeftMenu />
       </q-bar>
     </q-drawer>
