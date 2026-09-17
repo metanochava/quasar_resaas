@@ -82,7 +82,7 @@
      style="margin-left:-1px;"
     class="footer-fixed text-white full-widht" :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'"
     flat
-    :icon="isSidebarMini ? 'chevron_right' : 'chevron_left'"
+    :icon="isSidebarMini ?  User.ps?.layout?.menu_rtl ?  'chevron_right' : 'chevron_left' : User.ps?.layout?.menu_rtl ?  'chevron_left' : 'chevron_right'"
     @click="User.toggleSidebarMini()"
   >
     <s-tooltip>
