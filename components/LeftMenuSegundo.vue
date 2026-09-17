@@ -1,24 +1,16 @@
 <template>
   <div
-    class="left-menu overflow-hidden q-pa-none"
+    class="left-menu"
     :class="$q.dark.isActive
       ? 'bg-transparent text-white'
       : 'bg-transparent text-white'"
-    :style="{
-      width: sidebarWidth + 'px',
-      maxWidth: sidebarWidth + 'px',
-      marginTop: '94px',
-      height: 'calc(100vh - 205px)'
-    }"
   >
     <q-scroll-area
       :thumb-style="thumbStyle"
       :bar-style="barStyle"
-      class="full-width"
-      style="height: calc(100vh - 205px)"
+      class="fit"
     >
-      <q-list class="full-width q-pa-none">
-
+      <q-list class="fit q-pa-none">
         <q-expansion-item
           v-for="App in User.Menus"
           :key="App"
@@ -75,7 +67,6 @@
 
           <q-separator />
         </q-expansion-item>
-
       </q-list>
     </q-scroll-area>
   </div>
@@ -116,11 +107,7 @@ export default defineComponent({
     }
   },
   computed: {
-    // Mirrors the same User.ps.layout.sidebar QDrawer itself reads in
-    // MainLayout.vue (layout_setting.py's to_dict()) - QDrawer's own
-    // `mini` prop only resizes the drawer shell, it doesn't know this
-    // component exists, so its width/labels have to follow the same
-    // source independently.
+
     isMini () {
       return !!this.User.ps?.layout?.sidebar?.mini
     },
@@ -145,7 +132,21 @@ export default defineComponent({
 
 <style>
 .left-menu {
-  overflow-x: hidden !important;
+  position: absolute;
+
+  top: 94px;
+  bottom: 48px;
+
+  left: 0;
+  right: 0;
+
+  width: 100%;
+  max-width: 100%;
+
+  padding: 0;
+  margin: 0;
+
+  overflow: hidden;
 }
 
 .left-menu .q-scrollarea__container,
@@ -163,5 +164,6 @@ export default defineComponent({
   width: 100% !important;
   padding: 0 !important;
   align-items: center !important;
+  justify-content: center !important;
 }
 </style>

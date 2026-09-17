@@ -73,11 +73,7 @@
     </div>
   </s-card>
 
-  <LeftMenuSegundo  style="margin-top:95px; " />
-
-  <!-- 🔥 SIDEBAR MINI TOGGLE - fixed at the bottom of the drawer, same
-       reasoning as .header-fixed above but pinned to the bottom instead,
-       so it stays put while LeftMenuSegundo's own nav list scrolls. -->
+  <LeftMenuSegundo  />
 
   <s-btn
     square 
