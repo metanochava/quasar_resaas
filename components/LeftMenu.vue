@@ -73,12 +73,12 @@
     </div>
   </s-card>
 
-  <LeftMenuSegundo  style="margin-top:95px" />
+  <LeftMenuSegundo  style="margin-top:95px; margin-bottom:70px" />
 
   <!-- 🔥 SIDEBAR MINI TOGGLE - fixed at the bottom of the drawer, same
        reasoning as .header-fixed above but pinned to the bottom instead,
        so it stays put while LeftMenuSegundo's own nav list scrolls. -->
-  <s-card square flat class="footer-fixed" :class="$q.dark.isActive ? 'bg-dark' : 'bg-primary'">
+  <s-card square flat class="footer-fixed" :class="$q.dark.isActive ? 'bg-transparent' : 'bg-transparent'">
     <q-item class="row items-center justify-center">
       <s-btn
         flat

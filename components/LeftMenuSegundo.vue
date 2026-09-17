@@ -35,10 +35,7 @@
               : 'text-subtitle1 text-white'
           "
 
-          :icon="App.icon"
           dense
-
-          :label="isMini ? '' : tdc(App.menu)"
 
           :header-class="
             $q.dark.isActive
@@ -53,6 +50,25 @@
           expand-icon="chevron_right"
 
         >
+
+          <!-- Custom #header (instead of the icon/label props) so a
+               hover tooltip can attach directly to the always-visible
+               icon when mini hides the label - QExpansionItem still
+               appends its own expand-icon-side toggle automatically
+               regardless of this slot (Quasar's own
+               getHeaderChild()/getToggleIcon()). -->
+          <template #header>
+            <q-item-section avatar>
+              <q-icon :name="App.icon" />
+              <s-tooltip v-if="isMini" anchor="center right" self="center left">
+                {{ tdc(App.menu) }}
+              </s-tooltip>
+            </q-item-section>
+
+            <q-item-section v-if="!isMini">
+              {{ tdc(App.menu) }}
+            </q-item-section>
+          </template>
 
           <q-separator />
           <SubMenu :Dados="App.submenu" />
