@@ -43,7 +43,7 @@
 
             <!-- Tooltip -->
             <s-tooltip
-              class="text-h6"
+              style="font-size:15px;"
               anchor="center right"
               self="center left"
             >

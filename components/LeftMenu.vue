@@ -85,7 +85,7 @@
     :icon="isSidebarMini ?  User.ps?.layout?.menu_rtl ?   'chevron_left' : 'chevron_right' : User.ps?.layout?.menu_rtl ? 'chevron_right' : 'chevron_left' "
     @click="User.toggleSidebarMini()"
   >
-    <s-tooltip>
+    <s-tooltip style="font-size:15px;">
       {{ tdc(isSidebarMini ? 'Expand sidebar' : 'Collapse sidebar') }}
     </s-tooltip>
   </s-btn>
