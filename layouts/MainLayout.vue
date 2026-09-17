@@ -157,6 +157,7 @@ import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import { useEntityStore } from '../stores/EntityStore'
 import { useThemeStore } from '../stores/ThemeStore'
 import { useLayoutSettingStore } from '../stores/LayoutSettingStore'
+import { useDashboardStore } from '../stores/DashboardStore'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
@@ -205,6 +206,7 @@ export default defineComponent({
     const User = useUserStore()
     const Theme = useThemeStore()
     const LayoutSetting = useLayoutSettingStore()
+    const Dashboard = useDashboardStore()
 
     return {
       EntityType,
@@ -212,6 +214,7 @@ export default defineComponent({
       User,
       Theme,
       LayoutSetting,
+      Dashboard,
       barStyle,
       thumbStyle
     }
@@ -347,12 +350,23 @@ export default defineComponent({
       // same way (User.selectContext() -> refreshResaasContext()) when
       // switching profile mid-session - do it once here too, on every
       // fresh app boot, instead of only on an explicit profile switch.
-      // HomeDashboards.vue/DashboardRenderer.vue already watch
-      // User.ResaasContext and (re)fetch once it resolves to the fresh
-      // token, so this doesn't need to block anything below it.
-      this.User.refreshResaasContext().catch(err => {
-        console.error('refreshResaasContext on boot failed', err)
-      })
+      //
+      // Awaited (not fire-and-forget) and followed by an EXPLICIT
+      // Dashboard.loadDashboardList() call, rather than only relying on
+      // HomeDashboards.vue's own watch(User.ResaasContext, ...) to catch
+      // the change reactively - deterministic boot order beats depending
+      // on a side-effect elsewhere to happen to fire correctly.
+      // HomeDashboards.vue's `selected` (which dashboard, if any, to
+      // render) is computed from Dashboard.dashboards + User.Entity, so
+      // refreshing the list here is enough - it re-renders on its own
+      // once this resolves, no need to duplicate its widget-loading
+      // logic here too.
+      try {
+        await this.User.refreshResaasContext()
+        await this.Dashboard.loadDashboardList()
+      } catch (err) {
+        console.error('refreshResaasContext/loadDashboardList on boot failed', err)
+      }
 
       await this.Entity.getLayoutSettings(this.User?.Entity?.id)
     }
