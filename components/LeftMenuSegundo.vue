@@ -1,66 +1,65 @@
 <template>
   <div
-    class="overflow-hidden q-pa-0"
-    :class="$q.dark.isActive ? 'bg-transparent  text-white ' : 'bg-transparent text-white  '"
+    class="left-menu overflow-hidden q-pa-none"
+    :class="$q.dark.isActive
+      ? 'bg-transparent text-white'
+      : 'bg-transparent text-white'"
     :style="{
       width: sidebarWidth + 'px',
+      maxWidth: sidebarWidth + 'px',
       marginTop: '94px',
-      marginLeft: '-2px',
-      height: 'calc(100vh - 255px)'
+      height: 'calc(100vh - 205px)'
     }"
   >
-
     <q-scroll-area
       :thumb-style="thumbStyle"
       :bar-style="barStyle"
-      style="
-        height: calc(100vh - 255px);
-        width: 100%;
-      "
+      class="full-width"
+      style="height: calc(100vh - 205px)"
     >
-
-      <q-list
-        class=" q-pa-0"
-        :style="{ width: sidebarWidth - 10 + 'px' }"
-      >
+      <q-list class="full-width q-pa-none">
 
         <q-expansion-item
           v-for="App in User.Menus"
           :key="App"
-          class=" q-expansion-item q-pa-0"
-
+          dense
+          class="q-pa-none full-width"
           :class="
             $q.dark.isActive
               ? 'bg-dark-saas text-subtitle1 text-white'
               : 'text-subtitle1 text-white'
           "
-
-          dense
-
           :header-class="
             $q.dark.isActive
               ? 'bg-dark text-white'
               : 'bg-primary text-white'
           "
-
-          :header-style="isMini ? { padding: '0', justifyContent: 'center' } : {}"
-
-          :expand-icon-class="isMini ? 'mini-expand-icon' : 'text-white'"
-
+          :header-style="
+            isMini
+              ? {
+                  padding: '0',
+                  minWidth: '0',
+                  width: '100%'
+                }
+              : {}
+          "
+          :expand-icon-class="
+            isMini ? 'mini-expand-icon' : 'text-white'
+          "
           expand-icon="chevron_right"
-
         >
-
-          <!-- Custom #header (instead of the icon/label props) so a
-               hover tooltip can attach directly to the always-visible
-               icon when mini hides the label - QExpansionItem still
-               appends its own expand-icon-side toggle automatically
-               regardless of this slot (Quasar's own
-               getHeaderChild()/getToggleIcon()). -->
           <template #header>
-            <q-item-section avatar>
+            <q-item-section
+              avatar
+              :class="{ 'mini-avatar': isMini }"
+            >
               <q-icon :name="App.icon" />
-              <s-tooltip v-if="isMini" anchor="center right" self="center left">
+
+              <s-tooltip
+                v-if="isMini"
+                anchor="center right"
+                self="center left"
+              >
                 {{ tdc(App.menu) }}
               </s-tooltip>
             </q-item-section>
@@ -71,9 +70,12 @@
           </template>
 
           <q-separator />
+
           <SubMenu :Dados="App.submenu" />
+
           <q-separator />
         </q-expansion-item>
+
       </q-list>
     </q-scroll-area>
   </div>
@@ -125,8 +127,8 @@ export default defineComponent({
 
     sidebarWidth () {
       return this.isMini
-        ? (80)
-        : ( 320)
+        ? (this.User.ps?.layout?.sidebar?.mini_width || 70)
+        : (this.User.ps?.layout?.sidebar?.width || 300)
     }
   },
   watch: {
@@ -142,11 +144,24 @@ export default defineComponent({
 </script>
 
 <style>
-/* Deliberately global (not scoped) - expand-icon-class is applied by
-   q-expansion-item onto an icon element it renders internally, which a
-   scoped style's data-v-xxxx attribute selector would never match.
-   Quasar ships no plain .hidden utility, hence a real class here. */
+.left-menu {
+  overflow-x: hidden !important;
+}
+
+.left-menu .q-scrollarea__container,
+.left-menu .q-scrollarea__content {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
 .mini-expand-icon {
-  display: none;
+  display: none !important;
+}
+
+.mini-avatar {
+  min-width: 0 !important;
+  width: 100% !important;
+  padding: 0 !important;
+  align-items: center !important;
 }
 </style>
