@@ -1,24 +1,21 @@
 <template>
   <div
-    class="left-menu q-pa-none"
-    :class="
-      $q.dark.isActive
-        ? 'bg-transparent text-white'
-        : 'bg-transparent text-white'
-    "
+    class="left-menu"
+    :class="$q.dark.isActive
+      ? 'bg-transparent text-white'
+      : 'bg-transparent text-white'"
   >
     <q-scroll-area
       :thumb-style="thumbStyle"
       :bar-style="barStyle"
       class="fit"
     >
-      <q-list class="left-menu-list q-pa-none">
-
+      <q-list class="fit q-pa-none">
         <q-expansion-item
           v-for="App in User.Menus"
           :key="App"
           dense
-          class="left-menu-item q-pa-none"
+          class="q-pa-none full-width"
           :class="
             $q.dark.isActive
               ? 'bg-dark-saas text-subtitle1 text-white'
@@ -33,20 +30,17 @@
             isMini
               ? {
                   padding: '0',
-                  minWidth: '0'
+                  minWidth: '0',
+                  width: '100%'
                 }
               : {}
           "
           :expand-icon-class="
-            isMini
-              ? 'mini-expand-icon'
-              : 'text-white'
+            isMini ? 'mini-expand-icon' : 'text-white'
           "
           expand-icon="chevron_right"
         >
-
           <template #header>
-
             <q-item-section
               avatar
               :class="{ 'mini-avatar': isMini }"
@@ -62,13 +56,9 @@
               </s-tooltip>
             </q-item-section>
 
-            <q-item-section
-              v-if="!isMini"
-              class="left-menu-label"
-            >
+            <q-item-section v-if="!isMini">
               {{ tdc(App.menu) }}
             </q-item-section>
-
           </template>
 
           <q-separator />
@@ -76,31 +66,22 @@
           <SubMenu :Dados="App.submenu" />
 
           <q-separator />
-
         </q-expansion-item>
-
       </q-list>
     </q-scroll-area>
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
 
+<script >
+
+import { defineComponent, h } from 'vue'
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
-
 import SubMenu from './SubMenu.vue'
+import { barStyle, thumbStyle } from '../services/app'
+import { tdc, toPlural } from '../services/translation'
 
-import {
-  barStyle,
-  thumbStyle
-} from '../services/app'
-
-import {
-  tdc,
-  toPlural
-} from '../services/translation'
 
 export default defineComponent({
   name: 'LeftMenuSegundo',
@@ -108,11 +89,9 @@ export default defineComponent({
   components: {
     SubMenu
   },
-
   setup () {
     const EntityType = useEntityTypeStore()
-    const User = useUserStore()
-
+    const  User = useUserStore()
     return {
       EntityType,
       User,
@@ -122,23 +101,36 @@ export default defineComponent({
       thumbStyle
     }
   },
+  data () {
+    return {
 
+    }
+  },
   computed: {
+
     isMini () {
       return !!this.User.ps?.layout?.sidebar?.mini
+    },
+
+    sidebarWidth () {
+      return this.isMini
+        ? (this.User.ps?.layout?.sidebar?.mini_width || 70)
+        : (this.User.ps?.layout?.sidebar?.width || 300)
     }
+  },
+  watch: {
+
+  },
+  mounted () {
+
+  },
+  methods: {
+
   }
 })
 </script>
 
 <style>
-/*
- * O QDrawer é responsável pela largura.
- *
- * Não usamos width: 100% nem sidebarWidth aqui.
- * left + right fazem o menu ocupar exactamente
- * a largura disponível no drawer.
- */
 .left-menu {
   position: absolute;
 
@@ -148,127 +140,30 @@ export default defineComponent({
   left: 0;
   right: 0;
 
-  min-width: 0;
+  width: 100%;
   max-width: 100%;
 
-  margin: 0;
   padding: 0;
-
-  box-sizing: border-box;
-
-  overflow-x: hidden !important;
-  overflow-y: hidden;
-}
-
-
-/* Scroll Area */
-.left-menu .q-scrollarea {
-  min-width: 0 !important;
-  max-width: 100% !important;
-
-  overflow-x: hidden !important;
-}
-
-.left-menu .q-scrollarea__container {
-  min-width: 0 !important;
-  max-width: 100% !important;
-
-  overflow-x: hidden !important;
-}
-
-.left-menu .q-scrollarea__content {
-  min-width: 0 !important;
-  max-width: 100% !important;
-
-  overflow-x: hidden !important;
-}
-
-
-/* Lista principal */
-.left-menu-list {
-  min-width: 0 !important;
-  max-width: 100% !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  box-sizing: border-box;
-}
-
-
-/* Expansion Item */
-.left-menu-item {
-  min-width: 0 !important;
-  max-width: 100% !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  box-sizing: border-box;
-}
-
-
-/* Header interno do QExpansionItem */
-.left-menu .q-item {
-  min-width: 0 !important;
-  max-width: 100% !important;
-
   margin: 0;
-  box-sizing: border-box;
-}
-
-
-/* Evita que labels grandes aumentem a largura */
-.left-menu-label {
-  min-width: 0 !important;
 
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
+.left-menu .q-scrollarea__container,
+.left-menu .q-scrollarea__content {
+  width: 100% !important;
+  max-width: 100% !important;
+}
 
-/*
- * Esconde o chevron do QExpansionItem
- * quando o drawer está mini.
- */
 .mini-expand-icon {
   display: none !important;
 }
 
-
-/*
- * No modo mini, o avatar passa a ocupar
- * o espaço disponível e centraliza o ícone.
- */
 .mini-avatar {
   min-width: 0 !important;
-
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-
-  margin: 0 !important;
-
+  width: 100% !important;
+  padding: 0 !important;
   align-items: center !important;
   justify-content: center !important;
-}
-
-
-/*
- * Remove padding adicional que o Quasar
- * possa aplicar à secção avatar.
- */
-.left-menu .mini-avatar.q-item__section--avatar {
-  min-width: 0 !important;
-  padding: 0 !important;
-}
-
-
-/*
- * Segurança adicional contra overflow
- * causado por elementos internos.
- */
-.left-menu * {
-  box-sizing: border-box;
 }
 </style>
