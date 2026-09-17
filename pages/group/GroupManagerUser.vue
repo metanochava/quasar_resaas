@@ -9,17 +9,17 @@
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        Manage Groups of {{ Employee.form?.person_data.full_name}}
+        {{ tdc('Manage Groups of') }} {{ User.form?.username || User.row?.username || '' }}
       </div>
 
       <q-space />
 
       <q-badge color="white" text-color="primary">
-        {{ User.selectedGroups.length }} active
+        {{ User.selectedGroups.length }} {{ tdc('active') }}
       </q-badge>
 
       <s-btn dense flat icon="close" v-close-popup>
-        <s-tooltip>Close</s-tooltip>
+        <s-tooltip>{{ tdc('Close') }}</s-tooltip>
       </s-btn>
     </q-bar>
 
@@ -32,7 +32,7 @@
         dense
         outlined
         clearable
-        label="Search group"
+        :label="tdc('Search group')"
       >
         <template #prepend>
           <q-icon name="search" />
@@ -40,7 +40,7 @@
       </q-input>
     </q-card-section>
 
-    <q-separator /> 
+    <q-separator />
 
     <!-- LIST -->
     <q-card-section class="col scroll q-pa-none">
@@ -84,7 +84,7 @@
                 :color="User.hasGroup(group.id) ? 'primary' : 'grey-5'"
                 text-color="white"
               >
-                {{ User.hasGroup(group.id) ? 'Active' : 'Inactive' }}
+                {{ User.hasGroup(group.id) ? tdc('Active') : tdc('Inactive') }}
               </q-chip>
 
               <q-checkbox
@@ -107,25 +107,24 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useUserStore } from '../../stores/UserStore'
-// import { useEntityStore } from '../../stores/EntityStore'
-
-import { useEmployeeStore } from '../../stores/EmployeeStore'
-const Employee = useEmployeeStore()
-
+import { onMounted } from 'vue'
+import { useUserAdminStore } from '../../stores/UserAdminStore'
+import { tdc } from '../../services/translation'
 
 const props = defineProps({
   userId: [String, Number]
 })
 
+// Dedicated admin store (see stores/UserAdminStore.js) - NOT the
+// session useUserStore(), which this component used to call
+// getById()/loadGroups() on directly, overwriting the logged-in
+// admin's own session-shaped state (.row/.form) with whichever OTHER
+// user's data was being managed here.
+const User = useUserAdminStore()
 
-const User = useUserStore()
-// const Entity = useEntityStore() 
 async function init() {
-  User.getById(props.userId)
-  User.loadGroups(props.userId)
-  // Entity.loadGroups(User.Eentity.id)
+  await User.getById(props.userId)
+  await User.loadGroups(props.userId)
 }
 
 // INIT

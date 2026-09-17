@@ -1,34 +1,143 @@
 <template>
   <q-page class="q-pa-sm">
-    <!-- FORM -->
-    <div v-if="User.loading" class="flex flex-center q-pa-lg">
+
+    <!-- ===================================================== -->
+    <!-- GROUPS -->
+    <!-- ===================================================== -->
+
+    <q-dialog v-model="openGroups" persistent full-height full-width>
+      <GroupManagerUser :user-id="UserAdmin.form?.id" />
+    </q-dialog>
+
+
+    <!-- ===================================================== -->
+    <!-- THEME STUDIO -->
+    <!-- ===================================================== -->
+
+    <q-dialog v-model="openTheme" persistent full-height full-width>
+      <s-card class="q-pa-md">
+        <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
+          <q-toolbar-title>{{ tdc('Theme Management') }}</q-toolbar-title>
+          <q-space />
+          <s-btn dense flat round icon="close" @click="openTheme = false" />
+        </q-bar>
+
+        <q-separator />
+
+        <ThemeStudioEngine
+          scope="user"
+          :allow-scope-select="false"
+          :user="UserAdmin.form"
+          :user-store="UserAdmin"
+          :themes="Theme.rows"
+          :layouts="LayoutSetting.rows"
+          @saved="onThemeSaved"
+        />
+      </s-card>
+    </q-dialog>
+
+
+    <!-- ===================================================== -->
+    <!-- NOTIFICATION PREFERENCES -->
+    <!-- ===================================================== -->
+
+    <q-dialog v-model="openNotifications" persistent>
+      <UserNotificationPreferencesPanel :user-id="UserAdmin.form?.id" />
+    </q-dialog>
+
+
+    <!-- ===================================================== -->
+    <!-- LOADING -->
+    <!-- ===================================================== -->
+
+    <div v-if="UserAdmin.loading" class="flex flex-center q-pa-lg">
       <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
+
+    <!-- ===================================================== -->
+    <!-- FORM -->
+    <!-- ===================================================== -->
+
     <FormTwo
       v-else
-      :store="User"
+      :store="UserAdmin"
       :ignore-fields="ignoreFields"
       @saved="onSaved"
-    />
-  </q-page >
+    >
+
+      <template #right v-if="UserAdmin.form?.id">
+        <ManagementPanel>
+          <ManagementItem
+            icon="groups"
+            :label="tdc('Groups')"
+            @click="openGroups = true"
+          />
+          <ManagementItem
+            icon="palette"
+            :label="tdc('Theme Management')"
+            @click="openThemeStudio"
+          />
+          <ManagementItem
+            icon="forum"
+            :label="tdc('Notification Preferences')"
+            @click="openNotifications = true"
+          />
+        </ManagementPanel>
+
+        <div class="q-mt-md q-gutter-md">
+          <UserBranchesPanel :user-id="UserAdmin.form?.id" />
+          <UserEntitiesPanel :user-id="UserAdmin.form?.id" />
+          <UserPersonPanel :user-id="UserAdmin.form?.id" />
+        </div>
+      </template>
+
+    </FormTwo>
+
+  </q-page>
 </template>
 
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useUserStore } from '../../stores/UserStore'
+import { useUserAdminStore } from '../../stores/UserAdminStore'
+import { useThemeStore } from '../../stores/ThemeStore'
+import { useLayoutSettingStore } from '../../stores/LayoutSettingStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
+import ManagementPanel from '../../components/auto/ManagementPanel.vue'
+import ManagementItem from '../../components/auto/ManagementItem.vue'
+import GroupManagerUser from '../group/GroupManagerUser.vue'
+import UserBranchesPanel from './UserBranchesPanel.vue'
+import UserEntitiesPanel from './UserEntitiesPanel.vue'
+import UserPersonPanel from './UserPersonPanel.vue'
+import UserNotificationPreferencesPanel from './UserNotificationPreferencesPanel.vue'
+import { ThemeStudioEngine } from '../../components/theme/index.js'
+import { tdc } from '../../services/translation'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
-// ---------------- STORE ----------------
-const User = useUserStore()
+// ---------------- STORES ----------------
+// Dedicated admin store (stores/UserAdminStore.js) - NOT the session
+// useUserStore(), which used to get its own .form/.row overwritten by
+// whichever OTHER user was being edited here.
+const UserAdmin = useUserAdminStore()
+const Theme = useThemeStore()
+const LayoutSetting = useLayoutSettingStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
+const openGroups = ref(false)
+const openTheme = ref(false)
+const openNotifications = ref(false)
 
+// email/mobile stay editable-looking in this generic form (no
+// disabledFields-style mechanism exists on FormTwo/AutoForm to grey
+// them out without changing that shared component for every model),
+// but UserSerializer marks both read_only - a PATCH from here silently
+// drops any change to them. Changing another user's email/mobile
+// requires their own OTP-verified flow (data/user/views/
+// profile_contact_otp.py), never a plain admin form.
 const ignoreFields = [
   'id',
   'created_at',
@@ -38,29 +147,41 @@ const ignoreFields = [
   'deleted_at'
 ]
 
-// ---------------- PERMISSIONS ----------------
-function canDo(perm) {
-  if (!perm) return true
-  return true
-}
-
 // ---------------- LOAD DATA ----------------
 async function load(id) {
 
   if (!id) {
 
-    User.resetForm?.()
+    UserAdmin.resetForm?.()
     return
   }
 
 
   // 🔥 avoids duplicate calls with a safe comparison
-  if (String(User.row?.id) === String(id)) {
-    User.form = User.row 
+  if (String(UserAdmin.row?.id) === String(id)) {
+    UserAdmin.form = UserAdmin.row
     return
   }
 
-  User.row =  await User.getById(id)
+  UserAdmin.row = await UserAdmin.getById(id)
+}
+
+// ---------------- THEME STUDIO ----------------
+async function openThemeStudio() {
+  if (!UserAdmin.form?.id) return
+
+  await Promise.all([
+    Theme.loadData?.({ page_size: 100 }),
+    LayoutSetting.loadData?.({ page_size: 100 })
+  ])
+
+  openTheme.value = true
+}
+
+function onThemeSaved() {
+  // no-op: ThemeStudioEngine already PATCHed UserAdmin.form directly
+  // (see useThemeStudio.js's save()) - UserAdmin.form/.row already
+  // reflect the new values.
 }
 
 // ---------------- INIT ----------------
@@ -68,7 +189,7 @@ async function init() {
   try {
     ready.value = false
 
-    await User.init()
+    await UserAdmin.init()
 
     const id = route.params.id
     await load(id)
@@ -80,7 +201,7 @@ async function init() {
   }
 }
 
-// ---------------- WATCH ROUTE (FIXED) ----------------
+// ---------------- WATCH ROUTE ----------------
 watch(
   () => route.params,
   async (params) => {
@@ -88,10 +209,9 @@ watch(
 
     const id = params.id
 
-    // 🔥 always reloads when the route changes
     await load(id)
   },
-  { immediate: false } // init already handles the first load
+  { immediate: false }
 )
 
 // ---------------- EVENTS ----------------

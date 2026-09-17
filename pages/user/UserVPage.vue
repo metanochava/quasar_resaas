@@ -1,67 +1,73 @@
 <template>
-  <div class="q-pa-sm">
+  <q-page class="q-pa-sm">
     <!-- FORM -->
-    <div v-if="User.loading" class="flex flex-center q-pa-lg">
+    <div v-if="UserAdmin.loading" class="flex flex-center q-pa-lg">
       <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
     <FormTwo
       v-else
-      :store="User"
-      :ignore-fields="[
-        'id',
-        'created_at',
-        'updated_at',
-        'created_by',
-        'updated_by',
-        'deleted_at'
-      ]"
-
+      :store="UserAdmin"
+      :ignore-fields="ignoreFields"
       @saved="onSaved"
-    />
-  </div>
+    >
+      <template #right v-if="UserAdmin.form?.id">
+        <div class="q-gutter-md">
+          <UserBranchesPanel :user-id="UserAdmin.form?.id" />
+          <UserEntitiesPanel :user-id="UserAdmin.form?.id" />
+          <UserPersonPanel :user-id="UserAdmin.form?.id" />
+        </div>
+      </template>
+    </FormTwo>
+  </q-page>
 </template>
 
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useUserStore } from '../../stores/UserStore'
+import { useUserAdminStore } from '../../stores/UserAdminStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
+import UserBranchesPanel from './UserBranchesPanel.vue'
+import UserEntitiesPanel from './UserEntitiesPanel.vue'
+import UserPersonPanel from './UserPersonPanel.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
 
 // ---------------- STORE ----------------
-const User = useUserStore()
+// Dedicated admin store (stores/UserAdminStore.js) - see
+// UserSEPage.vue's own note for why this isn't useUserStore().
+const UserAdmin = useUserAdminStore()
 
 // ---------------- STATE ----------------
 const ready = ref(false)
 
-
-
-// ---------------- PERMISSIONS ----------------
-function canDo(perm) {
-  if (!perm) return true
-  return true
-}
+const ignoreFields = [
+  'id',
+  'created_at',
+  'updated_at',
+  'created_by',
+  'updated_by',
+  'deleted_at'
+]
 
 // ---------------- LOAD DATA ----------------
 async function load(id) {
 
   if (!id) {
 
-    User.resetForm?.()
+    UserAdmin.resetForm?.()
     return
   }
 
 
   // 🔥 avoids duplicate calls with a safe comparison
-  if (String(User.row?.id) === String(id)) {
-    User.form = User.row 
+  if (String(UserAdmin.row?.id) === String(id)) {
+    UserAdmin.form = UserAdmin.row
     return
   }
 
-  User.row =  await User.getById(id)
+  UserAdmin.row = await UserAdmin.getById(id)
 }
 
 // ---------------- INIT ----------------
@@ -69,7 +75,7 @@ async function init() {
   try {
     ready.value = false
 
-    await User.init()
+    await UserAdmin.init()
 
     const id = route.params.id
     await load(id)
@@ -81,7 +87,7 @@ async function init() {
   }
 }
 
-// ---------------- WATCH ROUTE (FIXED) ----------------
+// ---------------- WATCH ROUTE ----------------
 watch(
   () => route.params,
   async (params) => {
@@ -89,10 +95,9 @@ watch(
 
     const id = params.id
 
-    // 🔥 always reloads when the route changes
     await load(id)
   },
-  { immediate: false } // init already handles the first load
+  { immediate: false }
 )
 
 // ---------------- EVENTS ----------------
