@@ -13,68 +13,137 @@
       class="fit"
     >
       <q-list class="fit q-pa-none">
-        <q-expansion-item
-          v-for="App in User.Menus"
-          :key="App"
-          dense
-          class="q-pa-none full-width"
-          :class="
-            $q.dark.isActive
-              ? 'bg-dark-saas text-subtitle1 text-white'
-              : 'text-subtitle1 text-white'
-          "
-          :header-class="
-            $q.dark.isActive
-              ? 'bg-dark text-white'
-              : 'bg-primary text-white'
-          "
-          :header-style="
-            isMini
-              ? {
-                  padding: '0',
-                  minWidth: '0',
-                  width: '100%'
-                }
-              : {}
-          "
-          :expand-icon-class="
-            isMini
-              ? 'mini-expand-icon'
-              : 'text-white'
-          "
-          expand-icon="chevron_right"
-        >
-          <template #header>
+
+        <!-- ========================= -->
+        <!-- MODO MINI                 -->
+        <!-- ========================= -->
+
+        <template v-if="isMini">
+          <q-item
+            v-for="App in User.Menus"
+            :key="App.menu"
+            clickable
+            v-ripple
+            class="mini-menu-item"
+            :class="
+              $q.dark.isActive
+                ? 'bg-dark text-white'
+                : 'bg-primary text-white'
+            "
+          >
             <q-item-section
               avatar
-              :class="{ 'mini-avatar': isMini }"
+              class="mini-avatar"
             >
-              <q-icon :name="App.icon" />
-
-              <s-tooltip
-                v-if="isMini"
-                anchor="center right"
-                self="center left"
-              >
-                {{ tdc(App.menu) }}
-              </s-tooltip>
+              <q-icon
+                :name="App.icon"
+                size="22px"
+              />
             </q-item-section>
 
-            <q-item-section v-if="!isMini">
+            <!-- Tooltip -->
+            <s-tooltip
+              anchor="center right"
+              self="center left"
+            >
               {{ tdc(App.menu) }}
-            </q-item-section>
-          </template>
+            </s-tooltip>
 
-          <q-separator />
+            <!-- Menu lateral -->
+            <q-menu
+              anchor="top right"
+              self="top left"
+              :offset="[5, 0]"
+              transition-show="jump-right"
+              transition-hide="jump-left"
+            >
+              <div
+                class="mini-popup"
+                :class="
+                  $q.dark.isActive
+                    ? 'bg-dark text-white'
+                    : 'bg-white text-dark'
+                "
+              >
+                <!-- Nome da aplicação -->
+                <div class="row items-center no-wrap q-pa-sm">
 
-          <SubMenu :Dados="App.submenu" />
+                  <q-icon
+                    :name="App.icon"
+                    size="20px"
+                    class="q-mr-sm"
+                  />
 
-          <q-separator />
-        </q-expansion-item>
+                  <div class="text-subtitle2 ellipsis">
+                    {{ tdc(App.menu) }}
+                  </div>
+
+                </div>
+
+                <q-separator />
+
+                <!-- Submenus -->
+                <SubMenu :Dados="App.submenu" />
+
+              </div>
+            </q-menu>
+
+          </q-item>
+        </template>
+
+
+        <!-- ========================= -->
+        <!-- MODO NORMAL               -->
+        <!-- ========================= -->
+
+        <template v-else>
+          <q-expansion-item
+            v-for="App in User.Menus"
+            :key="App.menu"
+            dense
+            class="q-pa-none full-width"
+            :class="
+              $q.dark.isActive
+                ? 'bg-dark-saas text-subtitle1 text-white'
+                : 'text-subtitle1 text-white'
+            "
+            :header-class="
+              $q.dark.isActive
+                ? 'bg-dark text-white'
+                : 'bg-primary text-white'
+            "
+            expand-icon="chevron_right"
+            expand-icon-class="text-white"
+          >
+
+            <template #header>
+
+              <q-item-section avatar>
+                <q-icon :name="App.icon" />
+              </q-item-section>
+
+              <q-item-section>
+                <div class="ellipsis">
+                  {{ tdc(App.menu) }}
+                </div>
+              </q-item-section>
+
+            </template>
+
+            <q-separator />
+
+            <SubMenu :Dados="App.submenu" />
+
+            <q-separator />
+
+          </q-expansion-item>
+        </template>
+
       </q-list>
     </q-scroll-area>
   </div>
 </template>
+
 
 <script>
 import { defineComponent } from 'vue'
@@ -94,6 +163,7 @@ import {
   toPlural
 } from '../services/translation'
 
+
 export default defineComponent({
   name: 'LeftMenuSegundo',
 
@@ -108,14 +178,17 @@ export default defineComponent({
     return {
       EntityType,
       User,
+
       tdc,
       toPlural,
+
       barStyle,
       thumbStyle
     }
   },
 
   computed: {
+
     isMini () {
       return !!this.User.ps?.layout?.sidebar?.mini
     },
@@ -125,11 +198,18 @@ export default defineComponent({
         ? (this.User.ps?.layout?.sidebar?.mini_width || 70)
         : (this.User.ps?.layout?.sidebar?.width || 300)
     }
+
   }
 })
 </script>
 
+
 <style>
+
+/* =========================================================
+   CONTAINER PRINCIPAL
+   ========================================================= */
+
 .left-menu {
   position: absolute;
 
@@ -137,24 +217,29 @@ export default defineComponent({
   bottom: 38px;
 
   /*
-   * Ocupa a largura disponível do drawer,
-   * deixando 10px livres do lado direito.
+   * Deixa 10px livres no lado direito.
+   * Drawer 300px -> menu ~290px
+   * Drawer 70px  -> menu ~60px
    */
   left: 0;
   right: 10px;
 
+  min-width: 0;
+
   padding: 0;
   margin: 0;
 
-  min-width: 0;
+  box-sizing: border-box;
 
   overflow-x: hidden;
   overflow-y: hidden;
-
-  box-sizing: border-box;
 }
 
-/* QScrollArea */
+
+/* =========================================================
+   QSCROLLAREA
+   ========================================================= */
+
 .left-menu .q-scrollarea__container,
 .left-menu .q-scrollarea__content {
   width: 100% !important;
@@ -164,36 +249,116 @@ export default defineComponent({
   box-sizing: border-box;
 }
 
-/* Evita que a lista ultrapasse o menu */
+
+/* =========================================================
+   QLIST
+   ========================================================= */
+
 .left-menu .q-list {
+  width: 100%;
   min-width: 0 !important;
   max-width: 100% !important;
+
+  padding: 0;
+  margin: 0;
 
   box-sizing: border-box;
 }
 
-/* Evita overflow do QExpansionItem */
+
+/* =========================================================
+   MODO NORMAL
+   ========================================================= */
+
 .left-menu .q-expansion-item {
+  width: 100%;
   min-width: 0 !important;
   max-width: 100% !important;
 
   box-sizing: border-box;
 }
 
-/* Esconde o chevron no modo mini */
-.mini-expand-icon {
-  display: none !important;
+.left-menu .q-item {
+  min-width: 0 !important;
+  max-width: 100% !important;
+
+  box-sizing: border-box;
 }
 
-/* Centraliza o ícone no modo mini */
-.mini-avatar {
+
+/* =========================================================
+   MODO MINI
+   ========================================================= */
+
+.mini-menu-item {
+  width: 100%;
+
   min-width: 0 !important;
-  width: 100% !important;
+  max-width: 100% !important;
 
   padding: 0 !important;
   margin: 0 !important;
 
+  box-sizing: border-box;
+
+  justify-content: center;
+}
+
+
+/*
+ * O avatar ocupa todo o espaço disponível
+ * no drawer mini.
+ */
+
+.mini-menu-item .mini-avatar {
+  width: 100% !important;
+
+  min-width: 0 !important;
+  max-width: 100% !important;
+
+  padding: 12px 0 !important;
+  margin: 0 !important;
+
   align-items: center !important;
   justify-content: center !important;
+
+  box-sizing: border-box;
 }
+
+
+/*
+ * Remove o comportamento padrão do Quasar
+ * para q-item-section avatar.
+ */
+
+.mini-menu-item .q-item__section--avatar {
+  min-width: 0 !important;
+  padding: 0 !important;
+
+  align-items: center !important;
+}
+
+
+/* =========================================================
+   POPUP DO MENU MINI
+   ========================================================= */
+
+.mini-popup {
+  min-width: 220px;
+  max-width: 320px;
+
+  padding: 0;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   SEGURANÇA CONTRA OVERFLOW
+   ========================================================= */
+
+.left-menu * {
+  box-sizing: border-box;
+}
+
 </style>
