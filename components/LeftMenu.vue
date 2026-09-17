@@ -74,7 +74,7 @@
   </s-card>
 
 
-    <LeftMenuSegundo style="margin-left:-5px;" />
+    <LeftMenuSegundo style="margin-left:-2px;" />
 
 
   <s-btn
