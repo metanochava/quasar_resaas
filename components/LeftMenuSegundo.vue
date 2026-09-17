@@ -3,8 +3,8 @@
     class="left-menu"
     :class="
       $q.dark.isActive
-        ? 'bg-transparent '
-        : 'bg-transparent '
+        ? 'bg-transparent text-white'
+        : 'bg-transparent text-white'
     "
   >
     <q-scroll-area
@@ -27,8 +27,8 @@
             class="mini-menu-item"
             :class="
               $q.dark.isActive
-                ? 'bg-dark '
-                : 'bg-primary '
+                ? 'bg-dark text-white'
+                : 'bg-primary text-white'
             "
           >
             <q-item-section
@@ -61,7 +61,7 @@
                 class="mini-popup"
                 :class="
                   $q.dark.isActive
-                    ? 'bg-dark '
+                    ? 'bg-dark text-white'
                     : 'bg-white text-dark'
                 "
               >
@@ -104,16 +104,16 @@
             class="q-pa-none full-width"
             :class="
               $q.dark.isActive
-                ? 'bg-dark-saas text-subtitle1 '
-                : 'text-subtitle1 '
+                ? 'bg-dark-saas text-subtitle1 text-white'
+                : 'text-subtitle1 text-white'
             "
             :header-class="
               $q.dark.isActive
-                ? 'bg-dark '
-                : 'bg-primary '
+                ? 'bg-dark text-white'
+                : 'bg-primary text-white'
             "
             expand-icon="chevron_right"
-            expand-icon-class=""
+            expand-icon-class="text-white"
           >
 
             <template #header>
