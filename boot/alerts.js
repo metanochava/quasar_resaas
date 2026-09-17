@@ -62,6 +62,13 @@ export function buildErrorMessage(data) {
   return ''
 }
 
+// Configurable per consumer app (.env's ALERT_TIMEOUT, whitelisted into
+// the client bundle via quasar.config.js's build.env, same convention
+// as API_PREFIX/FRONT_END_KEY/GOOGLE_MAPS_API_KEY - see services/api.js)
+// - falls back to Quasar's own previous hardcoded value when unset, so
+// a consumer app that hasn't defined it yet keeps working unchanged.
+const ALERT_TIMEOUT = Number(process.env.ALERT_TIMEOUT) || 8000
+
 const pushAlert = (sms, type = 'info') => {
   const Alerta = useAlertStore()
 
@@ -81,6 +88,11 @@ const pushAlert = (sms, type = 'info') => {
     message: msg,
     position: 'top-right',
     html: true,
+    // Quasar's own default (5000ms) was too short to read anything
+    // beyond a one-word message - every alert (success/error/info/
+    // warning) funnels through this single function, so this covers
+    // all of them at once.
+    timeout: ALERT_TIMEOUT,
     actions: [
       { icon: 'close', color: 'white', round: true }
     ]
