@@ -69,19 +69,26 @@ watch(dashboardName, load)
 // load() only runs once the new context is the one actually sent.
 watch(() => User.ResaasContext, load)
 
-// refreshResaasContext() runs FIRST and is awaited, same reasoning (and
-// same call) as HomeDashboards.vue's own onMounted - this component is
-// also used standalone on its own dashboard routes (dashboardName comes
-// from route.params/route.meta then, not just a `name` prop from
-// HomeDashboards.vue), so it can't rely on always being mounted inside
-// a parent that already did this. The watch(User.ResaasContext) above
-// may also fire once more from this same refresh - load() is written to
-// tolerate being called multiple times (Dashboard.reset() at the top of
-// each run), so a possible extra call is harmless.
-onMounted(async () => {
-  await User.refreshResaasContext()
-  await load()
-})
+// Deliberately does NOT call User.refreshResaasContext() itself here
+// (it briefly did - caused a burst of duplicate loads, see below).
+// Nested under HomeDashboards.vue (the '/home' case), that parent
+// already awaits its OWN refreshResaasContext() before this even
+// mounts, and the watch(User.ResaasContext) above reacts to it
+// reactively. Used standalone on its own dashboard route (dashboardName
+// from route.params/route.meta, no parent doing this), a stale context
+// still self-heals: ResaasContextService.decode() 403s with "RESAAS
+// context has expired.", and services/api.js's response interceptor
+// already refreshes it and retries that one request automatically
+// (deduped via its own module-level contextRefreshPromise). Calling
+// User.refreshResaasContext() directly here bypassed that dedup
+// entirely (it's a different call site than the interceptor's), so
+// nested under HomeDashboards.vue this fired its OWN independent
+// refresh, changing User.ResaasContext a SECOND time (a fresh
+// token every call), which re-triggered the watch(User.ResaasContext)
+// above AND HomeDashboards.vue's own - each already-redundant call
+// begetting another one after it, one duplicate load() per refresh
+// site instead of a single clean one.
+onMounted(load)
 onUnmounted(() => Dashboard.reset())
 </script>
 
