@@ -73,9 +73,9 @@
     </div>
   </s-card>
 
-  <s-card >
+
     <LeftMenuSegundo  />
-  </s-card>
+
 
   <s-btn
     square 
