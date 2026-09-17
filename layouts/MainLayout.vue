@@ -157,7 +157,6 @@ import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import { useEntityStore } from '../stores/EntityStore'
 import { useThemeStore } from '../stores/ThemeStore'
 import { useLayoutSettingStore } from '../stores/LayoutSettingStore'
-import { useDashboardStore } from '../stores/DashboardStore'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
@@ -206,7 +205,6 @@ export default defineComponent({
     const User = useUserStore()
     const Theme = useThemeStore()
     const LayoutSetting = useLayoutSettingStore()
-    const Dashboard = useDashboardStore()
 
     return {
       EntityType,
@@ -214,7 +212,6 @@ export default defineComponent({
       User,
       Theme,
       LayoutSetting,
-      Dashboard,
       barStyle,
       thumbStyle
     }
@@ -316,18 +313,29 @@ export default defineComponent({
     }
   },
 
-  // Restoring the session (User.Entity/ResaasContext/Permissions) has to
-  // happen before any CHILD route component mounts, not after - Vue
-  // mounts children bottom-up and only then runs the parent's own
-  // mounted(), so putting loadFromStorage() there (as it was) meant a
-  // child like HomeDashboards.vue (mounted at '/home') already fired
-  // its own onMounted data fetch (Dashboard.loadDashboardList()) against
-  // a still-empty User.Entity/ResaasContext on a fresh page load. Works
-  // fine navigating to '/home' a second time within the same SPA session
-  // (MainLayout itself doesn't remount, so loadFromStorage() already ran
-  // once) - only breaks on a hard reload, which is exactly the reported
-  // symptom. beforeMount() still runs after MainLayout's OWN setup, but
-  // before any of its children mount.
+  // Restoring User.Entity/Branch/Group (localStorage) has to happen
+  // before any CHILD route component mounts, not after - Vue mounts
+  // children bottom-up and only then runs the parent's own mounted(),
+  // so putting loadFromStorage() there (as it was) meant a child like
+  // HomeDashboards.vue (mounted at '/home') read a still-empty
+  // User.Entity on a fresh page load. Works fine navigating to '/home' a
+  // second time within the same SPA session (MainLayout itself doesn't
+  // remount, so loadFromStorage() already ran once) - only breaks on a
+  // hard reload. beforeMount() still runs after MainLayout's OWN setup,
+  // but before any of its children mount.
+  //
+  // The X-RESAAS-Context token itself (services/tenantContext.js) lives
+  // in SEPARATE sessionStorage, can be missing/stale independently of
+  // Entity/Branch/Group, and loadFromStorage() only ever re-reads
+  // whatever's already there - it never re-establishes it. Re-fetching
+  // it (User.refreshResaasContext(), the same call Group.select() makes
+  // when switching profile) deliberately does NOT happen here: it
+  // belongs to whichever component actually needs fresh data gated by
+  // it, sequenced right before that component's own fetch (see
+  // HomeDashboards.vue/DashboardRenderer.vue's onMounted) - triggering
+  // it here too raced a SECOND, independent refresh + list-fetch
+  // against HomeDashboards.vue's own, and whichever response resolved
+  // last (not necessarily the correct one) won.
   beforeMount() {
     this.User?.loadFromStorage()
   },
@@ -335,37 +343,27 @@ export default defineComponent({
   async mounted(){
     // 🔥 RESTORE USER + SETTINGS (your original code)
     if(this.User){
-      // The X-RESAAS-Context token (services/tenantContext.js) lives in
-      // sessionStorage, separately from User.Entity/Branch/Group
-      // (localStorage, just restored above in beforeMount()) - it can be
-      // missing/stale independently of them (a new tab, an expired
-      // token, ...), and loadFromStorage() only ever re-reads whatever's
-      // already there, it never re-establishes it. Every page under here
-      // (services/api.js's request interceptor) sends whatever
-      // X-RESAAS-Context is currently set, so a stale/missing one means
-      // every request after a reload goes out with the wrong/no tenant
-      // context - which is exactly why '/home' showed no dashboard after
-      // a hard reload despite User.Entity itself being restored fine.
-      // Group.select()/GroupSelector.vue already re-establish it this
-      // same way (User.selectContext() -> refreshResaasContext()) when
-      // switching profile mid-session - do it once here too, on every
-      // fresh app boot, instead of only on an explicit profile switch.
-      //
-      // Awaited (not fire-and-forget) and followed by an EXPLICIT
-      // Dashboard.loadDashboardList() call, rather than only relying on
-      // HomeDashboards.vue's own watch(User.ResaasContext, ...) to catch
-      // the change reactively - deterministic boot order beats depending
-      // on a side-effect elsewhere to happen to fire correctly.
-      // HomeDashboards.vue's `selected` (which dashboard, if any, to
-      // render) is computed from Dashboard.dashboards + User.Entity, so
-      // refreshing the list here is enough - it re-renders on its own
-      // once this resolves, no need to duplicate its widget-loading
-      // logic here too.
-      try {
-        await this.User.refreshResaasContext()
-        await this.Dashboard.loadDashboardList()
-      } catch (err) {
-        console.error('refreshResaasContext/loadDashboardList on boot failed', err)
+      // The left/top navigation menu (User.Menus/AllMenus) starts empty
+      // ([]) and User.getMenus() was previously only ever called
+      // reactively (GroupStore.js's own group-switch flow, a couple of
+      // one-off pages) - never once on a normal app boot, so the menu
+      // was empty on every fresh page load until the user happened to
+      // switch group/profile. The backend action itself
+      // (UserAPIView.menus(), saas/data/user/views/user.py) also 200s
+      // an empty [] outright when request.entity_type_id is missing -
+      // it reads the SAME X-RESAAS-Context-derived tenant context as
+      // the dashboard endpoints, so this needs a fresh
+      // refreshResaasContext() first too (see HomeDashboards.vue's own
+      // onMounted for the identical reasoning re: sessionStorage vs
+      // localStorage). This is a separate refresh call from the
+      // dashboard's own (not shared/reused) - each writes to unrelated
+      // state (User.Menus here, Dashboard.dashboards there), so there's
+      // no race between them like there would be if two call sites
+      // wrote the SAME state from possibly-stale vs. fresh responses.
+      await this.User.refreshResaasContext().catch(() => {})
+
+      if (this.User.data?.id) {
+        await this.User.getMenus()
       }
 
       await this.Entity.getLayoutSettings(this.User?.Entity?.id)

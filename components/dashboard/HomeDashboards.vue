@@ -53,8 +53,27 @@ const selected = computed(() => {
 // which dashboard - engine vs legacy registry - gets selected below)
 // was only ever fetched once per SPA session, going stale on every
 // subsequent visit to home after leaving and coming back.
-onMounted(() => {
-  Dashboard.loadDashboardList()
+//
+// refreshResaasContext() runs FIRST and is awaited - the
+// X-RESAAS-Context token (services/tenantContext.js) lives in
+// sessionStorage, separately from User.Entity/Branch/Group
+// (localStorage, restored by MainLayout.vue's beforeMount() before this
+// even mounts). It can be missing/stale independently of them (a new
+// tab, an expired token, ...), and nothing else re-establishes it on a
+// fresh page load - every request (services/api.js's interceptor)
+// until then goes out with the wrong/no tenant context, which is why a
+// hard reload on '/home' showed no dashboard despite User.Entity itself
+// being restored fine. Same call Group.select() already makes when
+// switching profile mid-session (User.selectContext() ->
+// refreshResaasContext()) - just also made once on a fresh mount here,
+// sequenced before the fetch it gates rather than left to the
+// watch(User.ResaasContext) below to catch reactively (which still
+// exists for the profile-switch case, and may also fire once more from
+// this same refresh - loadDashboardList() is idempotent, so a possible
+// extra call is harmless).
+onMounted(async () => {
+  await User.refreshResaasContext()
+  await Dashboard.loadDashboardList()
 })
 
 // DashboardListAPIView filters by DashboardPermissionService against

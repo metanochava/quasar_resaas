@@ -69,7 +69,19 @@ watch(dashboardName, load)
 // load() only runs once the new context is the one actually sent.
 watch(() => User.ResaasContext, load)
 
-onMounted(load)
+// refreshResaasContext() runs FIRST and is awaited, same reasoning (and
+// same call) as HomeDashboards.vue's own onMounted - this component is
+// also used standalone on its own dashboard routes (dashboardName comes
+// from route.params/route.meta then, not just a `name` prop from
+// HomeDashboards.vue), so it can't rely on always being mounted inside
+// a parent that already did this. The watch(User.ResaasContext) above
+// may also fire once more from this same refresh - load() is written to
+// tolerate being called multiple times (Dashboard.reset() at the top of
+// each run), so a possible extra call is harmless.
+onMounted(async () => {
+  await User.refreshResaasContext()
+  await load()
+})
 onUnmounted(() => Dashboard.reset())
 </script>
 
