@@ -113,7 +113,7 @@
                 : 'bg-primary text-white'
             "
             expand-icon="chevron_right"
-            expand-icon-class="text-white"
+            expand-icon-class="white"
           >
 
             <template #header>
