@@ -74,7 +74,11 @@ async function save() {
     persistent
     @update:model-value="v => emit('update:modelValue', v)"
   >
-    <s-card style="min-width: 480px; max-width: 95vw" class="rounded-borders">
+    <!-- column no-wrap + the .dialog-card max-height below is what lets
+         the middle q-card-section be the ONLY scrolling area - same
+         layout FormModal.vue/FormTwo.vue already use, so header and
+         footer stay put while a long related-model form scrolls. -->
+    <s-card class="dialog-card column no-wrap">
       <q-bar
         class="row items-center"
         :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
@@ -90,25 +94,56 @@ async function save() {
         </s-btn>
       </q-bar>
 
-      <q-card-section v-if="!ready" class="flex flex-center q-pa-lg">
-        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
-      </q-card-section>
+      <q-separator />
 
-      <q-card-section v-else class="q-pa-none">
+      <q-card-section class="scroll col dialog-body">
+        <div v-if="!ready" class="flex flex-center q-pa-lg">
+          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
+        </div>
+
         <Form
+          v-else
           ref="formRef"
           :store="store"
           :ignore-fields="ignoreFields"
           @saved="onSaved"
         />
-
-        <ActionForm
-          :store="store"
-          :buttons="['cancel', 'save']"
-          @cancel="close"
-          @save="save"
-        />
       </q-card-section>
+
+      <q-separator />
+
+      <ActionForm
+        :store="store"
+        :buttons="['cancel', 'save']"
+        @cancel="close"
+        @save="save"
+      />
     </s-card>
   </q-dialog>
 </template>
+
+<style scoped>
+.dialog-card {
+  min-width: 480px;
+  max-width: 95vw;
+  max-height: 90vh;
+  border-radius: 14px;
+}
+
+.dialog-body {
+  padding: 20px;
+}
+
+@media (max-width: 767px) {
+  .dialog-card {
+    min-width: 95vw;
+    width: 95vw;
+    max-width: 95vw;
+    max-height: 95vh;
+  }
+
+  .dialog-body {
+    padding: 10px;
+  }
+}
+</style>

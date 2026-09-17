@@ -313,10 +313,25 @@ export default defineComponent({
     }
   },
 
+  // Restoring the session (User.Entity/ResaasContext/Permissions) has to
+  // happen before any CHILD route component mounts, not after - Vue
+  // mounts children bottom-up and only then runs the parent's own
+  // mounted(), so putting loadFromStorage() there (as it was) meant a
+  // child like HomeDashboards.vue (mounted at '/home') already fired
+  // its own onMounted data fetch (Dashboard.loadDashboardList()) against
+  // a still-empty User.Entity/ResaasContext on a fresh page load. Works
+  // fine navigating to '/home' a second time within the same SPA session
+  // (MainLayout itself doesn't remount, so loadFromStorage() already ran
+  // once) - only breaks on a hard reload, which is exactly the reported
+  // symptom. beforeMount() still runs after MainLayout's OWN setup, but
+  // before any of its children mount.
+  beforeMount() {
+    this.User?.loadFromStorage()
+  },
+
   async mounted(){
     // 🔥 RESTORE USER + SETTINGS (your original code)
     if(this.User){
-      this.User?.loadFromStorage()
       await this.Entity.getLayoutSettings(this.User?.Entity?.id)
     }
 
