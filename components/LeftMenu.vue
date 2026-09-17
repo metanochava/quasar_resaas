@@ -68,12 +68,12 @@
         </s-btn>
       </div>
     </q-item>
-    <div v-if="!isSidebarMini" class="q-pa-sm">
+    <div class="q-pa-sm">
       <search-menu size="100%" />
     </div>
   </s-card>
 
-  <LeftMenuSegundo  style="margin-top:95px; margin-bottom:70px" />
+  <LeftMenuSegundo  style="margin-top:95px; margin-bottom:0px" />
 
   <!-- 🔥 SIDEBAR MINI TOGGLE - fixed at the bottom of the drawer, same
        reasoning as .header-fixed above but pinned to the bottom instead,
