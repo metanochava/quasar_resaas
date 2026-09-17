@@ -31,7 +31,7 @@
     @virtual-scroll="onScroll"
   >
     <template v-if="canAdd" #after>
-      <s-btn flat round dense icon="add" @click.stop="showCreate = true">
+      <s-btn flat round dense color="primary" icon="add" @click.stop="showCreate = true">
         <s-tooltip>{{ tdc('Add new') }}</s-tooltip>
       </s-btn>
     </template>
@@ -689,7 +689,9 @@ export default defineComponent({
 
       canAdd,
 
-      onRelationCreated
+      onRelationCreated,
+
+      tdc
 
     }
 

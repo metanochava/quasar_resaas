@@ -85,7 +85,9 @@ async function save() {
 
         <q-space />
 
-        <s-btn flat round dense icon="close" @click="close" />
+        <s-btn flat round dense icon="close" @click="close">
+          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
+        </s-btn>
       </q-bar>
 
       <q-card-section v-if="!ready" class="flex flex-center q-pa-lg">
