@@ -1,5 +1,16 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { installAuthGuard } from './authGuard'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+const AlertWarning = vi.fn()
+
+vi.mock('../boot/alerts', () => ({
+  AlertWarning: (...args) => AlertWarning(...args),
+}))
+
+vi.mock('../services/translation', () => ({
+  tdc: (text) => text,
+}))
+
+const { installAuthGuard } = await import('./authGuard')
 
 let guardFn
 const fakeRouter = {
@@ -8,6 +19,7 @@ const fakeRouter = {
 
 beforeEach(() => {
   localStorage.clear()
+  AlertWarning.mockClear()
   installAuthGuard(fakeRouter)
 })
 
@@ -51,6 +63,44 @@ describe('installAuthGuard - requiredRole', () => {
     })
 
     expect(result).toEqual({ name: 'home' })
+  })
+
+  it('warns with the current profile and the target route when blocking navigation', () => {
+    localStorage.setItem('userGroup', JSON.stringify({ name: 'Guest' }))
+    localStorage.setItem('userPermissions', JSON.stringify([]))
+
+    guardFn({
+      meta: { requiresAuth: true, requiredRole: 'add_app', title: 'Add App' },
+      name: 'add_app',
+      fullPath: '/add_app'
+    })
+
+    expect(AlertWarning).toHaveBeenCalledTimes(1)
+    expect(AlertWarning.mock.calls[0][0]).toContain('Guest')
+    expect(AlertWarning.mock.calls[0][0]).toContain('Add App')
+  })
+
+  it('falls back to the route name when the route has no meta.title', () => {
+    localStorage.setItem('userGroup', JSON.stringify({ name: 'Guest' }))
+
+    guardFn({
+      meta: { requiresAuth: true, requiredRole: 'add_app' },
+      name: 'add_app',
+      fullPath: '/add_app'
+    })
+
+    expect(AlertWarning.mock.calls[0][0]).toContain('add_app')
+  })
+
+  it('does not warn when navigation is allowed', () => {
+    localStorage.setItem('userPermissions', JSON.stringify(['add_app']))
+
+    guardFn({
+      meta: { requiresAuth: true, requiredRole: 'add_app' },
+      fullPath: '/add_app'
+    })
+
+    expect(AlertWarning).not.toHaveBeenCalled()
   })
 
   it('allows navigation when the user has the required permission', () => {

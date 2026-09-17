@@ -208,6 +208,13 @@ const AlertInfo = (data) => {
 }
 
 /* =========================
+   WARNING
+========================= */
+const AlertWarning = (data) => {
+  pushAlert(data, 'warning')
+}
+
+/* =========================
    AUTO HANDLER
 ========================= */
 const Alert = (response) => {
@@ -234,5 +241,6 @@ export {
   AlertSuccess,
   AlertError,
   AlertInfo,
+  AlertWarning,
   Alert
 }

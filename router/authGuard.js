@@ -1,5 +1,7 @@
 import { getStorage } from '../services/storage'
 import { JSONSafeParse } from '../utils/json'
+import { AlertWarning } from '../boot/alerts'
+import { tdc } from '../services/translation'
 
 // Routes already declare `meta.requiresAuth` (see router/restRoutes.js)
 // but nothing ever enforced it - a protected route mounted its
@@ -49,6 +51,20 @@ function hasRequiredRole(role) {
     .includes(String(role).toLowerCase())
 }
 
+// "Profile" here is the currently active Group (userGroup storage key -
+// UserStore.selectContext()/GroupSelector.vue's own "switch profile"
+// language for the same concept), since permissions in this app are
+// always evaluated against whichever Group/profile is currently
+// selected, not the User account itself.
+function currentProfileLabel() {
+  const group = JSONSafeParse(getStorage('l', 'userGroup'))
+  return group?.name || group?.label || group?.value || tdc('Unknown profile')
+}
+
+function routeLabel(to) {
+  return to.meta?.title || String(to.name || to.fullPath || '')
+}
+
 export function installAuthGuard(router, {
   loginRouteName = 'login',
   forbiddenRouteName = 'home'
@@ -59,6 +75,10 @@ export function installAuthGuard(router, {
     }
 
     if (to.meta?.requiredRole && !hasRequiredRole(to.meta.requiredRole)) {
+      AlertWarning(
+        `${tdc('Profile')} "${currentProfileLabel()}" ${tdc('does not have permission for route')} "${routeLabel(to)}"`
+      )
+
       return { name: forbiddenRouteName }
     }
   })
