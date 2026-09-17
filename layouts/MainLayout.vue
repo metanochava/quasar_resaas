@@ -115,9 +115,12 @@
       :width="User.ps?.layout?.sidebar?.width || 300"
       :mini="!!User.ps?.layout?.sidebar?.mini"
       :mini-width="User.ps?.layout?.sidebar?.mini_width || 70"
-      :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary '"
+      :class="[
+        'q-pa-none',
+        $q.dark.isActive ? 'bg-dark text-white' : 'bg-saas bg-primary'
+      ]"
     >
-      <q-bar class="full-height q-pa-0" >
+      <q-bar class="full-height q-pa-none" >
         <LeftMenu />
       </q-bar>
     </q-drawer>
