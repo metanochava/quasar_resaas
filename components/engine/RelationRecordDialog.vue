@@ -5,19 +5,25 @@ import ActionForm from '../auto/ActionForm.vue'
 import { tdc } from '../../services/translation'
 import { getRelationStore } from '../../base/relation_store_registry'
 
-// Django-Admin-style "add related" dialog - a generic, metadata-driven
-// create form for WHATEVER model relationConfig points to (never
-// hardcoded to one model, unlike components/person/PersonSearch.vue's
-// own create dialog, which is Person-specific). Reused identically by
-// s-select and s-multiselect (SelectComponent.vue), since both need
-// the exact same "create the related record without leaving this
-// form" behavior.
+// Django-Admin-style "add/edit/view related" dialog - a generic,
+// metadata-driven form for WHATEVER model relationConfig points to
+// (never hardcoded to one model, unlike components/person/
+// PersonSearch.vue's own create dialog, which is Person-specific).
+// Reused identically by s-select and s-multiselect (SelectComponent.vue)
+// for all three modes - only `mode`/`recordId` differ.
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
-  relationConfig: { type: Object, required: true }
+  relationConfig: { type: Object, required: true },
+  mode: {
+    type: String,
+    default: 'add',
+    validator: v => ['add', 'edit', 'view'].includes(v)
+  },
+  // Required for 'edit'/'view' - the related record's id to load.
+  recordId: { type: [String, Number], default: null }
 })
 
-const emit = defineEmits(['update:modelValue', 'created'])
+const emit = defineEmits(['update:modelValue', 'saved'])
 
 const store = computed(() =>
   getRelationStore(props.relationConfig.app, props.relationConfig.model)
@@ -37,6 +43,22 @@ const ignoreFields = [
   'deleted_at'
 ]
 
+const titleVerb = computed(() => ({
+  add: 'New',
+  edit: 'Edit',
+  view: 'View'
+}[props.mode]))
+
+// 'view' has nothing to submit - drop save/edit entirely rather than
+// merely disabling them, so there's no button that looks actionable but
+// isn't. 'add' and 'edit' both keep the same ['save','edit'] pair -
+// ActionForm.vue already decides which ONE of the two to actually show
+// based on isEdit (store.form?.id), so this dialog never needs to
+// branch that itself.
+const buttons = computed(() =>
+  props.mode === 'view' ? ['cancel'] : ['cancel', 'save', 'edit']
+)
+
 watch(() => props.modelValue, async (open) => {
   if (!open) return
 
@@ -44,12 +66,19 @@ watch(() => props.modelValue, async (open) => {
 
   // loadSchemaOnce() only - NOT store.init() (which also calls
   // loadData(), fetching the related model's full list). This dialog
-  // only ever creates a record, so it needs the schema/fields, never
-  // the list - and a user with `add` but not `list`/`view` on the
-  // related model would otherwise have this dialog break on a 403 it
-  // has no reason to hit.
+  // never needs that list - and a user with `add` but not `list`/`view`
+  // on the related model would otherwise have it break on a 403 it has
+  // no reason to hit.
   await store.value.loadSchemaOnce()
-  store.value.resetForm()
+
+  if (props.mode === 'add') {
+    store.value.resetForm()
+  } else {
+    // force: true - a previous open of this SAME dynamic store (another
+    // field pointing at the same related model) may have cached a
+    // different id under .row.
+    await store.value.getById(props.recordId, { force: true })
+  }
 
   ready.value = true
 })
@@ -59,7 +88,7 @@ function close() {
 }
 
 function onSaved(record) {
-  emit('created', record)
+  emit('saved', record)
   close()
 }
 
@@ -84,7 +113,7 @@ async function save() {
         :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
       >
         <div class="text-h6">
-          {{ tdc('New') }} {{ tdc(relationConfig.model) }}
+          {{ tdc(titleVerb) }} {{ tdc(relationConfig.model) }}
         </div>
 
         <q-space />
@@ -106,6 +135,7 @@ async function save() {
           ref="formRef"
           :store="store"
           :ignore-fields="ignoreFields"
+          :readonly="mode === 'view'"
           @saved="onSaved"
         />
       </q-card-section>
@@ -114,7 +144,7 @@ async function save() {
 
       <ActionForm
         :store="store"
-        :buttons="['cancel', 'save']"
+        :buttons="buttons"
         @cancel="close"
         @save="save"
       />

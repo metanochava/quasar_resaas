@@ -8,7 +8,17 @@ import FormSection from '../auto/FormSection.vue'
 // ---------------- PROPS ----------------
 const props = defineProps({
   store: { default: () => [] },
-  ignoreFields: {  default: () => [] }
+  ignoreFields: {  default: () => [] },
+
+  // Forces every field readonly regardless of the schema's own
+  // read_only value - a "view" dialog reuses the exact same generic
+  // form (labels, components, relations, files) as create/edit, it
+  // just can't submit anything. Real enforcement stays the backend's
+  // (this is display-only, same as the schema-driven read_only already
+  // is - see app_schema.py), and the caller is expected to also drop
+  // 'save'/'edit' from ActionForm's buttons so there's nothing to
+  // submit in the first place.
+  readonly: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['saved'])
@@ -29,6 +39,13 @@ const ignoreSet = computed(() => new Set(props.ignoreFields || []))
 // 🔥 ocultar campos tipo id
 function isHiddenField(f) {
   return ['id'].includes(f.name)
+}
+
+// props.readonly forces EVERY field readonly (view mode) - merged on
+// top of, never instead of, the field's own schema-driven props (which
+// may already carry other config like accept/options/rules).
+function fieldProps(f) {
+  return props.readonly ? { ...f.props, readonly: true } : f.props
 }
 
 // ---------------- FIELD GROUPS ----------------
@@ -293,7 +310,7 @@ defineExpose({
           <component
             :is=" f.component"
             v-model="form[f.name]"
-            v-bind="f.props"
+            v-bind="fieldProps(f)"
             :rules="resolveRules(f.rules)"
             :error="!!errors[f.name]"
             :error-message="errors[f.name] || ''"
@@ -312,7 +329,7 @@ defineExpose({
           <component
             :is=" f.component"
             v-model="form[f.name]"
-            v-bind="f.props"
+            v-bind="fieldProps(f)"
             :rules="resolveRules(f.rules)"
             :error="!!errors[f.name]"
             :error-message="errors[f.name] || ''"
@@ -344,7 +361,7 @@ defineExpose({
           <component
             :is=" f.component"
             v-model="form[f.name]"
-            v-bind="f.props"
+            v-bind="fieldProps(f)"
             :rules="resolveRules(f.rules)"
             :error="!!errors[f.name]"
             :error-message="errors[f.name] || ''"

@@ -30,20 +30,47 @@
     @filter="onFilter"
     @virtual-scroll="onScroll"
   >
-    <template v-if="canAdd" #after>
-      <s-btn   size="sm" color="primary" icon="add" @click.stop="showCreate = true">
-        <s-tooltip>{{ tdc('Add new') }}</s-tooltip>
+    <template v-if="canAdd || canEdit || canView" #after>
+      <s-btn flat round dense size="sm" color="primary" icon="more_vert" @click.stop>
+        <s-tooltip>{{ tdc('Actions') }}</s-tooltip>
+
+        <q-menu auto-close>
+          <q-list dense style="min-width: 160px">
+            <q-item v-if="canAdd" clickable @click="openAdd">
+              <q-item-section avatar>
+                <q-icon name="add" color="primary" />
+              </q-item-section>
+              <q-item-section>{{ tdc('Add new') }}</q-item-section>
+            </q-item>
+
+            <q-item v-if="canEdit" clickable @click="openEdit">
+              <q-item-section avatar>
+                <q-icon name="edit" color="secondary" />
+              </q-item-section>
+              <q-item-section>{{ tdc('Edit') }}</q-item-section>
+            </q-item>
+
+            <q-item v-if="canView" clickable @click="openView">
+              <q-item-section avatar>
+                <q-icon name="visibility" color="grey-7" />
+              </q-item-section>
+              <q-item-section>{{ tdc('View') }}</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
       </s-btn>
     </template>
 
     <slot />
   </q-select>
 
-  <RelationQuickCreate
+  <RelationRecordDialog
     v-if="relationConfig"
-    v-model="showCreate"
+    v-model="showDialog"
     :relation-config="relationConfig"
-    @created="onRelationCreated"
+    :mode="dialogMode"
+    :record-id="dialogRecordId"
+    @saved="onDialogSaved"
   />
 </template>
 
@@ -61,7 +88,7 @@ import { useUserStore } from "../../stores/UserStore"
 import { tdc } from "../../services/translation"
 import { HTTPAuth } from "../../services/api"
 import { toRelationOption } from "../../utils/autoForm"
-import RelationQuickCreate from "./RelationQuickCreate.vue"
+import RelationRecordDialog from "./RelationRecordDialog.vue"
 
 export default defineComponent({
 
@@ -70,7 +97,7 @@ export default defineComponent({
   inheritAttrs: false,
 
   components: {
-    RelationQuickCreate
+    RelationRecordDialog
   },
 
   props: {
