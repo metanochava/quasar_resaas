@@ -6,6 +6,11 @@
         ? 'bg-transparent text-white'
         : 'bg-transparent text-white'
     "
+    :style="
+      menuRtl
+        ? { left: '10px', right: '0' }
+        : { left: '0', right: '10px' }
+    "
   >
     <q-scroll-area
       :thumb-style="thumbStyle"
@@ -14,9 +19,9 @@
     >
       <q-list class="fit q-pa-none">
 
-        <!-- ========================= -->
-        <!-- MODO MINI                 -->
-        <!-- ========================= -->
+        <!-- ============================================= -->
+        <!-- MINI MENU                                     -->
+        <!-- ============================================= -->
 
         <template v-if="isMini">
           <q-item
@@ -31,31 +36,60 @@
                 : 'bg-primary text-white'
             "
           >
+            <!-- ICON -->
             <q-item-section
               avatar
               class="mini-avatar"
             >
               <q-icon
-                :name="App.icon"
+                :name="App.icon || 'menu'"
                 size="22px"
               />
             </q-item-section>
 
-            <!-- Tooltip -->
+            <!-- TOOLTIP -->
             <s-tooltip
-              anchor="center right"
-              self="center left"
+              :anchor="
+                menuRtl
+                  ? 'center left'
+                  : 'center right'
+              "
+              :self="
+                menuRtl
+                  ? 'center right'
+                  : 'center left'
+              "
             >
               {{ tdc(App.menu) }}
             </s-tooltip>
 
-            <!-- Menu lateral -->
+            <!-- MINI POPUP -->
             <q-menu
-              anchor="top right"
-              self="top left"
-              :offset="[5, 0]"
-              transition-show="jump-right"
-              transition-hide="jump-left"
+              :anchor="
+                menuRtl
+                  ? 'top left'
+                  : 'top right'
+              "
+              :self="
+                menuRtl
+                  ? 'top right'
+                  : 'top left'
+              "
+              :offset="
+                menuRtl
+                  ? [-5, 0]
+                  : [5, 0]
+              "
+              :transition-show="
+                menuRtl
+                  ? 'jump-left'
+                  : 'jump-right'
+              "
+              :transition-hide="
+                menuRtl
+                  ? 'jump-right'
+                  : 'jump-left'
+              "
             >
               <div
                 class="mini-popup"
@@ -65,25 +99,41 @@
                     : 'bg-white text-dark'
                 "
               >
-                <!-- Nome da aplicação -->
-                <div class="row items-center no-wrap q-pa-sm">
 
+                <!-- POPUP HEADER -->
+                <div
+                  class="row items-center no-wrap q-pa-sm"
+                  :class="{ 'row-reverse': menuRtl }"
+                >
                   <q-icon
-                    :name="App.icon"
+                    :name="App.icon || 'menu'"
                     size="20px"
-                    class="q-mr-sm"
+                    :class="
+                      menuRtl
+                        ? 'q-ml-sm'
+                        : 'q-mr-sm'
+                    "
                   />
 
-                  <div class="text-subtitle2 ellipsis">
+                  <div
+                    class="col text-subtitle2 ellipsis"
+                    :class="
+                      menuRtl
+                        ? 'text-right'
+                        : 'text-left'
+                    "
+                  >
                     {{ tdc(App.menu) }}
                   </div>
-
                 </div>
 
                 <q-separator />
 
-                <!-- Submenus -->
-                <SubMenu :Dados="App.submenu" />
+                <!-- SUBMENU -->
+                <SubMenu
+                  :Dados="App.submenu"
+                  :menu-rtl="menuRtl"
+                />
 
               </div>
             </q-menu>
@@ -92,9 +142,9 @@
         </template>
 
 
-        <!-- ========================= -->
-        <!-- MODO NORMAL               -->
-        <!-- ========================= -->
+        <!-- ============================================= -->
+        <!-- MENU NORMAL                                   -->
+        <!-- ============================================= -->
 
         <template v-else>
           <q-expansion-item
@@ -113,26 +163,53 @@
                 : 'bg-primary text-white'
             "
             expand-icon="chevron_right"
-            expand-icon-class="text-white"
+            :expand-icon-class="
+              menuRtl
+                ? 'expand-icon-rtl text-white'
+                : 'text-white'
+            "
           >
 
+            <!-- CUSTOM HEADER -->
             <template #header>
+              <div
+                class="row items-center full-width no-wrap"
+                :class="{ 'row-reverse': menuRtl }"
+              >
 
-              <q-item-section avatar>
-                <q-icon :name="App.icon" />
-              </q-item-section>
+                <!-- ICON -->
+                <q-icon
+                  :name="App.icon || 'menu'"
+                  size="24px"
+                  :class="
+                    menuRtl
+                      ? 'q-ml-md'
+                      : 'q-mr-md'
+                  "
+                />
 
-              <q-item-section>
-                <div class="ellipsis">
+                <!-- TITLE -->
+                <div
+                  class="col ellipsis"
+                  :class="
+                    menuRtl
+                      ? 'text-right'
+                      : 'text-left'
+                  "
+                >
                   {{ tdc(App.menu) }}
                 </div>
-              </q-item-section>
 
+              </div>
             </template>
 
             <q-separator />
 
-            <SubMenu :Dados="App.submenu" />
+            <!-- SUBMENU -->
+            <SubMenu
+              :Dados="App.submenu"
+              :menu-rtl="menuRtl"
+            />
 
             <q-separator />
 
@@ -193,6 +270,10 @@ export default defineComponent({
       return !!this.User.ps?.layout?.sidebar?.mini
     },
 
+    menuRtl () {
+      return !!this.User.ps?.layout?.menu_rtl
+    },
+
     sidebarWidth () {
       return this.isMini
         ? (this.User.ps?.layout?.sidebar?.mini_width || 70)
@@ -205,9 +286,8 @@ export default defineComponent({
 
 
 <style>
-
 /* =========================================================
-   CONTAINER PRINCIPAL
+   CONTAINER
    ========================================================= */
 
 .left-menu {
@@ -215,14 +295,6 @@ export default defineComponent({
 
   top: 94px;
   bottom: 38px;
-
-  /*
-   * Deixa 10px livres no lado direito.
-   * Drawer 300px -> menu ~290px
-   * Drawer 70px  -> menu ~60px
-   */
-  left: 0;
-  right: 10px;
 
   min-width: 0;
 
@@ -237,25 +309,27 @@ export default defineComponent({
 
 
 /* =========================================================
-   QSCROLLAREA
+   SCROLL AREA
    ========================================================= */
 
 .left-menu .q-scrollarea__container,
 .left-menu .q-scrollarea__content {
   width: 100% !important;
-  max-width: 100% !important;
+
   min-width: 0 !important;
+  max-width: 100% !important;
 
   box-sizing: border-box;
 }
 
 
 /* =========================================================
-   QLIST
+   LIST
    ========================================================= */
 
 .left-menu .q-list {
   width: 100%;
+
   min-width: 0 !important;
   max-width: 100% !important;
 
@@ -267,16 +341,18 @@ export default defineComponent({
 
 
 /* =========================================================
-   MODO NORMAL
+   NORMAL MENU
    ========================================================= */
 
 .left-menu .q-expansion-item {
   width: 100%;
+
   min-width: 0 !important;
   max-width: 100% !important;
 
   box-sizing: border-box;
 }
+
 
 .left-menu .q-item {
   min-width: 0 !important;
@@ -286,8 +362,14 @@ export default defineComponent({
 }
 
 
+/* RTL expansion arrow */
+.expand-icon-rtl {
+  transform: rotate(180deg);
+}
+
+
 /* =========================================================
-   MODO MINI
+   MINI MENU
    ========================================================= */
 
 .mini-menu-item {
@@ -305,11 +387,6 @@ export default defineComponent({
 }
 
 
-/*
- * O avatar ocupa todo o espaço disponível
- * no drawer mini.
- */
-
 .mini-menu-item .mini-avatar {
   width: 100% !important;
 
@@ -326,21 +403,18 @@ export default defineComponent({
 }
 
 
-/*
- * Remove o comportamento padrão do Quasar
- * para q-item-section avatar.
- */
-
 .mini-menu-item .q-item__section--avatar {
   min-width: 0 !important;
+
   padding: 0 !important;
 
   align-items: center !important;
+  justify-content: center !important;
 }
 
 
 /* =========================================================
-   POPUP DO MENU MINI
+   MINI POPUP
    ========================================================= */
 
 .mini-popup {
@@ -354,11 +428,10 @@ export default defineComponent({
 
 
 /* =========================================================
-   SEGURANÇA CONTRA OVERFLOW
+   OVERFLOW
    ========================================================= */
 
 .left-menu * {
   box-sizing: border-box;
 }
-
 </style>
