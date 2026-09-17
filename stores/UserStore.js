@@ -9,6 +9,24 @@ import { JSONSafeParse } from '../utils/json'
 
 import { createResaasContext,  clearResaasContext, getResaasContext } from '../services/tenantContext'
 
+// Module-level (not store state - a Promise isn't serializable/reactive
+// state anyway), shared across every call regardless of which component
+// triggers it. Several independent boot-time call sites (MainLayout.vue,
+// HomeDashboards.vue, DashboardRenderer.vue) each legitimately need to
+// AWAIT a fresh context before their own fetch - but every call to
+// createResaasContext() issues a genuinely fresh, differently-signed
+// token even for the identical entity/branch/group, so without this
+// dedup each independent caller changed `this.ResaasContext` again,
+// which re-triggered every OTHER component's own
+// watch(() => User.ResaasContext, ...) (a real, pre-existing pattern for
+// the "switch profile mid-session" case) - a cascade of duplicate
+// dashboard loads a user saw as "a loop". Same dedup pattern
+// services/api.js's own response interceptor already uses locally for
+// its 403-"context expired"-retry - shared here so BOTH that interceptor
+// and any component calling this method directly collapse into the same
+// in-flight request.
+let resaasContextRefreshPromise = null
+
 
 
 
@@ -144,11 +162,15 @@ export const useUserStore = createBaseStore(
         return null
       }
 
-      const data = await createResaasContext({
-        entity: this.Entity,
-        branch: this.Branch,
-        group: this.Group
-      })
+      if (!resaasContextRefreshPromise) {
+        resaasContextRefreshPromise = createResaasContext({
+          entity: this.Entity,
+          branch: this.Branch,
+          group: this.Group
+        }).finally(() => { resaasContextRefreshPromise = null })
+      }
+
+      const data = await resaasContextRefreshPromise
 
       this.ResaasContext = data.token
 

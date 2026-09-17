@@ -69,26 +69,27 @@ watch(dashboardName, load)
 // load() only runs once the new context is the one actually sent.
 watch(() => User.ResaasContext, load)
 
-// Deliberately does NOT call User.refreshResaasContext() itself here
-// (it briefly did - caused a burst of duplicate loads, see below).
-// Nested under HomeDashboards.vue (the '/home' case), that parent
-// already awaits its OWN refreshResaasContext() before this even
-// mounts, and the watch(User.ResaasContext) above reacts to it
-// reactively. Used standalone on its own dashboard route (dashboardName
-// from route.params/route.meta, no parent doing this), a stale context
-// still self-heals: ResaasContextService.decode() 403s with "RESAAS
-// context has expired.", and services/api.js's response interceptor
-// already refreshes it and retries that one request automatically
-// (deduped via its own module-level contextRefreshPromise). Calling
-// User.refreshResaasContext() directly here bypassed that dedup
-// entirely (it's a different call site than the interceptor's), so
-// nested under HomeDashboards.vue this fired its OWN independent
-// refresh, changing User.ResaasContext a SECOND time (a fresh
-// token every call), which re-triggered the watch(User.ResaasContext)
-// above AND HomeDashboards.vue's own - each already-redundant call
-// begetting another one after it, one duplicate load() per refresh
-// site instead of a single clean one.
-onMounted(load)
+// refreshResaasContext() runs FIRST and is awaited - needed here too
+// (not just HomeDashboards.vue's own): this component is also used
+// standalone on its own dashboard routes (dashboardName from
+// route.params/route.meta, no parent already doing this), and
+// services/api.js's own interceptor-level auto-refresh only covers a
+// context that's EXPIRED (ResaasContextService.decode() 403ing with
+// "RESAAS context has expired.") - a MISSING context (never
+// established yet, e.g. right after a hard reload before anything set
+// it) 403s differently and isn't retried automatically at all.
+//
+// UserStore.refreshResaasContext() itself is deduped (module-level
+// promise, shared with services/api.js's interceptor) specifically so
+// this and HomeDashboards.vue's OWN call collapse into ONE real
+// request/token instead of each issuing its own fresh (differently-
+// signed every time) token - that used to change User.ResaasContext
+// repeatedly, cascading through every watch(User.ResaasContext) in both
+// files and causing a burst of duplicate loads.
+onMounted(async () => {
+  await User.refreshResaasContext()
+  await load()
+})
 onUnmounted(() => Dashboard.reset())
 </script>
 
