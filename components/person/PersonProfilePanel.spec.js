@@ -96,6 +96,20 @@ describe('PersonProfilePanel', () => {
     expect(w.find('.field-value.is-empty').exists()).toBe(true)
   })
 
+  it('shows EVERY contact field - empty ones as a dash - and both flags', async () => {
+    const w = mount(PersonProfilePanel, { props: { person }, global: globalOptions })
+    await flushPromises()
+
+    const card = w.find('.contact-card')
+    const text = card.text()
+
+    for (const label of ['Phone', 'Alternative phone', 'Email', 'Notes']) expect(text).toContain(label)
+    expect(text).toContain('841234567')
+    expect(text).toContain('Not primary') // is_primary is absent/false, still shown
+    expect(text).toContain('Emergency')
+    expect(card.findAll('.field-value.is-empty').length).toBe(3) // alt phone, email, notes
+  })
+
   it('loads documents (with expiry status) and emergency contacts', async () => {
     const w = mount(PersonProfilePanel, { props: { person }, global: globalOptions })
     await flushPromises()

@@ -181,26 +181,45 @@
               <div class="row q-col-gutter-md">
                 <div v-for="c in contacts" :key="c.id" class="col-12 col-sm-6">
                   <div class="contact-card">
+                    <!-- who -->
                     <div class="row items-center no-wrap">
                       <q-avatar size="40px" color="primary" text-color="white">{{ initialsOf(c.name) }}</q-avatar>
                       <div class="col q-ml-md">
                         <div class="text-weight-medium ellipsis">{{ c.name }}</div>
-                        <div v-if="c.relationship" class="text-caption text-grey-7">{{ c.relationship }}</div>
+                        <div class="text-caption" :class="c.relationship ? 'text-grey-7' : 'text-grey-5'">
+                          {{ c.relationship || tdc('Relationship not set') }}
+                        </div>
                       </div>
                     </div>
 
+                    <!-- flags: always both, so "not primary" is visible too -->
                     <div class="row q-gutter-xs q-mt-sm">
-                      <q-chip v-if="c.is_primary" dense square color="primary" text-color="white" icon="star" :label="tdc('Primary')" />
-                      <q-chip v-if="c.is_emergency" dense square color="negative" text-color="white" icon="emergency" :label="tdc('Emergency')" />
+                      <q-chip
+                        dense square
+                        :icon="c.is_primary ? 'star' : 'star_border'"
+                        :color="c.is_primary ? 'primary' : undefined"
+                        :text-color="c.is_primary ? 'white' : undefined"
+                        :outline="!c.is_primary"
+                        :label="c.is_primary ? tdc('Primary') : tdc('Not primary')"
+                      />
+                      <q-chip
+                        dense square
+                        :icon="c.is_emergency ? 'emergency' : 'do_not_disturb_on'"
+                        :color="c.is_emergency ? 'negative' : undefined"
+                        :text-color="c.is_emergency ? 'white' : undefined"
+                        :outline="!c.is_emergency"
+                        :label="c.is_emergency ? tdc('Emergency') : tdc('Not emergency')"
+                      />
                     </div>
 
-                    <div class="column q-gutter-y-xs q-mt-sm">
-                      <a v-if="c.phone" :href="`tel:${c.phone}`" class="quick-link"><q-icon name="call" size="16px" /> {{ c.phone }}</a>
-                      <a v-if="c.alternative_phone" :href="`tel:${c.alternative_phone}`" class="quick-link"><q-icon name="phone_forwarded" size="16px" /> {{ c.alternative_phone }}</a>
-                      <a v-if="c.email" :href="`mailto:${c.email}`" class="quick-link"><q-icon name="mail_outline" size="16px" /> <span class="ellipsis">{{ c.email }}</span></a>
+                    <!-- every contact field, empty ones as a dash -->
+                    <div class="row q-col-gutter-sm q-mt-xs">
+                      <div v-for="f in contactDetails(c)" :key="f.label" :class="f.wide ? 'col-12' : 'col-6'">
+                        <div class="field-label">{{ f.label }}</div>
+                        <a v-if="f.value && f.href" :href="f.href" class="field-value field-link ellipsis">{{ f.value }}</a>
+                        <div v-else class="field-value" :class="{ 'is-empty': !f.value }">{{ f.value || '—' }}</div>
+                      </div>
                     </div>
-
-                    <div v-if="c.notes" class="text-caption text-grey-7 q-mt-sm">{{ c.notes }}</div>
                   </div>
                 </div>
               </div>
@@ -345,6 +364,15 @@ const addressLines = computed(() => {
   ].filter(Boolean)
   return [...new Set(lines)]
 })
+
+function contactDetails(c) {
+  return [
+    { label: tdc('Phone'), value: c.phone, href: c.phone && `tel:${c.phone}` },
+    { label: tdc('Alternative phone'), value: c.alternative_phone, href: c.alternative_phone && `tel:${c.alternative_phone}` },
+    { label: tdc('Email'), value: c.email, href: c.email && `mailto:${c.email}`, wide: true },
+    { label: tdc('Notes'), value: c.notes, wide: true }
+  ]
+}
 
 const mapUrl = computed(() => {
   const a = props.person?.address

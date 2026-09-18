@@ -358,48 +358,45 @@
             {{ tdc('No emergency contacts added yet.') }}
           </q-card-section>
 
-          <q-card-section v-for="(contact, index) in contacts" :key="contact._key">
-            <div class="row q-col-gutter-md items-start">
-              <div class="col-12 col-sm-6 col-md-3">
-                <s-field v-model="contact.name" :field="fieldOf(PersonContact, 'name')" :label="tdc('Name')" :filled="false" dense outlined />
+          <q-card-section v-for="(contact, index) in contacts" :key="contact._key" class="contact-block">
+            <!-- one bordered block per contact: identity / how to reach / flags + notes -->
+            <div class="row items-center q-mb-sm">
+              <q-icon name="person_pin" size="20px" class="q-mr-xs text-primary" />
+              <div class="text-subtitle2 text-weight-medium">
+                {{ contact.name || `${tdc('Contact')} ${index + 1}` }}
               </div>
-              <div class="col-12 col-sm-6 col-md-3">
-                <s-field v-model="contact.relationship" :field="fieldOf(PersonContact, 'relationship')" :label="tdc('Relationship')" :filled="false" dense outlined />
-              </div>
-              <div class="col-12 col-sm-6 col-md-2">
-                <s-field v-model="contact.phone" :field="fieldOf(PersonContact, 'phone')" :label="tdc('Phone')" :filled="false" dense outlined />
-              </div>
-              <div class="col-12 col-sm-6 col-md-2">
-                <s-field v-model="contact.alternative_phone" :field="fieldOf(PersonContact, 'alternative_phone')" :label="tdc('Alternative phone')" :filled="false" dense outlined />
-              </div>
-              <div class="col-12 col-sm-6 col-md-2">
-                <s-field v-model="contact.email" :field="fieldOf(PersonContact, 'email')" type="email" :label="tdc('Email')" :filled="false" dense outlined />
-              </div>
-              <div class="col-12 col-sm-8">
-                <s-input v-model="contact.notes" :label="tdc('Notes')" dense outlined />
-              </div>
-
-              <div class="col-6 col-sm-2 col-md-1 ">
-                <s-field v-model="contact.is_primary" :field="fieldOf(PersonContact, 'is_primary')" :label="tdc('Primary')" dense />
-              </div>
-              <div class="col-6 col-sm-2 col-md-1 ">
-                <s-field v-model="contact.is_emergency" :field="fieldOf(PersonContact, 'is_emergency')" :label="tdc('Emergency')" dense />
-              </div>
-              <div class="col-12 col-sm-2 flex flex-center justify-end">
-                <s-btn
-                  flat
-                  round
-                  dense
-                  color="negative"
-                  icon="delete"
-                  @click="removeContact(index)"
-                >
-                  <s-tooltip>{{ tdc('Remove contact') }}</s-tooltip>
-                </s-btn>
-              </div>
+              <q-space />
+              <s-btn flat round dense color="negative" icon="delete" @click="removeContact(index)">
+                <s-tooltip>{{ tdc('Remove contact') }}</s-tooltip>
+              </s-btn>
             </div>
 
-            <q-separator v-if="index < contacts.length - 1" class="q-mt-md" />
+            <div class="row q-col-gutter-md items-start">
+              <div class="col-12 col-sm-6 col-md-4">
+                <s-field v-model="contact.name" :field="fieldOf(PersonContact, 'name')" :label="tdc('Name')" :filled="false" dense outlined />
+              </div>
+              <div class="col-12 col-sm-6 col-md-4">
+                <s-field v-model="contact.relationship" :field="fieldOf(PersonContact, 'relationship')" :label="tdc('Relationship')" :filled="false" dense outlined />
+              </div>
+              <div class="col-12 col-sm-6 col-md-4">
+                <s-field v-model="contact.email" :field="fieldOf(PersonContact, 'email')" type="email" :label="tdc('Email')" :filled="false" dense outlined />
+              </div>
+
+              <div class="col-12 col-sm-6 col-md-4">
+                <s-field v-model="contact.phone" :field="fieldOf(PersonContact, 'phone')" :label="tdc('Phone')" :filled="false" dense outlined />
+              </div>
+              <div class="col-12 col-sm-6 col-md-4">
+                <s-field v-model="contact.alternative_phone" :field="fieldOf(PersonContact, 'alternative_phone')" :label="tdc('Alternative phone')" :filled="false" dense outlined />
+              </div>
+              <div class="col-12 col-md-4 row items-center q-gutter-md no-wrap">
+                <s-field v-model="contact.is_primary" :field="fieldOf(PersonContact, 'is_primary')" :label="tdc('Primary')" dense />
+                <s-field v-model="contact.is_emergency" :field="fieldOf(PersonContact, 'is_emergency')" :label="tdc('Emergency')" dense />
+              </div>
+
+              <div class="col-12">
+                <s-input v-model="contact.notes" type="textarea" autogrow :label="tdc('Notes')" dense outlined />
+              </div>
+            </div>
           </q-card-section>
         </s-card>
       </div>
@@ -442,6 +439,9 @@ const {
 </script>
 
 <style scoped>
+.person-intake .contact-block + .contact-block {
+  border-top: 1px solid rgba(128, 128, 128, .25);
+}
 .person-intake .section-header {
   padding-bottom: 8px;
 }
