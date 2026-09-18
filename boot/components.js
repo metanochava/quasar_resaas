@@ -17,7 +17,7 @@ import SelectComponent from './../components/engine/SelectComponent.vue'
 import MultiSelectComponent from './../components/engine/MultiSelectComponent.vue'
 import DrawerComponent from './../components/engine/DrawerComponent.vue'
 import FieldComponent from './../components/engine/FieldComponent.vue'
-import UploadComponent from './../components/engine/UploadComponent.vue'
+import FileComponent from './../components/engine/FileComponent.vue'
 import ImageCaptureComponent from './../components/engine/ImageCaptureComponent.vue'
 import CheckBoxComponent from './../components/engine/CheckBoxComponent.vue'
 import SwitchComponent from './../components/engine/SwitchComponent.vue'
@@ -130,7 +130,7 @@ export default boot(({ app }) => {
 
   app.component('s-field', FieldComponent)
 
-  app.component('s-file', UploadComponent)
+  app.component('s-file', FileComponent)
 
   app.component('s-image-capture', ImageCaptureComponent)
 

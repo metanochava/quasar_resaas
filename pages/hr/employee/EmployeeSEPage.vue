@@ -506,10 +506,11 @@
               <div class="col-12 col-sm-8">
                 <s-input v-model="contact.notes" :label="tdc('Notes')" dense outlined />
               </div>
-              <div class="col-6 col-sm-2 col-md-1 flex flex-center">
+
+              <div class="col-6 col-sm-2 col-md-1 ">
                 <s-field v-model="contact.is_primary" :field="fieldOf(PersonContact, 'is_primary')" :label="tdc('Primary')" dense />
               </div>
-              <div class="col-6 col-sm-2 col-md-1 flex flex-center">
+              <div class="col-6 col-sm-2 col-md-1 ">
                 <s-field v-model="contact.is_emergency" :field="fieldOf(PersonContact, 'is_emergency')" :label="tdc('Emergency')" dense />
               </div>
               <div class="col-12 col-sm-2 flex flex-center justify-end">
