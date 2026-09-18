@@ -18,7 +18,6 @@ import MultiSelectComponent from './../components/engine/MultiSelectComponent.vu
 import DrawerComponent from './../components/engine/DrawerComponent.vue'
 import FieldComponent from './../components/engine/FieldComponent.vue'
 import FileComponent from './../components/engine/FileComponent.vue'
-import ImageCaptureComponent from './../components/engine/ImageCaptureComponent.vue'
 import CheckBoxComponent from './../components/engine/CheckBoxComponent.vue'
 import SwitchComponent from './../components/engine/SwitchComponent.vue'
 import Form from './../components/engine/FormComponent.vue'
