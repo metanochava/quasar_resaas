@@ -365,10 +365,11 @@
                   v-model="Employee.form.code"
                   :field="fieldOf(Employee, 'code')"
                   :label="tdc('Employee code')"
-                  :hint="tdc('Leave empty to auto-generate')"
+                  :hint="isEditMode ? undefined : tdc('Generated automatically')"
                   :error="!!Employee.errors.code"
                   :error-message="Employee.errors.code"
                   :filled="false"
+                  readonly
                   dense outlined
                 />
               </div>
@@ -951,7 +952,8 @@ async function save() {
       contacts: contacts.value
         .filter(c => c.name?.trim())
         .map(({ _key, id, ...contact }) => contact),
-      employeeData: { ...Employee.form }
+      // code is never client-supplied - EmployeeNumberService generates it server-side
+      employeeData: (({ code, ...rest }) => rest)(Employee.form)
     })
 
     router.push({ name: 'view_employee', params: { id: employee.id } })
