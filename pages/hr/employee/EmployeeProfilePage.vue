@@ -9,8 +9,9 @@
       <s-card class="q-mb-md">
         <q-card-section class="row items-center q-col-gutter-md">
           <div class="col-auto">
-            <q-avatar size="72px">
-              <img :src="photoUrl" />
+            <q-avatar size="72px" color="primary" text-color="white">
+              <img v-if="photoUrl" :src="photoUrl" />
+              <span v-else>{{ initials }}</span>
             </q-avatar>
           </div>
 
@@ -70,33 +71,8 @@
 
         <q-tab-panels v-model="tab" animated>
           <!-- PERSONAL -->
-          <q-tab-panel name="personal">
-            <div class="row q-col-gutter-md">
-              <div class="col-12 col-sm-6">
-                <div class="text-caption text-grey-7">{{ tdc('Full name') }}</div>
-                <div class="text-body1">{{ fullName || '-' }}</div>
-              </div>
-              <div class="col-12 col-sm-6">
-                <div class="text-caption text-grey-7">{{ tdc('Gender') }}</div>
-                <div class="text-body1">{{ person?.gender || '-' }}</div>
-              </div>
-              <div class="col-12 col-sm-6">
-                <div class="text-caption text-grey-7">{{ tdc('Date of birth') }}</div>
-                <div class="text-body1">{{ person?.date_of_birth || '-' }}</div>
-              </div>
-              <div class="col-12 col-sm-6">
-                <div class="text-caption text-grey-7">{{ tdc('Nationality') }}</div>
-                <div class="text-body1">{{ person?.nationality || '-' }}</div>
-              </div>
-              <div class="col-12 col-sm-6">
-                <div class="text-caption text-grey-7">{{ tdc('Email') }}</div>
-                <div class="text-body1">{{ person?.email || '-' }}</div>
-              </div>
-              <div class="col-12 col-sm-6">
-                <div class="text-caption text-grey-7">{{ tdc('Phone') }}</div>
-                <div class="text-body1">{{ person?.phone || '-' }}</div>
-              </div>
-            </div>
+          <q-tab-panel name="personal" class="q-pa-md">
+            <EmployeePersonalPanel :person="person" />
           </q-tab-panel>
 
           <!-- EMPLOYMENT -->
@@ -168,7 +144,7 @@
 
                 <q-item-section side>
                   <q-badge color="grey-7">
-                    {{ contract.status?.label || contract.status || '-' }}
+                    {{ displayValue(contract.status) || '-' }}
                   </q-badge>
                 </q-item-section>
               </q-item>
@@ -228,7 +204,7 @@
                       {{ tdc('Early') }} {{ record.early_departure_minutes }}m
                     </q-badge>
                     <q-badge :color="attendanceStatusColor(record.status)">
-                      {{ record.status?.label || record.status }}
+                      {{ displayValue(record.status) }}
                     </q-badge>
                   </div>
                 </q-item-section>
@@ -285,7 +261,7 @@
                 <q-item-section side>
                   <div class="row items-center q-gutter-sm">
                     <q-badge :color="leaveStatusColor(request.status)">
-                      {{ request.status?.label || request.status }}
+                      {{ displayValue(request.status) }}
                     </q-badge>
                     <s-btn
                       v-if="['draft', 'pending'].includes(request.status?.value || request.status)"
@@ -328,7 +304,7 @@
               <div class="row items-center q-col-gutter-md q-mb-md">
                 <div class="col-auto">
                   <q-badge :color="onboardingStatusColor(Employee.onboarding.status)" class="q-pa-sm">
-                    {{ Employee.onboarding.status?.label || Employee.onboarding.status }}
+                    {{ displayValue(Employee.onboarding.status) }}
                   </q-badge>
                 </div>
                 <div class="col">
@@ -423,7 +399,7 @@
                     <q-item-label>
                       {{ goal.title }}
                       <q-badge :color="goalStatusColor(goal.status)" class="q-ml-sm">
-                        {{ goal.status?.label || goal.status }}
+                        {{ displayValue(goal.status) }}
                       </q-badge>
                     </q-item-label>
                     <q-item-label caption v-if="goal.target">
@@ -466,9 +442,9 @@
                 <q-item v-for="review in Employee.reviews" :key="review.id">
                   <q-item-section>
                     <q-item-label>
-                      {{ review.review_type?.label || review.review_type }}
+                      {{ displayValue(review.review_type) }}
                       <q-badge :color="reviewStatusColor(review.status)" class="q-ml-sm">
-                        {{ review.status?.label || review.status }}
+                        {{ displayValue(review.status) }}
                       </q-badge>
                     </q-item-label>
                     <q-item-label caption v-if="review.overall_rating">
@@ -520,7 +496,7 @@
 
                   <q-item-section side>
                     <q-badge :color="trainingStatusColor(training.status)">
-                      {{ training.status?.label || training.status }}
+                      {{ displayValue(training.status) }}
                     </q-badge>
                   </q-item-section>
                 </q-item>
@@ -601,7 +577,7 @@
 
                   <q-item-section side>
                     <q-badge :color="payrollStatusColor(payroll.status)">
-                      {{ payroll.status?.label || payroll.status }}
+                      {{ displayValue(payroll.status) }}
                     </q-badge>
                   </q-item-section>
 
@@ -680,7 +656,7 @@
                     <q-item-label caption>{{ r.reason || '-' }}</q-item-label>
                   </q-item-section>
                   <q-item-section side>
-                    <q-badge :color="resignationStatusColor(r.status)">{{ r.status?.label || r.status }}</q-badge>
+                    <q-badge :color="resignationStatusColor(r.status)">{{ displayValue(r.status) }}</q-badge>
                   </q-item-section>
                   <q-item-section side v-if="(r.status?.value || r.status) === 'submitted'">
                     <div class="q-gutter-xs">
@@ -696,7 +672,7 @@
                 <q-item v-for="term in Employee.terminations" :key="'term-' + term.id">
                   <q-item-section>
                     <q-item-label>{{ tdc('Termination') }} · {{ term.termination_date }}</q-item-label>
-                    <q-item-label caption>{{ term.termination_type?.label || term.termination_type }} · {{ term.reason || '-' }}</q-item-label>
+                    <q-item-label caption>{{ displayValue(term.termination_type) }} · {{ term.reason || '-' }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -716,7 +692,7 @@
                   <div class="row items-center q-col-gutter-md q-mb-md">
                     <div class="col-auto">
                       <q-badge :color="onboardingStatusColor(Employee.offboarding.status)" class="q-pa-sm">
-                        {{ Employee.offboarding.status?.label || Employee.offboarding.status }}
+                        {{ displayValue(Employee.offboarding.status) }}
                       </q-badge>
                     </div>
                     <div class="col">
@@ -765,11 +741,11 @@
                 <q-list v-if="Employee.disciplinaryCases.length" bordered separator>
                   <q-item v-for="c in Employee.disciplinaryCases" :key="'case-' + c.id">
                     <q-item-section>
-                      <q-item-label>{{ c.case_type?.label || c.case_type }}</q-item-label>
+                      <q-item-label>{{ displayValue(c.case_type) }}</q-item-label>
                       <q-item-label caption>{{ c.description }}</q-item-label>
                     </q-item-section>
                     <q-item-section side>
-                      <q-badge :color="disciplinaryStatusColor(c.status)">{{ c.status?.label || c.status }}</q-badge>
+                      <q-badge :color="disciplinaryStatusColor(c.status)">{{ displayValue(c.status) }}</q-badge>
                     </q-item-section>
                     <q-item-section side>
                       <s-btn dense flat icon="add_comment" @click="openDisciplinaryActionDialog(c)">
@@ -1091,6 +1067,8 @@ import { useJobPositionStore } from '../../../stores/JobPositionStore'
 import { useJobGradeStore } from '../../../stores/JobGradeStore'
 import { useBranchStore } from '../../../stores/BranchStore'
 import { tdc } from '../../../services/translation'
+import { displayValue, rawValue } from '../../../utils/display'
+import EmployeePersonalPanel from './EmployeePersonalPanel.vue'
 
 const route = useRoute()
 const Employee = useEmployeeStore()
@@ -1122,27 +1100,26 @@ const fullName = computed(() =>
   person.value?.full_name || [person.value?.name, person.value?.surname].filter(Boolean).join(' ')
 )
 
-const photoUrl = computed(() =>
-  person.value?.profile?.url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'
+const photoUrl = computed(() => person.value?.photo?.url || person.value?.profile?.url || null)
+
+const initials = computed(() =>
+  (fullName.value || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('')
 )
 
 const positionLabel = computed(() => employee.value?.position_data?.title || tdc('No position'))
 const departmentLabel = computed(() => employee.value?.position_data?.department_data?.name || '')
-const branchLabel = computed(() => employee.value?.branch?.name || employee.value?.branch_data?.name || '')
+const branchLabel = computed(() => displayValue(employee.value?.branch) || employee.value?.branch_data?.name || '')
 
 const employmentTypeLabel = computed(() => {
-  const value = employee.value?.employment_type
-  return value?.label || value || ''
+  return displayValue(employee.value?.employment_type)
 })
 
 const statusValue = computed(() => {
-  const value = employee.value?.employment_status
-  return value?.value || value || (employee.value?.termination_date ? 'terminated' : 'active')
+  return rawValue(employee.value?.employment_status) || (employee.value?.termination_date ? 'terminated' : 'active')
 })
 
 const statusLabel = computed(() => {
-  const value = employee.value?.employment_status
-  return value?.label || value || (employee.value?.termination_date ? tdc('Terminated') : tdc('Active'))
+  return displayValue(employee.value?.employment_status) || (employee.value?.termination_date ? tdc('Terminated') : tdc('Active'))
 })
 
 const statusColor = computed(() => {
