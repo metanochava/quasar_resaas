@@ -2,7 +2,7 @@
 // object with `.url`/`.mime_type`/`.name` (RESAAS file/image field
 // representation) - a value the user just picked in THIS session is a
 // real File instance instead, with no `.url` yet (only createObjectURL
-// can preview it). Shared by UploadComponent.vue (s-upload/s-file) so
+// can preview it). Shared by UploadComponent.vue (s-file) so
 // every place a file field renders previews the exact same way.
 export function resolvePreview(value) {
   if (!value) return null

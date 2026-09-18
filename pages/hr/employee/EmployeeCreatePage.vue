@@ -22,7 +22,7 @@
             <div class="row q-col-gutter-md">
 
               <div class="col-12 col-sm-3 col-md-2 flex flex-center">
-                <s-upload
+                <s-file
                   v-model="Person.form.photo"
                   accept="image/*"
                   :label="tdc('Photo')"

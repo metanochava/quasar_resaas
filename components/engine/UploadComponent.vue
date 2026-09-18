@@ -1,62 +1,124 @@
 <template>
-  <div class="s-upload">
+  <div class="s-file">
+    <!-- Native picker stays mounted (q-file's own pickFiles()/rules/
+         FormData integration is still what actually opens the OS file
+         dialog and holds the value) but is never shown - only the
+         buttons below are, per-field label/hint/error still render
+         above them so nothing informational is lost. -->
+    <div v-if="translatedLabel || translatedHint || hasError" class="s-file-meta">
+      <div v-if="translatedLabel" class="text-caption text-grey-7">{{ translatedLabel }}</div>
+      <div v-if="hasError" class="text-negative text-caption">{{ firstError }}</div>
+      <div v-else-if="translatedHint" class="text-caption text-grey-6">{{ translatedHint }}</div>
+    </div>
+
     <q-file
+      ref="fileRef"
       v-model="localValue"
       v-bind="fileAttrs"
       :multiple="multiple"
       :append="multiple"
-      :label="translatedLabel"
-      :hint="translatedHint"
-      :error="hasError"
-      :error-message="firstError"
-      :dense="attrs.dense ?? layout.dense"
-      :outlined="attrs.outlined ?? (attrs.filled === undefined && attrs.standout === undefined)"
-      :filled="attrs.filled"
-      :standout="attrs.standout"
-      :class="attrs.class"
-      :style="radiusStyle"
       :rules="computedRules"
+      class="s-file-native-input"
     />
 
-    <div v-if="previewItems.length" class="s-upload-previews row q-gutter-sm q-mt-sm">
+    <div class="row items-center q-gutter-sm">
       <div
         v-for="item in previewItems"
         :key="item.key"
-        class="s-upload-preview-item column items-center"
+        class="s-file-preview-item column items-center"
       >
-        <div class="s-upload-preview-thumb" :style="radiusStyle">
+        <div class="s-file-preview-thumb" :style="radiusStyle">
           <img v-if="item.type === 'image'" :src="item.src" :alt="item.name">
           <q-icon v-else-if="item.type === 'pdf'" name="picture_as_pdf" size="32px" />
           <q-icon v-else name="insert_drive_file" size="32px" />
         </div>
 
-        <div class="s-upload-preview-name text-caption ellipsis">{{ item.name }}</div>
+        <div class="s-file-preview-name text-caption ellipsis">{{ item.name }}</div>
 
-        <s-btn
-          flat
-          round
-          dense
-          size="sm"
-          color="negative"
-          icon="close"
-          @click="removeAt(item.index)"
-        >
-          <s-tooltip>{{ tdc('Remove') }}</s-tooltip>
-        </s-btn>
+        <div class="row q-gutter-xs">
+          <s-btn
+            v-if="!multiple"
+            flat
+            round
+            dense
+            size="sm"
+            color="primary"
+            icon="edit"
+            @click="openAdd"
+          >
+            <s-tooltip>{{ tdc('Change') }}</s-tooltip>
+          </s-btn>
+          <s-btn
+            flat
+            round
+            dense
+            size="sm"
+            color="negative"
+            icon="delete"
+            @click="removeAt(item.index)"
+          >
+            <s-tooltip>{{ tdc('Remove') }}</s-tooltip>
+          </s-btn>
+        </div>
       </div>
+
+      <!-- Add - a single value already has its own "Change" button
+           above, so this only shows again once empty (single) or
+           always (multiple, to keep adding more). -->
+      <s-btn
+        v-if="multiple || !previewItems.length"
+        round
+        outline
+        color="primary"
+        icon="add"
+        @click="isImageField ? (addMenuOpen = true) : openAdd()"
+      >
+        <s-tooltip>{{ tdc('Add') }}</s-tooltip>
+
+        <q-menu v-if="isImageField" v-model="addMenuOpen">
+          <q-list dense style="min-width: 160px">
+            <q-item clickable v-close-popup @click="openAdd">
+              <q-item-section avatar><q-icon name="upload" /></q-item-section>
+              <q-item-section>{{ tdc('Choose file') }}</q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup @click="cameraOpen = true">
+              <q-item-section avatar><q-icon name="photo_camera" /></q-item-section>
+              <q-item-section>{{ tdc('Use camera') }}</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+      </s-btn>
     </div>
+
+    <CameraCaptureDialog v-if="isImageField" v-model="cameraOpen" @captured="onCameraCaptured" />
   </div>
 </template>
 
 <script>
-import { defineComponent, computed, ref, watch, useAttrs, onBeforeUnmount } from "vue"
+import { defineComponent, computed, ref, watch, useAttrs, onBeforeUnmount, nextTick } from "vue"
 import { useUserStore } from "../../stores/UserStore"
 import { tdc } from "../../services/translation"
 import { resolvePreview } from "../../utils/filePreview"
+import CameraCaptureDialog from "./CameraCaptureDialog.vue"
+
+// A comma-joined accept list can be MIME-based ("image/*") or
+// extension-based (".png,.jpg,.jpeg,.webp" - see User.RESAAS.fields'
+// own profile config, saas/models/user.py) - either form should offer
+// the camera option, so both are checked.
+const IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp|bmp|heic|heif)\b/i
+
+function looksLikeImageAccept(accept) {
+  if (!accept) return false
+  return accept.includes("image/") || IMAGE_EXTENSIONS.test(accept)
+}
 
 export default defineComponent({
-  name: "s-upload",
+  name: "s-file",
   inheritAttrs: false,
+
+  components: {
+    CameraCaptureDialog
+  },
 
   props: {
     modelValue: [Object, Array, File, null],
@@ -102,6 +164,9 @@ export default defineComponent({
     const User = useUserStore()
     const layout = computed(() => User.ps?.layout || {})
     const localValue = ref(props.modelValue)
+    const fileRef = ref(null)
+    const addMenuOpen = ref(false)
+    const cameraOpen = ref(false)
 
     watch(() => props.modelValue, v => (localValue.value = v))
     watch(localValue, v => emit("update:modelValue", v))
@@ -113,6 +178,8 @@ export default defineComponent({
     const translatedHint = computed(() =>
       props.hint ? tdc(props.hint) : undefined
     )
+
+    const isImageField = computed(() => looksLikeImageAccept(attrs.accept))
 
     const computedRules = computed(() => {
       const rules = []
@@ -150,6 +217,24 @@ export default defineComponent({
       const { class: klass, ...rest } = attrs
       return rest
     })
+
+    // ---------------- OPEN NATIVE PICKER ----------------
+    // The visible q-file is display:none (see <style> below) but stays
+    // fully functional - pickFiles() is QFile's own exposed method for
+    // opening the OS file dialog programmatically, so "Add"/"Change"
+    // can trigger it without the native control ever being shown.
+    function openAdd() {
+      nextTick(() => fileRef.value?.pickFiles?.())
+    }
+
+    function onCameraCaptured(file) {
+      if (props.multiple) {
+        const current = Array.isArray(localValue.value) ? localValue.value : []
+        localValue.value = [...current, file]
+      } else {
+        localValue.value = file
+      }
+    }
 
     // ---------------- PREVIEW ----------------
     const blobUrls = new Set()
@@ -191,6 +276,10 @@ export default defineComponent({
       attrs,
       layout,
       localValue,
+      fileRef,
+      addMenuOpen,
+      cameraOpen,
+      isImageField,
       translatedLabel,
       translatedHint,
       computedRules,
@@ -199,7 +288,9 @@ export default defineComponent({
       firstError,
       fileAttrs,
       previewItems,
+      openAdd,
       removeAt,
+      onCameraCaptured,
       tdc
     }
   }
@@ -207,7 +298,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.s-upload-preview-thumb {
+.s-file-native-input {
+  display: none;
+}
+
+.s-file-preview-thumb {
   width: 64px;
   height: 64px;
   display: flex;
@@ -217,17 +312,21 @@ export default defineComponent({
   background: rgba(128, 128, 128, 0.12);
 }
 
-.s-upload-preview-thumb img {
+.s-file-preview-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.s-upload-preview-item {
+.s-file-preview-item {
   width: 72px;
 }
 
-.s-upload-preview-name {
+.s-file-preview-name {
   max-width: 72px;
+}
+
+.s-file-meta {
+  margin-bottom: 4px;
 }
 </style>

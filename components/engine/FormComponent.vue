@@ -277,7 +277,7 @@ defineExpose({
       <FormSection v-if="fileFields.length" title="Attachments">
         <div v-for="f in fileFields" :key="f.name" class="col-12 col-sm-6 col-md-4">
 
-          <!-- s-file/s-upload (UploadComponent.vue) previews its own
+          <!-- s-file (UploadComponent.vue) previews its own
                value now (image thumbnail/pdf+file icon), so this no
                longer needs its own separate preview block above it. -->
           <component

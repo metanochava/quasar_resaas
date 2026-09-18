@@ -157,7 +157,7 @@ describe('createBaseStore - a File in form is sent as multipart, not lost as JSO
   // Pages that build `this.form` by hand (e.g. PacienteSEPage assigning
   // Person.form = personFormRef.value.form before Person.save()) never go
   // through FormComponent.vue's own buildPayload() - without this, a File
-  // picked/captured via s-upload/s-image-capture would silently vanish
+  // picked/captured via s-file/s-image-capture would silently vanish
   // instead of failing loudly, since axios has no generic way to
   // serialize a File as JSON.
   it('create() sends the plain form object as-is when it has no File field', async () => {

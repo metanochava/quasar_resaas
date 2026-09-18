@@ -130,9 +130,6 @@ export default boot(({ app }) => {
 
   app.component('s-field', FieldComponent)
 
-  app.component('s-upload', UploadComponent)
-
-  // alias
   app.component('s-file', UploadComponent)
 
   app.component('s-image-capture', ImageCaptureComponent)

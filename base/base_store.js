@@ -27,7 +27,7 @@ function normalizeFieldValue(v) {
   return v
 }
 
-// Um form pode conter um File (ex.: s-upload/s-image-capture) mesmo
+// Um form pode conter um File (ex.: s-file/s-image-capture) mesmo
 // quando a página não passa por FormComponent.vue's próprio
 // buildPayload() - por exemplo, PacienteSEPage monta Person.form
 // directamente a partir de personFormRef.value.form antes de chamar
