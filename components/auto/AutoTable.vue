@@ -1081,16 +1081,17 @@ function filteredItems(row, field) {
                     can(permissions.change) &&
                     !isDeleted(slotRow.row)
                   "
+                  :to="{
+                    name:props.config.routes.change,
+                    params:{id:slotRow.row?.id}
+                  }"
                   clickable
                 >
 
                   <q-item-section
                     avatar
                     
-                    :to="{
-                      name:props.config.routes.change,
-                      params:{id:slotRow.row?.id}
-                    }"
+                    
                   >
 
                     <q-icon
@@ -1099,6 +1100,13 @@ function filteredItems(row, field) {
                     />
 
                   </q-item-section>
+
+                  <q-item-section
+                    
+                  >
+                    {{ tdc(actionStore.getAction('edit').label) }}
+                  </q-item-section>
+
 
                   <q-item-section
                     side
@@ -1377,16 +1385,17 @@ function filteredItems(row, field) {
                     can(permissions.change) &&
                     !isDeleted(slotRow.row)
                   "
+                  :to="{
+                    name:props.config.routes.change,
+                    params:{id:slotRow.row?.id}
+                  }"
                   clickable
                 >
 
                   <q-item-section
                     avatar
                     
-                    :to="{
-                      name:props.config.routes.change,
-                      params:{id:slotRow.row?.id}
-                    }"
+                    
                   >
 
                     <q-icon
@@ -1395,6 +1404,13 @@ function filteredItems(row, field) {
                     />
 
                   </q-item-section>
+
+                  <q-item-section
+                    
+                  >
+                    {{ tdc(actionStore.getAction('edit').label) }}
+                  </q-item-section>
+
 
                   <q-item-section
                     side

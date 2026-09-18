@@ -82,6 +82,32 @@ export const usePersonStore = createBaseStore(
       },
 
       // ========================================
+      // ADD DOCUMENT (to an existing Person)
+      // ========================================
+      // PersonAPIView.add_document - same @resaas_action convention as
+      // matchCandidates above. Only needed for a Person that already
+      // exists (change_employee's edit flow): a brand new Person's
+      // documents still go through EmployeeAPIView.register's atomic
+      // person.documents.create() instead, same as before.
+      async addDocument(personId, payload) {
+        const hasFile = payload?.arquivo instanceof File
+
+        let body = payload
+        if (hasFile) {
+          body = new FormData()
+          Object.entries(payload).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) body.append(key, value)
+          })
+        }
+
+        const { data } = await HTTPAuth.post(
+          url({ type: 'u', url: `django_resaas/persons/${personId}/add_document/` }),
+          body
+        )
+        return data
+      },
+
+      // ========================================
       // SELECT PERSON
       // ========================================
       selectPerson(person) {

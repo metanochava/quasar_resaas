@@ -428,6 +428,8 @@
                   map-options
                   :options="positionOptions"
                   :label="tdc('Job position')"
+                  :disable="isEditMode"
+                  :hint="isEditMode ? tdc('Use Promotion/Transfer to change this') : undefined"
                   clearable
                   dense outlined
                 />
@@ -439,6 +441,8 @@
                   map-options
                   :options="jobGradeOptions"
                   :label="tdc('Job grade')"
+                  :disable="isEditMode"
+                  :hint="isEditMode ? tdc('Use Promotion/Transfer to change this') : undefined"
                   clearable
                   dense outlined
                 />
@@ -546,7 +550,7 @@
               icon="save"
               :loading="saving"
               :disable="saving"
-              :label="tdc('Save employee')"
+              :label="isEditMode ? tdc('Save changes') : tdc('Save employee')"
             />
           </div>
         </s-card>
@@ -565,8 +569,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 
 import { usePersonStore } from '../../../stores/PersonStore'
@@ -600,6 +604,7 @@ import { Alert } from '../../../boot/alerts'
 // own that logic - a future Patient/Student/Customer intake flow can
 // call the exact same match action and reuse the exact same dialog.
 const router = useRouter()
+const route = useRoute()
 const $q = useQuasar()
 
 const Person = usePersonStore()
@@ -618,6 +623,23 @@ const Document = useDocumentStore()
 const formRef = ref(null)
 const saving = ref(false)
 
+// ---------------- ADD vs CHANGE ----------------
+// /change_employee/:id and /add_employee both route to this same page
+// (employeeRoute.js) - route.params.id is the only thing that tells
+// the two apart. Editing an existing Employee never goes through
+// Employee.register() (person-matching/atomic creation only makes
+// sense for a BRAND NEW Person) - it loads the real row and PATCHes
+// Person/Employee/documents/contacts directly instead, same generic
+// BaseStore.update() every other rich edit page already uses.
+const employeeId = computed(() => route.params.id || null)
+const isEditMode = computed(() => !!employeeId.value)
+
+// ids of the documents/contacts that existed on the server when this
+// edit session started - diffed against the current `documents`/
+// `contacts` arrays on save() to know what to create/update/delete.
+const originalDocumentIds = ref(new Set())
+const originalContactIds = ref(new Set())
+
 // ---------------- EMERGENCY CONTACTS ----------------
 let contactKeySeq = 0
 const contacts = ref([])
@@ -625,6 +647,7 @@ const contacts = ref([])
 function addContact() {
   contacts.value.push({
     _key: ++contactKeySeq,
+    id: null,
     name: '',
     relationship: '',
     phone: '',
@@ -647,6 +670,7 @@ const documents = ref([])
 function addDocument() {
   documents.value.push({
     _key: ++documentKeySeq,
+    id: null,
     tipo: null,
     numero: '',
     data_emissao: null,
@@ -779,9 +803,118 @@ function buildPersonData() {
   return rest
 }
 
+// Diffs `rows` (the local, editable array) against `originalIds` (what
+// existed on the server when this edit session started) and applies
+// each change through the given store's own generic BaseStore.create()/
+// update()/remove() - the same generic per-row CRUD every plain edit
+// page already uses, just looped: unlike Employee.register(), there is
+// no single atomic transaction wrapping all of this (register_employee
+// can afford one because it's creating everything for the first time;
+// here each row is an independent, already-existing record, so a
+// failure partway through leaves the rows already saved saved, and
+// Alert() surfaces whichever one failed).
+async function saveContactsRow(row, personId) {
+  const { _key, ...fields } = row
+
+  if (row.id) {
+    PersonContact.form = { ...fields }
+    await PersonContact.update()
+  } else {
+    PersonContact.form = { ...fields, id: undefined, person: personId }
+    await PersonContact.create()
+  }
+}
+
+async function saveDocumentsRow(row, personId) {
+  const { _key, ...fields } = row
+  const hasNewFile = fields.arquivo instanceof File
+
+  if (row.id) {
+    Document.form = { ...fields, arquivo: hasNewFile ? fields.arquivo : undefined }
+    await Document.update()
+  } else {
+    await Person.addDocument(personId, {
+      tipo: fields.tipo,
+      numero: fields.numero,
+      data_emissao: fields.data_emissao || null,
+      data_validade: fields.data_validade || null,
+      arquivo: hasNewFile ? fields.arquivo : null
+    })
+  }
+}
+
+async function saveContactsAndDocuments(personId) {
+  const currentContacts = contacts.value.filter(c => c.name?.trim())
+  for (const row of currentContacts) {
+    await saveContactsRow(row, personId)
+  }
+  for (const removedId of originalContactIds.value) {
+    if (!currentContacts.some(c => c.id === removedId)) {
+      PersonContact.form = { id: removedId }
+      await PersonContact.remove()
+    }
+  }
+
+  const currentDocuments = documents.value.filter(d => d.tipo && d.numero)
+  for (const row of currentDocuments) {
+    await saveDocumentsRow(row, personId)
+  }
+  for (const removedId of originalDocumentIds.value) {
+    if (!currentDocuments.some(d => d.id === removedId)) {
+      Document.form = { id: removedId }
+      await Document.remove()
+    }
+  }
+}
+
+// change_employee - PATCHes the existing Person/Employee rows directly
+// instead of Employee.register()'s one-shot creation (person-matching
+// makes no sense for a Person that's already known), then diffs
+// documents/contacts. position/job_grade are stripped from the request
+// entirely (never just left unchanged) because EmployeeAPIView.update()
+// rejects the whole PATCH if either key is even PRESENT, regardless of
+// value - they only ever change through apply_promotion/apply_transfer
+// (hr/views/employee.py's LOCKED_ON_UPDATE_FIELDS).
+async function saveEdit() {
+  saving.value = true
+
+  try {
+    const photo = Person.form.photo
+    if (!(photo instanceof File)) delete Person.form.photo
+    try {
+      await Person.update()
+    } finally {
+      if (!(photo instanceof File)) Person.form.photo = photo
+    }
+
+    const { position, job_grade } = Employee.form
+    delete Employee.form.position
+    delete Employee.form.job_grade
+    try {
+      await Employee.update()
+    } finally {
+      Employee.form.position = position
+      Employee.form.job_grade = job_grade
+    }
+
+    await saveContactsAndDocuments(Person.form.id)
+
+    router.push({ name: 'view_employee', params: { id: employeeId.value } })
+  } catch (error) {
+    Alert(error?.response)
+  } finally {
+    saving.value = false
+  }
+}
+
 async function save() {
   const valid = await formRef.value?.validate()
   if (!valid) return
+
+  if (isEditMode.value) {
+    await saveEdit()
+    return
+  }
 
   try {
     if (!selectedPerson.value && !matchResolved.value) {
@@ -817,7 +950,7 @@ async function save() {
         })),
       contacts: contacts.value
         .filter(c => c.name?.trim())
-        .map(({ _key, ...contact }) => contact),
+        .map(({ _key, id, ...contact }) => contact),
       employeeData: { ...Employee.form }
     })
 
@@ -854,6 +987,45 @@ async function save() {
 }
 
 // ---------------- INIT ----------------
+// change_employee only - loads the existing Employee/Person/documents/
+// contacts so editing never starts from the same blank form add_employee
+// does (and so save() PATCHes the real rows instead of registering a
+// duplicate). Runs list_personcontact/list_document here (unlike
+// add_employee, which deliberately avoids needing either - see the
+// comment that used to sit on the removed loadSchemaOnce() calls
+// below) because showing what's already on file is the whole point of
+// an edit screen; a role with change_employee is expected to also hold
+// those two.
+async function loadForEdit() {
+  const employee = await Employee.getById(employeeId.value)
+  const person = employee.person_data || {}
+
+  Person.form = { ...person }
+  matchResolved.value = true
+
+  // position/job_grade/manager are write_only on EmployeeSerializer (see
+  // hr/serializers/employee.py) - a plain GET only returns them as their
+  // *_data companions, so the id has to be lifted back out of those for
+  // the s-select widgets below to show the employee's real current value.
+  Employee.form.position = employee.position_data?.id ?? null
+  Employee.form.job_grade = employee.job_grade_data?.id ?? null
+  Employee.form.manager = employee.manager_data?.id ?? null
+
+  await Promise.all([
+    PersonContact.loadData({ person: person.id }),
+    // object_id alone is enough to scope this to the right owner - it's
+    // a UUID (Person's own pk), so a collision with some other model's
+    // Document via the same generic relation is not a realistic concern.
+    Document.loadData({ object_id: person.id })
+  ])
+
+  contacts.value = (PersonContact.rows || []).map(row => ({ _key: ++contactKeySeq, ...row }))
+  documents.value = (Document.rows || []).map(row => ({ _key: ++documentKeySeq, ...row }))
+
+  originalContactIds.value = new Set(contacts.value.map(c => c.id))
+  originalDocumentIds.value = new Set(documents.value.map(d => d.id))
+}
+
 onMounted(async () => {
   Person.resetForm?.()
   Employee.resetForm?.()
@@ -862,8 +1034,8 @@ onMounted(async () => {
     // Only the schema is needed here (for fieldOf()'s component/props/
     // rules lookup) - .init() also runs loadData(), fetching the full
     // row list and requiring list_person/list_personcontact/
-    // list_document, a permission this page has no actual use for
-    // (nothing here ever shows a Person/PersonContact/Document list)
+    // list_document, a permission add_employee has no actual use for
+    // (nothing there ever shows a Person/PersonContact/Document list)
     // and a role allowed to add employees may well not hold.
     // Employee/JobPosition/JobGrade/DocumentType DO need their .rows
     // (position/job_grade/manager/document-type option lists), so
@@ -877,6 +1049,11 @@ onMounted(async () => {
     DocumentType.init()
   ])
 
+  if (isEditMode.value) {
+    await loadForEdit()
+    return
+  }
+
   // Fresh, blank forms again - Employee.init() above also calls
   // loadData(), whose resulting list has nothing to do with the form
   // being filled in here.
@@ -885,6 +1062,19 @@ onMounted(async () => {
 
   addContact()
 })
+
+// Vue Router reuses this same component instance when navigating
+// between two routes that both resolve to it (e.g. change_employee/A
+// -> change_employee/B directly) - onMounted only fires once, so
+// without this, the page would keep showing employee A's data under
+// employee B's URL. Same pattern as EntitySEPage.vue's own route watch.
+watch(
+  () => route.params.id,
+  async (id) => {
+    if (!id) return
+    await loadForEdit()
+  }
+)
 </script>
 
 <style scoped>
