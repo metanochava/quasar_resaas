@@ -3,7 +3,11 @@
     <div class="row q-col-gutter-md">
 
       <!-- ============ IDENTITY CARD ============ -->
+      <!-- Left column: identity, then address (with its map), then any
+           business-specific card - keeps the map next to the photo so the
+           wide right column stays for the long lists. -->
       <div class="col-12 col-md-4">
+        <div class="column q-gutter-y-md">
         <s-card flat bordered class="identity-card">
           <div class="identity-cover" />
 
@@ -45,6 +49,32 @@
             </div>
           </div>
         </s-card>
+
+        <!-- Address -->
+        <s-card flat bordered>
+          <q-card-section class="section-title">
+            <q-icon name="place" size="20px" /> {{ tdc('Address') }}
+          </q-card-section>
+          <q-separator />
+          <q-card-section v-if="addressLines.length || mapUrl">
+            <div v-for="(line, i) in addressLines" :key="i" :class="i === 0 ? 'field-value' : 'text-grey-7'">
+              {{ line }}
+            </div>
+            <AddressMiniMap class="q-mt-md" :address="person.address" :label="fullName" />
+            <a v-if="mapUrl" :href="mapUrl" target="_blank" rel="noopener" class="field-link inline-flex items-center q-mt-sm">
+              <q-icon name="map" size="18px" class="q-mr-xs" /> {{ tdc('View on map') }}
+            </a>
+          </q-card-section>
+          <q-card-section v-else class="empty-state">
+            <q-icon name="location_off" size="28px" />
+            <div>{{ tdc('No address on file.') }}</div>
+          </q-card-section>
+        </s-card>
+
+        <!-- Business-specific cards (e.g. the patient data of view_paciente)
+             sit under the address without the panel knowing them. -->
+        <slot name="aside" />
+        </div>
       </div>
 
       <!-- ============ DETAIL SECTIONS ============ -->
@@ -81,27 +111,6 @@
                   <div v-else class="field-value" :class="{ 'is-empty': !f.value }">{{ f.value || '—' }}</div>
                 </div>
               </div>
-            </q-card-section>
-          </s-card>
-
-          <!-- Address -->
-          <s-card flat bordered>
-            <q-card-section class="section-title">
-              <q-icon name="place" size="20px" /> {{ tdc('Address') }}
-            </q-card-section>
-            <q-separator />
-            <q-card-section v-if="addressLines.length || mapUrl">
-              <div v-for="(line, i) in addressLines" :key="i" :class="i === 0 ? 'field-value' : 'text-grey-7'">
-                {{ line }}
-              </div>
-              <AddressMiniMap class="q-mt-md" :address="person.address" :label="fullName" />
-              <a v-if="mapUrl" :href="mapUrl" target="_blank" rel="noopener" class="field-link inline-flex items-center q-mt-sm">
-                <q-icon name="map" size="18px" class="q-mr-xs" /> {{ tdc('View on map') }}
-              </a>
-            </q-card-section>
-            <q-card-section v-else class="empty-state">
-              <q-icon name="location_off" size="28px" />
-              <div>{{ tdc('No address on file.') }}</div>
             </q-card-section>
           </s-card>
 

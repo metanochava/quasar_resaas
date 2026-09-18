@@ -1,10 +1,11 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 import { usePersonStore } from '../stores/PersonStore'
 import { usePersonContactStore } from '../stores/PersonContactStore'
 import { useDocumentStore } from '../stores/DocumentStore'
-import { useDocumentTypeStore } from '../stores/DocumentTypeStore'
 import { buildWritePayload, updateWithPayload, omit } from '../utils/payload'
+import { toRelationOption } from '../utils/autoForm'
+import { rawValue } from '../utils/display'
 
 // Everything a "register a Person as <something>" page needs that has
 // nothing to do with WHAT they are registered as: the Person form (BaseStore
@@ -23,7 +24,6 @@ export function usePersonIntake() {
   const Person = usePersonStore()
   const PersonContact = usePersonContactStore()
   const Document = useDocumentStore()
-  const DocumentType = useDocumentTypeStore()
 
   // ---------------- schema lookup ----------------
   // Person/PersonContact/Document.fields (from each store's loadSchema())
@@ -77,9 +77,10 @@ export function usePersonIntake() {
     documents.value.splice(index, 1)
   }
 
-  const documentTypeOptions = computed(() =>
-    (DocumentType.rows || []).map(r => ({ label: r.label || r.name, value: r.id }))
-  )
+  // Document.tipo is a relation: the s-select the schema builds for it
+  // works on {label, value} option objects (and carries the add/edit/view
+  // menu for document types); everything sent to the API takes the value.
+  const typeId = (tipo) => rawValue(tipo)
 
   // ---------------- person matching ----------------
   const matchDialogOpen = ref(false)
@@ -132,7 +133,7 @@ export function usePersonIntake() {
       date_of_birth: Person.form.date_of_birth,
       documents: documents.value
         .filter(d => d.tipo && d.numero)
-        .map(d => ({ tipo: d.tipo, numero: d.numero }))
+        .map(d => ({ tipo: typeId(d.tipo), numero: d.numero }))
     }
   }
 
@@ -174,7 +175,7 @@ export function usePersonIntake() {
       documents: documents.value
         .filter(d => d.tipo && d.numero)
         .map(d => ({
-          tipo: d.tipo,
+          tipo: typeId(d.tipo),
           numero: d.numero,
           data_emissao: d.data_emissao || null,
           data_validade: d.data_validade || null,
@@ -207,7 +208,12 @@ export function usePersonIntake() {
     ])
 
     contacts.value = (PersonContact.rows || []).map(row => ({ _key: ++contactKeySeq, ...row }))
-    documents.value = (Document.rows || []).map(row => ({ _key: ++documentKeySeq, ...row }))
+    documents.value = (Document.rows || []).map(row => ({
+      _key: ++documentKeySeq,
+      ...row,
+      // raw pk -> the option object the relation select shows
+      tipo: row.tipo_data ? toRelationOption(row.tipo_data) : row.tipo
+    }))
 
     originalContactIds.value = new Set(contacts.value.map(c => c.id))
     originalDocumentIds.value = new Set(documents.value.map(d => d.id))
@@ -233,7 +239,7 @@ export function usePersonIntake() {
       await updateWithPayload(Document, buildWritePayload(fields, Document.fields))
     } else {
       await Person.addDocument(personId, {
-        tipo: fields.tipo,
+        tipo: typeId(fields.tipo),
         numero: fields.numero,
         data_emissao: fields.data_emissao || null,
         data_validade: fields.data_validade || null,
@@ -291,14 +297,14 @@ export function usePersonIntake() {
   // ---------------- lifecycle ----------------
   // Only the schemas are needed for the sub-forms (fieldOf()) - .init()
   // would also run loadData(), requiring list_person/list_personcontact/
-  // list_document for lists this page never shows. DocumentType DOES need
-  // its .rows (the type select), so it stays on the full init().
+  // list_document for lists this page never shows. Relation selects (e.g.
+  // the document type) search the API themselves, so nothing else to
+  // preload.
   async function init() {
     await Promise.all([
       Person.loadSchemaOnce(),
       PersonContact.loadSchemaOnce(),
-      Document.loadSchemaOnce(),
-      DocumentType.init()
+      Document.loadSchemaOnce()
     ])
   }
 
@@ -323,11 +329,10 @@ export function usePersonIntake() {
 
   return {
     // stores (for v-model bindings / errors)
-    Person, PersonContact, Document, DocumentType,
+    Person, PersonContact, Document,
     // state
     contacts, documents, selectedPerson, matchResolved,
     matchDialogOpen, matchCandidatesList,
-    documentTypeOptions,
     // helpers
     fieldOf,
     addContact, removeContact, addDocument, removeDocument,

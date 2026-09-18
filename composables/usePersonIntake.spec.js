@@ -96,6 +96,42 @@ describe('usePersonIntake - registration payload', () => {
   })
 })
 
+describe('usePersonIntake - document type is a relation option', () => {
+  it('sends the plain id for a {label, value} option in the create payload and the match payload', () => {
+    intake.Person.form = { name: 'Ana' }
+    intake.addDocument()
+    intake.documents.value[0].tipo = { label: 'ID Card', value: 't1' }
+    intake.documents.value[0].numero = '123'
+
+    expect(intake.registrationPayload().documents[0].tipo).toBe('t1')
+  })
+
+  it('loadExisting turns the raw pk + tipo_data into the option the relation select shows', async () => {
+    vi.spyOn(intake.PersonContact, 'loadData').mockImplementation(async function () { this.rows = [] })
+    vi.spyOn(intake.Document, 'loadData').mockImplementation(async function () {
+      this.rows = [{ id: 'd1', tipo: 't1', tipo_data: { id: 't1', name: 'ID Card' }, numero: '1' }]
+    })
+
+    await intake.loadExisting({ id: 'p1', name: 'Ana' })
+
+    expect(intake.documents.value[0].tipo).toMatchObject({ value: 't1', label: 'ID Card' })
+  })
+
+  it('adds a new document to an existing person with the plain type id', async () => {
+    intake.Person.fields = []
+    intake.Person.form = { id: 'p1' }
+    intake.addDocument()
+    intake.documents.value[0].tipo = { label: 'Passport', value: 't2' }
+    intake.documents.value[0].numero = 'P-9'
+    vi.spyOn(intake.Person, 'update').mockResolvedValue()
+    const add = vi.spyOn(intake.Person, 'addDocument').mockResolvedValue({})
+
+    await intake.saveExisting()
+
+    expect(add).toHaveBeenCalledWith('p1', expect.objectContaining({ tipo: 't2', numero: 'P-9' }))
+  })
+})
+
 describe('usePersonIntake - edit (load + diff save)', () => {
   it('loads person, documents and contacts and remembers their ids', async () => {
     vi.spyOn(intake.PersonContact, 'loadData').mockImplementation(async function () {

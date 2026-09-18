@@ -294,11 +294,9 @@
           <q-card-section v-for="(doc, index) in documents" :key="doc._key">
             <div class="row q-col-gutter-md items-start">
               <div class="col-12 col-sm-6 col-md-3">
-                <s-select
+                <s-field
                   v-model="doc.tipo"
-                  emit-value
-                  map-options
-                  :options="documentTypeOptions"
+                  :field="fieldOf(Document, 'tipo')"
                   :label="tdc('Document type')"
                   dense outlined
                 />
@@ -436,7 +434,6 @@ const {
   Person, PersonContact, Document,
   contacts, documents, selectedPerson,
   matchDialogOpen, matchCandidatesList,
-  documentTypeOptions,
   fieldOf,
   addContact, removeContact, addDocument, removeDocument,
   clearSelectedPerson,

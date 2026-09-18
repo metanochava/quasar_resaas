@@ -34,6 +34,20 @@ beforeEach(() => {
   })
 })
 
+describe('PersonProfilePanel - aside slot', () => {
+  it('renders business-specific cards passed in the aside slot under the identity card', async () => {
+    const w = mount(PersonProfilePanel, {
+      props: { person },
+      slots: { aside: '<div class="patient-card">Patient data</div>' },
+      global: globalOptions
+    })
+    await flushPromises()
+
+    expect(w.find('.patient-card').exists()).toBe(true)
+    expect(w.text()).toContain('Metano Chavana')
+  })
+})
+
 describe('PersonProfilePanel - address map', () => {
   it('shows a small map inside the address card when the address has coordinates', async () => {
     const withAddress = { ...person, address: { formatted_address: 'Av. 24 de Julho, Maputo', latitude: '-25.9655', longitude: '32.5832' } }

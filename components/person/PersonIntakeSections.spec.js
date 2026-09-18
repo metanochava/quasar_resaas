@@ -72,6 +72,14 @@ describe('PersonIntakeSections', () => {
     expect(intake.documents.value.length + intake.contacts.value.length).toBe(1)
   })
 
+  it('renders the document type as a schema-driven field (relation select with its add/edit/view menu)', async () => {
+    const wrapper = mountSections()
+    await wrapper.find('button[data-label="Add document"]').trigger('click')
+
+    const typeField = wrapper.findAll('input.stub-s-field').find(i => i.attributes('data-label') === 'Document type')
+    expect(typeField).toBeTruthy()
+  })
+
   it('shows the matched person summary instead of the personal-data form once one is selected', async () => {
     intake.selectedPerson.value = { id: 'p1', full_name: 'Marta Sitoe', email: 'm@example.com', documents: [] }
     const wrapper = mountSections()

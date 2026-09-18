@@ -86,40 +86,31 @@
                 />
               </div>
               <div class="col-12 col-sm-6 col-md-3">
-                <s-select
+                <s-field
                   v-model="Employee.form.position"
-                  emit-value
-                  map-options
-                  :options="positionOptions"
+                  :field="fieldOf(Employee, 'position')"
                   :label="tdc('Job position')"
                   :disable="isEditMode"
                   :hint="isEditMode ? tdc('Use Promotion/Transfer to change this') : undefined"
-                  clearable
                   dense outlined
                 />
               </div>
               <div class="col-12 col-sm-6 col-md-3">
-                <s-select
+                <s-field
                   v-model="Employee.form.job_grade"
-                  emit-value
-                  map-options
-                  :options="jobGradeOptions"
+                  :field="fieldOf(Employee, 'job_grade')"
                   :label="tdc('Job grade')"
                   :disable="isEditMode"
                   :hint="isEditMode ? tdc('Use Promotion/Transfer to change this') : undefined"
-                  clearable
                   dense outlined
                 />
               </div>
 
               <div class="col-12 col-sm-6 col-md-3">
-                <s-select
+                <s-field
                   v-model="Employee.form.manager"
-                  emit-value
-                  map-options
-                  :options="managerOptions"
+                  :field="fieldOf(Employee, 'manager')"
                   :label="tdc('Manager')"
-                  clearable
                   dense outlined
                 />
               </div>
@@ -158,10 +149,9 @@ import { useRouter, useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 
 import { useEmployeeStore } from '../../../stores/EmployeeStore.js'
-import { useJobPositionStore } from '../../../stores/JobPositionStore'
-import { useJobGradeStore } from '../../../stores/JobGradeStore'
+import { toRelationOption } from '../../../utils/autoForm'
 import { usePersonIntake } from '../../../composables/usePersonIntake'
-import { buildWritePayload, updateWithPayload, omit } from '../../../utils/payload'
+import { buildWritePayload, updateWithPayload } from '../../../utils/payload'
 import { tdc } from '../../../services/translation'
 import { Alert } from '../../../boot/alerts'
 
@@ -180,8 +170,6 @@ const intake = usePersonIntake()
 const { Person } = intake
 
 const Employee = useEmployeeStore()
-const JobPosition = useJobPositionStore()
-const JobGrade = useJobGradeStore()
 
 const formRef = ref(null)
 const saving = ref(false)
@@ -191,19 +179,6 @@ const saving = ref(false)
 // two apart.
 const employeeId = computed(() => route.params.id || null)
 const isEditMode = computed(() => !!employeeId.value)
-
-// ---------------- RELATION OPTIONS ----------------
-const positionOptions = computed(() =>
-  (JobPosition.rows || []).map(r => ({ label: r.label || r.name || r.code, value: r.id }))
-)
-
-const jobGradeOptions = computed(() =>
-  (JobGrade.rows || []).map(r => ({ label: r.label || r.name || r.code, value: r.id }))
-)
-
-const managerOptions = computed(() =>
-  (Employee.rows || []).map(r => ({ label: r.label || String(r), value: r.id }))
-)
 
 function fieldOf(store, name) {
   return intake.fieldOf(store, name)
@@ -239,7 +214,8 @@ async function saveNew() {
   const employee = await Employee.register({
     ...intake.registrationPayload(),
     // code is never client-supplied - EmployeeNumberService generates it
-    employeeData: omit(Employee.form, ['code'])
+    // {label, value} relation options -> plain ids, read-only extras out
+    employeeData: buildWritePayload(Employee.form, Employee.fields, { exclude: ['code'] })
   })
 
   router.push({ name: 'view_employee', params: { id: employee.id } })
@@ -305,10 +281,13 @@ async function loadForEdit() {
 
   // position/job_grade/manager are write_only on EmployeeSerializer - a
   // plain GET only returns their *_data companions, so the id is lifted
-  // back out for the s-select widgets to show the real current value.
-  Employee.form.position = employee.position_data?.id ?? null
-  Employee.form.job_grade = employee.job_grade_data?.id ?? null
-  Employee.form.manager = employee.manager_data?.id ?? null
+  // back out as {label, value} options for the relation selects (the
+  // s-select the schema builds for a ForeignKey works on option objects).
+  const asOption = (record) => (record ? toRelationOption(record) : null)
+
+  Employee.form.position = asOption(employee.position_data)
+  Employee.form.job_grade = asOption(employee.job_grade_data)
+  Employee.form.manager = asOption(employee.manager_data)
 
   await intake.loadExisting(employee.person_data || {})
 }
@@ -319,11 +298,10 @@ onMounted(async () => {
 
   await Promise.all([
     intake.init(),
-    // Employee/JobPosition/JobGrade DO need their .rows (position/
-    // job_grade/manager option lists), so those stay on the full init().
-    Employee.init(),
-    JobPosition.init(),
-    JobGrade.init()
+    // Only the schema: the relation selects (position/job grade/manager)
+    // search the API themselves and carry the add/edit/view menu from
+    // the schema's relation_config - no option lists to preload.
+    Employee.loadSchemaOnce()
   ])
 
   if (isEditMode.value) {
@@ -331,8 +309,6 @@ onMounted(async () => {
     return
   }
 
-  // Employee.init() also runs loadData(), whose list has nothing to do
-  // with the form being filled in here.
   Person.resetForm?.()
   Employee.resetForm?.()
 })
