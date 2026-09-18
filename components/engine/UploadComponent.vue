@@ -95,7 +95,7 @@
 </template>
 
 <script>
-import { defineComponent, computed, ref, watch, useAttrs, onBeforeUnmount, nextTick } from "vue"
+import { defineComponent, computed, ref, watch, useAttrs, onBeforeUnmount } from "vue"
 import { useUserStore } from "../../stores/UserStore"
 import { tdc } from "../../services/translation"
 import { resolvePreview } from "../../utils/filePreview"
@@ -223,8 +223,13 @@ export default defineComponent({
     // fully functional - pickFiles() is QFile's own exposed method for
     // opening the OS file dialog programmatically, so "Add"/"Change"
     // can trigger it without the native control ever being shown.
+    // MUST run synchronously inside the click handler: browsers only
+    // honour a programmatic file-dialog trigger while it is still part
+    // of the original trusted click's call stack - deferring it even
+    // one microtask (nextTick/Promise) drops user-activation and the
+    // dialog silently never opens.
     function openAdd() {
-      nextTick(() => fileRef.value?.pickFiles?.())
+      fileRef.value?.pickFiles?.()
     }
 
     function onCameraCaptured(file) {
