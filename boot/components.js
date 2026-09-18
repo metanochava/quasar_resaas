@@ -131,8 +131,6 @@ export default boot(({ app }) => {
 
   app.component('s-file', FileComponent)
 
-  app.component('s-image-capture', ImageCaptureComponent)
-
   app.component('s-checkbox', CheckBoxComponent)
 
   app.component('s-switch', SwitchComponent)
