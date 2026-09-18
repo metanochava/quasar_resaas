@@ -1086,7 +1086,11 @@ function filteredItems(row, field) {
 
                   <q-item-section
                     avatar
-                    @click="emit('edit', slotRow.row)"
+                    
+                    :to="{
+                      name:props.config.routes.change,
+                      params:{id:slotRow.row?.id}
+                    }"
                   >
 
                     <q-icon
@@ -1097,13 +1101,6 @@ function filteredItems(row, field) {
                   </q-item-section>
 
                   <q-item-section
-                    @click="emit('edit', slotRow.row)"
-                  >
-                    {{ tdc(actionStore.getAction('edit').label) }}
-                  </q-item-section>
-
-
-                  <q-item-section
                     side
                     v-if="props.config?.routes?.change"
                   >
@@ -1112,13 +1109,8 @@ function filteredItems(row, field) {
                       flat
                       size="sm"
                       icon="open_in_new"
-                      :to="{
-                        name: props.config.routes.change,
-                        params: {
-                          id: slotRow.row?.id
-                        }
-                      }"
-                      @click.stop
+
+                      @click.stop="emit('edit',slotRow.row)"
                     />
 
                   </q-item-section>
@@ -1390,7 +1382,11 @@ function filteredItems(row, field) {
 
                   <q-item-section
                     avatar
-                    @click="emit('edit', slotRow.row)"
+                    
+                    :to="{
+                      name:props.config.routes.change,
+                      params:{id:slotRow.row?.id}
+                    }"
                   >
 
                     <q-icon
@@ -1401,13 +1397,6 @@ function filteredItems(row, field) {
                   </q-item-section>
 
                   <q-item-section
-                    @click="emit('edit', slotRow.row)"
-                  >
-                    {{ tdc(actionStore.getAction('edit').label) }}
-                  </q-item-section>
-
-
-                  <q-item-section
                     side
                     v-if="props.config?.routes?.change"
                   >
@@ -1416,13 +1405,8 @@ function filteredItems(row, field) {
                       flat
                       size="sm"
                       icon="open_in_new"
-                      :to="{
-                        name: props.config.routes.change,
-                        params: {
-                          id: slotRow.row?.id
-                        }
-                      }"
-                      @click.stop
+
+                      @click.stop="emit('edit',slotRow.row)"
                     />
 
                   </q-item-section>
