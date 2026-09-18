@@ -219,17 +219,17 @@ export default defineComponent({
     })
 
     // ---------------- OPEN NATIVE PICKER ----------------
-    // The visible q-file is display:none (see <style> below) but stays
-    // fully functional - pickFiles() is QFile's own exposed method for
-    // opening the OS file dialog programmatically, so "Add"/"Change"
-    // can trigger it without the native control ever being shown.
-    // MUST run synchronously inside the click handler: browsers only
-    // honour a programmatic file-dialog trigger while it is still part
-    // of the original trusted click's call stack - deferring it even
-    // one microtask (nextTick/Promise) drops user-activation and the
-    // dialog silently never opens.
+    // The hidden q-file (display:none, see <style> below) stays fully
+    // functional - QFile does NOT expose a public pickFiles(), only
+    // getNativeElement() (src/components/file/QFile.js), which returns
+    // the underlying <input type="file"> so it can be .click()'d
+    // directly. Must run synchronously inside the click handler:
+    // browsers only honour a programmatic file-dialog trigger while
+    // still on the original trusted click's call stack - any deferral
+    // (nextTick/Promise) drops user-activation and the dialog silently
+    // never opens.
     function openAdd() {
-      fileRef.value?.pickFiles?.()
+      fileRef.value?.getNativeElement?.()?.click()
     }
 
     function onCameraCaptured(file) {

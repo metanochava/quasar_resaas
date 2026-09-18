@@ -17,7 +17,7 @@ export let employeeRoutes = [
   {
     path: '/add_employee',
     name: 'add_employee',
-    component: () => import('./EmployeeCreatePage.vue'),
+    component: () => import('./EmployeeSEPage.vue'),
     meta: {
       title: tdc('Add') + ' ' + tdc('employee'),
       requiresAuth: true,
