@@ -209,11 +209,11 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { usePersonContactStore } from '../../../stores/PersonContactStore'
-import { useDocumentStore } from '../../../stores/DocumentStore'
-import { useUserStore } from '../../../stores/UserStore'
-import { tdc } from '../../../services/translation'
-import { displayValue, rawValue } from '../../../utils/display'
+import { usePersonContactStore } from '../../stores/PersonContactStore'
+import { useDocumentStore } from '../../stores/DocumentStore'
+import { useUserStore } from '../../stores/UserStore'
+import { tdc } from '../../services/translation'
+import { displayValue, rawValue } from '../../utils/display'
 
 // Read-only "Personal" tab of view_employee. Everything shown comes from
 // what the backend really returns for this Person (PersonSerializer via

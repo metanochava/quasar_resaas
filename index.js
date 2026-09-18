@@ -16,6 +16,7 @@ export * from './router/authGuard.js'
 // =========================================================
 
 export * from './composables/useResaas.js'
+export * from './composables/usePersonIntake.js'
 
 
 // =========================================================
@@ -28,6 +29,9 @@ export * from './stores/EntityTypeStore.js'
 export * from './stores/BranchStore.js'
 export * from './stores/MenuStore.js'
 export * from './stores/PersonStore.js'
+export * from './stores/PersonContactStore.js'
+export * from './stores/DocumentStore.js'
+export * from './stores/DocumentTypeStore.js'
 
 export * from './stores/ThemeStore.js'
 export * from './stores/LayoutSettingStore.js'
@@ -59,6 +63,8 @@ export * from './utils/json.js'
 export * from './utils/text.js'
 export * from './utils/profile.js'
 export * from './utils/schema.js'
+export * from './utils/display.js'
+export * from './utils/payload.js'
 
 
 // =========================================================

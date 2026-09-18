@@ -3,12 +3,12 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { Quasar } from 'quasar'
 import { createPinia, setActivePinia } from 'pinia'
 
-import EmployeePersonalPanel from './EmployeePersonalPanel.vue'
-import BtnComponent from '../../../components/engine/BtnComponent.vue'
-import TooltipComponent from '../../../components/engine/TooltipComponent.vue'
-import CardComponent from '../../../components/engine/CardComponent.vue'
-import { usePersonContactStore } from '../../../stores/PersonContactStore'
-import { useDocumentStore } from '../../../stores/DocumentStore'
+import PersonProfilePanel from './PersonProfilePanel.vue'
+import BtnComponent from '../engine/BtnComponent.vue'
+import TooltipComponent from '../engine/TooltipComponent.vue'
+import CardComponent from '../engine/CardComponent.vue'
+import { usePersonContactStore } from '../../stores/PersonContactStore'
+import { useDocumentStore } from '../../stores/DocumentStore'
 
 const globalOptions = {
   plugins: [[Quasar, {}]],
@@ -33,9 +33,9 @@ beforeEach(() => {
   })
 })
 
-describe('EmployeePersonalPanel', () => {
+describe('PersonProfilePanel', () => {
   it('shows what the database has: name, gender label, country, initials fallback', async () => {
-    const w = mount(EmployeePersonalPanel, { props: { person }, global: globalOptions })
+    const w = mount(PersonProfilePanel, { props: { person }, global: globalOptions })
     await flushPromises()
     const text = w.text()
     expect(text).toContain('Metano Chavana')
@@ -46,7 +46,7 @@ describe('EmployeePersonalPanel', () => {
   })
 
   it('never prints a raw object: {id,value,label} choices show the label, all-null shows nothing', async () => {
-    const w = mount(EmployeePersonalPanel, { props: { person }, global: globalOptions })
+    const w = mount(PersonProfilePanel, { props: { person }, global: globalOptions })
     await flushPromises()
     expect(w.text()).not.toContain('[object Object]')
     expect(w.text()).not.toContain('"label"')
@@ -54,14 +54,14 @@ describe('EmployeePersonalPanel', () => {
   })
 
   it('renders missing address as an empty state and empty fields as a dash', async () => {
-    const w = mount(EmployeePersonalPanel, { props: { person }, global: globalOptions })
+    const w = mount(PersonProfilePanel, { props: { person }, global: globalOptions })
     await flushPromises()
     expect(w.text()).toContain('No address on file.')
     expect(w.find('.field-value.is-empty').exists()).toBe(true)
   })
 
   it('loads documents (with expiry status) and emergency contacts', async () => {
-    const w = mount(EmployeePersonalPanel, { props: { person }, global: globalOptions })
+    const w = mount(PersonProfilePanel, { props: { person }, global: globalOptions })
     await flushPromises()
     expect(w.text()).toContain('ID Card')
     expect(w.text()).toContain('Expired')
@@ -70,7 +70,7 @@ describe('EmployeePersonalPanel', () => {
 
   it('a denied list (no permission) does not break the panel', async () => {
     useDocumentStore().loadData.mockRejectedValue(new Error('403'))
-    const w = mount(EmployeePersonalPanel, { props: { person }, global: globalOptions })
+    const w = mount(PersonProfilePanel, { props: { person }, global: globalOptions })
     await flushPromises()
     expect(w.text()).toContain('No documents on file.')
   })

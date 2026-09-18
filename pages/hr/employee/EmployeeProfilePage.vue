@@ -72,7 +72,7 @@
         <q-tab-panels v-model="tab" animated>
           <!-- PERSONAL -->
           <q-tab-panel name="personal" class="q-pa-md">
-            <EmployeePersonalPanel :person="person" />
+            <PersonProfilePanel :person="person" />
           </q-tab-panel>
 
           <!-- EMPLOYMENT -->
@@ -1068,7 +1068,7 @@ import { useJobGradeStore } from '../../../stores/JobGradeStore'
 import { useBranchStore } from '../../../stores/BranchStore'
 import { tdc } from '../../../services/translation'
 import { displayValue, rawValue } from '../../../utils/display'
-import EmployeePersonalPanel from './EmployeePersonalPanel.vue'
+import PersonProfilePanel from '../../../components/person/PersonProfilePanel.vue'
 
 const route = useRoute()
 const Employee = useEmployeeStore()

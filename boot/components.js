@@ -71,6 +71,8 @@ import HeaderLanguage from './../components/header/HeaderLanguage.vue'
 import PersonCard from './../components/person/PersonCard.vue'
 import PersonCreateDialog from './../components/person/PersonCreateDialog.vue'
 import PersonSearch from './../components/person/PersonSearch.vue'
+import PersonIntakeSections from './../components/person/PersonIntakeSections.vue'
+import PersonProfilePanel from './../components/person/PersonProfilePanel.vue'
 
 import  SDashboard from "./../components/DashboardComponent.vue"
 import DashboardRenderer from "./../components/dashboard/DashboardRenderer.vue"
@@ -198,6 +200,8 @@ export default boot(({ app }) => {
   app.component( 's-person-create-dialog', PersonCreateDialog )
 
   app.component( 's-person-search', PersonSearch )
+  app.component( 's-person-intake', PersonIntakeSections )
+  app.component( 's-person-profile', PersonProfilePanel )
 
 
   // =======================================================

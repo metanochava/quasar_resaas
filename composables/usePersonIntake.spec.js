@@ -1,0 +1,202 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
+
+import { usePersonIntake } from './usePersonIntake'
+
+let intake
+
+beforeEach(() => {
+  setActivePinia(createPinia())
+  intake = usePersonIntake()
+  intake.reset({ withBlankContact: false })
+})
+
+describe('usePersonIntake - duplicate matching', () => {
+  it('resolves straight to ready (and remembers it) when there are no candidates', async () => {
+    const match = vi.spyOn(intake.Person, 'matchCandidates').mockResolvedValue([])
+
+    expect(await intake.resolveMatch()).toBe('ready')
+    expect(intake.matchResolved.value).toBe(true)
+
+    await intake.resolveMatch()
+    expect(match).toHaveBeenCalledTimes(1)
+  })
+
+  it('opens the dialog for candidates and waits for the user choice', async () => {
+    vi.spyOn(intake.Person, 'matchCandidates').mockResolvedValue([{ id: 'p1', full_name: 'Ana' }])
+
+    const pending = intake.resolveMatch()
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(intake.matchDialogOpen.value).toBe(true)
+
+    intake.onMatchSelect({ id: 'p1' })
+
+    expect(await pending).toBe('ready')
+    expect(intake.selectedPerson.value.id).toBe('p1')
+    expect(intake.matchDialogOpen.value).toBe(false)
+  })
+
+  it('reports cancel when the user backs out', async () => {
+    vi.spyOn(intake.Person, 'matchCandidates').mockResolvedValue([{ id: 'p1' }])
+
+    const pending = intake.resolveMatch()
+    await Promise.resolve()
+    await Promise.resolve()
+    intake.onMatchCancel()
+
+    expect(await pending).toBe('cancel')
+    expect(intake.matchResolved.value).toBe(false)
+  })
+
+  it('"create new anyway" resolves without selecting a person', async () => {
+    vi.spyOn(intake.Person, 'matchCandidates').mockResolvedValue([{ id: 'p1' }])
+
+    const pending = intake.resolveMatch()
+    await Promise.resolve()
+    await Promise.resolve()
+    intake.onMatchCreateNew()
+
+    expect(await pending).toBe('ready')
+    expect(intake.selectedPerson.value).toBe(null)
+    expect(intake.matchResolved.value).toBe(true)
+  })
+})
+
+describe('usePersonIntake - registration payload', () => {
+  it('sends person data and photo for a new person, never the id, and skips empty rows', () => {
+    const photo = new File(['x'], 'p.png', { type: 'image/png' })
+    intake.Person.form = { id: 'x', name: 'Ana', surname: 'Costa', photo }
+    intake.addDocument()
+    intake.documents.value[0].tipo = 't1'
+    intake.documents.value[0].numero = '123'
+    intake.addDocument() // empty - must be skipped
+    intake.addContact()
+    intake.contacts.value[0].name = 'Irmao'
+    intake.addContact() // empty - must be skipped
+
+    const payload = intake.registrationPayload()
+
+    expect(payload.personId).toBe(null)
+    expect(payload.personData).toEqual({ name: 'Ana', surname: 'Costa' })
+    expect(payload.photo).toStrictEqual(photo)
+    expect(payload.documents).toHaveLength(1)
+    expect(payload.contacts).toHaveLength(1)
+    expect(payload.contacts[0]).not.toHaveProperty('_key')
+    expect(payload.contacts[0]).not.toHaveProperty('id')
+  })
+
+  it('a reused person sends only its id - never person data or a photo', () => {
+    intake.Person.form = { name: 'Ignored', photo: new File(['x'], 'p.png') }
+    intake.selectedPerson.value = { id: 'p9' }
+
+    const payload = intake.registrationPayload()
+
+    expect(payload).toMatchObject({ personId: 'p9', personData: null, photo: null })
+  })
+})
+
+describe('usePersonIntake - edit (load + diff save)', () => {
+  it('loads person, documents and contacts and remembers their ids', async () => {
+    vi.spyOn(intake.PersonContact, 'loadData').mockImplementation(async function () {
+      this.rows = [{ id: 'c1', name: 'Irmao', person: 'p1' }]
+    })
+    vi.spyOn(intake.Document, 'loadData').mockImplementation(async function () {
+      this.rows = [{ id: 'd1', tipo: 't1', numero: '1' }]
+    })
+
+    await intake.loadExisting({ id: 'p1', name: 'Ana' })
+
+    expect(intake.Person.form.name).toBe('Ana')
+    expect(intake.matchResolved.value).toBe(true)
+    expect(intake.contacts.value.map(c => c.id)).toEqual(['c1'])
+    expect(intake.documents.value.map(d => d.id)).toEqual(['d1'])
+  })
+
+  it('a denied list (no permission) leaves that section empty instead of failing', async () => {
+    vi.spyOn(intake.PersonContact, 'loadData').mockRejectedValue(new Error('403'))
+    vi.spyOn(intake.Document, 'loadData').mockRejectedValue(new Error('403'))
+    intake.PersonContact.rows = []
+    intake.Document.rows = []
+
+    await expect(intake.loadExisting({ id: 'p1', name: 'Ana' })).resolves.not.toThrow()
+    expect(intake.contacts.value).toEqual([])
+  })
+
+  it('saveExisting creates new rows, updates existing ones and deletes removed ones', async () => {
+    vi.spyOn(intake.PersonContact, 'loadData').mockImplementation(async function () {
+      this.rows = [{ id: 'c1', name: 'Keep' }, { id: 'c2', name: 'Drop' }]
+    })
+    vi.spyOn(intake.Document, 'loadData').mockImplementation(async function () {
+      this.rows = [{ id: 'd1', tipo: 't', numero: '1' }, { id: 'd2', tipo: 't', numero: '2' }]
+    })
+    await intake.loadExisting({ id: 'p1', name: 'Ana', photo: { url: 'http://x/p.png' } })
+
+    intake.contacts.value = intake.contacts.value.filter(c => c.id === 'c1')
+    intake.contacts.value[0].name = 'Keep edited'
+    intake.addContact()
+    intake.contacts.value[1].name = 'Brand new'
+    intake.documents.value = intake.documents.value.filter(d => d.id === 'd1')
+    intake.addDocument()
+    intake.documents.value[1].tipo = 't'
+    intake.documents.value[1].numero = 'NEW'
+
+    const personUpdate = vi.spyOn(intake.Person, 'update').mockImplementation(async function () {
+      expect(this.form).not.toHaveProperty('photo') // unchanged photo never resent
+    })
+    const contactUpdate = vi.spyOn(intake.PersonContact, 'update').mockResolvedValue()
+    const contactCreate = vi.spyOn(intake.PersonContact, 'create').mockImplementation(async function () {
+      expect(this.form.person).toBe('p1')
+      expect(this.form.id).toBeUndefined()
+    })
+    const contactRemove = vi.spyOn(intake.PersonContact, 'remove').mockImplementation(async function () {
+      expect(this.form.id).toBe('c2')
+    })
+    const documentUpdate = vi.spyOn(intake.Document, 'update').mockResolvedValue()
+    const documentRemove = vi.spyOn(intake.Document, 'remove').mockImplementation(async function () {
+      expect(this.form.id).toBe('d2')
+    })
+    const addDocument = vi.spyOn(intake.Person, 'addDocument').mockResolvedValue({})
+
+    await intake.saveExisting()
+
+    expect(personUpdate).toHaveBeenCalledTimes(1)
+    expect(contactUpdate).toHaveBeenCalledTimes(1)
+    expect(contactCreate).toHaveBeenCalledTimes(1)
+    expect(contactRemove).toHaveBeenCalledTimes(1)
+    expect(documentUpdate).toHaveBeenCalledTimes(1)
+    expect(addDocument).toHaveBeenCalledWith('p1', expect.objectContaining({ numero: 'NEW' }))
+    expect(documentRemove).toHaveBeenCalledTimes(1)
+  })
+
+  it('a newly picked photo is sent in its own request, without the rest of the form', async () => {
+    const photo = new File(['x'], 'new.png', { type: 'image/png' })
+    intake.Person.fields = [{ name: 'name', type: 'CharField' }, { name: 'photo', type: 'ImageField' }]
+    intake.Person.form = { id: 'p1', name: 'Ana', photo, address: { id: 'a1', route: 'Rua X' } }
+
+    const bodies = []
+    vi.spyOn(intake.Person, 'update').mockImplementation(async function () {
+      bodies.push({ ...this.form })
+    })
+
+    await intake.saveExisting()
+
+    expect(bodies).toHaveLength(2)
+    expect(bodies[0]).toMatchObject({ id: 'p1', name: 'Ana', address: { id: 'a1', route: 'Rua X' } })
+    expect(bodies[0]).not.toHaveProperty('photo')
+    expect(bodies[1].photo).toStrictEqual(photo)
+    expect(bodies[1]).not.toHaveProperty('address') // multipart must never flatten the nested address
+  })
+
+  it('sends a WRITE payload: {id,value,label} choices become their value, extras are dropped', async () => {
+    intake.Person.fields = [{ name: 'gender', type: 'CharField' }, { name: 'age', type: 'IntegerField', read_only: true }]
+    intake.Person.form = { id: 'p1', gender: { id: 'M', value: 'M', label: 'Masculine' }, age: 3, label: 'x' }
+
+    let body
+    vi.spyOn(intake.Person, 'update').mockImplementation(async function () { body = { ...this.form } })
+
+    await intake.saveExisting()
+
+    expect(body).toEqual({ id: 'p1', gender: 'M' })
+  })
+})
