@@ -22,9 +22,9 @@
             <div class="row q-col-gutter-md">
 
               <div class="col-12 col-sm-3 col-md-2 flex flex-center">
-                <s-file
+                <s-field
                   v-model="Person.form.photo"
-                  accept="image/*"
+                  :field="fieldOf(Person, 'photo')"
                   :label="tdc('Photo')"
                   class="full-width"
                 />
@@ -33,77 +33,89 @@
               <div class="col-12 col-sm-9 col-md-10">
                 <div class="row q-col-gutter-md">
                   <div class="col-12 col-sm-4">
-                    <s-input
+                    <s-field
                       v-model="Person.form.name"
+                      :field="fieldOf(Person, 'name')"
                       :label="tdc('First name')"
                       :error="!!Person.errors.name"
                       :error-message="Person.errors.name"
+                      :filled="false"
                       dense outlined
                     />
                   </div>
                   <div class="col-12 col-sm-4">
-                    <s-input
+                    <s-field
                       v-model="Person.form.middle_name"
+                      :field="fieldOf(Person, 'middle_name')"
                       :label="tdc('Middle name')"
+                      :filled="false"
                       dense outlined
                     />
                   </div>
                   <div class="col-12 col-sm-4">
-                    <s-input
+                    <s-field
                       v-model="Person.form.surname"
+                      :field="fieldOf(Person, 'surname')"
                       :label="tdc('Surname')"
                       :error="!!Person.errors.surname"
                       :error-message="Person.errors.surname"
+                      :filled="false"
                       dense outlined
                     />
                   </div>
 
                   <div class="col-12 col-sm-4">
-                    <s-input
+                    <s-field
                       v-model="Person.form.preferred_name"
+                      :field="fieldOf(Person, 'preferred_name')"
                       :label="tdc('Preferred name')"
+                      :filled="false"
                       dense outlined
                     />
                   </div>
                   <div class="col-12 col-sm-4">
-                    <s-select
+                    <s-field
                       v-model="Person.form.gender"
-                      emit-value
-                      map-options
-                      :options="genderOptions"
+                      :field="fieldOf(Person, 'gender')"
                       :label="tdc('Gender')"
+                      :filled="false"
                       dense outlined
                     />
                   </div>
                   <div class="col-12 col-sm-4">
-                    <s-date
+                    <s-field
                       v-model="Person.form.date_of_birth"
+                      :field="fieldOf(Person, 'date_of_birth')"
                       :label="tdc('Date of birth')"
+                      :filled="false"
                       dense outlined
                     />
                   </div>
 
                   <div class="col-12 col-sm-4">
-                    <s-select
+                    <s-field
                       v-model="Person.form.marital_status"
-                      emit-value
-                      map-options
-                      :options="maritalStatusOptions"
+                      :field="fieldOf(Person, 'marital_status')"
                       :label="tdc('Marital status')"
+                      :filled="false"
                       dense outlined
                     />
                   </div>
                   <div class="col-12 col-sm-4">
-                    <s-input
+                    <s-field
                       v-model="Person.form.nationality"
+                      :field="fieldOf(Person, 'nationality')"
                       :label="tdc('Nationality')"
+                      :filled="false"
                       dense outlined
                     />
                   </div>
                   <div class="col-12 col-sm-4">
-                    <s-input
+                    <s-field
                       v-model="Person.form.occupation"
+                      :field="fieldOf(Person, 'occupation')"
                       :label="tdc('Occupation')"
+                      :filled="false"
                       dense outlined
                     />
                   </div>
@@ -130,34 +142,42 @@
           <q-card-section>
             <div class="row q-col-gutter-md">
               <div class="col-12 col-sm-6">
-                <s-input
+                <s-field
                   v-model="Person.form.email"
+                  :field="fieldOf(Person, 'email')"
                   type="email"
                   :label="tdc('Email')"
                   :error="!!Person.errors.email"
                   :error-message="Person.errors.email"
+                  :filled="false"
                   dense outlined
                 />
               </div>
               <div class="col-12 col-sm-6">
-                <s-input
+                <s-field
                   v-model="Person.form.secondary_email"
+                  :field="fieldOf(Person, 'secondary_email')"
                   type="email"
                   :label="tdc('Secondary email')"
+                  :filled="false"
                   dense outlined
                 />
               </div>
               <div class="col-12 col-sm-6">
-                <s-input
+                <s-field
                   v-model="Person.form.phone"
+                  :field="fieldOf(Person, 'phone')"
                   :label="tdc('Phone')"
+                  :filled="false"
                   dense outlined
                 />
               </div>
               <div class="col-12 col-sm-6">
-                <s-input
+                <s-field
                   v-model="Person.form.alternative_phone"
+                  :field="fieldOf(Person, 'alternative_phone')"
                   :label="tdc('Alternative phone')"
+                  :filled="false"
                   dense outlined
                 />
               </div>
@@ -193,57 +213,63 @@
           <q-card-section>
             <div class="row q-col-gutter-md">
               <div class="col-12 col-sm-6 col-md-3">
-                <s-input
+                <s-field
                   v-model="Employee.form.code"
+                  :field="fieldOf(Employee, 'code')"
                   :label="tdc('Employee code')"
                   :hint="tdc('Leave empty to auto-generate')"
                   :error="!!Employee.errors.code"
                   :error-message="Employee.errors.code"
+                  :filled="false"
                   dense outlined
                 />
               </div>
               <div class="col-12 col-sm-6 col-md-3">
-                <s-date
+                <s-field
                   v-model="Employee.form.hire_date"
+                  :field="fieldOf(Employee, 'hire_date')"
                   :label="tdc('Hire date')"
                   :error="!!Employee.errors.hire_date"
                   :error-message="Employee.errors.hire_date"
+                  :filled="false"
                   dense outlined
                 />
               </div>
               <div class="col-12 col-sm-6 col-md-3">
-                <s-select
+                <s-field
                   v-model="Employee.form.employment_status"
-                  emit-value
-                  map-options
-                  :options="employmentStatusOptions"
+                  :field="fieldOf(Employee, 'employment_status')"
                   :label="tdc('Employment status')"
+                  :filled="false"
                   dense outlined
                 />
               </div>
               <div class="col-12 col-sm-6 col-md-3">
-                <s-select
+                <s-field
                   v-model="Employee.form.employment_type"
-                  emit-value
-                  map-options
-                  :options="employmentTypeOptions"
+                  :field="fieldOf(Employee, 'employment_type')"
                   :label="tdc('Employment type')"
+                  :filled="false"
                   dense outlined
                 />
               </div>
 
               <div class="col-12 col-sm-6 col-md-3">
-                <s-input
+                <s-field
                   v-model="Employee.form.work_email"
+                  :field="fieldOf(Employee, 'work_email')"
                   type="email"
                   :label="tdc('Work email')"
+                  :filled="false"
                   dense outlined
                 />
               </div>
               <div class="col-12 col-sm-6 col-md-3">
-                <s-input
+                <s-field
                   v-model="Employee.form.work_phone"
+                  :field="fieldOf(Employee, 'work_phone')"
                   :label="tdc('Work phone')"
+                  :filled="false"
                   dense outlined
                 />
               </div>
@@ -315,23 +341,23 @@
           <q-card-section v-for="(contact, index) in contacts" :key="contact._key">
             <div class="row q-col-gutter-md items-start">
               <div class="col-12 col-sm-6 col-md-3">
-                <s-input v-model="contact.name" :label="tdc('Name')" dense outlined />
+                <s-field v-model="contact.name" :field="fieldOf(PersonContact, 'name')" :label="tdc('Name')" :filled="false" dense outlined />
               </div>
               <div class="col-12 col-sm-6 col-md-3">
-                <s-input v-model="contact.relationship" :label="tdc('Relationship')" dense outlined />
+                <s-field v-model="contact.relationship" :field="fieldOf(PersonContact, 'relationship')" :label="tdc('Relationship')" :filled="false" dense outlined />
               </div>
               <div class="col-12 col-sm-6 col-md-2">
-                <s-input v-model="contact.phone" :label="tdc('Phone')" dense outlined />
+                <s-field v-model="contact.phone" :field="fieldOf(PersonContact, 'phone')" :label="tdc('Phone')" :filled="false" dense outlined />
               </div>
               <div class="col-12 col-sm-6 col-md-2">
-                <s-input v-model="contact.email" type="email" :label="tdc('Email')" dense outlined />
+                <s-field v-model="contact.email" :field="fieldOf(PersonContact, 'email')" type="email" :label="tdc('Email')" :filled="false" dense outlined />
               </div>
 
               <div class="col-6 col-sm-3 col-md-1 flex flex-center">
-                <s-switch v-model="contact.is_primary" :label="tdc('Primary')" dense />
+                <s-field v-model="contact.is_primary" :field="fieldOf(PersonContact, 'is_primary')" :label="tdc('Primary')" dense />
               </div>
               <div class="col-6 col-sm-3 col-md-1 flex flex-center">
-                <s-switch v-model="contact.is_emergency" :label="tdc('Emergency')" dense />
+                <s-field v-model="contact.is_emergency" :field="fieldOf(PersonContact, 'is_emergency')" :label="tdc('Emergency')" dense />
               </div>
 
               <div class="col-12 col-sm-9">
@@ -434,36 +460,21 @@ function removeContact(index) {
   contacts.value.splice(index, 1)
 }
 
-// ---------------- STATIC OPTIONS (mirror the model's own choices) ----------------
-const genderOptions = [
-  { label: tdc('Masculine'), value: 'M' },
-  { label: tdc('Feminine'), value: 'F' },
-  { label: tdc('Others'), value: 'O' }
-]
-
-const maritalStatusOptions = [
-  { label: tdc('Single'), value: 'single' },
-  { label: tdc('Married'), value: 'married' },
-  { label: tdc('Divorced'), value: 'divorced' },
-  { label: tdc('Widowed'), value: 'widowed' },
-  { label: tdc('Other'), value: 'other' }
-]
-
-const employmentStatusOptions = [
-  { label: tdc('Active'), value: 'active' },
-  { label: tdc('Probation'), value: 'probation' },
-  { label: tdc('Suspended'), value: 'suspended' },
-  { label: tdc('Terminated'), value: 'terminated' },
-  { label: tdc('Resigned'), value: 'resigned' },
-  { label: tdc('Retired'), value: 'retired' }
-]
-
-const employmentTypeOptions = [
-  { label: tdc('Full Time'), value: 'full_time' },
-  { label: tdc('Part Time'), value: 'part_time' },
-  { label: tdc('Contractor'), value: 'contractor' },
-  { label: tdc('Intern'), value: 'intern' }
-]
+// ---------------- SCHEMA FIELD LOOKUP ----------------
+// Person/Employee/PersonContact.fields (populated by each store's own
+// loadSchema() -> buildFormFromSchema(), see utils/autoForm.js) already
+// carry the real component/props/rules resolved from the backend model
+// (component guessed from field type, choices turned into translated
+// options, file accept/multiple/maxSize, validators...) - s-field
+// (FieldComponent.vue) uses that to render the right widget on its own
+// instead of this page hardcoding which s-* component/options go with
+// which field, and duplicating the model's own choices as separate
+// arrays here. Falls back to a plain text field before the schema has
+// loaded (or for a name with no matching field), same category of
+// fallback FieldComponent.vue already has for a hand-built field.
+function fieldOf(store, name) {
+  return (store.fields || []).find(f => f.name === name) || { name, type: 'CharField', label: name }
+}
 
 // ---------------- RELATION OPTIONS ----------------
 const positionOptions = computed(() =>
@@ -537,6 +548,7 @@ onMounted(async () => {
   await Promise.all([
     Person.init(),
     Employee.init(),
+    PersonContact.init(),
     JobPosition.init(),
     JobGrade.init()
   ])
