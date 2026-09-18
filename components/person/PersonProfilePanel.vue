@@ -25,6 +25,7 @@
                 {{ person.age }} {{ tdc('years') }}
               </q-chip>
               <q-chip v-if="maritalLabel" dense square icon="favorite_border" class="soft-chip">{{ maritalLabel }}</q-chip>
+              <q-chip v-if="bloodTypeLabel" dense square icon="water_drop" class="soft-chip">{{ bloodTypeLabel }}</q-chip>
             </div>
 
             <q-separator class="full-width q-my-md" />
@@ -89,10 +90,11 @@
               <q-icon name="place" size="20px" /> {{ tdc('Address') }}
             </q-card-section>
             <q-separator />
-            <q-card-section v-if="addressLines.length">
+            <q-card-section v-if="addressLines.length || mapUrl">
               <div v-for="(line, i) in addressLines" :key="i" :class="i === 0 ? 'field-value' : 'text-grey-7'">
                 {{ line }}
               </div>
+              <AddressMiniMap class="q-mt-md" :address="person.address" :label="fullName" />
               <a v-if="mapUrl" :href="mapUrl" target="_blank" rel="noopener" class="field-link inline-flex items-center q-mt-sm">
                 <q-icon name="map" size="18px" class="q-mr-xs" /> {{ tdc('View on map') }}
               </a>
@@ -213,6 +215,7 @@ import { usePersonContactStore } from '../../stores/PersonContactStore'
 import { useDocumentStore } from '../../stores/DocumentStore'
 import { useUserStore } from '../../stores/UserStore'
 import { tdc } from '../../services/translation'
+import AddressMiniMap from '../address/AddressMiniMap.vue'
 import { displayValue, rawValue } from '../../utils/display'
 
 // Read-only "Personal" tab of view_employee. Everything shown comes from
@@ -263,6 +266,7 @@ const genderLabel = computed(() => {
   const text = typeof g === 'object' ? displayValue(g) : (GENDERS[g] || g)
   return text ? tdc(text) : ''
 })
+const bloodTypeLabel = computed(() => displayValue(props.person?.blood_type))
 const genderIcon = computed(() => GENDER_ICONS[rawValue(props.person?.gender)] || 'person')
 const maritalLabel = computed(() => {
   const m = props.person?.marital_status
@@ -306,8 +310,7 @@ const identityFields = computed(() => {
     { label: tdc('Country of birth'), value: displayValue(p.country_of_birth) },
     { label: tdc('Place of birth'), value: displayValue(p.place_of_birth) },
     { label: tdc('Occupation'), value: displayValue(p.occupation) },
-    { label: tdc('Preferred language'), value: displayValue(p.preferred_language) },
-    { label: tdc('Timezone'), value: displayValue(p.timezone) }
+    { label: tdc('Blood type'), value: bloodTypeLabel.value }
   ]
 })
 

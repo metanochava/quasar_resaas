@@ -128,7 +128,6 @@ export function usePersonIntake() {
       phone: Person.form.phone,
       alternative_phone: Person.form.alternative_phone,
       name: Person.form.name,
-      middle_name: Person.form.middle_name,
       surname: Person.form.surname,
       date_of_birth: Person.form.date_of_birth,
       documents: documents.value

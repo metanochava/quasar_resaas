@@ -43,6 +43,11 @@ describe('buildWritePayload', () => {
     expect(buildWritePayload({ ...loaded, photo: file }, fields).photo).toStrictEqual(file)
   })
 
+  it('an emptied photo input (null/"") is never sent, so the current photo is kept', () => {
+    expect(buildWritePayload({ ...loaded, photo: null }, fields)).not.toHaveProperty('photo')
+    expect(buildWritePayload({ ...loaded, photo: '' }, fields)).not.toHaveProperty('photo')
+  })
+
   it('keeps an explicit null so a cleared field is actually cleared', () => {
     expect(buildWritePayload(loaded, fields).notes).toBe(null)
   })

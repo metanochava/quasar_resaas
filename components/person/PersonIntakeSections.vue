@@ -158,19 +158,9 @@
                   </div>
                   <div class="col-12 col-sm-4">
                     <s-field
-                      v-model="Person.form.preferred_language"
-                      :field="fieldOf(Person, 'preferred_language')"
-                      :label="tdc('Preferred language')"
-                      :filled="false"
-                      dense outlined
-                    />
-                  </div>
-
-                  <div class="col-12 col-sm-4">
-                    <s-field
-                      v-model="Person.form.timezone"
-                      :field="fieldOf(Person, 'timezone')"
-                      :label="tdc('Timezone')"
+                      v-model="Person.form.blood_type"
+                      :field="fieldOf(Person, 'blood_type')"
+                      :label="tdc('Blood type')"
                       :filled="false"
                       dense outlined
                     />

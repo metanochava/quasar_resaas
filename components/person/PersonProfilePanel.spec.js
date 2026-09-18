@@ -20,6 +20,7 @@ const person = {
   gender: { id: 'M', value: 'M', label: 'Masculine' },
   marital_status: { id: null, value: null, label: null },
   date_of_birth: '1990-05-20', age: 36, country_of_birth: 'India',
+  blood_type: { id: 'O+', value: 'O+', label: 'O+' },
   email: 'metano@example.com', address: null, photo: null
 }
 
@@ -33,6 +34,25 @@ beforeEach(() => {
   })
 })
 
+describe('PersonProfilePanel - address map', () => {
+  it('shows a small map inside the address card when the address has coordinates', async () => {
+    const withAddress = { ...person, address: { formatted_address: 'Av. 24 de Julho, Maputo', latitude: '-25.9655', longitude: '32.5832' } }
+    const w = mount(PersonProfilePanel, { props: { person: withAddress }, global: globalOptions })
+    await flushPromises()
+
+    expect(w.text()).toContain('Av. 24 de Julho, Maputo')
+    expect(w.find('.address-mini-map').exists()).toBe(true)
+  })
+
+  it('shows no map (only the empty state) when there is no address', async () => {
+    const w = mount(PersonProfilePanel, { props: { person }, global: globalOptions })
+    await flushPromises()
+
+    expect(w.find('.address-mini-map').exists()).toBe(false)
+    expect(w.text()).toContain('No address on file.')
+  })
+})
+
 describe('PersonProfilePanel', () => {
   it('shows what the database has: name, gender label, country, initials fallback', async () => {
     const w = mount(PersonProfilePanel, { props: { person }, global: globalOptions })
@@ -41,6 +61,8 @@ describe('PersonProfilePanel', () => {
     expect(text).toContain('Metano Chavana')
     expect(text).toContain('Masculine')
     expect(text).toContain('India')
+    expect(text).toContain('O+')
+    expect(text).toContain('Blood type')
     expect(text).toContain('metano@example.com')
     expect(w.find('.identity-initials').text()).toBe('MC')
   })
