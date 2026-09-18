@@ -652,14 +652,17 @@ function filteredItems(row, field) {
             <!-- DEFAULT CREATE -->
 
             <s-btn
-              
               icon="add"
               color="primary"
-              @click="emit('create')"
-              v-show="schemaUi.crud && can(permissions.add)"
+              :to="{ name: props.config?.routes?.add }"
+              v-show="
+                schemaUi.crud &&
+                can(permissions.add) &&
+                props.config?.routes?.add
+              "
             >
               <s-tooltip>
-                {{ tdc('Default') }}
+                {{ tdc('Custom') }}
               </s-tooltip>
             </s-btn>
 
@@ -670,15 +673,11 @@ function filteredItems(row, field) {
               
               icon="open_in_new"
               color="secondary"
-              :to="{ name: props.config?.routes?.add }"
-              v-show="
-                schemaUi.crud &&
-                can(permissions.add) &&
-                props.config?.routes?.add
-              "
+              @click="emit('create')"
+              v-show="schemaUi.crud && can(permissions.add)"
             >
               <s-tooltip>
-                {{ tdc('Custom') }}
+                {{ tdc('Default') }}
               </s-tooltip>
             </s-btn>
 

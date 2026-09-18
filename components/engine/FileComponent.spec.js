@@ -51,46 +51,29 @@ beforeEach(() => {
 })
 
 describe('FileComponent (s-file) - native picker wiring', () => {
-  // The native picker is opened via a real <label for="..."> wrapping
-  // the button, never a JS .click() call on the input - some browsers/
-  // webviews apply stricter "was this really user-activated"
-  // heuristics to a programmatic .click() than to genuine label
-  // activation, even when that call runs perfectly synchronously
-  // inside a click handler (the previous implementation's approach,
-  // and the previous regression class: pickFiles() not existing, then
-  // nextTick()-deferring the call). A <label> sidesteps that whole
-  // class of heuristics by never going through JS to open the dialog
-  // at all - the browser handles it natively, the same as any <label>/
-  // <input> pair on the web.
-  it('wraps Add in a <label> whose for= matches the real <input type="file">\'s id', () => {
+  // The native picker opens because the real <input type="file"> is
+  // stacked transparently on top of the visible button, so the
+  // pointer/touch event that "clicks the button" actually lands on the
+  // input itself. This deliberately avoids the two previous regression
+  // classes: a JS .click() call on the input from inside a handler
+  // (some browsers/webviews apply stricter "was this really
+  // user-activated" heuristics to a programmatic .click() than to a
+  // genuine click), and a <label for> wrapping the button (per the HTML
+  // label activation-behaviour spec, a click on a nested interactive
+  // element like <button> is handled by that element and never
+  // forwarded to the labeled control - only non-interactive label
+  // content forwards the click; happy-dom's simplified label-forwarding
+  // model does not reflect this real-browser rule, which is exactly why
+  // that approach kept passing here while failing for the user).
+  it('stacks the real <input type="file"> directly on top of the Add button, not behind a <label>', () => {
     const wrapper = mountFile({ modelValue: null })
 
-    const input = wrapper.find('input[type="file"]')
-    const label = wrapper.find('label')
+    const wrapperDiv = wrapper.find('.s-file-picker-btn')
+    const input = wrapperDiv.find('input[type="file"]')
 
+    expect(input.exists()).toBe(true)
     expect(input.attributes('id')).toBeTruthy()
-    expect(label.attributes('for')).toBe(input.attributes('id'))
-  })
-
-  it('clicking the Add button (inside its label) forwards a click to the real input, natively', () => {
-    // <label for> resolution needs the element actually connected to a
-    // live document (matching id lookup scoped to the document tree) -
-    // attachTo mounts into document.body instead of a detached
-    // fragment, the same way a real page's DOM always is.
-    const wrapper = mountFile({ modelValue: null }, { attachTo: document.body })
-    const input = wrapper.find('input[type="file"]')
-
-    let inputReceivedClick = false
-    input.element.addEventListener('click', () => { inputReceivedClick = true })
-
-    // Clicking anywhere inside the <label> (here, the nested button) -
-    // real browsers forward this to the associated control themselves;
-    // happy-dom implements the same <label>/<input> forwarding.
-    wrapper.find('.s-file button').element.click()
-
-    expect(inputReceivedClick).toBe(true)
-
-    wrapper.unmount()
+    expect(wrapper.find('label').exists()).toBe(false)
   })
 
   it('each s-file instance gets its own unique input id (no collision between multiple fields on one page)', () => {
@@ -103,24 +86,15 @@ describe('FileComponent (s-file) - native picker wiring', () => {
     expect(firstId).not.toBe(secondId)
   })
 
-  it('the image field\'s "Choose file" menu item is also wrapped in a label targeting the same input', async () => {
-    // QMenu teleports its content to document.body - attachTo makes
-    // that teleported markup queryable from the real document instead
-    // of only the wrapper's own (detached) root subtree.
-    const wrapper = mountFile({ modelValue: null, accept: 'image/*' }, { attachTo: document.body })
-    const inputId = wrapper.find('input[type="file"]').attributes('id')
+  it('an image field gets a separate "Use camera" button instead of a choice menu over the picker', () => {
+    const wrapper = mountFile({ modelValue: null, accept: 'image/*' })
 
-    // "Add" on an image field opens the choice menu first (not file-
-    // picker-sensitive, a plain JS click is fine for that step).
-    await wrapper.find('.s-file button').trigger('click')
-
-    const chooseFileLabel = Array.from(document.body.querySelectorAll('label'))
-      .find(el => el.textContent.includes('Choose file'))
-
-    expect(chooseFileLabel).toBeTruthy()
-    expect(chooseFileLabel.getAttribute('for')).toBe(inputId)
-
-    wrapper.unmount()
+    // "Choose file" no longer exists as a menu item that needs its own
+    // label - the Add button's overlay input above covers that case
+    // directly. Camera capture is a distinct button with a plain click
+    // handler, since it never touches the native file picker.
+    expect(wrapper.find('.s-file-picker-btn input[type="file"]').exists()).toBe(true)
+    expect(wrapper.findAllComponents({ name: 'CameraCaptureDialog' }).length).toBeGreaterThan(0)
   })
 })
 

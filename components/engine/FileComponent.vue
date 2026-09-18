@@ -6,8 +6,6 @@
       <div v-else-if="translatedHint" class="text-caption text-grey-6">{{translatedHint}}</div>
     </div>
 
-    <input :id="inputId" ref="nativeInput" type="file" class="s-file-native-input" :accept="accept" :multiple="multiple" @change="onFileChange">
-
     <div class="row items-center q-gutter-sm">
       <div v-for="item in previewItems" :key="item.key" class="s-file-preview-item column items-center">
         <div class="s-file-preview-thumb" :style="radiusStyle">
@@ -17,11 +15,25 @@
         </div>
         <div class="s-file-preview-name text-caption ellipsis">{{item.name}}</div>
         <div class="row q-gutter-xs">
-          <label v-if="!multiple" :for="inputId" class="s-file-label">
+          <!-- The real <input type="file"> sits transparently on top of
+               the visible button inside this wrapper, so the pointer/
+               touch event that opens the OS picker lands directly on
+               the input itself - not on a JS .click() call, and not on
+               a <label for> that merely wraps an interactive <button>
+               (per the HTML label activation-behaviour spec, a click on
+               a nested labelable/interactive element such as <button>
+               is handled by that element and is NOT forwarded to the
+               labeled control - only non-interactive label content
+               forwards the click; real Chromium/Firefox honour this,
+               even though some simplified DOM test environments do
+               not). This is the same overlay technique virtually every
+               cross-browser custom-file-input implementation uses. -->
+          <div v-if="!multiple" class="s-file-picker-btn">
             <s-btn flat round dense size="sm" color="primary" icon="edit">
               <s-tooltip>{{tdc('Change')}}</s-tooltip>
             </s-btn>
-          </label>
+            <input :id="inputId" ref="nativeInput" type="file" class="s-file-overlay-input" :accept="accept" :multiple="multiple" @change="onFileChange">
+          </div>
           <s-btn flat round dense size="sm" color="negative" icon="delete" @click="removeAt(item.index)">
             <s-tooltip>{{tdc('Remove')}}</s-tooltip>
           </s-btn>
@@ -29,42 +41,20 @@
       </div>
 
       <template v-if="multiple||!previewItems.length">
-        <!-- Plain FileField (no image affordance) - the native picker
-             opens through the browser's own label-activation, not a JS
-             .click() call: some browsers/webviews apply stricter
-             "was this really user-activated" heuristics to a
-             programmatic .click() on a file input than to a real
-             <label for>, even when that .click() runs perfectly
-             synchronously inside the click handler - a <label>
-             sidesteps the whole class of heuristics by never going
-             through JS to open the dialog at all. -->
-        <label v-if="!isImageField" :for="inputId" class="s-file-label">
+        <div class="s-file-picker-btn">
           <s-btn round outline color="primary" icon="add">
             <s-tooltip>{{tdc('Add')}}</s-tooltip>
           </s-btn>
-        </label>
+          <input :id="inputId" ref="nativeInput" type="file" class="s-file-overlay-input" :accept="accept" :multiple="multiple" @change="onFileChange">
+        </div>
 
-        <!-- Image field - "Add" itself only ever opens the choice menu
-             (not file-picker-sensitive, a plain JS click is fine);
-             "Choose file" inside it is the one that must actually open
-             the native picker, so THAT item is the one wrapped in the
-             label instead. -->
-        <s-btn v-else round outline color="primary" icon="add" @click="addMenuOpen=true">
-          <s-tooltip>{{tdc('Add')}}</s-tooltip>
-          <q-menu v-model="addMenuOpen">
-            <q-list dense style="min-width:160px">
-              <label :for="inputId" class="s-file-label s-file-label-block" v-close-popup>
-                <q-item clickable>
-                  <q-item-section avatar><q-icon name="upload"/></q-item-section>
-                  <q-item-section>{{tdc('Choose file')}}</q-item-section>
-                </q-item>
-              </label>
-              <q-item clickable v-close-popup @click="cameraOpen=true">
-                <q-item-section avatar><q-icon name="photo_camera"/></q-item-section>
-                <q-item-section>{{tdc('Use camera')}}</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
+        <!-- Image field - camera capture is a plain JS-driven dialog
+             (never a native OS file picker), so a regular @click is
+             fine here; it is a separate action button rather than a
+             menu item so it never needs to share the overlay trick
+             above with "Choose file". -->
+        <s-btn v-if="isImageField" round outline color="primary" icon="photo_camera" @click="cameraOpen=true">
+          <s-tooltip>{{tdc('Use camera')}}</s-tooltip>
         </s-btn>
       </template>
     </div>
@@ -84,9 +74,9 @@ const IMAGE_EXTENSIONS=/\.(png|jpe?g|gif|webp|bmp|heic|heif)\b/i
 const looksLikeImageAccept=accept=>!!accept&&(accept.includes("image/")||IMAGE_EXTENSIONS.test(accept))
 
 // Multiple s-file instances can exist on the same page (e.g. a
-// repeatable "documents" section, one file input per row) - each needs
-// its own unique id for the <label for> association below to target
-// the right <input>, never a hardcoded/shared one.
+// repeatable "documents" section, one file input per row) - each gets
+// its own id so the two mutually-exclusive <input> branches above never
+// collide with another instance's.
 let instanceSeq=0
 
 export default defineComponent({
@@ -106,7 +96,7 @@ export default defineComponent({
   emits:["update:modelValue"],
   setup(props,{emit}){
     const inputId=`s-file-input-${++instanceSeq}`
-    const attrs=useAttrs(),User=useUserStore(),nativeInput=ref(null),localValue=ref(props.modelValue),addMenuOpen=ref(false),cameraOpen=ref(false),blobUrls=new Set()
+    const attrs=useAttrs(),User=useUserStore(),nativeInput=ref(null),localValue=ref(props.modelValue),cameraOpen=ref(false),blobUrls=new Set()
     const layout=computed(()=>User.ps?.layout||{})
     const accept=computed(()=>attrs.accept||"")
     const translatedLabel=computed(()=>props.label?tdc(props.label):undefined)
@@ -155,9 +145,8 @@ export default defineComponent({
         localValue.value=[...current,...valid]
       }else localValue.value=valid[0]||null
       // Cleared even on success (not just on the validation-failure path
-      // above) - the native <label for> re-opens the SAME <input> every
-      // time, and a still-populated .value would make the browser skip
-      // firing 'change' if the user picks that exact same file again.
+      // above) - picking the same file again wouldn't otherwise fire
+      // 'change' a second time on the same <input>.
       event.target.value=""
     }
 
@@ -179,16 +168,15 @@ export default defineComponent({
 
     onBeforeUnmount(()=>blobUrls.forEach(url=>URL.revokeObjectURL(url)))
 
-    return{inputId,nativeInput,localValue,addMenuOpen,cameraOpen,accept,translatedLabel,translatedHint,isImageField,hasError,firstError,radiusStyle,previewItems,onFileChange,onCameraCaptured,removeAt,tdc}
+    return{inputId,nativeInput,localValue,cameraOpen,accept,translatedLabel,translatedHint,isImageField,hasError,firstError,radiusStyle,previewItems,onFileChange,onCameraCaptured,removeAt,tdc}
   }
 })
 </script>
 
 <style scoped>
 .s-file{position:relative}
-.s-file-native-input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
-.s-file-label{cursor:pointer;display:inline-flex}
-.s-file-label-block{display:block}
+.s-file-picker-btn{position:relative;display:inline-flex}
+.s-file-overlay-input{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:0;cursor:pointer;font-size:0;z-index:1}
 .s-file-preview-thumb{width:64px;height:64px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(128,128,128,.12)}
 .s-file-preview-thumb img{width:100%;height:100%;object-fit:cover}
 .s-file-preview-item{width:72px}
