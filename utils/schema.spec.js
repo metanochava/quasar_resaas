@@ -9,8 +9,85 @@ import {
   schemaPermission,
   canSchema,
   resolveActionEndpoint,
-  resolvePdfDetailEndpoint
+  resolvePdfDetailEndpoint,
+  resolveRules,
+  guessComponent
 } from './schema.js'
+
+describe('guessComponent', () => {
+  it('always prefers an explicit field.component when present', () => {
+    expect(guessComponent({ component: 's-editor', type: 'CharField' })).toBe('s-editor')
+  })
+
+  it('guesses s-select for a field with choices', () => {
+    expect(guessComponent({ choices: [['a', 'A']] })).toBe('s-select')
+  })
+
+  it('guesses s-file for FileField/ImageField, by type or by ui flag', () => {
+    expect(guessComponent({ type: 'FileField' })).toBe('s-file')
+    expect(guessComponent({ type: 'ImageField' })).toBe('s-file')
+    expect(guessComponent({ type: 'CharField', ui: { isFile: true } })).toBe('s-file')
+    expect(guessComponent({ type: 'CharField', ui: { isImage: true } })).toBe('s-file')
+  })
+
+  it('guesses s-select for a to-one relation, s-multiselect for a to-many one', () => {
+    expect(guessComponent({ type: 'ForeignKey', relation: 'hr.Employee' })).toBe('s-select')
+    expect(guessComponent({ type: 'OneToOneField', relation: 'django_resaas.Person' })).toBe('s-select')
+    expect(guessComponent({ type: 'ManyToManyField', relation: 'auth.Permission' })).toBe('s-multiselect')
+    expect(guessComponent({ type: 'ManyToManyField', ui: { isRelation: true } })).toBe('s-multiselect')
+  })
+
+  it('guesses by plain Django field type for everything else', () => {
+    expect(guessComponent({ type: 'BooleanField' })).toBe('s-switch')
+    expect(guessComponent({ type: 'TextField' })).toBe('s-editor')
+    expect(guessComponent({ type: 'DateField' })).toBe('s-date')
+    expect(guessComponent({ type: 'TimeField' })).toBe('s-time')
+    expect(guessComponent({ type: 'DateTimeField' })).toBe('s-date-time')
+  })
+
+  it('falls back to s-input for a plain CharField or an unknown type', () => {
+    expect(guessComponent({ type: 'CharField' })).toBe('s-input')
+    expect(guessComponent({ type: 'SomeFutureFieldType' })).toBe('s-input')
+    expect(guessComponent({})).toBe('s-input')
+  })
+})
+
+describe('resolveRules', () => {
+  it('converts a required rule descriptor into a validator that fails on empty', () => {
+    const [rule] = resolveRules([{ type: 'required', message: 'Field is required' }])
+
+    expect(rule('')).toBe('Field is required')
+    expect(rule(null)).toBe('Field is required')
+    expect(rule('x')).toBe(true)
+  })
+
+  it('converts min_length/max_length/min/max/email the same way FormComponent.vue always relied on', () => {
+    const [minLen] = resolveRules([{ type: 'min_length', value: 3, message: 'too short' }])
+    expect(minLen('ab')).toBe('too short')
+    expect(minLen('abc')).toBe(true)
+
+    const [maxLen] = resolveRules([{ type: 'max_length', value: 3, message: 'too long' }])
+    expect(maxLen('abcd')).toBe('too long')
+    expect(maxLen('abc')).toBe(true)
+
+    const [min] = resolveRules([{ type: 'min', value: 5, message: 'too small' }])
+    expect(min(4)).toBe('too small')
+    expect(min(5)).toBe(true)
+
+    const [max] = resolveRules([{ type: 'max', value: 5, message: 'too big' }])
+    expect(max(6)).toBe('too big')
+    expect(max(5)).toBe(true)
+
+    const [email] = resolveRules([{ type: 'email', message: 'invalid email' }])
+    expect(email('not-an-email')).toBe('invalid email')
+    expect(email('a@b.com')).toBe(true)
+  })
+
+  it('an unknown rule type always passes, never blocking submission', () => {
+    const [rule] = resolveRules([{ type: 'something_new' }])
+    expect(rule('anything')).toBe(true)
+  })
+})
 
 describe('normalizeSchema', () => {
   it('exposes the current schema version', () => {

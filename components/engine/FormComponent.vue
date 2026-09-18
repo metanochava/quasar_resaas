@@ -2,6 +2,7 @@
 import { ref, watch, computed } from 'vue'
 import { HTTPAuth, url } from '../../services/api'
 import { parseFieldErrors } from '../../boot/alerts'
+import { resolveRules } from '../../utils/schema'
 import FormSection from '../auto/FormSection.vue'
 
 
@@ -93,72 +94,7 @@ function resetForm() {
   form.value = props.store.row ? { ...props.store.row } : {}
 }
 
-// ---------------- RULES ----------------
-function resolveRules(rules = []) {
-  return rules.map(r => {
-    switch (r.type) {
-      case 'required':
-        return val => !!val || r.message
-      case 'min_length':
-        return val => !val || val.length >= r.value || r.message
-      case 'max_length':
-        return val => !val || val.length <= r.value || r.message
-      case 'min':
-        return val => val == null || val >= r.value || r.message
-      case 'max':
-        return val => val == null || val <= r.value || r.message
-      case 'email':
-        return val =>
-          !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || r.message
-      default:
-        return () => true
-    }
-  })
-}
 
-// ---------------- HELPERS ----------------
-function isRealFile(v) {
-  return v instanceof File
-}
-
-// ---------------- PREVIEW ----------------
-function getPreview(f, value) {
-  if (!value) return null
-  if (!f.ui?.isFile && !f.ui?.isImage) return null
-
-  // New file
-  if (value instanceof File) {
-    if (value.type.startsWith('image')) {
-      return { type: 'image', src: URL.createObjectURL(value) }
-    }
-    if (value.type === 'application/pdf') {
-      return { type: 'pdf', src: URL.createObjectURL(value) }
-    }
-    return { type: 'file', name: value.name }
-  }
-
-  // Objeto backend
-  if (typeof value === 'object' && value.url) {
-
-    let safeUrl = value.url.replace('http://', 'https://')
-
-    if (value.mime_type?.startsWith('image')) {
-      return { type: 'image', src: safeUrl }
-    }
-
-    if (value.mime_type === 'application/pdf') {
-      return { type: 'pdf', src: safeUrl }
-    }
-
-    return { type: 'file', name: value.name }
-  }
-
-  return null
-}
-
-function previewOf(f) {
-  return getPreview(f, form.value[f.name])
-}
 
 // ---------------- NORMALIZE ----------------
 function normalizeValue(v) {
@@ -341,23 +277,9 @@ defineExpose({
       <FormSection v-if="fileFields.length" title="Attachments">
         <div v-for="f in fileFields" :key="f.name" class="col-12 col-sm-6 col-md-4">
 
-          <!-- PREVIEW -->
-          <template v-if="previewOf(f)">
-            <q-img
-              v-if="previewOf(f).type === 'image'"
-              :src="previewOf(f).src"
-              class="form-file-preview-image"
-            />
-
-            <iframe
-              v-else-if="previewOf(f).type === 'pdf'"
-              :src="previewOf(f).src"
-              class="form-file-preview-pdf"
-            />
-          </template>
-
-          <!-- INPUT -->
-
+          <!-- s-file/s-upload (UploadComponent.vue) previews its own
+               value now (image thumbnail/pdf+file icon), so this no
+               longer needs its own separate preview block above it. -->
           <component
             :is=" f.component"
             v-model="form[f.name]"
@@ -380,17 +302,3 @@ defineExpose({
   </q-card>
 </template>
 
-<style scoped>
-.form-file-preview-image {
-  max-width: 120px;
-  margin-bottom: 8px;
-  border-radius: 4px;
-}
-
-.form-file-preview-pdf {
-  width: 100%;
-  height: 200px;
-  margin-bottom: 8px;
-  border: none;
-}
-</style>

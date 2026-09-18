@@ -38,6 +38,78 @@ export const DEFAULT_PDF = {
   list: true
 }
 
+// Mirrors app_schema.py's own _resolve_ui() type -> component mapping
+// (saas/management/apicommands/view/app_schema.py) - the backend is
+// still the authority when a field already carries an explicit
+// `component` (the normal case for anything that went through the real
+// schema pipeline, buildFormFromSchema()). This is only the fallback
+// for a field object built by hand, or trimmed down before reaching
+// here, that never got a `component` in the first place - guessed from
+// whatever's actually on it (type/choices/relation/ui), same
+// convention, so a caller (FieldComponent.vue) doesn't have to
+// pre-resolve one just to render a field.
+export function guessComponent(field) {
+  if (field.component) return field.component
+
+  if (Array.isArray(field.choices) && field.choices.length) {
+    return 's-select'
+  }
+
+  if (field.ui?.isFile || field.ui?.isImage || field.type === 'FileField' || field.type === 'ImageField') {
+    return 's-file'
+  }
+
+  if (field.ui?.isRelation || field.relation) {
+    return field.type === 'ManyToManyField' ? 's-multiselect' : 's-select'
+  }
+
+  switch (field.type) {
+    case 'ManyToManyField':
+      return 's-multiselect'
+    case 'ForeignKey':
+    case 'OneToOneField':
+      return 's-select'
+    case 'BooleanField':
+      return 's-switch'
+    case 'TextField':
+      return 's-editor'
+    case 'DateField':
+      return 's-date'
+    case 'TimeField':
+      return 's-time'
+    case 'DateTimeField':
+      return 's-date-time'
+    default:
+      return 's-input'
+  }
+}
+
+// Backend's own {type, value, message} rule descriptors (app_schema.py's
+// _build_rules()) turned into actual Quasar-shaped validator functions -
+// shared so FormComponent.vue and FieldComponent.vue don't each keep
+// their own (previously slightly-diverging) copy of this conversion.
+export function resolveRules(rules = []) {
+  return rules.map(r => {
+    switch (r.type) {
+      case 'required':
+        return val => !!val || r.message
+      case 'min_length':
+        return val => !val || val.length >= r.value || r.message
+      case 'max_length':
+        return val => !val || val.length <= r.value || r.message
+      case 'min':
+        return val => val == null || val >= r.value || r.message
+      case 'max':
+        return val => val == null || val <= r.value || r.message
+      case 'email':
+        return val =>
+          !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || r.message
+      default:
+        return () => true
+    }
+  })
+}
+
 export function normalizeSchema(data = {}) {
   const schema = data?.data || data || {}
   const model = schema.model
