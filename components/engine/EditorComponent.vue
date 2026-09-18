@@ -1,245 +1,139 @@
 <template>
   <div class="s-editor-wrapper">
-    <div
-      v-if="translatedLabel"
-      class="s-editor-label"
-    >
-      {{ translatedLabel }}
-      <span
-        v-if="required"
-        class="text-negative"
-      >
-        *
-      </span>
-    </div>
-
     <q-editor
       v-bind="editorAttrs"
       v-model="localValue"
       :placeholder="translatedPlaceholder"
       :toolbar="computedToolbar"
+      :definitions="computedDefinitions"
       :min-height="computedMinHeight"
       :max-height="attrs.maxHeight"
       :height="attrs.height"
-      :dense="attrs.dense ?? layout.dense"
-      :class="[
-        's-editor',
-        attrs.class,
-        {
-          's-editor--error': hasError
-        }
-      ]"
+      :dense="attrs.dense??layout.dense"
+      :class="['s-editor',attrs.class,{'s-editor--error':hasError}]"
     />
-
-    <div
-      v-if="translatedHint && !hasError"
-      class="s-editor-hint"
-    >
-      {{ translatedHint }}
-    </div>
-
-    <div
-      v-if="hasError"
-      class="s-editor-error"
-    >
-      {{ firstError }}
-    </div>
+    <div v-if="translatedHint&&!hasError" class="s-editor-hint">{{translatedHint}}</div>
+    <div v-if="hasError" class="s-editor-error">{{firstError}}</div>
   </div>
 </template>
 
 <script>
-import { defineComponent, computed, useAttrs, ref, watch } from "vue"
-import { useUserStore } from "../../stores/UserStore"
-import { tdc } from "../../services/translation"
+import {defineComponent,computed,useAttrs,ref,watch} from "vue"
+import {useUserStore} from "../../stores/UserStore"
+import {tdc} from "../../services/translation"
 
 export default defineComponent({
-  name: "s-editor",
-  inheritAttrs: false,
-
-  props: {
-    modelValue: {
-      type: String,
-      default: ""
-    },
-
-    label: String,
-
-    placeholder: String,
-
-    hint: String,
-
-    required: Boolean,
-
-    validators: {
-      type: Array,
-      default: () => []
-    },
-
-    toolbar: {
-      type: Array,
-      default: null
-    },
-
-    minHeight: {
-      type: String,
-      default: "180px"
-    },
-
-    // Backend validation error for this field (BaseStore.errors[name],
-    // see parseFieldErrors in boot/alerts.js) - shown alongside (not
-    // instead of) the local client-side validators below.
-    error: {
-      type: [Boolean, String],
-      default: false
-    },
-    errorMessage: {
-      type: String,
-      default: ''
-    }
+  name:"s-editor",
+  inheritAttrs:false,
+  props:{
+    modelValue:{type:String,default:""},
+    label:String,
+    placeholder:String,
+    hint:String,
+    required:Boolean,
+    validators:{type:Array,default:()=>[]},
+    toolbar:{type:Array,default:null},
+    minHeight:{type:String,default:"180px"},
+    error:{type:[Boolean,String],default:false},
+    errorMessage:{type:String,default:""}
   },
+  emits:["update:modelValue"],
+  setup(props,{emit}){
+    const attrs=useAttrs(),User=useUserStore()
+    const layout=computed(()=>User.ps?.layout||{})
+    const localValue=ref(props.modelValue||"")
+    const localHasError=ref(false),localFirstError=ref("")
 
-  emits: ["update:modelValue"],
+    const translatedLabel=computed(()=>{
+      const label=props.label||attrs.label||attrs.name||""
+      return label?tdc(label):""
+    })
 
-  setup(props, { emit }) {
-    const attrs = useAttrs()
-    const User = useUserStore()
+    const translatedPlaceholder=computed(()=>{
+      const value=props.placeholder||attrs.placeholder
+      return value?tdc(value):undefined
+    })
 
-    const layout = computed(() => User.ps?.layout || {})
+    const translatedHint=computed(()=>{
+      const value=props.hint||attrs.hint
+      return value?tdc(value):undefined
+    })
 
-    const localValue = ref(props.modelValue || "")
+    const hasError=computed(()=>localHasError.value||!!props.error)
 
-    // Local client-side validators (required/custom) run on every
-    // change; an external backend error (props.error/errorMessage,
-    // from BaseStore.errors[name]) is shown alongside them - whichever
-    // is set wins the display, local validation taking priority since
-    // it's the more current signal once the user starts typing again.
-    const localHasError = ref(false)
-    const localFirstError = ref("")
-
-    const hasError = computed(() => localHasError.value || !!props.error)
-    const firstError = computed(() =>
-      localFirstError.value ||
-      (typeof props.error === "string" && props.error) ||
-      props.errorMessage ||
+    const firstError=computed(()=>
+      localFirstError.value||
+      (typeof props.error==="string"&&props.error)||
+      props.errorMessage||
       ""
     )
 
-    watch(
-      () => props.modelValue,
-      value => {
-        localValue.value = value || ""
+    const computedDefinitions=computed(()=>{
+      const label=translatedLabel.value
+      return{
+        fieldLabel:{
+          label:`${label}${props.required?" *":""}`,
+          tip:label,
+          disable:true
+        }
       }
-    )
-
-    watch(localValue, value => {
-      emit("update:modelValue", value)
-      validate(value)
     })
 
-    const translatedLabel = computed(() =>
-      props.label
-        ? tdc(props.label)
-        : attrs.label
-        ? tdc(attrs.label)
-        : undefined
-    )
+    const computedToolbar=computed(()=>props.toolbar||[
+      ["fieldLabel","bold","italic","strike","underline"],
+      ["left","center","right","justify"],
+      ["unordered","ordered","outdent","indent"],
+      ["undo","redo","fullscreen"]
+    ])
 
-    const translatedPlaceholder = computed(() =>
-      props.placeholder
-        ? tdc(props.placeholder)
-        : attrs.placeholder
-        ? tdc(attrs.placeholder)
-        : undefined
-    )
+    const computedMinHeight=computed(()=>attrs.minHeight||props.minHeight)
 
-    const translatedHint = computed(() =>
-      props.hint
-        ? tdc(props.hint)
-        : attrs.hint
-        ? tdc(attrs.hint)
-        : undefined
-    )
-
-    const computedToolbar = computed(() => {
-      if (props.toolbar) return props.toolbar
-
-      return [
-        [
-          "bold",
-          "italic",
-          "strike",
-          "underline",
-        ],
-        [
-          "left",
-          "center",
-          "right",
-          "justify"
-        ],
-        [
-          "undo",
-          "redo",
-          "fullscreen"
-        ],
-      ]
+    const editorAttrs=computed(()=>{
+      const {class:klass,label,placeholder,hint,minHeight,maxHeight,height,name,...rest}=attrs
+      return rest
     })
 
-    const computedMinHeight = computed(() => {
-      return attrs.minHeight || props.minHeight
-    })
+    function stripHtml(value){
+      return String(value||"").replace(/<[^>]*>/g,"").replace(/&nbsp;/gi," ").trim()
+    }
 
-    function validate(value) {
-      const rules = []
+    function validate(value){
+      const rules=[]
+      if(props.required)rules.push(v=>!!stripHtml(v)||tdc("Required field"))
+      rules.push(...props.validators)
 
-      if (props.required) {
-        rules.push(v => !!stripHtml(v).trim() || tdc("Required field"))
-      }
-
-      for (const validator of props.validators) {
-        rules.push(validator)
-      }
-
-      for (const rule of rules) {
-        const result = rule(value)
-
-        if (result !== true) {
-          localHasError.value = true
-          localFirstError.value = result
+      for(const rule of rules){
+        if(typeof rule!=="function")continue
+        const result=rule(value)
+        if(result!==true){
+          localHasError.value=true
+          localFirstError.value=typeof result==="string"?result:tdc("Invalid value")
           return false
         }
       }
 
-      localHasError.value = false
-      localFirstError.value = ""
+      localHasError.value=false
+      localFirstError.value=""
       return true
     }
 
-    function stripHtml(value) {
-      return String(value || "").replace(/<[^>]*>/g, "")
-    }
-
-    const editorAttrs = computed(() => {
-      const {
-        class: klass,
-        label,
-        placeholder,
-        hint,
-        minHeight,
-        maxHeight,
-        height,
-        ...rest
-      } = attrs
-
-      return rest
+    watch(()=>props.modelValue,value=>{
+      const next=value||""
+      if(next!==localValue.value)localValue.value=next
     })
 
-    return {
+    watch(localValue,value=>{
+      emit("update:modelValue",value)
+      validate(value)
+    })
+
+    return{
       attrs,
       layout,
       localValue,
-      translatedLabel,
       translatedPlaceholder,
       translatedHint,
+      computedDefinitions,
       computedToolbar,
       computedMinHeight,
       hasError,
@@ -251,35 +145,9 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.s-editor-wrapper {
-  width: 100%;
-}
-
-.s-editor-label {
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: rgba(0, 0, 0, 0.75);
-}
-
-.s-editor {
-  width: 100%;
-}
-
-.s-editor--error {
-  border: 1px solid var(--q-negative);
-  border-radius: 4px;
-}
-
-.s-editor-hint {
-  font-size: 12px;
-  color: #777;
-  margin-top: 4px;
-}
-
-.s-editor-error {
-  font-size: 12px;
-  color: var(--q-negative);
-  margin-top: 4px;
-}
+.s-editor-wrapper{width:100%}
+.s-editor{width:100%}
+.s-editor--error{border:1px solid var(--q-negative);border-radius:4px}
+.s-editor-hint{font-size:12px;color:#777;margin-top:4px}
+.s-editor-error{font-size:12px;color:var(--q-negative);margin-top:4px}
 </style>

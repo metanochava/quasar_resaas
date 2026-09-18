@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.1352",
+  "version": "0.0.1353",
   "description": "Quasar rest SaaS",
   "keywords": [
     "quasar",
@@ -56,6 +56,8 @@
     "./core/*": "./core/*"
   },
   "devDependencies": {
+    "@quasar/vite-plugin": "^2.0.2",
+    "@vitejs/plugin-vue": "^6.0.9",
     "@vue/test-utils": "^2.5.0",
     "happy-dom": "^20.11.10",
     "pinia": "^4.0.3",
