@@ -71,15 +71,7 @@
                       dense outlined
                     />
                   </div>
-                  <div class="col-12 col-sm-4">
-                    <s-field
-                      v-model="Person.form.middle_name"
-                      :field="fieldOf(Person, 'middle_name')"
-                      :label="tdc('Middle name')"
-                      :filled="false"
-                      dense outlined
-                    />
-                  </div>
+                  
                   <div class="col-12 col-sm-4">
                     <s-field
                       v-model="Person.form.surname"
