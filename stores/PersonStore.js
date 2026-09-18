@@ -1,4 +1,5 @@
 import { createBaseStore } from '../base/base_store'
+import { HTTPAuth, url } from '../services/api'
 
 export const usePersonStore = createBaseStore(
   'person',
@@ -15,6 +16,7 @@ export const usePersonStore = createBaseStore(
 
       selectedPerson: null,
       searchingPerson: false,
+      matchingPerson: false,
 
     }),
 
@@ -53,6 +55,30 @@ export const usePersonStore = createBaseStore(
 
         }
 
+      },
+
+      // ========================================
+      // MATCH (duplicate-detection)
+      // ========================================
+      // PersonAPIView.match (saas/data/person/views/person.py) - a
+      // @resaas_action, not generic CRUD, so it's called directly
+      // rather than through loadData()/create() (same convention as
+      // EmployeeStore's checkIn/checkOut). Backed by the reusable
+      // person_matching_service, deliberately NOT Employee-specific -
+      // any future intake flow (Patient/Student/Customer) can call
+      // this same action.
+      async matchCandidates(payload) {
+        this.matchingPerson = true
+
+        try {
+          const { data } = await HTTPAuth.post(
+            url({ type: 'u', url: 'django_resaas/persons/match/' }),
+            payload
+          )
+          return data?.results || []
+        } finally {
+          this.matchingPerson = false
+        }
       },
 
       // ========================================

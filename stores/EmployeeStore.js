@@ -31,6 +31,7 @@ export const useEmployeeStore = createBaseStore(
       onboarding: null,
       loadingOnboarding: false,
       onboardingActionLoading: false,
+      registering: false,
       goals: [],
       reviews: [],
       loadingPerformance: false,
@@ -118,6 +119,70 @@ export const useEmployeeStore = createBaseStore(
           this.attendances = data?.results ?? data ?? []
         } finally {
           this.loadingAttendances = false
+        }
+      },
+
+      // ------------------------------------------------------------
+      // REGISTRATION (add_employee)
+      // ------------------------------------------------------------
+      // hr/employees/register/ is a @resaas_action wrapping the atomic
+      // Person(+reuse)/Document/PersonContact/Employee creation
+      // (hr/services/employee_registration_service.py) - not generic
+      // CRUD, so this builds its own multipart request instead of
+      // going through create() (BaseStore's own FormData builder only
+      // flattens plain scalars/arrays, not this shape: a nested,
+      // per-item list of documents each carrying its own file - see
+      // base_store.js's own toFormData()). Mirrors exactly what the
+      // backend action expects (hr/views/employee.py's register()):
+      // a single `payload` JSON field, plus `person_photo` and one
+      // `document_file_<index>` per document that actually carries a
+      // File.
+      //
+      // personId: an existing Person id (from Person.matchCandidates())
+      //   to reuse - mutually exclusive with personData.
+      // personData: plain fields for a brand new Person (no photo key -
+      //   passed separately below).
+      // photo: File|null for a NEW person's photo.
+      // documents: [{ tipo, numero, data_emissao, data_validade,
+      //   arquivo: File|null }, ...] - only documents to CREATE.
+      // contacts: [...PersonContact fields, ...] - only NEW contacts.
+      // employeeData: plain EmployeeSerializer fields (person is added
+      //   automatically server-side, never sent from here).
+      async register({ personId, personData, photo, documents, contacts, employeeData } = {}) {
+        this.registering = true
+
+        try {
+          const fd = new FormData()
+
+          const payloadDocuments = (documents || []).map((doc, index) => {
+            const hasFile = doc.arquivo instanceof File
+            if (hasFile) fd.append(`document_file_${index}`, doc.arquivo)
+
+            const { arquivo, ...rest } = doc
+            return { ...rest, _file_key: hasFile ? `document_file_${index}` : null }
+          })
+
+          fd.append('payload', JSON.stringify({
+            person_id: personId || null,
+            person: personId ? null : (personData || null),
+            documents: payloadDocuments,
+            contacts: contacts || [],
+            employee: employeeData || {}
+          }))
+
+          if (!personId && photo instanceof File) {
+            fd.append('person_photo', photo)
+          }
+
+          const { data } = await HTTPAuth.post(
+            url({ type: 'u', url: 'hr/employees/register/' }),
+            fd,
+            { headers: { 'Content-Type': 'multipart/form-data' } }
+          )
+
+          return data
+        } finally {
+          this.registering = false
         }
       },
 
