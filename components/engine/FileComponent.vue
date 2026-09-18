@@ -6,7 +6,7 @@
       <div v-else-if="translatedHint" class="text-caption text-grey-6">{{translatedHint}}</div>
     </div>
 
-    <input ref="nativeInput" type="file" class="s-file-native-input" :accept="accept" :multiple="multiple" @change="onFileChange">
+    <input :id="inputId" ref="nativeInput" type="file" class="s-file-native-input" :accept="accept" :multiple="multiple" @change="onFileChange">
 
     <div class="row items-center q-gutter-sm">
       <div v-for="item in previewItems" :key="item.key" class="s-file-preview-item column items-center">
@@ -17,30 +17,56 @@
         </div>
         <div class="s-file-preview-name text-caption ellipsis">{{item.name}}</div>
         <div class="row q-gutter-xs">
-          <s-btn v-if="!multiple" flat round dense size="sm" color="primary" icon="edit" @click="openAdd">
-            <s-tooltip>{{tdc('Change')}}</s-tooltip>
-          </s-btn>
+          <label v-if="!multiple" :for="inputId" class="s-file-label">
+            <s-btn flat round dense size="sm" color="primary" icon="edit">
+              <s-tooltip>{{tdc('Change')}}</s-tooltip>
+            </s-btn>
+          </label>
           <s-btn flat round dense size="sm" color="negative" icon="delete" @click="removeAt(item.index)">
             <s-tooltip>{{tdc('Remove')}}</s-tooltip>
           </s-btn>
         </div>
       </div>
 
-      <s-btn v-if="multiple||!previewItems.length" round outline color="primary" icon="add" @click="isImageField?(addMenuOpen=true):openAdd()">
-        <s-tooltip>{{tdc('Add')}}</s-tooltip>
-        <q-menu v-if="isImageField" v-model="addMenuOpen">
-          <q-list dense style="min-width:160px">
-            <q-item clickable v-close-popup @click="openAdd">
-              <q-item-section avatar><q-icon name="upload"/></q-item-section>
-              <q-item-section>{{tdc('Choose file')}}</q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup @click="cameraOpen=true">
-              <q-item-section avatar><q-icon name="photo_camera"/></q-item-section>
-              <q-item-section>{{tdc('Use camera')}}</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </s-btn>
+      <template v-if="multiple||!previewItems.length">
+        <!-- Plain FileField (no image affordance) - the native picker
+             opens through the browser's own label-activation, not a JS
+             .click() call: some browsers/webviews apply stricter
+             "was this really user-activated" heuristics to a
+             programmatic .click() on a file input than to a real
+             <label for>, even when that .click() runs perfectly
+             synchronously inside the click handler - a <label>
+             sidesteps the whole class of heuristics by never going
+             through JS to open the dialog at all. -->
+        <label v-if="!isImageField" :for="inputId" class="s-file-label">
+          <s-btn round outline color="primary" icon="add">
+            <s-tooltip>{{tdc('Add')}}</s-tooltip>
+          </s-btn>
+        </label>
+
+        <!-- Image field - "Add" itself only ever opens the choice menu
+             (not file-picker-sensitive, a plain JS click is fine);
+             "Choose file" inside it is the one that must actually open
+             the native picker, so THAT item is the one wrapped in the
+             label instead. -->
+        <s-btn v-else round outline color="primary" icon="add" @click="addMenuOpen=true">
+          <s-tooltip>{{tdc('Add')}}</s-tooltip>
+          <q-menu v-model="addMenuOpen">
+            <q-list dense style="min-width:160px">
+              <label :for="inputId" class="s-file-label s-file-label-block" v-close-popup>
+                <q-item clickable>
+                  <q-item-section avatar><q-icon name="upload"/></q-item-section>
+                  <q-item-section>{{tdc('Choose file')}}</q-item-section>
+                </q-item>
+              </label>
+              <q-item clickable v-close-popup @click="cameraOpen=true">
+                <q-item-section avatar><q-icon name="photo_camera"/></q-item-section>
+                <q-item-section>{{tdc('Use camera')}}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </s-btn>
+      </template>
     </div>
 
     <CameraCaptureDialog v-if="isImageField" v-model="cameraOpen" @captured="onCameraCaptured"/>
@@ -56,6 +82,12 @@ import CameraCaptureDialog from "./CameraCaptureDialog.vue"
 
 const IMAGE_EXTENSIONS=/\.(png|jpe?g|gif|webp|bmp|heic|heif)\b/i
 const looksLikeImageAccept=accept=>!!accept&&(accept.includes("image/")||IMAGE_EXTENSIONS.test(accept))
+
+// Multiple s-file instances can exist on the same page (e.g. a
+// repeatable "documents" section, one file input per row) - each needs
+// its own unique id for the <label for> association below to target
+// the right <input>, never a hardcoded/shared one.
+let instanceSeq=0
 
 export default defineComponent({
   name:"s-file",
@@ -73,6 +105,7 @@ export default defineComponent({
   },
   emits:["update:modelValue"],
   setup(props,{emit}){
+    const inputId=`s-file-input-${++instanceSeq}`
     const attrs=useAttrs(),User=useUserStore(),nativeInput=ref(null),localValue=ref(props.modelValue),addMenuOpen=ref(false),cameraOpen=ref(false),blobUrls=new Set()
     const layout=computed(()=>User.ps?.layout||{})
     const accept=computed(()=>attrs.accept||"")
@@ -95,12 +128,6 @@ export default defineComponent({
         return {...preview,index,key:value instanceof File?`${value.name}-${value.size}-${value.lastModified}`:(value?.url||index)}
       }).filter(Boolean)
     })
-
-    function openAdd(){
-      if(!nativeInput.value)return
-      nativeInput.value.value=""
-      nativeInput.value.click()
-    }
 
     function validateFile(file){
       if(!file)return false
@@ -127,6 +154,10 @@ export default defineComponent({
         const current=Array.isArray(localValue.value)?localValue.value:(localValue.value?[localValue.value]:[])
         localValue.value=[...current,...valid]
       }else localValue.value=valid[0]||null
+      // Cleared even on success (not just on the validation-failure path
+      // above) - the native <label for> re-opens the SAME <input> every
+      // time, and a still-populated .value would make the browser skip
+      // firing 'change' if the user picks that exact same file again.
       event.target.value=""
     }
 
@@ -148,7 +179,7 @@ export default defineComponent({
 
     onBeforeUnmount(()=>blobUrls.forEach(url=>URL.revokeObjectURL(url)))
 
-    return{nativeInput,localValue,addMenuOpen,cameraOpen,accept,translatedLabel,translatedHint,isImageField,hasError,firstError,radiusStyle,previewItems,openAdd,onFileChange,onCameraCaptured,removeAt,tdc}
+    return{inputId,nativeInput,localValue,addMenuOpen,cameraOpen,accept,translatedLabel,translatedHint,isImageField,hasError,firstError,radiusStyle,previewItems,onFileChange,onCameraCaptured,removeAt,tdc}
   }
 })
 </script>
@@ -156,6 +187,8 @@ export default defineComponent({
 <style scoped>
 .s-file{position:relative}
 .s-file-native-input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+.s-file-label{cursor:pointer;display:inline-flex}
+.s-file-label-block{display:block}
 .s-file-preview-thumb{width:64px;height:64px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(128,128,128,.12)}
 .s-file-preview-thumb img{width:100%;height:100%;object-fit:cover}
 .s-file-preview-item{width:72px}

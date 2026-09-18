@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { Quasar } from 'quasar'
 import { createPinia, setActivePinia } from 'pinia'
@@ -51,59 +51,74 @@ beforeEach(() => {
 })
 
 describe('FileComponent (s-file) - native picker wiring', () => {
-  it('clicking Add calls .click() on the real underlying <input type="file">, synchronously', async () => {
+  // The native picker is opened via a real <label for="..."> wrapping
+  // the button, never a JS .click() call on the input - some browsers/
+  // webviews apply stricter "was this really user-activated"
+  // heuristics to a programmatic .click() than to genuine label
+  // activation, even when that call runs perfectly synchronously
+  // inside a click handler (the previous implementation's approach,
+  // and the previous regression class: pickFiles() not existing, then
+  // nextTick()-deferring the call). A <label> sidesteps that whole
+  // class of heuristics by never going through JS to open the dialog
+  // at all - the browser handles it natively, the same as any <label>/
+  // <input> pair on the web.
+  it('wraps Add in a <label> whose for= matches the real <input type="file">\'s id', () => {
     const wrapper = mountFile({ modelValue: null })
 
     const input = wrapper.find('input[type="file"]')
-    expect(input.exists()).toBe(true)
+    const label = wrapper.find('label')
 
-    const clickSpy = vi.spyOn(input.element, 'click')
-
-    // Plain (non-image) field - never shows the choose-file/use-camera
-    // menu, so the Add button calls openAdd() directly.
-    await wrapper.find('.s-file button').trigger('click')
-
-    expect(clickSpy).toHaveBeenCalledTimes(1)
+    expect(input.attributes('id')).toBeTruthy()
+    expect(label.attributes('for')).toBe(input.attributes('id'))
   })
 
-  it('never defers the native-picker trigger through a microtask (regression guard)', () => {
-    const wrapper = mountFile({ modelValue: null })
+  it('clicking the Add button (inside its label) forwards a click to the real input, natively', () => {
+    // <label for> resolution needs the element actually connected to a
+    // live document (matching id lookup scoped to the document tree) -
+    // attachTo mounts into document.body instead of a detached
+    // fragment, the same way a real page's DOM always is.
+    const wrapper = mountFile({ modelValue: null }, { attachTo: document.body })
     const input = wrapper.find('input[type="file"]')
 
-    let calledSynchronously = false
-    const nativeClick = input.element.click.bind(input.element)
-    input.element.click = () => {
-      calledSynchronously = true
-      return nativeClick()
-    }
+    let inputReceivedClick = false
+    input.element.addEventListener('click', () => { inputReceivedClick = true })
 
-    wrapper.find('.s-file button').element.dispatchEvent(new Event('click', { bubbles: true }))
+    // Clicking anywhere inside the <label> (here, the nested button) -
+    // real browsers forward this to the associated control themselves;
+    // happy-dom implements the same <label>/<input> forwarding.
+    wrapper.find('.s-file button').element.click()
 
-    // No await/microtask boundary between dispatch and this assertion -
-    // if openAdd() ever goes back to nextTick()/Promise-deferring the
-    // click(), this observes it still being false here.
-    expect(calledSynchronously).toBe(true)
+    expect(inputReceivedClick).toBe(true)
+
+    wrapper.unmount()
   })
 
-  it('opening the picker through the image field\'s "Choose file" menu item is still synchronous', async () => {
+  it('each s-file instance gets its own unique input id (no collision between multiple fields on one page)', () => {
+    const first = mountFile({ modelValue: null })
+    const second = mountFile({ modelValue: null })
+
+    const firstId = first.find('input[type="file"]').attributes('id')
+    const secondId = second.find('input[type="file"]').attributes('id')
+
+    expect(firstId).not.toBe(secondId)
+  })
+
+  it('the image field\'s "Choose file" menu item is also wrapped in a label targeting the same input', async () => {
     // QMenu teleports its content to document.body - attachTo makes
     // that teleported markup queryable from the real document instead
     // of only the wrapper's own (detached) root subtree.
     const wrapper = mountFile({ modelValue: null, accept: 'image/*' }, { attachTo: document.body })
-    const input = wrapper.find('input[type="file"]')
-    const clickSpy = vi.spyOn(input.element, 'click')
+    const inputId = wrapper.find('input[type="file"]').attributes('id')
 
-    // Open the menu, then click "Choose file" inside it - the second,
-    // separate click is what actually must stay synchronous.
+    // "Add" on an image field opens the choice menu first (not file-
+    // picker-sensitive, a plain JS click is fine for that step).
     await wrapper.find('.s-file button').trigger('click')
 
-    const chooseFileItem = Array.from(document.body.querySelectorAll('.q-item'))
+    const chooseFileLabel = Array.from(document.body.querySelectorAll('label'))
       .find(el => el.textContent.includes('Choose file'))
-    expect(chooseFileItem).toBeTruthy()
 
-    chooseFileItem.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-
-    expect(clickSpy).toHaveBeenCalledTimes(1)
+    expect(chooseFileLabel).toBeTruthy()
+    expect(chooseFileLabel.getAttribute('for')).toBe(inputId)
 
     wrapper.unmount()
   })
