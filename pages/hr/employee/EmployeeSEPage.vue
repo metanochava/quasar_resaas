@@ -546,15 +546,24 @@ onMounted(async () => {
   Employee.resetForm?.()
 
   await Promise.all([
-    Person.init(),
+    // Only the schema is needed here (for fieldOf()'s component/props/
+    // rules lookup) - .init() also runs loadData(), fetching the full
+    // row list and requiring list_person/list_personcontact, a
+    // permission this page has no actual use for (nothing here ever
+    // shows a Person/PersonContact list) and a role allowed to add
+    // employees may well not hold. Employee/JobPosition/JobGrade DO
+    // need their .rows (position/job_grade/manager option lists), so
+    // those stay on the full init().
+    Person.loadSchemaOnce(),
+    PersonContact.loadSchemaOnce(),
     Employee.init(),
-    PersonContact.init(),
     JobPosition.init(),
     JobGrade.init()
   ])
 
-  // Fresh, blank forms again - .init() above calls loadData(), whose
-  // resulting list has nothing to do with the form being filled in here.
+  // Fresh, blank forms again - Employee.init() above also calls
+  // loadData(), whose resulting list has nothing to do with the form
+  // being filled in here.
   Person.resetForm?.()
   Employee.resetForm?.()
 
