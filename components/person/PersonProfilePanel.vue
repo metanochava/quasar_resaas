@@ -3,8 +3,8 @@
     <div class="row q-col-gutter-md">
 
       <!-- ============ IDENTITY CARD ============ -->
-      <!-- Left column: identity, then address (with its map), then any
-           business-specific card - keeps the map next to the photo so the
+      <!-- Left column: identity, then the user account, then address (with
+           its map), then any business-specific card - keeps the map next to the photo so the
            wide right column stays for the long lists. -->
       <div class="col-12 col-md-4">
         <div class="column q-gutter-y-md">
@@ -48,6 +48,61 @@
               </div>
             </div>
           </div>
+        </s-card>
+
+        <!-- User account (login linked to this Person, read-only) -->
+        <s-card flat bordered class="user-card">
+          <q-card-section class="section-title">
+            <q-icon name="manage_accounts" size="20px" /> {{ tdc('User account') }}
+          </q-card-section>
+          <q-separator />
+          <q-card-section v-if="userInfo">
+            <div class="row items-center no-wrap q-mb-md">
+              <q-avatar size="48px" class="q-mr-md user-avatar">
+                <img v-if="userPhotoUrl" :src="userPhotoUrl" :alt="tdc('Profile picture')">
+                <q-icon v-else name="person" />
+              </q-avatar>
+              <div class="col">
+                <div class="field-label">{{ tdc('Username') }}</div>
+                <div class="field-value ellipsis">{{ userInfo.username || '—' }}</div>
+              </div>
+            </div>
+
+            <div class="column q-gutter-y-sm">
+              <div>
+                <div class="field-label">{{ tdc('Email') }}</div>
+                <div class="row items-center no-wrap q-gutter-x-sm">
+                  <div class="field-value ellipsis" :class="{ 'is-empty': !userInfo.email }">{{ userInfo.email || '—' }}</div>
+                  <q-chip
+                    dense square
+                    :icon="userInfo.is_verified_email ? 'verified' : 'error_outline'"
+                    :color="userInfo.is_verified_email ? 'positive' : 'grey-6'"
+                    text-color="white"
+                    :aria-label="tdc('Email verified')"
+                    data-test="email-verification"
+                  >{{ userInfo.is_verified_email ? tdc('Verified') : tdc('Not verified') }}</q-chip>
+                </div>
+              </div>
+              <div>
+                <div class="field-label">{{ tdc('Mobile') }}</div>
+                <div class="row items-center no-wrap q-gutter-x-sm">
+                  <div class="field-value" :class="{ 'is-empty': !userInfo.mobile }">{{ userInfo.mobile || '—' }}</div>
+                  <q-chip
+                    dense square
+                    :icon="userInfo.is_verified_mobile ? 'verified' : 'error_outline'"
+                    :color="userInfo.is_verified_mobile ? 'positive' : 'grey-6'"
+                    text-color="white"
+                    :aria-label="tdc('Mobile verified')"
+                    data-test="mobile-verification"
+                  >{{ userInfo.is_verified_mobile ? tdc('Verified') : tdc('Not verified') }}</q-chip>
+                </div>
+              </div>
+            </div>
+          </q-card-section>
+          <q-card-section v-else class="empty-state">
+            <q-icon name="no_accounts" size="28px" />
+            <div>{{ tdc('No user account linked.') }}</div>
+          </q-card-section>
         </s-card>
 
         <!-- Address -->
@@ -274,6 +329,11 @@ const fullName = computed(() =>
 
 const photoUrl = computed(() => props.person?.photo?.url || null)
 
+// PersonSerializer.user_data: username/email/mobile/verification flags/
+// profile of the linked login account, null when the Person has none.
+const userInfo = computed(() => props.person?.user_data || null)
+const userPhotoUrl = computed(() => userInfo.value?.profile?.url || null)
+
 function initialsOf(text) {
   return String(text || '')
     .split(/\s+/).filter(Boolean).slice(0, 2)
@@ -429,6 +489,8 @@ watch(() => props.person?.id, loadRelated, { immediate: true })
 .body--dark .identity-photo { border-color: #1d1d1d; }
 .identity-photo img { width: 100%; height: 100%; object-fit: cover; }
 .identity-initials { font-size: 44px; font-weight: 700; color: var(--q-primary); }
+
+.user-avatar { background: color-mix(in srgb, var(--q-primary) 14%, transparent); color: var(--q-primary); }
 
 .soft-chip { background: color-mix(in srgb, var(--q-primary) 12%, transparent); color: var(--q-primary); }
 

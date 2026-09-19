@@ -48,6 +48,46 @@ describe('PersonProfilePanel - aside slot', () => {
   })
 })
 
+describe('PersonProfilePanel - user account', () => {
+  const user_data = {
+    id: 'u1', username: 'metano', email: 'metano@login.com', mobile: '841234567',
+    is_verified_email: true, is_verified_mobile: false, profile: { url: 'http://x/u.png', name: 'u.png' }
+  }
+
+  it('shows username, email, mobile and their verification state, between identity and address', async () => {
+    const w = mount(PersonProfilePanel, { props: { person: { ...person, user_data } }, global: globalOptions })
+    await flushPromises()
+
+    const card = w.find('.user-card')
+    expect(card.exists()).toBe(true)
+    expect(card.text()).toContain('User account')
+    expect(card.text()).toContain('metano')
+    expect(card.text()).toContain('metano@login.com')
+    expect(card.text()).toContain('841234567')
+    expect(card.find('[data-test="email-verification"]').text()).toContain('Verified')
+    expect(card.find('[data-test="mobile-verification"]').text()).toContain('Not verified')
+    expect(card.find('img').attributes('src')).toBe('http://x/u.png')
+
+    const html = w.html()
+    expect(html.indexOf('identity-card')).toBeLessThan(html.indexOf('user-card'))
+    expect(html.indexOf('user-card')).toBeLessThan(html.indexOf('No address on file.'))
+  })
+
+  it('shows an empty state when the Person has no user account', async () => {
+    const w = mount(PersonProfilePanel, { props: { person: { ...person, user_data: null } }, global: globalOptions })
+    await flushPromises()
+
+    expect(w.find('.user-card').text()).toContain('No user account linked.')
+    expect(w.find('[data-test="email-verification"]').exists()).toBe(false)
+  })
+
+  it('never prints a raw object for the user data', async () => {
+    const w = mount(PersonProfilePanel, { props: { person: { ...person, user_data } }, global: globalOptions })
+    await flushPromises()
+    expect(w.find('.user-card').text()).not.toContain('[object Object]')
+  })
+})
+
 describe('PersonProfilePanel - address map', () => {
   it('shows a small map inside the address card when the address has coordinates', async () => {
     const withAddress = { ...person, address: { formatted_address: 'Av. 24 de Julho, Maputo', latitude: '-25.9655', longitude: '32.5832' } }
