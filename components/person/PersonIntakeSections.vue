@@ -20,14 +20,26 @@
               </div>
             </div>
 
-            <s-btn
-              flat
-              no-caps
-              icon="close"
-              color="white"
-              :label="tdc('Change')"
-              @click="clearSelectedPerson"
-            />
+            <div class="row items-center no-wrap q-gutter-sm">
+              <s-btn
+                v-if="canViewPerson"
+                flat
+                no-caps
+                icon="visibility"
+                color="white"
+                :label="tdc('View')"
+                data-test="person-view"
+                @click="showSelectedPerson"
+              />
+              <s-btn
+                flat
+                no-caps
+                icon="close"
+                color="white"
+                :label="tdc('Change')"
+                @click="clearSelectedPerson"
+              />
+            </div>
           </q-card-section>
         </s-card>
       </div>
@@ -421,6 +433,25 @@
       </div>
 
 
+    <!-- All the data of the reused person -->
+    <q-dialog v-model="detailOpen">
+      <s-card class="person-detail-card column no-wrap">
+        <q-bar class="bg-primary text-white">
+          <div class="text-subtitle1 ellipsis">{{ detail?.full_name }}</div>
+          <q-space />
+          <s-btn flat dense round icon="close" data-test="person-detail-close" @click="detailOpen = false">
+            <s-tooltip>{{ tdc('Close') }}</s-tooltip>
+          </s-btn>
+        </q-bar>
+
+        <q-linear-progress v-if="detailLoading" indeterminate />
+
+        <div class="col scroll q-pa-md">
+          <s-person-profile v-if="detail" :person="detail" />
+        </div>
+      </s-card>
+    </q-dialog>
+
     <PersonMatchDialog
       v-model="matchDialogOpen"
       :candidates="matchCandidatesList"
@@ -432,7 +463,9 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { tdc } from '../../services/translation'
+import { useUserStore } from '../../stores/UserStore'
 import AddressLocationPicker from '../address/AddressLocationPicker.vue'
 import PersonMatchDialog from './PersonMatchDialog.vue'
 
@@ -456,11 +489,18 @@ const {
   fieldOf,
   addContact, removeContact, addDocument, removeDocument,
   clearSelectedPerson, pickerValue, onPersonPicked,
+  showSelectedPerson, detailOpen, detail, detailLoading,
   onMatchSelect, onMatchCreateNew, onMatchCancel
 } = props.intake
+
+// The backend authorises the read anyway; this only hides a button that
+// would end in a denial.
+const User = useUserStore()
+const canViewPerson = computed(() => User.can('view_person'))
 </script>
 
 <style scoped>
+.person-detail-card { width: 1100px; max-width: 96vw; height: 88vh; }
 .person-intake .contact-block + .contact-block {
   border-top: 1px solid rgba(128, 128, 128, .25);
 }

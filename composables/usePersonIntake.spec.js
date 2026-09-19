@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
+import { HTTPAuth } from '../services/api'
 import { usePersonIntake } from './usePersonIntake'
 
 let intake
@@ -263,5 +264,60 @@ describe('usePersonIntake - existing person picked in the relation picker', () =
     intake.onPersonPicked(null)
     expect(intake.selectedPerson.value).toBeNull()
     expect(intake.matchResolved.value).toBe(false)
+  })
+})
+
+describe('usePersonIntake - viewing the reused person', () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  const selected = { id: 'p7', full_name: 'Ana Costa', email: 'a@x.com' }
+
+  it('opens at once with the summary, then shows the full record', async () => {
+    const full = { id: 'p7', full_name: 'Ana Costa', blood_type: { label: 'O+' }, address: { formatted_address: 'Maputo' } }
+    const get = vi.spyOn(HTTPAuth, 'get').mockResolvedValue({ data: full })
+    intake.selectedPerson.value = selected
+
+    const pending = intake.showSelectedPerson()
+    expect(intake.detailOpen.value).toBe(true)
+    expect(intake.detail.value).toEqual(selected)
+    expect(intake.detailLoading.value).toBe(true)
+
+    await pending
+
+    expect(get.mock.calls[0][0]).toContain('django_resaas/persons/p7/')
+    expect(intake.detail.value).toEqual(full)
+    expect(intake.detailLoading.value).toBe(false)
+  })
+
+  it('keeps the summary when the record cannot be read', async () => {
+    vi.spyOn(HTTPAuth, 'get').mockRejectedValue(new Error('403'))
+    intake.selectedPerson.value = selected
+
+    await intake.showSelectedPerson()
+
+    expect(intake.detail.value).toEqual(selected)
+    expect(intake.detailLoading.value).toBe(false)
+  })
+
+  it('ignores an answer for a person that is no longer the selected one', async () => {
+    let answer
+    vi.spyOn(HTTPAuth, 'get').mockReturnValue(new Promise(resolve => { answer = resolve }))
+    intake.selectedPerson.value = selected
+
+    const pending = intake.showSelectedPerson()
+    intake.selectedPerson.value = { id: 'p8', full_name: 'Other' }
+    answer({ data: { id: 'p7', full_name: 'Stale' } })
+    await pending
+
+    expect(intake.detail.value).toEqual(selected)
+  })
+
+  it('does nothing without a selected person', async () => {
+    const get = vi.spyOn(HTTPAuth, 'get')
+
+    await intake.showSelectedPerson()
+
+    expect(get).not.toHaveBeenCalled()
+    expect(intake.detailOpen.value).toBe(false)
   })
 })

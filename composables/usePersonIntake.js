@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { usePersonStore } from '../stores/PersonStore'
 import { usePersonContactStore } from '../stores/PersonContactStore'
 import { useDocumentStore } from '../stores/DocumentStore'
+import { HTTPAuth, url } from '../services/api'
 import { buildWritePayload, updateWithPayload, omit } from '../utils/payload'
 import { toRelationOption } from '../utils/autoForm'
 import { rawValue } from '../utils/display'
@@ -137,6 +138,35 @@ export function usePersonIntake() {
   function onPersonPicked(row) {
     if (row) useExistingPerson(row)
     else clearSelectedPerson()
+  }
+
+  // "View" on the reused person: every stored detail (identity, contacts,
+  // address, documents...), through the same tenant/permission-checked
+  // Person endpoint. The summary already in hand is shown at once and
+  // replaced by the full record when it arrives (or kept when it can't be
+  // read).
+  const detailOpen = ref(false)
+  const detail = ref(null)
+  const detailLoading = ref(false)
+
+  async function showSelectedPerson() {
+    const selected = selectedPerson.value
+    if (!selected) return
+
+    detail.value = selected
+    detailOpen.value = true
+    detailLoading.value = true
+
+    try {
+      const { data } = await HTTPAuth.get(url({ type: 'u', url: `django_resaas/persons/${selected.id}/` }))
+
+      // the user may have changed the person meanwhile
+      if (selectedPerson.value?.id === selected.id) detail.value = data
+    } catch {
+      // keep the summary
+    } finally {
+      detailLoading.value = false
+    }
   }
 
   let resolveMatchChoice = null
@@ -377,7 +407,8 @@ export function usePersonIntake() {
     fieldOf,
     addContact, removeContact, addDocument, removeDocument,
     // matching
-    resolveMatch, clearSelectedPerson, useExistingPerson, pickerValue, onPersonPicked,
+    resolveMatch, clearSelectedPerson, useExistingPerson, showSelectedPerson,
+    detailOpen, detail, detailLoading, pickerValue, onPersonPicked,
     onMatchSelect, onMatchCreateNew, onMatchCancel,
     // create / edit
     registrationPayload, loadExisting, saveExisting,

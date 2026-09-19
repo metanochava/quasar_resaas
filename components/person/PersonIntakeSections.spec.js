@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { Quasar } from 'quasar'
 import { createPinia, setActivePinia } from 'pinia'
 
 import PersonIntakeSections from './PersonIntakeSections.vue'
 import { usePersonIntake } from '../../composables/usePersonIntake'
+import { useUserStore } from '../../stores/UserStore'
 
 // s-field/s-select/... are covered by their own specs - here only the
 // wiring of THIS component to usePersonIntake() matters, so each widget
@@ -26,6 +27,7 @@ const global = {
     's-btn': { name: 's-btn', props: ['label', 'icon'], emits: ['click'], template: '<button type="button" :data-icon="icon" :data-label="label" @click="$emit(\'click\')"><slot /></button>' },
     's-card': slotStub('s-card'),
     's-tooltip': slotStub('s-tooltip'),
+    's-person-profile': slotStub('s-person-profile'),
     's-relation-picker': {
       name: 's-relation-picker',
       props: ['modelValue', 'relationConfig', 'label', 'minChars', 'creatable', 'editable', 'mode'],
@@ -134,6 +136,32 @@ describe('PersonIntakeSections', () => {
 
       expect(intake.selectedPerson.value).toBeNull()
       expect(wrapper.text()).toContain('Personal data')
+    })
+  })
+
+  describe('viewing the selected person', () => {
+    const chosen = { id: 'p1', full_name: 'Marta Sitoe', email: 'm@example.com' }
+
+    it('shows a View button next to Change only with the view_person permission', () => {
+      intake.selectedPerson.value = chosen
+
+      useUserStore().Permissions = new Set()
+      expect(mountSections().find('button[data-test="person-view"]').exists()).toBe(false)
+      expect(mountSections().find('button[data-label="Change"]').exists()).toBe(true)
+
+      useUserStore().Permissions = new Set(['view_person'])
+      expect(mountSections().find('button[data-test="person-view"]').exists()).toBe(true)
+    })
+
+    it('View opens the person details', async () => {
+      useUserStore().Permissions = new Set(['view_person'])
+      intake.selectedPerson.value = chosen
+      const show = vi.spyOn(intake, 'showSelectedPerson').mockResolvedValue()
+      const wrapper = mountSections()
+
+      await wrapper.find('button[data-test="person-view"]').trigger('click')
+
+      expect(show).toHaveBeenCalled()
     })
   })
 })
