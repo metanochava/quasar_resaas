@@ -15,6 +15,7 @@ import DateTimeComponent from './../components/engine/DateTimeComponent.vue'
 import EditorComponent from './../components/engine/EditorComponent.vue'
 import SelectComponent from './../components/engine/SelectComponent.vue'
 import MultiSelectComponent from './../components/engine/MultiSelectComponent.vue'
+import RelationPickerComponent from './../components/engine/RelationPickerComponent.vue'
 import DrawerComponent from './../components/engine/DrawerComponent.vue'
 import FieldComponent from './../components/engine/FieldComponent.vue'
 import FileComponent from './../components/engine/FileComponent.vue'
@@ -128,6 +129,9 @@ export default boot(({ app }) => {
   app.component('s-select', SelectComponent)
 
   app.component('s-multiselect', MultiSelectComponent)
+
+  // relation_config.variant "card": search + rich preview + create/view/edit
+  app.component('s-relation-picker', RelationPickerComponent)
 
   app.component('s-drawer', DrawerComponent)
 

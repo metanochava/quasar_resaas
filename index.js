@@ -17,6 +17,7 @@ export * from './router/authGuard.js'
 
 export * from './composables/useResaas.js'
 export * from './composables/usePersonIntake.js'
+export * from './composables/useRelationSearch.js'
 
 
 // =========================================================

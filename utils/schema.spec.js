@@ -11,8 +11,28 @@ import {
   resolveActionEndpoint,
   resolvePdfDetailEndpoint,
   resolveRules,
-  guessComponent
+  guessComponent,
+  relationPickerComponent
 } from './schema.js'
+
+describe('relation picker selection (schema variant)', () => {
+  const card = { name: 'person', type: 'ForeignKey', component: 's-select', relation: 'django_resaas.Person', relation_config: { variant: 'card' } }
+
+  it('a relation whose relation_config.variant is "card" resolves to the picker', () => {
+    expect(guessComponent(card)).toBe('s-relation-picker')
+    expect(relationPickerComponent(card)).toBe('s-relation-picker')
+  })
+
+  it('is decided by the variant only - never by the model or field name', () => {
+    expect(guessComponent({ ...card, name: 'anything', relation: 'demo.Product' })).toBe('s-relation-picker')
+    expect(guessComponent({ ...card, relation_config: { variant: 'select' } })).toBe('s-select')
+    expect(guessComponent({ ...card, relation_config: null })).toBe('s-select')
+  })
+
+  it('a many-to-many keeps the multi-select even if it were flagged "card"', () => {
+    expect(guessComponent({ ...card, type: 'ManyToManyField', component: 's-multiselect' })).toBe('s-multiselect')
+  })
+})
 
 describe('guessComponent', () => {
   it('always prefers an explicit field.component when present', () => {

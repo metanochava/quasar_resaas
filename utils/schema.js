@@ -48,7 +48,20 @@ export const DEFAULT_PDF = {
 // whatever's actually on it (type/choices/relation/ui), same
 // convention, so a caller (FieldComponent.vue) doesn't have to
 // pre-resolve one just to render a field.
+// A single-selection relation whose related model declares a preview
+// (schema relation_config.variant === 'card') is rendered by the relation
+// picker instead of the plain select. Purely metadata-driven - the variant is
+// decided by the backend, never by a model or field name here.
+export function relationPickerComponent(field) {
+  return field?.relation_config?.variant === 'card' && field.type !== 'ManyToManyField'
+    ? 's-relation-picker'
+    : null
+}
+
 export function guessComponent(field) {
+  const picker = relationPickerComponent(field)
+  if (picker) return picker
+
   if (field.component) return field.component
 
   if (Array.isArray(field.choices) && field.choices.length) {

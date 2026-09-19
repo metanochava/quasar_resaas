@@ -1,6 +1,6 @@
 import { HTTPAuth, url } from '../services/api'
 import { tdc } from '../services/translation'
-import { normalizeSchema } from './schema'
+import { normalizeSchema, relationPickerComponent } from './schema'
 
 const __relationCache = new Map()
 
@@ -261,17 +261,21 @@ export async function buildFormFromSchema({
         }
       }
 
-      try {
-        const cacheKey = `${relationKeyBase}::`
+      // the relation picker searches the related model's own endpoint
+      // itself - preloading select options for it would be a wasted request
+      if (!relationPickerComponent(f)) {
+        try {
+          const cacheKey = `${relationKeyBase}::`
 
-        if (__relationCache.has(cacheKey)) {
-          props.options = __relationCache.get(cacheKey)
-        } else {
-          const opts = await relFetcher(relationKeyBase, '')
-          __relationCache.set(cacheKey, opts)
-          props.options = opts
-        }
-      } catch {}
+          if (__relationCache.has(cacheKey)) {
+            props.options = __relationCache.get(cacheKey)
+          } else {
+            const opts = await relFetcher(relationKeyBase, '')
+            __relationCache.set(cacheKey, opts)
+            props.options = opts
+          }
+        } catch {}
+      }
     }
 
     if (Array.isArray(f.choices) && f.choices.length) {
@@ -291,7 +295,7 @@ export async function buildFormFromSchema({
     out.push({
       ...f,
       label,
-      component: f.component || 's-input',
+      component: relationPickerComponent(f) || f.component || 's-input',
       props,
       ui: {
         isFile: isFileType(f.type),

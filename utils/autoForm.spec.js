@@ -227,6 +227,33 @@ describe('buildFormFromSchema - real Django schema contract', () => {
     expect(category.props.relationConfig).toEqual(relationConfig)
   })
 
+  it('a "card" relation is rendered by the relation picker and skips the options preload', async () => {
+    const relationConfig = {
+      app: 'django_resaas', model: 'Person', endpoint: 'django_resaas/persons/', variant: 'card',
+      permissions: { list: 'list_person' }, preview: { title: 'full_name' },
+    }
+
+    httpGet.mockReset()
+    httpGet.mockResolvedValueOnce({
+      data: {
+        ...REALISTIC_DJANGO_SCHEMA,
+        fields: [
+          { name: 'person', type: 'ForeignKey', label: 'Person', relation: 'django_resaas.Person', relation_config: relationConfig, ui: { isRelation: true } },
+          { name: 'manager', type: 'ForeignKey', label: 'Manager', relation: 'hr.Employee', relation_config: { ...relationConfig, variant: 'select' }, ui: { isRelation: true } },
+        ],
+      },
+    })
+    httpGet.mockResolvedValue({ data: [] })
+
+    const result = await buildFormFromSchema({ app: 'hr', model: 'Employee' })
+
+    expect(result.fields.find(f => f.name === 'person').component).toBe('s-relation-picker')
+    expect(result.fields.find(f => f.name === 'person').props.relationConfig).toEqual(relationConfig)
+    expect(result.fields.find(f => f.name === 'manager').component).not.toBe('s-relation-picker')
+    // schema + the plain select's own preload only - the picker preloads nothing
+    expect(httpGet).toHaveBeenCalledTimes(2)
+  })
+
   it('a non-relation field gets relationConfig: null', async () => {
     httpGet.mockResolvedValue({ data: REALISTIC_DJANGO_SCHEMA })
 
