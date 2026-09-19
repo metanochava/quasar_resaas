@@ -25,7 +25,13 @@ const global = {
     's-input': inputStub('s-input'),
     's-btn': { name: 's-btn', props: ['label', 'icon'], emits: ['click'], template: '<button type="button" :data-icon="icon" :data-label="label" @click="$emit(\'click\')"><slot /></button>' },
     's-card': slotStub('s-card'),
-    's-tooltip': slotStub('s-tooltip')
+    's-tooltip': slotStub('s-tooltip'),
+    's-relation-picker': {
+      name: 's-relation-picker',
+      props: ['modelValue', 'relationConfig', 'label', 'minChars', 'creatable', 'editable'],
+      emits: ['update:modelValue'],
+      template: '<div class="stub-picker" :data-min="minChars" :data-creatable="creatable" :data-editable="editable">{{ modelValue?.label }}</div>'
+    }
   },
   stubs: { AddressLocationPicker: true, PersonMatchDialog: true }
 }
@@ -38,7 +44,9 @@ beforeEach(() => {
   intake.reset({ withBlankContact: false })
 })
 
-const mountSections = () => mount(PersonIntakeSections, { props: { intake }, global })
+const mountSections = (props = {}) => mount(PersonIntakeSections, { props: { intake, ...props }, global })
+
+const PERSON_CONFIG = { endpoint: 'django_resaas/persons/', permissions: { list: 'list_person' }, preview: { title: 'full_name' } }
 
 describe('PersonIntakeSections', () => {
   it('renders every person section for a new person', () => {
@@ -86,5 +94,42 @@ describe('PersonIntakeSections', () => {
 
     expect(wrapper.text()).toContain('Marta Sitoe')
     expect(wrapper.text()).not.toContain('Personal data')
+  })
+
+  describe('existing-person picker (page passes its Person relation config)', () => {
+    it('is not rendered without a relation config (edit pages)', () => {
+      expect(mountSections().find('.stub-picker').exists()).toBe(false)
+    })
+
+    it('is rendered with the config, without create/edit actions and with a minimum query length', () => {
+      const picker = mountSections({ relationConfig: PERSON_CONFIG }).find('.stub-picker')
+
+      expect(picker.exists()).toBe(true)
+      expect(picker.attributes('data-min')).toBe('2')
+      expect(picker.attributes('data-creatable')).toBe('false')
+      expect(picker.attributes('data-editable')).toBe('false')
+    })
+
+    it('picking a person reuses it (hides the create form) and clearing brings the form back', async () => {
+      const wrapper = mountSections({ relationConfig: PERSON_CONFIG })
+
+      wrapper.findComponent({ name: 's-relation-picker' }).vm.$emit('update:modelValue', {
+        value: 'p9', label: 'Zed Quux',
+        preview: { title: 'Zed Quux', avatar: null, values: { email: 'zed@example.com', phone: '850000123' } }
+      })
+      await wrapper.vm.$nextTick()
+
+      expect(intake.selectedPerson.value).toMatchObject({ id: 'p9', full_name: 'Zed Quux', email: 'zed@example.com', phone: '850000123' })
+      expect(wrapper.find('.stub-picker').text()).toBe('Zed Quux')
+      expect(wrapper.text()).not.toContain('Personal data')
+      // the summary card is replaced by the picker, never shown twice
+      expect(wrapper.text()).not.toContain('Using existing person')
+
+      wrapper.findComponent({ name: 's-relation-picker' }).vm.$emit('update:modelValue', null)
+      await wrapper.vm.$nextTick()
+
+      expect(intake.selectedPerson.value).toBeNull()
+      expect(wrapper.text()).toContain('Personal data')
+    })
   })
 })

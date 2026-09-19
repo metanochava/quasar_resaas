@@ -3,7 +3,32 @@
     <!-- ================================================= -->
     <!-- SELECTED EXISTING PERSON SUMMARY -->
     <!-- ================================================= -->
-      <div v-if="selectedPerson" class="col-12">
+      <!-- With a relation config (the page passes its Person relation's
+           schema config) the person is picked through the generic relation
+           picker; otherwise the plain summary below is used. -->
+      <div v-if="relationConfig" class="col-12">
+        <s-card flat bordered>
+          <q-card-section class="q-pb-none">
+            <div class="text-caption text-grey-7">
+              {{ tdc('Search an existing person to reuse it, or fill in the form below to create a new one.') }}
+            </div>
+          </q-card-section>
+          <q-card-section>
+            <s-relation-picker
+              :model-value="pickerValue"
+              :relation-config="relationConfig"
+              :label="tdc('Existing person')"
+              :min-chars="2"
+              :creatable="false"
+              :editable="false"
+              clearable
+              @update:model-value="onPersonPicked"
+            />
+          </q-card-section>
+        </s-card>
+      </div>
+
+      <div v-else-if="selectedPerson" class="col-12">
         <s-card flat bordered class="bg-primary text-white">
           <q-card-section class="row items-center no-wrap q-gutter-md">
             <q-avatar size="56px" square class="rounded-borders">
@@ -424,7 +449,10 @@ import PersonMatchDialog from './PersonMatchDialog.vue'
 // it registers the Person as. `intake` is the object usePersonIntake()
 // returned - destructured once so refs unwrap in the template.
 const props = defineProps({
-  intake: { type: Object, required: true }
+  intake: { type: Object, required: true },
+  // The owning page's Person relation config (schema field "person" ->
+  // relation_config). Omit it (edit pages) to hide the picker.
+  relationConfig: { type: Object, default: null }
 })
 
 const {
@@ -433,7 +461,7 @@ const {
   matchDialogOpen, matchCandidatesList,
   fieldOf,
   addContact, removeContact, addDocument, removeDocument,
-  clearSelectedPerson,
+  clearSelectedPerson, pickerValue, onPersonPicked,
   onMatchSelect, onMatchCreateNew, onMatchCancel
 } = props.intake
 </script>

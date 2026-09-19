@@ -33,6 +33,13 @@ const props = defineProps({
 
   label: { type: String, default: '' },
   clearable: { type: Boolean, default: null },
+  // A page that already has its own way to create/edit the related record
+  // (add_employee's person form) turns the dialog actions off here.
+  creatable: { type: Boolean, default: true },
+  editable: { type: Boolean, default: true },
+  // Do not list anything until this many characters were typed - for
+  // relations whose full list should not be shown unprompted.
+  minChars: { type: Number, default: 0 },
   disable: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
   rules: { type: Array, default: undefined },
@@ -76,9 +83,9 @@ const selection = computed(() => {
 
 const hasSelection = computed(() => selection.value?.value != null)
 
-const canAdd = computed(() => !locked.value && allowed('add'))
+const canAdd = computed(() => props.creatable && !locked.value && allowed('add'))
 const canView = computed(() => hasSelection.value && allowed('view'))
-const canEdit = computed(() => !locked.value && hasSelection.value && allowed('change'))
+const canEdit = computed(() => props.editable && !locked.value && hasSelection.value && allowed('change'))
 
 // ---------- search ----------
 const search = useRelationSearch(() => config.value)
@@ -87,13 +94,15 @@ const changing = ref(false)
 
 const showSearch = computed(() => !hasSelection.value || changing.value)
 
+const enoughChars = computed(() => query.value.trim().length >= props.minChars)
+
 function openSearch() {
   if (locked.value) return
 
   changing.value = true
   query.value = ''
 
-  if (canSearch.value) search.searchNow('')
+  if (canSearch.value && enoughChars.value) search.searchNow('')
 }
 
 function closeSearch() {
@@ -104,6 +113,12 @@ function closeSearch() {
 
 function onQuery(value) {
   query.value = value ?? ''
+
+  if (!enoughChars.value) {
+    search.reset()
+    return
+  }
+
   search.search(query.value)
 }
 
@@ -123,7 +138,7 @@ function clear() {
 watch(
   () => [showSearch.value, canSearch.value, config.value?.endpoint],
   ([open, allowedToSearch]) => {
-    if (open && allowedToSearch && !search.searched.value && !search.loading.value && !locked.value) {
+    if (open && allowedToSearch && enoughChars.value && !search.searched.value && !search.loading.value && !locked.value) {
       search.searchNow(query.value)
     }
   },
@@ -310,6 +325,14 @@ const density = computed(() => attrs.dense ?? User.ps?.layout?.dense)
               </q-item-section>
             </q-item>
           </q-list>
+
+          <div
+            v-else-if="canSearch && !enoughChars"
+            class="text-caption text-grey-7 q-pa-sm"
+            data-test="relation-min-chars"
+          >
+            {{ tdc('Type at least') }} {{ minChars }} {{ tdc('characters to search') }}
+          </div>
 
           <div
             v-else-if="canSearch && search.searched.value && !search.loading.value"

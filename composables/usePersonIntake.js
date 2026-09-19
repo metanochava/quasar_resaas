@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 import { usePersonStore } from '../stores/PersonStore'
 import { usePersonContactStore } from '../stores/PersonContactStore'
@@ -97,6 +97,46 @@ export function usePersonIntake() {
   function clearSelectedPerson() {
     selectedPerson.value = null
     matchResolved.value = false
+  }
+
+  // A person picked in the relation picker (<s-relation-picker>): same
+  // effect as choosing a candidate in the match dialog - the Person is
+  // reused instead of created. Values are read by FIELD NAME from the
+  // preview the Person model declares (RESAAS.preview), never by position.
+  function useExistingPerson(row) {
+    const values = row.preview?.values || {}
+
+    selectedPerson.value = {
+      id: row.value ?? row.id,
+      full_name: row.preview?.title || row.label,
+      email: values.email || null,
+      phone: values.phone || null,
+      photo: row.preview?.avatar || null
+    }
+    matchResolved.value = true
+  }
+
+  // The picker's v-model: the reused Person as a relation option.
+  const pickerValue = computed(() => {
+    const p = selectedPerson.value
+    if (!p) return null
+
+    return {
+      value: p.id,
+      id: p.id,
+      label: p.full_name,
+      preview: {
+        title: p.full_name,
+        subtitle: [p.email, p.phone].filter(Boolean),
+        avatar: p.photo?.url ? p.photo : null,
+        meta: []
+      }
+    }
+  })
+
+  function onPersonPicked(row) {
+    if (row) useExistingPerson(row)
+    else clearSelectedPerson()
   }
 
   let resolveMatchChoice = null
@@ -337,7 +377,7 @@ export function usePersonIntake() {
     fieldOf,
     addContact, removeContact, addDocument, removeDocument,
     // matching
-    resolveMatch, clearSelectedPerson,
+    resolveMatch, clearSelectedPerson, useExistingPerson, pickerValue, onPersonPicked,
     onMatchSelect, onMatchCreateNew, onMatchCancel,
     // create / edit
     registrationPayload, loadExisting, saveExisting,

@@ -236,3 +236,32 @@ describe('usePersonIntake - edit (load + diff save)', () => {
     expect(body).toEqual({ id: 'p1', gender: 'M' })
   })
 })
+
+describe('usePersonIntake - existing person picked in the relation picker', () => {
+  const row = {
+    value: 'p7', id: 'p7', label: 'Ana Costa',
+    preview: { title: 'Ana Costa', subtitle: ['841110000'], avatar: { url: 'http://x/a.png' }, values: { phone: '841110000' } }
+  }
+
+  it('reuses the person: id for the register payload, values read by field name (not position)', () => {
+    intake.useExistingPerson(row)
+
+    expect(intake.selectedPerson.value).toMatchObject({ id: 'p7', full_name: 'Ana Costa', email: null, phone: '841110000' })
+    expect(intake.matchResolved.value).toBe(true)
+
+    const payload = intake.registrationPayload()
+    expect(payload.personId).toBe('p7')
+    expect(payload.personData).toBeNull()
+  })
+
+  it('exposes the reused person as the picker value, and clearing goes back to a new person', () => {
+    expect(intake.pickerValue.value).toBeNull()
+
+    intake.onPersonPicked(row)
+    expect(intake.pickerValue.value).toMatchObject({ value: 'p7', label: 'Ana Costa', preview: { title: 'Ana Costa', subtitle: ['841110000'] } })
+
+    intake.onPersonPicked(null)
+    expect(intake.selectedPerson.value).toBeNull()
+    expect(intake.matchResolved.value).toBe(false)
+  })
+})

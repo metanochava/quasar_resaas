@@ -6,7 +6,7 @@
            contacts / address / documents / emergency contacts, plus the
            duplicate-match dialog - shared with add_paciente. -->
       <div class="col-12">
-        <s-person-intake :intake="intake" />
+        <s-person-intake :intake="intake" :relation-config="personRelationConfig" />
       </div>
 
       <!-- ================================================= -->
@@ -190,6 +190,13 @@ usePageTitle(() => {
 function fieldOf(store, name) {
   return intake.fieldOf(store, name)
 }
+
+// The Person relation's own schema config (endpoint, permissions, preview),
+// so add_employee's "existing person" picker needs no model knowledge. Not
+// offered when editing - the Person is fixed there.
+const personRelationConfig = computed(() =>
+  isEditMode.value ? null : fieldOf(Employee, 'person').relation_config || null
+)
 
 // ---------------- CANCEL ----------------
 function hasUnsavedData() {

@@ -281,3 +281,38 @@ describe('s-relation-picker - permission-driven actions', () => {
     expect(w.emitted('update:modelValue')[0][0]).toMatchObject({ value: 'p1', preview: { title: 'Ana Costa' } })
   })
 })
+
+describe('s-relation-picker - minimum characters', () => {
+  it('lists nothing until enough characters are typed', async () => {
+    vi.useFakeTimers()
+    const w = mountPicker({ minChars: 2 })
+    await vi.advanceTimersByTimeAsync(0)
+
+    expect(HTTPAuth.get).not.toHaveBeenCalled()
+    expect(w.find('[data-test="relation-min-chars"]').text()).toContain('Type at least 2 characters to search')
+
+    const input = w.find('input[data-test="relation-query"]')
+    await input.setValue('a')
+    await vi.advanceTimersByTimeAsync(400)
+    expect(HTTPAuth.get).not.toHaveBeenCalled()
+
+    await input.setValue('an')
+    await vi.advanceTimersByTimeAsync(400)
+    expect(HTTPAuth.get).toHaveBeenCalledTimes(1)
+    expect(HTTPAuth.get.mock.calls[0][1].params.search).toBe('an')
+    vi.useRealTimers()
+  })
+
+  it('creatable=false / editable=false hide the create and edit actions even with the permissions', async () => {
+    grant('list_person', 'add_person', 'change_person', 'view_person')
+
+    const searching = mountPicker({ creatable: false, minChars: 0 })
+    await flushPromises()
+    expect(searching.find('[data-test="relation-create"]').exists()).toBe(false)
+
+    const selected = mountPicker({ modelValue: ana, editable: false })
+    await flushPromises()
+    expect(selected.find('[data-test="relation-edit"]').exists()).toBe(false)
+    expect(selected.find('[data-test="relation-view"]').exists()).toBe(true)
+  })
+})
