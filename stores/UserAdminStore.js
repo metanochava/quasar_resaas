@@ -1,3 +1,4 @@
+import { groupLabel } from '../utils/groupLabel'
 import { createBaseStore } from '../base/base_store'
 import { HTTPAuth, url } from '../services/api'
 
@@ -35,7 +36,7 @@ export const useUserAdminStore = createBaseStore(
         const search = (state.groupSearch || '').toLowerCase()
 
         return state.groups.filter(group =>
-          !search || String(group.name || '').toLowerCase().includes(search)
+          !search || `${group.name || ''} ${groupLabel(group)}`.toLowerCase().includes(search)
         )
       }
     },

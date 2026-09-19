@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { tdc } from '../services/translation'
-import { profileSplint } from '../utils/profile'
+import { groupLabel } from '../utils/groupLabel'
 
 import { useUserStore } from '../stores/UserStore'
 import { useGroupStore } from '../stores/GroupStore'
@@ -16,9 +16,7 @@ const props = defineProps({
 const User = useUserStore()
 const Group = useGroupStore()
 
-const label = computed(() =>
-  profileSplint(User.Group?.name || User.Group?.label || '')
-)
+const label = computed(() => groupLabel(User.Group))
 
 const groups = computed(() => User.Groups || [])
 
@@ -30,7 +28,7 @@ const select = group => Group.select(group)
     flat
     dense
 
-    :label="minimenu ? tdc(label).charAt(0) : tdc(label)"
+    :label="minimenu ? label.charAt(0) : label"
     class="full-width"
   >
     <q-menu fit>
@@ -51,15 +49,7 @@ const select = group => Group.select(group)
               overline
               class="ellipsis"
             >
-              {{
-                tdc(
-                  profileSplint(
-                    group.name ||
-                    group.label ||
-                    ''
-                  )
-                )
-              }}
+              {{ groupLabel(group) }}
             </q-item-label>
           </q-item-section>
         </q-item>

@@ -1,3 +1,4 @@
+import { groupLabel } from '../utils/groupLabel'
 import { createBaseStore } from '../base/base_store'
 import { HTTPClient, HTTPAuth, url } from '../services/api'
 import { useUserStore } from './UserStore'
@@ -72,7 +73,8 @@ export const useEntityTypeStore = createBaseStore(
         const search = (state.groupSearch || '').toLowerCase()
 
         return state.groups.filter(group => {
-          const name = (group.name || '').toLowerCase()
+          // raw name AND the translated one, so a user can search in their language
+        const name = `${group.name || ''} ${groupLabel(group)}`.toLowerCase()
           const active = state.selectedGroups.some(g => g.id === group.id)
 
           const matchSearch = !search || name.includes(search)

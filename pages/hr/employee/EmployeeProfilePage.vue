@@ -1067,6 +1067,7 @@ import { useJobPositionStore } from '../../../stores/JobPositionStore'
 import { useJobGradeStore } from '../../../stores/JobGradeStore'
 import { useBranchStore } from '../../../stores/BranchStore'
 import { tdc } from '../../../services/translation'
+import { usePageTitle } from '../../../services/pageTitle'
 import { displayValue, rawValue } from '../../../utils/display'
 import PersonProfilePanel from '../../../components/person/PersonProfilePanel.vue'
 
@@ -1101,6 +1102,9 @@ const fullName = computed(() =>
 )
 
 const photoUrl = computed(() => person.value?.photo?.url || person.value?.profile?.url || null)
+
+// tab title: the employee's name (data, so passed as-is), fixed part translated
+usePageTitle(() => (fullName.value ? `${fullName.value} - ${tdc('Employee')}` : ''))
 
 const initials = computed(() =>
   (fullName.value || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('')

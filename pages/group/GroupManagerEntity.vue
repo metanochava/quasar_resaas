@@ -10,7 +10,7 @@
           "
         >
           <div class="text-subtitle2">
-            Permissions - {{ Group.row?.name }}
+            {{ tdc('Permissions') }} - {{ groupLabel(Group.row) }}
           </div>
 
           <q-space />
@@ -47,17 +47,17 @@
       <q-icon name="groups" size="22px" />
 
       <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        Manage Groups of {{ Entity.row.name }}
+        {{ tdc('Manage Groups of') }} {{ Entity.row.name }}
       </div>
 
       <q-space />
 
       <q-badge color="white" text-color="primary">
-        {{ Entity.selectedGroups.length }} active
+        {{ Entity.selectedGroups.length }} {{ tdc('active') }}
       </q-badge>
 
       <s-btn v-close-popup dense flat icon="close">
-        <s-tooltip>Close</s-tooltip>
+        <s-tooltip>{{ tdc('Close') }}</s-tooltip>
       </s-btn>
     </q-bar>
 
@@ -71,7 +71,7 @@
             dense
             outlined
             clearable
-            label="New group"
+            :label="tdc('New group')"
             @keyup.enter="addGroup"
           >
             <template #prepend>
@@ -84,7 +84,7 @@
           <s-btn
             color="primary"
             icon="add"
-            label="Add"
+            :label="tdc('Add')"
             unelevated
             no-caps
             :disable="!canAdd"
@@ -102,7 +102,7 @@
         dense
         outlined
         clearable
-        label="Search group"
+        :label="tdc('Search group')"
       >
         <template #prepend>
           <q-icon name="search" />
@@ -149,7 +149,7 @@
           </q-item-section>
 
           <q-item-section>
-            <q-item-label>{{ group.name }}</q-item-label>
+            <q-item-label>{{ groupLabel(group) }}</q-item-label>
           </q-item-section>
 
           <q-item-section side>
@@ -174,8 +174,8 @@
               >
                 {{
                   Entity.hasGroup(group.id)
-                    ? 'Active'
-                    : 'Inactive'
+                    ? tdc('Active')
+                    : tdc('Inactive')
                 }}
               </q-chip>
 
@@ -201,6 +201,9 @@ import { useEntityTypeStore } from '../../stores/EntityTypeStore'
 import { useGroupStore } from '../../stores/GroupStore'
 import { usePermissionStore } from '../../stores/PermissionStore'
 import { HTTPAuth, url } from '../../services/api'
+
+import { tdc } from '../../services/translation'
+import { groupLabel } from '../../utils/groupLabel'
 
 import PermissionManager from '../permission/PermissionManager.vue'
 

@@ -87,12 +87,12 @@
                 </q-item>
               </q-expansion-item>
 
-            <s-btn dense  flat  size="" @click="branchClosed = false" color="grey" :label="tdc(profileSplint(User?.Group?.name)) " style="width: 100%; border-color: transparent;">
+            <s-btn dense  flat  size="" @click="branchClosed = false" color="grey" :label="groupLabel(User?.Group)" style="width: 100%; border-color: transparent;">
               <q-menu fit>
                 <q-list dense   class="rounded-borders" style="min-width: 100px" >
                   <q-item clickable v-close-popup @click="selectGroup(group)" v-ripple v-for=" group in User.Groups" :key="group.id">
                     <q-item-section>
-                      <q-item-label overline> {{ tdc(profileSplint(group.name))}}</q-item-label>
+                      <q-item-label overline> {{ groupLabel(group) }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -111,7 +111,7 @@
         </q-menu>
       </q-avatar>
       <s-tooltip v-if="User">{{User?.username }} </s-tooltip>
-      <s-tooltip v-else>{{tdc(User?.Group?.name)}}</s-tooltip>
+      <s-tooltip v-else>{{ groupLabel(User?.Group) }}</s-tooltip>
     </s-btn>
   </div>
 </template>
@@ -126,6 +126,7 @@ import { useUserStore } from '../../stores/UserStore'
 
 import { tdc } from '../../services/translation'
 import { profileSplint } from '../../utils/profile'
+import { groupLabel } from '../../utils/groupLabel'
 
 
 
@@ -147,6 +148,7 @@ export default defineComponent({
       pergunta: false,
       selectBranchModal: false,
       profileSplint: profileSplint,
+      groupLabel,
     }
   },
 

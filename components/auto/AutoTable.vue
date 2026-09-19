@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { tdc } from '../../services/translation'
+import { groupLabel } from '../../utils/groupLabel'
 import { useRouter } from 'vue-router'
 
 import { useActionStore } from '../../stores/ActionStore'
@@ -13,7 +14,26 @@ const User =useUserStore()
 const actionStore = useActionStore()
 
 
-function resolveValue(val) {
+// A cell that shows a Group (the name column of the Group list itself, or
+// any relation column pointing at the Group model) is shown in the user's
+// language; the raw name stays what is edited/sent.
+function isGroupColumn(col) {
+  if (!col) return false
+
+  if (String(props.model || '').toLowerCase() === 'group' && col.name === 'name') return true
+
+  const field = props.fields.find(f => f.name === col.name)
+
+  return /(^|\.)group$/i.test(String(field?.relation || ''))
+}
+
+function resolveValue(val, col) {
+  const shown = resolveRawValue(val)
+
+  return isGroupColumn(col) && typeof shown === 'string' ? groupLabel(shown) : shown
+}
+
+function resolveRawValue(val) {
   try {
     const parsed = typeof val === 'string' ? JSON.parse(val) : val
 
@@ -1886,7 +1906,7 @@ function filteredItems(row, field) {
           </q-popup-edit>
 
           <span class="cursor-pointer">
-            {{ props.value }}
+            {{ isGroupColumn(props.col) ? groupLabel(props.value) : props.value }}
           </span>
 
         </template>
@@ -1896,7 +1916,7 @@ function filteredItems(row, field) {
 
         <template v-else>
 
-          <label class="insize" v-html="resolveValue(props.value)"></label>
+          <label class="insize" v-html="resolveValue(props.value, props.col)"></label>
 
         </template>
 

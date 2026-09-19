@@ -2,6 +2,7 @@ import { getStorage } from '../services/storage'
 import { JSONSafeParse } from '../utils/json'
 import { AlertWarning } from '../boot/alerts'
 import { tdc } from '../services/translation'
+import { groupLabel } from '../utils/groupLabel'
 
 // Routes already declare `meta.requiresAuth` (see router/restRoutes.js)
 // but nothing ever enforced it - a protected route mounted its
@@ -58,7 +59,7 @@ function hasRequiredRole(role) {
 // selected, not the User account itself.
 function currentProfileLabel() {
   const group = JSONSafeParse(getStorage('l', 'userGroup'))
-  return group?.name || group?.label || group?.value || tdc('Unknown profile')
+  return groupLabel(group) || tdc('Unknown profile')
 }
 
 function routeLabel(to) {

@@ -1,4 +1,5 @@
 
+import { groupLabel } from '../utils/groupLabel'
 import { getStorage, setStorage, deleteStorage } from '../services/storage'
 import { HTTPAuth, HTTPClient, url } from '../services/api'
 import { useLanguageStore } from  './LanguageStore'
@@ -111,7 +112,8 @@ export const useUserStore = createBaseStore(
       const search = (state.groupSearch || '').toLowerCase()
 
       return state.groups.filter(group => {
-        const name = (group.name || '').toLowerCase()
+        // raw name AND the translated one, so a user can search in their language
+        const name = `${group.name || ''} ${groupLabel(group)}`.toLowerCase()
         const active = state.selectedGroups.some(g => g.id === group.id)
 
         const matchSearch = !search || name.includes(search)
@@ -175,6 +177,26 @@ export const useUserStore = createBaseStore(
       this.ResaasContext = data.token
 
       return data
+    },
+    // Silent, proactive renewal used by services/api.js shortly before the
+    // token expires. Unlike refreshResaasContext() it deliberately does NOT
+    // assign this.ResaasContext: that value is the trigger of several
+    // watch(() => User.ResaasContext, ...) (dashboards reload on it), and a
+    // background renewal must not make the page the user is on reload. The
+    // API client reads the token from storage, which createResaasContext()
+    // has already updated.
+    async renewResaasContextQuietly() {
+      if (!this.Entity?.id) return null
+
+      if (!resaasContextRefreshPromise) {
+        resaasContextRefreshPromise = createResaasContext({
+          entity: this.Entity,
+          branch: this.Branch,
+          group: this.Group
+        }).finally(() => { resaasContextRefreshPromise = null })
+      }
+
+      return resaasContextRefreshPromise
     },
     async selectContext({ entity, branch = null, group = null }) {
       this.Entity = entity || null

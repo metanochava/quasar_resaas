@@ -1,6 +1,7 @@
 <template>
   <q-dialog :model-value="modelValue" persistent @update:model-value="v => emit('update:modelValue', v)">
     <s-card class="match-dialog-card column no-wrap">
+      <s-page-title :title="tdc('We found possible matches')" :active="modelValue" />
       <q-bar class="row items-center" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
         <div class="text-h6">{{ tdc('We found possible matches') }}</div>
         <q-space />

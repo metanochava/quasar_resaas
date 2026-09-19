@@ -281,7 +281,7 @@
                     </span>
 
                     <span v-if="selected.group?.name">
-                      • {{ selected.group.name }}
+                      • {{ groupLabel(selected.group) }}
                     </span>
                   </div>
                 </div>
@@ -440,6 +440,7 @@ import { defineComponent } from 'vue'
 import { Notify } from 'quasar'
 
 import { tdc } from '../../services/translation'
+import { groupLabel } from '../../utils/groupLabel'
 import { getFirebase } from 'quasar_resaas'
 
 
@@ -466,6 +467,7 @@ export default defineComponent({
   data () {
     return {
       tdc,
+      groupLabel,
 
       open: false,
 
@@ -540,6 +542,7 @@ export default defineComponent({
             item.branch?.name,
 
             item.group?.name,
+            item.group?.name ? groupLabel(item.group) : null,
 
             item.last_message,
 

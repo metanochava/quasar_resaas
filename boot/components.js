@@ -18,6 +18,7 @@ import MultiSelectComponent from './../components/engine/MultiSelectComponent.vu
 import DrawerComponent from './../components/engine/DrawerComponent.vue'
 import FieldComponent from './../components/engine/FieldComponent.vue'
 import FileComponent from './../components/engine/FileComponent.vue'
+import PageTitleComponent from './../components/engine/PageTitleComponent.vue'
 import CheckBoxComponent from './../components/engine/CheckBoxComponent.vue'
 import SwitchComponent from './../components/engine/SwitchComponent.vue'
 import Form from './../components/engine/FormComponent.vue'
@@ -142,6 +143,7 @@ export default boot(({ app }) => {
   // schema-driven boolean (s-field / FormComponent use f.component as-is)
   // resolved to nothing and rendered no input at all.
   app.component('s-toggle', SwitchComponent)
+  app.component('s-page-title', PageTitleComponent)
 
   app.component('s-form', Form)
 

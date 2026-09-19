@@ -71,7 +71,7 @@
 
           <q-item-section>
             <q-item-label>
-              {{ group.name }}
+              {{ groupLabel(group) }}
             </q-item-label>
           </q-item-section>
 
@@ -107,6 +107,7 @@
 </template>
 
 <script setup>
+import { groupLabel } from '../../utils/groupLabel'
 import { onMounted } from 'vue'
 import { useUserAdminStore } from '../../stores/UserAdminStore'
 import { tdc } from '../../services/translation'

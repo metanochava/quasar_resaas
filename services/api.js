@@ -3,6 +3,7 @@
 
 import axios from 'axios'
 import { getStorage } from './storage'
+import { shouldRenewContext, isContextExpiredError } from './contextExpiry'
 import { useUserStore } from '../stores/UserStore'
 import { useLoadStore } from '../stores/LoadStore'
 import { Alert } from '../boot/alerts'
@@ -85,11 +86,29 @@ const createClient = (auth = false, blob = false) => {
     responseType: blob ? 'blob' : 'json'
   })
 
-  instance.interceptors.request.use(config => {
+  instance.interceptors.request.use(async config => {
     const User = useUserStore()
     const Load = useLoadStore()
 
     config.headers ||= {}
+
+    // Proactive renewal, same idea as the access-token refresh: when the
+    // stored RESAAS-context token is about to expire, re-issue it BEFORE
+    // sending, so the user never sees "RESAAS context has expired." The
+    // call that issues the context itself is exempt (it would recurse),
+    // and a failed renewal just falls through - the reactive 403 retry
+    // below still covers it.
+    if (
+      auth &&
+      !String(config.url || '').includes('resaas/context/') &&
+      shouldRenewContext(getStorage('s', 'resaasContextExpiresAt'))
+    ) {
+      try {
+        await User.renewResaasContextQuietly()
+      } catch {
+        // handled by the reactive retry
+      }
+    }
 
     if (auth) {
       const accessToken = User.access || getStorage('l', 'access')
@@ -169,9 +188,9 @@ const createClient = (auth = false, blob = false) => {
       // Re-issue it from the entity/branch/group already held in
       // UserStore and retry once, silently.
       if (
-        auth && status === 403 && originalRequest &&
+        auth && originalRequest &&
         !originalRequest._retriedContext &&
-        error?.response?.data?.detail === 'RESAAS context has expired.'
+        await isContextExpiredError(error)
       ) {
         originalRequest._retriedContext = true
 

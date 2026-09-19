@@ -62,7 +62,7 @@
               <div class="row items-center q-mb-sm">
                 <q-icon name="groups" size="20px" class="q-mr-sm text-accent" />
                 <span class="text-caption text-grey-7 q-mr-xs">{{ tdc('Group') }}:</span>
-                <span class="text-weight-medium">{{ User.Group?.name || tdc('None') }}</span>
+                <span class="text-weight-medium">{{ groupLabel(User.Group) || tdc('None') }}</span>
               </div>
 
               <div class="row items-center">
@@ -127,6 +127,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
+import { groupLabel } from '../../utils/groupLabel'
 
 import { useBranchStore } from '../../stores/BranchStore'
 import { useGroupStore } from '../../stores/GroupStore'

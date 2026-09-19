@@ -153,6 +153,7 @@ import { toRelationOption } from '../../../utils/autoForm'
 import { usePersonIntake } from '../../../composables/usePersonIntake'
 import { buildWritePayload, updateWithPayload } from '../../../utils/payload'
 import { tdc } from '../../../services/translation'
+import { usePageTitle } from '../../../services/pageTitle'
 import { Alert } from '../../../boot/alerts'
 
 // The Person half (personal data, contacts, address, documents, emergency
@@ -179,6 +180,12 @@ const saving = ref(false)
 // two apart.
 const employeeId = computed(() => route.params.id || null)
 const isEditMode = computed(() => !!employeeId.value)
+
+// editing: "Edit employee - <name>" (add keeps the route's own title)
+usePageTitle(() => {
+  const name = Person.form.full_name || [Person.form.name, Person.form.surname].filter(Boolean).join(' ')
+  return isEditMode.value && name ? `${tdc('Edit employee')} - ${name}` : ''
+})
 
 function fieldOf(store, name) {
   return intake.fieldOf(store, name)

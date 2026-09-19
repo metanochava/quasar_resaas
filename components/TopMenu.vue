@@ -23,18 +23,18 @@
         </div>
 
         <!-- 🔥 DIREITA -->
-        <div class="row items-center">
+        <!-- <div class="row items-center">
 
           <s-btn
             round
             dense
             flat
-            icon="settings"
+            icon="swap_horiz"
             class="text-white"
-            @click="User.toggleSettings()"
+            @click="User.toggleMenuRtl()"
           />
 
-        </div>
+        </div> -->
 
       </q-item>
     </div>
