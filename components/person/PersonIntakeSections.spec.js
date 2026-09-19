@@ -28,9 +28,9 @@ const global = {
     's-tooltip': slotStub('s-tooltip'),
     's-relation-picker': {
       name: 's-relation-picker',
-      props: ['modelValue', 'relationConfig', 'label', 'minChars', 'creatable', 'editable'],
+      props: ['modelValue', 'relationConfig', 'label', 'minChars', 'creatable', 'editable', 'mode'],
       emits: ['update:modelValue'],
-      template: '<div class="stub-picker" :data-min="minChars" :data-creatable="creatable" :data-editable="editable">{{ modelValue?.label }}</div>'
+      template: '<div class="stub-picker" :data-mode="mode" :data-min="minChars" :data-creatable="creatable" :data-editable="editable">{{ modelValue?.label }}</div>'
     }
   },
   stubs: { AddressLocationPicker: true, PersonMatchDialog: true }
@@ -101,10 +101,14 @@ describe('PersonIntakeSections', () => {
       expect(mountSections().find('.stub-picker').exists()).toBe(false)
     })
 
-    it('is rendered with the config, without create/edit actions and with a minimum query length', () => {
-      const picker = mountSections({ relationConfig: PERSON_CONFIG }).find('.stub-picker')
+    it('is rendered inside the Personal data card as a modal-mode input, without create/edit actions', () => {
+      const wrapper = mountSections({ relationConfig: PERSON_CONFIG })
+      const picker = wrapper.find('.stub-picker')
 
       expect(picker.exists()).toBe(true)
+      expect(picker.attributes('data-mode')).toBe('modal')
+      // same card as the "Personal data" title (the form card), not a card of its own
+      expect(wrapper.findAll('.stub-s-card').find(card => card.text().includes('Personal data')).find('.stub-picker').exists()).toBe(true)
       expect(picker.attributes('data-min')).toBe('2')
       expect(picker.attributes('data-creatable')).toBe('false')
       expect(picker.attributes('data-editable')).toBe('false')
@@ -120,13 +124,13 @@ describe('PersonIntakeSections', () => {
       await wrapper.vm.$nextTick()
 
       expect(intake.selectedPerson.value).toMatchObject({ id: 'p9', full_name: 'Zed Quux', email: 'zed@example.com', phone: '850000123' })
-      expect(wrapper.find('.stub-picker').text()).toBe('Zed Quux')
+      // the form gives way to the "using existing person" summary
+      expect(wrapper.text()).toContain('Using existing person')
+      expect(wrapper.text()).toContain('Zed Quux')
       expect(wrapper.text()).not.toContain('Personal data')
-      // the summary card is replaced by the picker, never shown twice
-      expect(wrapper.text()).not.toContain('Using existing person')
 
-      wrapper.findComponent({ name: 's-relation-picker' }).vm.$emit('update:modelValue', null)
-      await wrapper.vm.$nextTick()
+      // "Change" on the summary goes back to the form (and its picker)
+      await wrapper.find('button[data-label="Change"]').trigger('click')
 
       expect(intake.selectedPerson.value).toBeNull()
       expect(wrapper.text()).toContain('Personal data')

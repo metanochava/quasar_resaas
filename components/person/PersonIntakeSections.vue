@@ -3,32 +3,7 @@
     <!-- ================================================= -->
     <!-- SELECTED EXISTING PERSON SUMMARY -->
     <!-- ================================================= -->
-      <!-- With a relation config (the page passes its Person relation's
-           schema config) the person is picked through the generic relation
-           picker; otherwise the plain summary below is used. -->
-      <div v-if="relationConfig" class="col-12">
-        <s-card flat bordered>
-          <q-card-section class="q-pb-none">
-            <div class="text-caption text-grey-7">
-              {{ tdc('Search an existing person to reuse it, or fill in the form below to create a new one.') }}
-            </div>
-          </q-card-section>
-          <q-card-section>
-            <s-relation-picker
-              :model-value="pickerValue"
-              :relation-config="relationConfig"
-              :label="tdc('Existing person')"
-              :min-chars="2"
-              :creatable="false"
-              :editable="false"
-              clearable
-              @update:model-value="onPersonPicked"
-            />
-          </q-card-section>
-        </s-card>
-      </div>
-
-      <div v-else-if="selectedPerson" class="col-12">
+      <div v-if="selectedPerson" class="col-12">
         <s-card flat bordered class="bg-primary text-white">
           <q-card-section class="row items-center no-wrap q-gutter-md">
             <q-avatar size="56px" square class="rounded-borders">
@@ -62,9 +37,28 @@
     <!-- ================================================= -->
       <div v-if="!selectedPerson" class="col-12">
         <s-card flat bordered>
-          <q-card-section class="section-header row items-center">
-            <q-icon name="badge" size="24px" class="q-mr-sm" />
-            <div class="text-subtitle1 text-weight-bold">{{ tdc('Personal data') }}</div>
+          <q-card-section class="section-header row items-center q-col-gutter-sm">
+            <div class="col row items-center no-wrap">
+              <q-icon name="badge" size="24px" class="q-mr-sm" />
+              <div class="text-subtitle1 text-weight-bold">{{ tdc('Personal data') }}</div>
+            </div>
+
+            <!-- The page passes its Person relation's schema config: typing
+                 in this input opens a modal to search an existing person
+                 and reuse it instead of creating a new one. -->
+            <div v-if="relationConfig" class="col-12 col-sm-6 col-md-4">
+              <s-relation-picker
+                mode="modal"
+                :model-value="pickerValue"
+                :relation-config="relationConfig"
+                :label="tdc('Existing person')"
+                :placeholder="tdc('Search an existing person')"
+                :min-chars="2"
+                :creatable="false"
+                :editable="false"
+                @update:model-value="onPersonPicked"
+              />
+            </div>
           </q-card-section>
 
           <q-separator />

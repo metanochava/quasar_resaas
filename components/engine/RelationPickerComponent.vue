@@ -5,6 +5,8 @@ import { useUserStore } from '../../stores/UserStore'
 import { useRelationSearch } from '../../composables/useRelationSearch'
 import { tdc } from '../../services/translation'
 import RelationRecordDialog from './RelationRecordDialog.vue'
+import RelationSearchPanel from './RelationSearchPanel.vue'
+import { initialsOf } from '../../utils/relationRow'
 
 // Generic relation picker (schema variant "card"): search the related model,
 // pick one result and see it as a card - avatar, title, subtitle, meta -
@@ -40,6 +42,11 @@ const props = defineProps({
   // Do not list anything until this many characters were typed - for
   // relations whose full list should not be shown unprompted.
   minChars: { type: Number, default: 0 },
+  // 'inline' (default): the picker is the card, search opens in place.
+  // 'modal': a compact input - focusing/clicking it opens the search in a
+  // modal; use it where the field must stay one line high (page headers).
+  mode: { type: String, default: 'inline', validator: v => ['inline', 'modal'].includes(v) },
+  placeholder: { type: String, default: '' },
   disable: { type: Boolean, default: false },
   readonly: { type: Boolean, default: false },
   rules: { type: Array, default: undefined },
@@ -92,6 +99,36 @@ const search = useRelationSearch(() => config.value)
 const query = ref('')
 const changing = ref(false)
 
+// ---------- modal mode ----------
+const isModal = computed(() => props.mode === 'modal')
+const modalOpen = ref(false)
+
+// Closing the modal hands focus back to the trigger input, whose @focus
+// would reopen it straight away - ignore focus for a moment after a hide.
+let ignoreFocusUntil = 0
+
+function openModal(event) {
+  if (locked.value || Date.now() < ignoreFocusUntil) return
+
+  event?.target?.blur?.()
+  query.value = ''
+  modalOpen.value = true
+}
+
+// The dialog's @show fires after its transition - the user may already have
+// typed, so the query is reset on open (above), never here.
+function onModalShow() {
+  if (canSearch.value && enoughChars.value && !search.searched.value && !search.loading.value) {
+    search.searchNow(query.value)
+  }
+}
+
+function onModalHide() {
+  ignoreFocusUntil = Date.now() + 500
+  query.value = ''
+  search.reset()
+}
+
 const showSearch = computed(() => !hasSelection.value || changing.value)
 
 const enoughChars = computed(() => query.value.trim().length >= props.minChars)
@@ -126,19 +163,21 @@ function choose(row) {
   emit('update:modelValue', row)
   emit('selected', row)
   closeSearch()
+  modalOpen.value = false
 }
 
 function clear() {
   emit('update:modelValue', null)
   emit('cleared')
   closeSearch()
+  modalOpen.value = false
 }
 
 // nothing selected: the results are shown right away, without a click
 watch(
   () => [showSearch.value, canSearch.value, config.value?.endpoint],
   ([open, allowedToSearch]) => {
-    if (open && allowedToSearch && enoughChars.value && !search.searched.value && !search.loading.value && !locked.value) {
+    if (!isModal.value && open && allowedToSearch && enoughChars.value && !search.searched.value && !search.loading.value && !locked.value) {
       search.searchNow(query.value)
     }
   },
@@ -176,20 +215,6 @@ const shown = computed(() => {
   }
 })
 
-function initialsOf(text) {
-  return String(text || '')
-    .split(/\s+/).filter(Boolean).slice(0, 2)
-    .map(word => word[0].toUpperCase()).join('') || '?'
-}
-
-function rowView(row) {
-  return {
-    title: row.preview?.title || row.label,
-    subtitle: row.preview?.subtitle || [],
-    avatar: row.preview?.avatar?.url || null
-  }
-}
-
 // ---------- create / view / edit (existing generic dialog) ----------
 const showDialog = ref(false)
 const dialogMode = ref('add')
@@ -224,7 +249,54 @@ const density = computed(() => attrs.dense ?? User.ps?.layout?.dense)
 </script>
 
 <template>
+  <!-- ============ MODAL MODE: a compact input that opens the search ============ -->
+  <template v-if="isModal">
+    <q-input
+      v-bind="rootAttrs"
+      :model-value="hasSelection ? shown.title : ''"
+      :placeholder="placeholder || tdc('Search')"
+      :disable="disable"
+      :dense="density"
+      readonly
+      outlined
+      class="relation-trigger cursor-pointer"
+      data-test="relation-trigger"
+      @focus="openModal"
+      @click="openModal"
+    >
+      <template #prepend><q-icon name="search" /></template>
+      <template v-if="hasSelection && !locked && isClearable" #append>
+        <q-icon name="close" class="cursor-pointer" data-test="relation-clear" @click.stop="clear" />
+      </template>
+    </q-input>
+
+    <q-dialog v-model="modalOpen" @show="onModalShow" @hide="onModalHide">
+      <s-card class="relation-modal">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-subtitle1 text-weight-bold col">{{ fieldLabel || tdc('Search') }}</div>
+          <s-btn flat round dense icon="close" data-test="relation-modal-close" @click="modalOpen = false" />
+        </q-card-section>
+
+        <q-card-section>
+          <RelationSearchPanel
+            :search="search"
+            :query="query"
+            :min-chars="minChars"
+            :can-search="canSearch"
+            :can-add="canAdd"
+            :locked="locked"
+            @update:query="onQuery"
+            @choose="choose"
+            @create="openDialog('add')"
+          />
+        </q-card-section>
+      </s-card>
+    </q-dialog>
+  </template>
+
+  <!-- ============ INLINE MODE: the card itself ============ -->
   <q-field
+    v-else
     v-bind="rootAttrs"
     :model-value="hasSelection ? selection.value : null"
     :label="fieldLabel"
@@ -271,91 +343,20 @@ const density = computed(() => attrs.dense ?? User.ps?.layout?.dense)
         </div>
 
         <!-- ================= SEARCH ================= -->
-        <div v-else class="relation-search">
-          <div v-if="canSearch" class="row items-center no-wrap q-gutter-x-sm">
-            <s-input
-              class="col"
-              dense
-              outlined
-              autofocus
-              clearable
-              :model-value="query"
-              :placeholder="tdc('Type to search')"
-              :disable="locked"
-              data-test="relation-query"
-              @update:model-value="onQuery"
-            >
-              <template #prepend><q-icon name="search" /></template>
-            </s-input>
-
-            <s-btn v-if="hasSelection" flat dense :label="tdc('Cancel')" data-test="relation-cancel" @click.stop="closeSearch" />
-          </div>
-
-          <div v-else class="text-caption text-grey-7 q-pa-sm" data-test="relation-no-search">
-            {{ tdc('You do not have permission to search this list.') }}
-          </div>
-
-          <q-linear-progress v-if="search.loading.value" indeterminate size="2px" class="q-mt-xs" />
-
-          <q-list v-if="canSearch && search.results.value.length" separator class="relation-results">
-            <q-item
-              v-for="row in search.results.value"
-              :key="row.value"
-              clickable
-              v-ripple
-              data-test="relation-result"
-              @click.stop="choose(row)"
-            >
-              <q-item-section avatar>
-                <q-avatar size="36px" class="relation-avatar">
-                  <img v-if="rowView(row).avatar" :src="rowView(row).avatar" :alt="rowView(row).title">
-                  <span v-else>{{ initialsOf(rowView(row).title) }}</span>
-                </q-avatar>
-              </q-item-section>
-
-              <q-item-section>
-                <q-item-label class="ellipsis">{{ rowView(row).title }}</q-item-label>
-                <q-item-label v-if="rowView(row).subtitle.length" caption class="ellipsis">
-                  {{ rowView(row).subtitle.join(' · ') }}
-                </q-item-label>
-              </q-item-section>
-
-              <q-item-section side>
-                <span class="text-primary text-caption">{{ tdc('Select') }} →</span>
-              </q-item-section>
-            </q-item>
-          </q-list>
-
-          <div
-            v-else-if="canSearch && !enoughChars"
-            class="text-caption text-grey-7 q-pa-sm"
-            data-test="relation-min-chars"
-          >
-            {{ tdc('Type at least') }} {{ minChars }} {{ tdc('characters to search') }}
-          </div>
-
-          <div
-            v-else-if="canSearch && search.searched.value && !search.loading.value"
-            class="text-caption text-grey-7 q-pa-sm"
-            data-test="relation-empty"
-          >
-            {{ search.failed.value ? tdc('Could not load the results.') : tdc('No results found') }}
-          </div>
-
-          <div v-if="canSearch && search.hasMore.value" class="row justify-center q-mt-xs">
-            <s-btn
-              flat dense size="sm"
-              :loading="search.loadingMore.value"
-              :label="tdc('Load more')"
-              data-test="relation-more"
-              @click.stop="search.loadMore()"
-            />
-          </div>
-
-          <div v-if="canAdd" class="row justify-center q-mt-xs">
-            <s-btn flat dense size="sm" color="primary" icon="add" :label="tdc('Create new')" data-test="relation-create" @click.stop="openDialog('add')" />
-          </div>
-        </div>
+        <RelationSearchPanel
+          v-else
+          :search="search"
+          :query="query"
+          :min-chars="minChars"
+          :can-search="canSearch"
+          :can-add="canAdd"
+          :show-cancel="hasSelection"
+          :locked="locked"
+          @update:query="onQuery"
+          @choose="choose"
+          @cancel="closeSearch"
+          @create="openDialog('add')"
+        />
 
       </div>
     </template>
@@ -407,13 +408,8 @@ const density = computed(() => attrs.dense ?? User.ps?.layout?.dense)
   font-weight: 700;
 }
 
-.relation-results {
-  max-height: 260px;
-  overflow-y: auto;
-  margin-top: 4px;
-  border: 1px solid rgba(128, 128, 128, .25);
-  border-radius: var(--s-radius, 8px);
-}
+.relation-modal { width: 520px; max-width: 94vw; }
+.relation-trigger :deep(input) { cursor: pointer; }
 
 @media (max-width: 599px) {
   .relation-actions { align-items: stretch; width: 100%; margin-left: 0; }

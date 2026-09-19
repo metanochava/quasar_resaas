@@ -316,3 +316,67 @@ describe('s-relation-picker - minimum characters', () => {
     expect(selected.find('[data-test="relation-view"]').exists()).toBe(true)
   })
 })
+
+describe('s-relation-picker - modal mode', () => {
+  const mountModal = (props = {}) => mountPicker({ mode: 'modal', minChars: 2, placeholder: 'Search an existing person', ...props })
+
+  it('renders only a compact input; nothing is searched until it is focused', async () => {
+    const w = mountModal()
+    await flushPromises()
+
+    expect(w.find('[data-test="relation-trigger"]').exists()).toBe(true)
+    expect(w.find('[data-test="relation-result"]').exists()).toBe(false)
+    expect(HTTPAuth.get).not.toHaveBeenCalled()
+  })
+
+  it('focusing the input opens a modal with a search input; typing filters and picking selects', async () => {
+    vi.useFakeTimers()
+    const w = mountModal()
+    await vi.advanceTimersByTimeAsync(0)
+
+    await w.find('input').trigger('click')
+    // let the dialog finish showing (its @show resets the query)
+    await vi.advanceTimersByTimeAsync(800)
+
+    // the modal hosts the same search panel the inline mode uses
+    const panel = w.findComponent({ name: 'RelationSearchPanel' })
+    expect(panel.exists()).toBe(true)
+
+    panel.vm.$emit('update:query', 'an')
+    await vi.advanceTimersByTimeAsync(400)
+
+    expect(HTTPAuth.get.mock.calls.at(-1)[1].params.search).toBe('an')
+
+    panel.vm.$emit('choose', { value: 'p1', id: 'p1', label: 'Ana Costa', preview: null })
+    await vi.advanceTimersByTimeAsync(0)
+
+    expect(w.emitted('update:modelValue')[0][0]).toMatchObject({ value: 'p1' })
+    vi.useRealTimers()
+  })
+
+  it('shows the selected value in the input and clears it from there', async () => {
+    const w = mountModal({ modelValue: ana, clearable: true })
+    await flushPromises()
+
+    expect(w.find('input').element.value).toBe('Ana Costa')
+
+    await w.find('[data-test="relation-clear"]').trigger('click')
+    expect(w.emitted('update:modelValue')[0][0]).toBeNull()
+  })
+
+  it('keyboard focus (tabbing into the input) opens it too', async () => {
+    const w = mountModal()
+    await w.find('input').trigger('focusin')
+    await flushPromises()
+
+    expect(document.body.querySelector('input[data-test="relation-query"]')).toBeTruthy()
+  })
+
+  it('does nothing when locked', async () => {
+    const w = mountModal({ readonly: true })
+    await w.find('input').trigger('click')
+    await flushPromises()
+
+    expect(document.body.querySelector('input[data-test="relation-query"]')).toBeNull()
+  })
+})
