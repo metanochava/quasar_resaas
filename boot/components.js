@@ -137,6 +137,11 @@ export default boot(({ app }) => {
   app.component('s-checkbox', CheckBoxComponent)
 
   app.component('s-switch', SwitchComponent)
+  // Schema 1.0 emits component "s-toggle" for a BooleanField (app_schema.py's
+  // _resolve_ui()); this frontend's toggle is s-switch. Without the alias a
+  // schema-driven boolean (s-field / FormComponent use f.component as-is)
+  // resolved to nothing and rendered no input at all.
+  app.component('s-toggle', SwitchComponent)
 
   app.component('s-form', Form)
 
