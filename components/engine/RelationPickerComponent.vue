@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, useAttrs } from 'vue'
+import { ref, computed, watch, useAttrs, getCurrentInstance } from 'vue'
 
 import { useUserStore } from '../../stores/UserStore'
 import { useRelationSearch } from '../../composables/useRelationSearch'
@@ -100,7 +100,8 @@ const query = ref('')
 const changing = ref(false)
 
 // ---------- modal mode ----------
-const isModal = computed(() => props.mode === 'modal')
+// mode='modal' from the page, or the schema's relation_config.variant
+const isModal = computed(() => props.mode === 'modal' || config.value?.variant === 'modal')
 const modalOpen = ref(false)
 
 // Closing the modal hands focus back to the trigger input, whose @focus
@@ -220,6 +221,24 @@ const showDialog = ref(false)
 const dialogMode = ref('add')
 const dialogRecordId = ref(null)
 
+// "View" shows ALL the data of the related record: its own page when the
+// schema says which route that is (relation_config.routes.view - opened in a
+// new tab so the form being filled is never lost), otherwise the generic
+// read-only dialog.
+const router = getCurrentInstance()?.appContext.config.globalProperties.$router
+
+function openView() {
+  const name = config.value?.routes?.view
+  const id = selection.value?.value
+
+  if (name && id != null && router?.hasRoute?.(name)) {
+    window.open(router.resolve({ name, params: { id } }).href, '_blank', 'noopener')
+    return
+  }
+
+  openDialog('view')
+}
+
 function openDialog(mode) {
   dialogMode.value = mode
   dialogRecordId.value = mode === 'add' ? null : selection.value?.value
@@ -265,8 +284,13 @@ const density = computed(() => attrs.dense ?? User.ps?.layout?.dense)
       @click="openModal"
     >
       <template #prepend><q-icon name="search" /></template>
-      <template v-if="hasSelection && !locked && isClearable" #append>
-        <q-icon name="close" class="cursor-pointer" data-test="relation-clear" @click.stop="clear" />
+      <template v-if="hasSelection && (canView || (!locked && isClearable))" #append>
+        <q-icon v-if="canView" name="visibility" class="cursor-pointer" data-test="relation-view" @click.stop="openView">
+          <s-tooltip>{{ tdc('View') }}</s-tooltip>
+        </q-icon>
+        <q-icon v-if="!locked && isClearable" name="close" class="cursor-pointer" data-test="relation-clear" @click.stop="clear">
+          <s-tooltip>{{ tdc('Clear') }}</s-tooltip>
+        </q-icon>
       </template>
     </q-input>
 
@@ -335,7 +359,7 @@ const density = computed(() => attrs.dense ?? User.ps?.layout?.dense)
             </q-chip>
             <div class="row justify-end q-gutter-xs">
               <s-btn v-if="!locked && canSearch" flat dense size="sm" icon="swap_horiz" :label="tdc('Change')" data-test="relation-change" @click.stop="openSearch" />
-              <s-btn v-if="canView" flat dense size="sm" icon="visibility" :label="tdc('View')" data-test="relation-view" @click.stop="openDialog('view')" />
+              <s-btn v-if="canView" flat dense size="sm" icon="visibility" :label="tdc('View')" data-test="relation-view" @click.stop="openView" />
               <s-btn v-if="canEdit" flat dense size="sm" icon="edit" :label="tdc('Edit')" data-test="relation-edit" @click.stop="openDialog('edit')" />
               <s-btn v-if="!locked && isClearable" flat dense size="sm" color="negative" icon="close" :label="tdc('Clear')" data-test="relation-clear" @click.stop="clear" />
             </div>

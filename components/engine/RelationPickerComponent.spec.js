@@ -380,3 +380,62 @@ describe('s-relation-picker - modal mode', () => {
     expect(document.body.querySelector('input[data-test="relation-query"]')).toBeNull()
   })
 })
+
+describe('s-relation-picker - schema-driven modal variant and View', () => {
+  const modalConfig = { ...PERSON, variant: 'modal', routes: { view: 'view_person' } }
+
+  it('relation_config.variant "modal" renders the compact input without a mode prop', async () => {
+    const w = mountPicker({ relationConfig: modalConfig })
+    await flushPromises()
+
+    expect(w.find('[data-test="relation-trigger"]').exists()).toBe(true)
+  })
+
+  it('View (with view permission) sits in the input once a value is selected', async () => {
+    grant('list_person', 'view_person')
+    const w = mountPicker({ relationConfig: modalConfig, modelValue: ana })
+    await flushPromises()
+
+    expect(w.find('input').element.value).toBe('Ana Costa')
+    expect(w.find('[data-test="relation-view"]').exists()).toBe(true)
+
+    grant('list_person')
+    const denied = mountPicker({ relationConfig: modalConfig, modelValue: ana })
+    await flushPromises()
+    expect(denied.find('[data-test="relation-view"]').exists()).toBe(false)
+  })
+
+  it('View opens the record\'s own page in a new tab when the schema names a registered route', async () => {
+    grant('list_person', 'view_person')
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null)
+    const router = { hasRoute: vi.fn(() => true), resolve: vi.fn(() => ({ href: '/view_person/p1' })) }
+
+    const w = mount(RelationPickerComponent, {
+      props: { relationConfig: modalConfig, modelValue: ana },
+      global: { ...options(), config: { globalProperties: { $router: router, $route: { fullPath: '/', path: '/', matched: [] } } } },
+      attachTo: document.body
+    })
+    await flushPromises()
+    await w.find('[data-test="relation-view"]').trigger('click')
+
+    expect(router.resolve).toHaveBeenCalledWith({ name: 'view_person', params: { id: 'p1' } })
+    expect(open).toHaveBeenCalledWith('/view_person/p1', '_blank', 'noopener')
+  })
+
+  it('View falls back to the generic read-only dialog when there is no such route', async () => {
+    grant('list_person', 'view_person')
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null)
+    const router = { hasRoute: vi.fn(() => false), resolve: vi.fn() }
+
+    const w = mount(RelationPickerComponent, {
+      props: { relationConfig: modalConfig, modelValue: ana },
+      global: { ...options(), config: { globalProperties: { $router: router, $route: { fullPath: '/', path: '/', matched: [] } } } },
+      attachTo: document.body
+    })
+    await flushPromises()
+    await w.find('[data-test="relation-view"]').trigger('click')
+
+    expect(open).not.toHaveBeenCalled()
+    expect(w.findComponent({ name: 'RelationRecordDialog' }).props('mode')).toBe('view')
+  })
+})

@@ -29,6 +29,10 @@ describe('relation picker selection (schema variant)', () => {
     expect(guessComponent({ ...card, relation_config: null })).toBe('s-select')
   })
 
+  it('the "modal" variant also resolves to the picker', () => {
+    expect(guessComponent({ ...card, relation_config: { variant: 'modal' } })).toBe('s-relation-picker')
+  })
+
   it('a many-to-many keeps the multi-select even if it were flagged "card"', () => {
     expect(guessComponent({ ...card, type: 'ManyToManyField', component: 's-multiselect' })).toBe('s-multiselect')
   })
