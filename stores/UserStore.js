@@ -425,13 +425,12 @@ export const useUserStore = createBaseStore(
       this.refresh = data.tokens.refresh
       setStorage('l', 'access', this.access,  365)
       setStorage('l', 'refresh', this.refresh,  365)
-      if (this.manterLogado) {
-        setStorage('l', 'username', data.email)
-        setStorage('l', 'password', data.password)
-      } else {
-        deleteStorage('l', 'username')
-        deleteStorage('l', 'password')
-      }
+      // "Keep me signed in" lives in the access/refresh tokens stored above
+      // (loadFromStorage() refreshes them) - a password is NEVER written to
+      // any storage. Older versions stored 'username'/'password' keys here
+      // (nothing ever read them back): drop any leftovers on every login.
+      deleteStorage('l', 'username')
+      deleteStorage('l', 'password')
       this.loginMsg = 'good'
       this.isLogin = true
       // Vue watchers only fire on an actual value change - if

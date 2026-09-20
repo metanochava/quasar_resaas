@@ -254,3 +254,176 @@ describe('UserSecurityPanel - regenerate', () => {
     expect(admin.viewTemporaryPassword).not.toHaveBeenCalled()
   })
 })
+
+// ---------------------------------------------------------------------------
+// state x permission matrix
+// ---------------------------------------------------------------------------
+const VIEW = 'view_temporary_password'
+const REGENERATE = 'regenerate_temporary_password'
+
+const MATRIX = [
+  // state, permissions, [view, copy, regenerate]
+  ['temporary', temporary, [VIEW, REGENERATE], [true, true, true]],
+  ['temporary', temporary, [VIEW], [true, true, false]],
+  ['temporary', temporary, [REGENERATE], [false, false, true]],
+  ['temporary', temporary, [], [false, false, false]],
+  ['expired', expired, [VIEW, REGENERATE], [false, false, true]],
+  ['expired', expired, [VIEW], [false, false, false]],
+  ['expired', expired, [], [false, false, false]],
+  ['permanent', permanent, [VIEW, REGENERATE], [false, false, true]],
+  ['permanent', permanent, [], [false, false, false]]
+]
+
+describe('UserSecurityPanel - which actions each password state offers', () => {
+  it.each(MATRIX)('%s with %j offers view/copy/regenerate = %j', async (_state, details, permissions, expected) => {
+    admin.fetchPasswordSecurity.mockResolvedValue(details)
+    session.Permissions = new Set(permissions)
+
+    const wrapper = mountPanel()
+    await flushPromises()
+
+    const offered = ['security-view', 'security-copy', 'security-regenerate'].map(id => wrapper.find(`[data-test="${id}"]`).exists())
+    expect(offered).toEqual(expected)
+  })
+
+  it('an expired password says so and never offers to reveal the old one', async () => {
+    admin.fetchPasswordSecurity.mockResolvedValue(expired)
+    const wrapper = mountPanel()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Temporary password expired')
+    expect(admin.viewTemporaryPassword).not.toHaveBeenCalled()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// the secret never leaves the dialog
+// ---------------------------------------------------------------------------
+describe('UserSecurityPanel - the revealed password stays ephemeral', () => {
+  const everywhere = () => JSON.stringify({
+    local: { ...localStorage },
+    session: { ...sessionStorage },
+    cookie: document.cookie,
+    url: window.location.href
+  })
+
+  it('is written to no storage, cookie or URL, and no Pinia store', async () => {
+    const wrapper = mountPanel()
+    await flushPromises()
+    await wrapper.find('[data-test="security-view"]').trigger('click')
+    await flushPromises()
+
+    expect(inBody('[data-test="revealed-password"]').textContent).toBe(SECRET)
+    expect(everywhere()).not.toContain(SECRET)
+
+    for (const store of Object.values(pinia.state.value)) {
+      expect(JSON.stringify(store)).not.toContain(SECRET)
+    }
+  })
+
+  it('is not logged to the console', async () => {
+    const spies = ['log', 'info', 'debug', 'warn', 'error'].map(level => vi.spyOn(console, level).mockImplementation(() => {}))
+
+    const wrapper = mountPanel()
+    await flushPromises()
+    await wrapper.find('[data-test="security-view"]').trigger('click')
+    await flushPromises()
+    inBody('[data-test="reveal-copy"]').click()
+    await flushPromises()
+
+    for (const spy of spies) {
+      expect(JSON.stringify(spy.mock.calls)).not.toContain(SECRET)
+    }
+  })
+
+  it('the copy confirmation never contains the password', async () => {
+    const wrapper = mountPanel()
+    await flushPromises()
+    await wrapper.find('[data-test="security-copy"]').trigger('click')
+    await flushPromises()
+
+    expect(alertSuccess).toHaveBeenCalledWith('Password copied.')
+    expect(JSON.stringify(alertSuccess.mock.calls)).not.toContain(SECRET)
+  })
+
+  it('is wiped when the component goes away', async () => {
+    const wrapper = mountPanel()
+    await flushPromises()
+    await wrapper.find('[data-test="security-view"]').trigger('click')
+    await flushPromises()
+    expect(wrapper.vm.revealed).toBe(SECRET)
+
+    const vm = wrapper.vm
+    wrapper.unmount()
+
+    expect(vm.revealed).toBe('')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// errors and stale state
+// ---------------------------------------------------------------------------
+describe('UserSecurityPanel - failures', () => {
+  it.each([400, 401, 403, 404, 409, 410])('a %s while viewing is shown and the state is reloaded', async (status) => {
+    const response = { status, data: { detail: 'nope' } }
+    admin.viewTemporaryPassword.mockRejectedValue({ response })
+    const wrapper = mountPanel()
+    await flushPromises()
+
+    await wrapper.find('[data-test="security-view"]').trigger('click')
+    await flushPromises()
+
+    expect(alertError).toHaveBeenCalledWith(response)
+    expect(inBody('[data-test="revealed-password"]')).toBeNull()
+    expect(admin.fetchPasswordSecurity).toHaveBeenCalledTimes(2)
+  })
+
+  it('a failed regeneration reloads the state too', async () => {
+    admin.regenerateTemporaryPassword.mockRejectedValue({ response: { status: 404, data: {} } })
+    const wrapper = mountPanel()
+    await flushPromises()
+
+    await wrapper.find('[data-test="security-regenerate"]').trigger('click')
+    await flushPromises()
+    ;[...document.body.querySelectorAll('.q-dialog .q-btn')].find(button => button.textContent.trim() === 'Generate').click()
+    await flushPromises()
+
+    expect(admin.fetchPasswordSecurity).toHaveBeenCalledTimes(2)
+  })
+
+  it('the buttons are disabled while a request is in flight', async () => {
+    let finish
+    admin.viewTemporaryPassword.mockReturnValue(new Promise(resolve => { finish = resolve }))
+    const wrapper = mountPanel()
+    await flushPromises()
+
+    await wrapper.find('[data-test="security-view"]').trigger('click')
+
+    expect(wrapper.find('[data-test="security-copy"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.find('[data-test="security-regenerate"]').attributes('disabled')).toBeDefined()
+
+    finish({ password: SECRET, ...temporary })
+    await flushPromises()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// two-factor block (prepared - renders only when the backend reports it)
+// ---------------------------------------------------------------------------
+describe('UserSecurityPanel - two-factor block', () => {
+  it('is absent while the backend reports no two-factor data', async () => {
+    const wrapper = mountPanel()
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="two-factor"]').exists()).toBe(false)
+  })
+
+  it('shows the organisation policy and the account state as two separate things', async () => {
+    admin.fetchPasswordSecurity.mockResolvedValue({ ...permanent, two_factor: { policy: 'required', state: 'not_configured' } })
+    const wrapper = mountPanel()
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="two-factor-policy"]').text()).toBe('Required')
+    expect(wrapper.find('[data-test="two-factor-state"]').text()).toBe('Not configured')
+  })
+})

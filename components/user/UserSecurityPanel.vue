@@ -6,6 +6,7 @@ import { useUserAdminStore } from '../../stores/UserAdminStore'
 import { useUserStore } from '../../stores/UserStore'
 import { tdc } from '../../services/translation'
 import { Alert, AlertSuccess } from '../../boot/alerts'
+import TwoFactorCard from './TwoFactorCard.vue'
 
 // "Security" section of the User details: the state of the password and - only
 // while it is still TEMPORARY - the explicit, permission-gated, audited way to
@@ -135,6 +136,8 @@ function confirmRegenerate() {
     } catch (error) {
       Alert(error?.response)
       busy.value = false
+      // the state may have moved on (expired, changed by the user, no longer in scope)
+      await load()
       return
     }
 
@@ -229,6 +232,9 @@ onBeforeUnmount(wipe)
       <div v-if="state === 'permanent'" class="text-caption text-grey-7">
         {{ tdc('The password chosen by the user cannot be viewed.') }}
       </div>
+
+      <!-- appears only when the backend reports two-factor data -->
+      <TwoFactorCard :two-factor="security.two_factor || null" />
     </q-card-section>
 
     <!-- the password lives only here, only while open -->

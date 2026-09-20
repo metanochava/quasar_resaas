@@ -344,6 +344,8 @@ export default defineComponent({
           return
         }
 
+        // the typed password is not needed any more
+        this.password = ''
         this.correctEntityType = true
       } catch (error) {
         this.incorrectEntityType = true
@@ -369,7 +371,7 @@ export default defineComponent({
         })
 
         this.changeDialog = false
-        this.newPassword = ''
+          this.newPassword = ''
         this.confirmPassword = ''
         this.password = ''
         this.correctEntityType = true

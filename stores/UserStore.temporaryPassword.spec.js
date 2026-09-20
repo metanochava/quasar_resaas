@@ -80,3 +80,83 @@ describe('UserStore - first login with a temporary password', () => {
     expect(User.loginMsg).toBe('good')
   })
 })
+
+describe('UserStore - passwords are never persisted', () => {
+  const SESSION = { id: 'u1', email: 'joao@example.com', must_change_password: false, tokens: { access: 'A', refresh: 'R' } }
+
+  const storedEverywhere = () => JSON.stringify({ local: { ...localStorage }, session: { ...sessionStorage }, cookie: document.cookie })
+
+  beforeEach(() => {
+    localStorage.clear()
+    sessionStorage.clear()
+  })
+
+  it.each([true, false])('a login (keep signed in = %s) writes no password and no username key', async (keep) => {
+    User.manterLogado = keep
+    post.mockResolvedValue({ data: { ...SESSION, password: 'must-never-be-stored' } })
+
+    await User.login({ identifier: 'joao', password: 'Permanent-Pass-1' })
+
+    expect(localStorage.getItem('password')).toBeNull()
+    expect(localStorage.getItem('username')).toBeNull()
+    expect(storedEverywhere()).not.toContain('Permanent-Pass-1')
+    expect(storedEverywhere()).not.toContain('must-never-be-stored')
+    // "keep me signed in" is the token pair
+    expect(localStorage.getItem('access')).toBe('A')
+    expect(localStorage.getItem('refresh')).toBe('R')
+  })
+
+  it('the temporary password and the new one are never stored while changing it', async () => {
+    post.mockResolvedValue({ data: SESSION })
+
+    await User.changeTemporaryPassword({ identifier: 'joao', password: 'Temp-Pass-1234', newPassword: 'My-own-Password-1' })
+
+    const stored = storedEverywhere()
+    expect(stored).not.toContain('Temp-Pass-1234')
+    expect(stored).not.toContain('My-own-Password-1')
+  })
+
+  it('a temporary-password login writes nothing at all (no session exists yet)', async () => {
+    post.mockResolvedValue({ data: { must_change_password: true, tokens: null } })
+
+    await User.login({ identifier: 'joao', password: 'Temp-Pass-1234' })
+
+    expect(localStorage.length).toBe(0)
+    expect(sessionStorage.length).toBe(0)
+  })
+
+  it('leftovers written by older versions are removed on the next login', async () => {
+    localStorage.setItem('password', 'old-plaintext')
+    localStorage.setItem('username', 'joao@example.com')
+    post.mockResolvedValue({ data: SESSION })
+
+    await User.login({ identifier: 'joao', password: 'Permanent-Pass-1' })
+
+    expect(localStorage.getItem('password')).toBeNull()
+    expect(localStorage.getItem('username')).toBeNull()
+  })
+
+  it('setStorage is never asked to persist a password key', async () => {
+    const storage = await import('../services/storage')
+    const setStorage = vi.spyOn(storage, 'setStorage')
+    post.mockResolvedValue({ data: { ...SESSION, password: 'x' } })
+
+    await User.login({ identifier: 'joao', password: 'Permanent-Pass-1' })
+    await User.changeTemporaryPassword({ identifier: 'joao', password: 'a', newPassword: 'My-own-Password-1' })
+
+    expect(setStorage.mock.calls.map(call => call[1])).not.toContain('password')
+    expect(setStorage.mock.calls.map(call => call[1])).not.toContain('username')
+  })
+
+  it('the session only starts after the mandatory change', async () => {
+    post.mockResolvedValueOnce({ data: { must_change_password: true, tokens: null } })
+    await User.login({ identifier: 'joao', password: 'Temp-Pass-1234' })
+    expect(User.isLogin).toBeFalsy()
+    expect(localStorage.getItem('access')).toBeNull()
+
+    post.mockResolvedValueOnce({ data: SESSION })
+    await User.changeTemporaryPassword({ identifier: 'joao', password: 'Temp-Pass-1234', newPassword: 'My-own-Password-1' })
+    expect(User.isLogin).toBe(true)
+    expect(localStorage.getItem('access')).toBe('A')
+  })
+})
