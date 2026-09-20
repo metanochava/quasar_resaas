@@ -16,6 +16,7 @@ import EditorComponent from './../components/engine/EditorComponent.vue'
 import SelectComponent from './../components/engine/SelectComponent.vue'
 import MultiSelectComponent from './../components/engine/MultiSelectComponent.vue'
 import RelationPickerComponent from './../components/engine/RelationPickerComponent.vue'
+import UserGroupsPanel from './../components/user/UserGroupsPanel.vue'
 import DrawerComponent from './../components/engine/DrawerComponent.vue'
 import FieldComponent from './../components/engine/FieldComponent.vue'
 import FileComponent from './../components/engine/FileComponent.vue'
@@ -132,6 +133,9 @@ export default boot(({ app }) => {
 
   // relation_config.variant "card": search + rich preview + create/view/edit
   app.component('s-relation-picker', RelationPickerComponent)
+
+  // profiles (Groups) of one user in the current Entity: list/assign/remove
+  app.component('s-user-groups-panel', UserGroupsPanel)
 
   app.component('s-drawer', DrawerComponent)
 

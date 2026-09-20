@@ -77,6 +77,43 @@ export const useUserAdminStore = createBaseStore(
         }
       },
 
+      // ---- profile (Group) assignment of ONE user in the CURRENT Entity/
+      // Branch - the API behind view_employee's "Profiles" tab
+      // (composables/useUserGroups.js). Same UserAPIView actions as above;
+      // they take the user id explicitly (never this.row) so a page can
+      // manage any user without touching the store's own form/row. The
+      // backend decides the Entity/Branch from the signed context and
+      // enforces permission + tenant scope - nothing here is authority.
+      async fetchAssignedGroups(userId) {
+        const { data } = await HTTPAuth.get(
+          url({ type: 'u', url: `${this.safeUrl}/${userId}/userGroups/` })
+        )
+        return data || []
+      },
+
+      // the Groups the Entity already owns (EntityGroup)
+      async fetchEntityGroups(entityId) {
+        const { data } = await HTTPAuth.get(
+          url({ type: 'u', url: `django_resaas/entitys/${entityId}/groups/` })
+        )
+        return data || []
+      },
+
+      async assignGroup(userId, groupId) {
+        const { data } = await HTTPAuth.post(
+          url({ type: 'u', url: `${this.safeUrl}/${userId}/addGroup/` }),
+          { group: groupId }
+        )
+        return data
+      },
+
+      async unassignGroup(userId, groupId) {
+        await HTTPAuth.post(
+          url({ type: 'u', url: `${this.safeUrl}/${userId}/removeGroup/` }),
+          { group: groupId }
+        )
+      },
+
       async toggleGroup(group) {
         try {
           const id = this.row?.id

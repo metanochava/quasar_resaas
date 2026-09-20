@@ -57,6 +57,14 @@
         >
           <q-tab name="personal" :label="tdc('Personal')" />
           <q-tab name="employment" :label="tdc('Employment')" />
+          <q-tab v-if="canListProfiles" name="profiles" data-test="tab-profiles">
+            <div class="row items-center no-wrap q-gutter-xs">
+              <span>{{ tdc('Profiles') }}</span>
+              <q-badge v-if="userGroups.count.value" color="primary" data-test="profiles-count">
+                {{ userGroups.count.value }}
+              </q-badge>
+            </div>
+          </q-tab>
           <q-tab name="contract" :label="tdc('Contract')" />
           <q-tab name="attendance" :label="tdc('Attendance')" />
           <q-tab name="leave" :label="tdc('Leave')" />
@@ -119,6 +127,15 @@
                 <div class="text-body1">{{ employee.work_phone || '-' }}</div>
               </div>
             </div>
+          </q-tab-panel>
+
+          <!-- PROFILES: the Groups of the employee's user account in the current entity -->
+          <q-tab-panel v-if="canListProfiles" name="profiles" class="q-pa-md">
+            <s-user-groups-panel
+              :controller="userGroups"
+              :has-user="!!userId"
+              :subject-name="fullName"
+            />
           </q-tab-panel>
 
           <!-- CONTRACT -->
@@ -1061,6 +1078,8 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEmployeeStore } from '../../../stores/EmployeeStore'
+import { useUserStore } from '../../../stores/UserStore'
+import { useUserGroups } from '../../../composables/useUserGroups'
 import { useLeaveTypeStore } from '../../../stores/LeaveTypeStore'
 import { useOnboardingTemplateStore } from '../../../stores/OnboardingTemplateStore'
 import { useJobPositionStore } from '../../../stores/JobPositionStore'
@@ -1073,6 +1092,7 @@ import PersonProfilePanel from '../../../components/person/PersonProfilePanel.vu
 
 const route = useRoute()
 const Employee = useEmployeeStore()
+const Session = useUserStore()
 const LeaveType = useLeaveTypeStore()
 const OnboardingTemplate = useOnboardingTemplateStore()
 const JobPosition = useJobPositionStore()
@@ -1096,6 +1116,15 @@ const leaveTypeOptions = computed(() =>
 
 const employee = computed(() => Employee.row)
 const person = computed(() => employee.value?.person_data)
+
+// The employee's user account (Employee -> Person -> User): the profiles
+// (Groups) belong to the User. null when the person has no account.
+const userId = computed(() => person.value?.user_data?.id || rawValue(person.value?.user) || null)
+
+// UX only - the backend authorises every profile call
+const canListProfiles = computed(() => Session.can('list_branchusergroup'))
+
+const userGroups = useUserGroups(() => userId.value, { enabled: () => canListProfiles.value })
 
 const fullName = computed(() =>
   person.value?.full_name || [person.value?.name, person.value?.surname].filter(Boolean).join(' ')
