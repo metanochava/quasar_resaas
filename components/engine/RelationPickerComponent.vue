@@ -276,6 +276,8 @@ const density = computed(() => attrs.dense ?? User.ps?.layout?.dense)
       :placeholder="placeholder || tdc('Search')"
       :disable="disable"
       :dense="density"
+      :error="!!error"
+      :error-message="typeof error === 'string' && error ? error : errorMessage"
       readonly
       outlined
       class="relation-trigger cursor-pointer"

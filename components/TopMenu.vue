@@ -6,8 +6,10 @@
           ? 'bg-dark text-white'
           : 'bg-primary text-white'"
       >
+        <!-- 🔥 CENTRO -->
+
         <!-- 🔥 ESQUERDA -->
-        <div class="row items-center">
+        <!-- <div class="row items-center">
           <s-btn
             flat
             round
@@ -15,9 +17,7 @@
             icon="home"
             @click="$router.push({ name: 'home' })"
           />
-        </div>
-
-        <!-- 🔥 CENTRO -->
+        </div> -->
         <div class=" col row items-center">
           <GroupSelector />
         </div>

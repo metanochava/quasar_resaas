@@ -439,3 +439,12 @@ describe('s-relation-picker - schema-driven modal variant and View', () => {
     expect(w.findComponent({ name: 'RelationRecordDialog' }).props('mode')).toBe('view')
   })
 })
+
+describe('s-relation-picker - modal mode validation', () => {
+  it('shows the field error on the compact input', async () => {
+    const w = mountPicker({ mode: 'modal', error: true, errorMessage: 'Select an employee' })
+    await flushPromises()
+
+    expect(w.text()).toContain('Select an employee')
+  })
+})

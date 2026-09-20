@@ -8,7 +8,7 @@
       :key="App.menu"
       flat
       square
-      dense
+      
       class="top-menu-btn"
       :icon="App.icon"
       :label="tdc(App.menu)"

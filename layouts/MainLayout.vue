@@ -65,8 +65,8 @@
         <!-- Menu Esquerdo -->
         <s-btn dense flat round icon="menu" @click="User.toggleLeftTop()" />
 
-        <!-- Marca (logo + name) -->
-        <HeaderBrand />
+        <!-- Marca (logo + name): also the way back to the home page -->
+        <HeaderBrand :to="{ name: 'home' }" />
 
         <q-space />
 
