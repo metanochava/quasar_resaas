@@ -21,7 +21,7 @@
                   {{ isEditMode ? tdc('Edit employee') : tdc('Add employee') }}
                 </div>
                 <div class="text-caption text-grey-7">
-                  {{ tdc('Pick the pesrson who is this employee.') }}
+                  {{ tdc('Pick the person who is this employee.') }}
                 </div>
               </div>
             </q-card-section>
