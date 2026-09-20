@@ -1,7 +1,9 @@
 <template>
-  <q-page class="q-pa-sm employee-create-page">
+  <q-page class="q-pa-sm employee-create-page ">
 
-        <!-- =========================================
+    <q-form ref="formRef" class="row q-col-gutter-md" @submit.prevent="save">
+
+              <!-- =========================================
              HEADER
         ========================================== -->
         <div class="col-12">
@@ -16,20 +18,16 @@
               />
               <div class="col">
                 <div class="text-h6 text-weight-bold">
-                  {{ isEditMode ? tdc('Edit doctor') : tdc('Add doctor') }}
+                  {{ isEditMode ? tdc('Edit employee') : tdc('Add employee') }}
                 </div>
                 <div class="text-caption text-grey-7">
-                  {{ tdc('Pick the employee who is this doctor.') }}
+                  {{ tdc('Pick the pesrson who is this employee.') }}
                 </div>
               </div>
             </q-card-section>
           </s-card>
         </div>
-    <q-form ref="formRef" class="row q-col-gutter-md" @submit.prevent="save">
-
-      <!-- Person half: summary of a matched person / personal data /
-           contacts / address / documents / emergency contacts, plus the
-           duplicate-match dialog - shared with add_paciente. -->
+        
       <div class="col-12">
         <s-person-intake :intake="intake" :relation-config="personRelationConfig" />
       </div>
