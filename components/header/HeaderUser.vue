@@ -129,7 +129,8 @@
               <q-item-section class="item-content">
                 <q-item-label
                   overline
-                  class="text-blue ellipsis"
+                  class="text-blue ellipsis text-center"
+                  data-test="register-entity"
                 >
                   {{ tdc('Register Entity') }}
                 </q-item-label>

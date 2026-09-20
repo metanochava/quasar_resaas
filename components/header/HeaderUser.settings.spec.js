@@ -47,3 +47,16 @@ describe('HeaderUser - the settings button', () => {
     expect(User.toggleSettings).toBeUndefined()
   })
 })
+
+describe('HeaderUser - "Register Entity"', () => {
+  it('is centred in its menu entry', async () => {
+    User.EntityType = { crair_entity: true }
+    const wrapper = mountHeader()
+
+    const label = wrapper.find('[data-test="register-entity"]')
+
+    expect(label.exists()).toBe(true)
+    expect(label.text()).toBe('Register Entity')
+    expect(label.classes()).toContain('text-center')
+  })
+})

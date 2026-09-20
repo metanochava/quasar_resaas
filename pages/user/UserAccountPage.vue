@@ -69,9 +69,12 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnBeforeLeavi
 
 <template>
   <q-page class="q-pa-md account-page" data-test="account-page">
-    <div class="row q-col-gutter-lg">
+    <!-- A grid, not a content-sized row: the navigation keeps its width and the
+         content always takes ALL the rest, so switching sections never makes the
+         layout shrink and grow again. -->
+    <div class="account-layout">
 
-      <div class="col-12 col-md-4 col-lg-3">
+      <aside class="account-side">
         <s-card flat bordered class="account-nav-card">
           <AccountSidebar
             v-model="section"
@@ -82,15 +85,12 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnBeforeLeavi
             :avatar="Session.profile"
           />
         </s-card>
-      </div>
+      </aside>
 
-      <div class="col-12 col-md-8 col-lg-9">
+      <main class="account-main">
         <q-tab-panels
           v-model="section"
           keep-alive
-          animated
-          transition-prev="fade"
-          transition-next="fade"
           class="account-panels bg-transparent"
         >
           <q-tab-panel name="overview" class="q-pa-none">
@@ -117,18 +117,32 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnBeforeLeavi
             <AccountPreferences />
           </q-tab-panel>
         </q-tab-panels>
-      </div>
+      </main>
 
     </div>
   </q-page>
 </template>
 
 <style scoped>
-.account-page { max-width: 1280px; margin: 0 auto; }
+/* fills the area it is in (no max-width, no centring) */
+.account-page { width: 100%; }
+
+.account-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+.account-side,
+.account-main { min-width: 0; }
+
 .account-nav-card { overflow: hidden; }
-.account-panels { overflow: hidden; }
+.account-panels { width: 100%; overflow: visible; }
+.account-panels :deep(.q-panel) { width: 100%; }
 
 @media (min-width: 1024px) {
+  .account-layout { grid-template-columns: 300px minmax(0, 1fr); align-items: start; }
   .account-nav-card { position: sticky; top: 72px; }
 }
 </style>

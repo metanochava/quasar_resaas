@@ -65,6 +65,21 @@ const go = async (page, section) => {
 }
 
 describe('UserAccountPage - the Account Center', () => {
+  it('is one fixed grid: the navigation and the content share the page and nothing depends on the section', async () => {
+    const page = mountPage()
+    await flushPromises()
+
+    const layout = page.find('.account-layout')
+    expect(layout.exists()).toBe(true)
+    expect(layout.findAll(':scope > aside, :scope > main')).toHaveLength(2)
+
+    // moving between sections keeps the very same grid (no re-created layout)
+    const before = layout.element
+    await go(page, 'security')
+    await go(page, 'sessions')
+    expect(page.find('.account-layout').element).toBe(before)
+  })
+
   it('is a layout: sidebar + the overview first', async () => {
     const page = mountPage()
     await flushPromises()
