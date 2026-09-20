@@ -65,7 +65,9 @@ export default defineComponent({
     emitValue () {
       const value = this.boxes.join('')
       this.$emit('update:modelValue', value)
-      if (value.length === this.length && !value.includes('')) {
+      // (String.includes('') is ALWAYS true, so the old check could never pass
+      // and `complete` never fired)
+      if (this.boxes.length === this.length && this.boxes.every(Boolean)) {
         this.$emit('complete', value)
       }
     },

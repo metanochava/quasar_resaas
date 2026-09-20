@@ -318,7 +318,9 @@ export default defineComponent({
     },
 
     async completeRegistration (otp) {
-      if (!otp || otp.length !== 6) return
+      // OtpInput now fires `complete` on the 6th digit, and the Confirm
+      // button calls this too - never submit the same code twice
+      if (!otp || otp.length !== 6 || this.loading) return
 
       this.loading = true
       this.otpError = ''
