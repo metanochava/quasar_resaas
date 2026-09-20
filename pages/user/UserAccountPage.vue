@@ -18,9 +18,8 @@ import { tdc } from '../../services/translation'
 // (components/user/account/). Sections stay mounted (keep-alive) so edits made
 // in Profile survive a trip to another section.
 //
-// Sections the backend cannot serve yet (two-factor) are simply absent - see
-// AccountSecurity.vue for the extension point - rather than shown with invented
-// data. Sessions and recent activity are real (sessions/, security/activity/).
+// Every section is backed by a real endpoint (sessions/, security/activity/,
+// two_factor/ ...): nothing is shown with invented data.
 const Session = useUserStore()
 
 const SECTIONS = [

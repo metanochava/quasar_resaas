@@ -160,6 +160,56 @@
         </q-card-section>
       </s-card>
     </q-dialog>
+
+    <!-- Two-factor is active on the account: the password alone gets no
+         session, a code from the authenticator app (or a recovery code) does. -->
+    <q-dialog :model-value="User.loginMsg === 'two_factor'" persistent>
+      <s-card class="change-card">
+        <q-card-section>
+          <div class="text-h6">{{ tdc('Two-factor authentication') }}</div>
+          <div class="text-caption text-grey-7">
+            {{ tdc('Enter the 6-digit code from your authenticator app, or a recovery code.') }}
+          </div>
+        </q-card-section>
+
+        <q-card-section>
+          <q-form class="q-gutter-md" @submit.prevent="submitTwoFactor">
+            <s-input
+              v-model="twoFactorCode"
+              outlined
+              autofocus
+              autocomplete="one-time-code"
+              :label="tdc('Authentication code or recovery code')"
+              data-test="two-factor-code"
+            />
+
+            <div class="row justify-end q-gutter-sm">
+              <s-btn flat :label="tdc('Cancel')" :disable="User.loading" data-test="two-factor-cancel" @click="cancelTwoFactor" />
+              <s-btn
+                type="submit"
+                unelevated
+                color="primary"
+                :label="tdc('Verify')"
+                :loading="User.loading"
+                :disable="twoFactorCode.trim().length < 6"
+                data-test="two-factor-submit"
+              />
+            </div>
+          </q-form>
+        </q-card-section>
+      </s-card>
+    </q-dialog>
+
+    <!-- The organisation REQUIRES two-factor and this account has none yet:
+         enrol before the first session (no way to close it but cancelling). -->
+    <TwoFactorSetupDialog
+      :model-value="User.loginMsg === 'two_factor_setup'"
+      persistent
+      :begin="beginTwoFactorSetup"
+      :confirm="confirmTwoFactorSetup"
+      @update:model-value="value => !value && cancelTwoFactor()"
+      @finished="finishTwoFactorSetup"
+    />
   </div>
 </template>
 
@@ -169,6 +219,7 @@ import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 
 import AllLogo from './../components/AllLogo.vue'
+import TwoFactorSetupDialog from './user/TwoFactorSetupDialog.vue'
 import { loadUserSaas } from './../boot/login_boot'
 import { tdc } from '../services/translation'
 import { Alert } from '../boot/alerts'
@@ -181,7 +232,8 @@ export default defineComponent({
   name: 'FormLogin',
 
   components: {
-    AllLogo
+    AllLogo,
+    TwoFactorSetupDialog
   },
 
   setup () {
@@ -211,7 +263,10 @@ export default defineComponent({
       ipAddress: '0.0.0.0',
       changeDialog: false,
       newPassword: '',
-      confirmPassword: ''
+      confirmPassword: '',
+      // local only - never Pinia/storage
+      twoFactorCode: '',
+      pendingSession: null
     }
   },
 
@@ -346,10 +401,57 @@ export default defineComponent({
 
         // the typed password is not needed any more
         this.password = ''
+
+        // two-factor pending: the dialogs above take over, no session yet
+        if (['two_factor', 'two_factor_setup'].includes(this.User.loginMsg)) return
+
         this.correctEntityType = true
       } catch (error) {
         this.incorrectEntityType = true
       }
+    },
+
+    async submitTwoFactor () {
+      const code = this.twoFactorCode.trim()
+      if (code.length < 6) return
+
+      try {
+        await this.User.verifyTwoFactorLogin(code)
+        this.twoFactorCode = ''
+        this.correctEntityType = true
+      } catch {
+        // the API client alerted the reason; a wrong code keeps the step open
+        this.twoFactorCode = ''
+      }
+    },
+
+    beginTwoFactorSetup () {
+      return this.User.setupTwoFactorLogin()
+    },
+
+    async confirmTwoFactorSetup (code) {
+      const { recovery_codes: codes, session } = await this.User.confirmTwoFactorLogin(code)
+
+      // the session starts only after the user has seen the recovery codes
+      this.pendingSession = session
+      return codes
+    },
+
+    async finishTwoFactorSetup () {
+      const session = this.pendingSession
+      this.pendingSession = null
+
+      if (!session) return
+
+      await this.User.startSession(session)
+      this.correctEntityType = true
+    },
+
+    cancelTwoFactor () {
+      this.twoFactorCode = ''
+      this.pendingSession = null
+      this.password = ''
+      this.User.cancelTwoFactorStep()
     },
 
     cancelChange () {
@@ -371,9 +473,12 @@ export default defineComponent({
         })
 
         this.changeDialog = false
-          this.newPassword = ''
+        this.newPassword = ''
         this.confirmPassword = ''
         this.password = ''
+
+        if (['two_factor', 'two_factor_setup'].includes(this.User.loginMsg)) return
+
         this.correctEntityType = true
       } catch (error) {
         Alert(error?.response)

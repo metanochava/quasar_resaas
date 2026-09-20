@@ -88,7 +88,7 @@ describe('UserAccountPage - the Account Center', () => {
     expect(page.find('[data-test="account-overview"]').exists()).toBe(true)
   })
 
-  it('offers exactly the sections the backend can serve (sessions yes, two-factor no)', async () => {
+  it('offers exactly the sections the backend can serve', async () => {
     const page = mountPage()
     await flushPromises()
 

@@ -72,6 +72,10 @@ export const useUserStore = createBaseStore(
     redirect: '',
     loginMsg: '',
     loginDetail: '',
+    // a pending SECOND step of the sign-in, never persisted: { kind: 'code' |
+    // 'setup', challenge } - the signed, 5-minute proof that the password
+    // step succeeded. It is not a session and grants nothing on its own.
+    twoFactorStep: null,
     loading: false,
 
     Theme: {},
@@ -380,7 +384,7 @@ export const useUserStore = createBaseStore(
           return res
         }
 
-        await this.startSession(res.data)
+        if (await this.continueSignIn(res.data)) return res
       }).catch(err => {
         this.loading = false
         this.loginMsg = 'error'
@@ -405,8 +409,85 @@ export const useUserStore = createBaseStore(
           { identifier, password, new_password: newPassword }
         )
 
+        // the new password may still have to pass the second factor
+        await this.continueSignIn(res.data)
+        return res
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // The answer of a successful PASSWORD step: either a session, or - when
+    // two-factor is active/required - a challenge and NO tokens. Returns true
+    // when a second step is pending instead of a session.
+    async continueSignIn(data) {
+      if (data?.two_factor && data?.challenge) {
+        this.twoFactorStep = {
+          kind: data.two_factor === 'two_factor_setup_required' ? 'setup' : 'code',
+          challenge: data.challenge
+        }
+        this.loginMsg = this.twoFactorStep.kind === 'setup' ? 'two_factor_setup' : 'two_factor'
+        return true
+      }
+
+      this.twoFactorStep = null
+      await this.startSession(data)
+      return false
+    },
+
+    cancelTwoFactorStep() {
+      this.twoFactorStep = null
+      this.loginMsg = ''
+    },
+
+    // Second step with an authenticator code or a recovery code. A wrong code
+    // rethrows (the caller shows the backend message) and keeps the step open.
+    async verifyTwoFactorLogin(code) {
+      if (!this.twoFactorStep) return
+
+      this.loading = true
+
+      try {
+        const res = await HTTPClient.post(
+          url({ type: 'u', url: 'login/two_factor/', params: {} }),
+          { challenge: this.twoFactorStep.challenge, code }
+        )
+
+        this.twoFactorStep = null
         await this.startSession(res.data)
         return res
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // Forced enrolment (a REQUIRED policy) before the first session. The
+    // secret/QR go straight to the caller - never into this store.
+    async setupTwoFactorLogin() {
+      const res = await HTTPClient.post(
+        url({ type: 'u', url: 'login/two_factor/setup/', params: {} }),
+        { challenge: this.twoFactorStep?.challenge }
+      )
+
+      return res.data
+    },
+
+    // Proving the first code. Returns { recovery_codes, session } WITHOUT
+    // starting the session yet: the user has to see the recovery codes first,
+    // then the caller runs startSession(session).
+    async confirmTwoFactorLogin(code) {
+      this.loading = true
+
+      try {
+        const res = await HTTPClient.post(
+          url({ type: 'u', url: 'login/two_factor/setup/confirm/', params: {} }),
+          { challenge: this.twoFactorStep?.challenge, code }
+        )
+
+        const { recovery_codes: recoveryCodes, ...session } = res.data
+        this.twoFactorStep = null
+
+        return { recovery_codes: recoveryCodes, session }
       } finally {
         this.loading = false
       }

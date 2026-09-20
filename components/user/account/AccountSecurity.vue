@@ -2,20 +2,14 @@
 import { ref } from 'vue'
 
 import ChangePasswordDialog from './ChangePasswordDialog.vue'
-import TwoFactorCard from '../TwoFactorCard.vue'
+import AccountTwoFactor from './AccountTwoFactor.vue'
 import SecurityActivity from './SecurityActivity.vue'
 import { computed } from 'vue'
 import { useUserStore } from '../../../stores/UserStore'
 import { tdc } from '../../../services/translation'
 
-// Security of the signed-in user's own account. Today the backend supports the
-// password change; two-factor authentication, active sessions and security
-// activity have NO API yet, so they are not shown (no fake data, no buttons that
-// would call something that does not exist). `twoFactor` is the extension point:
-// give it the backend's { policy, state } object and its card appears.
-defineProps({
-  twoFactor: { type: Object, default: null }
-})
+// Security of the signed-in user's own account: password, recent security
+// activity and two-factor authentication - everything comes from the backend.
 
 const passwordDialog = ref(false)
 
@@ -52,11 +46,7 @@ const passwordChangedAt = computed(() => {
 
       <SecurityActivity />
 
-      <s-card v-if="twoFactor" flat bordered class="security-card">
-        <q-card-section>
-          <TwoFactorCard :two-factor="twoFactor" />
-        </q-card-section>
-      </s-card>
+      <AccountTwoFactor />
     </div>
 
     <ChangePasswordDialog v-model="passwordDialog" />

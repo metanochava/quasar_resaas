@@ -16,7 +16,11 @@ const KINDS = {
   PASSWORD_CHANGED: { icon: 'key', label: 'Password changed' },
   TEMPORARY_PASSWORD_CHANGED: { icon: 'key', label: 'Temporary password replaced' },
   EMAIL_CHANGED: { icon: 'mail', label: 'Email changed' },
-  MOBILE_CHANGED: { icon: 'phone_iphone', label: 'Phone number changed' }
+  MOBILE_CHANGED: { icon: 'phone_iphone', label: 'Phone number changed' },
+  TWO_FACTOR_ENABLED: { icon: 'shield', label: 'Two-factor authentication turned on' },
+  TWO_FACTOR_DISABLED: { icon: 'shield_off', label: 'Two-factor authentication turned off' },
+  TWO_FACTOR_RECOVERY_USED: { icon: 'vpn_key', label: 'Recovery code used' },
+  TWO_FACTOR_RECOVERY_REGENERATED: { icon: 'autorenew', label: 'Recovery codes regenerated' }
 }
 
 const kind = (event) => KINDS[event.type] || { icon: 'info', label: 'Account activity' }
