@@ -1,5 +1,30 @@
 <template>
   <q-page class="q-pa-sm employee-create-page">
+
+        <!-- =========================================
+             HEADER
+        ========================================== -->
+        <div class="col-12">
+          <s-card flat bordered>
+            <q-card-section class="row items-center no-wrap">
+              <q-avatar
+                size="44px"
+                color="primary"
+                text-color="white"
+                icon="medical_services"
+                class="q-mr-md"
+              />
+              <div class="col">
+                <div class="text-h6 text-weight-bold">
+                  {{ isEditMode ? tdc('Edit doctor') : tdc('Add doctor') }}
+                </div>
+                <div class="text-caption text-grey-7">
+                  {{ tdc('Pick the employee who is this doctor.') }}
+                </div>
+              </div>
+            </q-card-section>
+          </s-card>
+        </div>
     <q-form ref="formRef" class="row q-col-gutter-md" @submit.prevent="save">
 
       <!-- Person half: summary of a matched person / personal data /
