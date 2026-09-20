@@ -9,7 +9,10 @@
           class="bg-red text-white" 
         >
           <q-card-section>
-            <div class="text-subtitle2">
+            <div v-if="User.loginDetail" class="text-subtitle2">
+              {{ User.loginDetail }}
+            </div>
+            <div v-else class="text-subtitle2">
               {{ tdc('Incorrect username or password entered') }}
               <br>
               {{ tdc('Please try again') }}
@@ -108,6 +111,55 @@
         />
       </q-card-actions>
     </s-card>
+  
+
+    <!-- First login with a TEMPORARY password: choose a definitive one. No
+         session exists until this succeeds. -->
+    <q-dialog v-model="changeDialog" persistent>
+      <s-card class="change-card">
+        <q-card-section>
+          <div class="text-h6">{{ tdc('Choose your password') }}</div>
+          <div class="text-caption text-grey-7">
+            {{ tdc('Your temporary password must be replaced before you can continue.') }}
+          </div>
+        </q-card-section>
+
+        <q-card-section>
+          <q-form class="q-gutter-md" @submit.prevent="changePassword">
+            <s-input
+              v-model="newPassword"
+              outlined
+              type="password"
+              autocomplete="new-password"
+              :label="tdc('New password')"
+              :rules="[v => (v && v.length >= 8) || tdc('The password must be at least 8 characters long')]"
+              data-test="new-password"
+            />
+            <s-input
+              v-model="confirmPassword"
+              outlined
+              type="password"
+              autocomplete="new-password"
+              :label="tdc('Confirm password')"
+              :rules="[v => v === newPassword || tdc('The passwords do not match')]"
+              data-test="confirm-password"
+            />
+
+            <div class="row justify-end q-gutter-sm">
+              <s-btn flat :label="tdc('Cancel')" :disable="User.loading" data-test="change-cancel" @click="cancelChange" />
+              <s-btn
+                type="submit"
+                unelevated
+                color="primary"
+                :label="tdc('Save password')"
+                :loading="User.loading"
+                data-test="change-submit"
+              />
+            </div>
+          </q-form>
+        </q-card-section>
+      </s-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -119,6 +171,7 @@ import { useRouter } from 'vue-router'
 import AllLogo from './../components/AllLogo.vue'
 import { loadUserSaas } from './../boot/login_boot'
 import { tdc } from '../services/translation'
+import { Alert } from '../boot/alerts'
 import { getStorage, setStorage } from '../services/storage'
 import { useUserStore } from '../stores/UserStore'
 import { useEntityStore } from '../stores/EntityStore'
@@ -155,7 +208,10 @@ export default defineComponent({
       latitude: '',
       longitude: '',
       local: '',
-      ipAddress: '0.0.0.0'
+      ipAddress: '0.0.0.0',
+      changeDialog: false,
+      newPassword: '',
+      confirmPassword: ''
     }
   },
 
@@ -280,9 +336,45 @@ export default defineComponent({
           this.q
         )
 
+        // temporary password: no session yet - ask for the definitive one
+        if (this.User.loginMsg === 'must_change') {
+          this.newPassword = ''
+          this.confirmPassword = ''
+          this.changeDialog = true
+          return
+        }
+
         this.correctEntityType = true
       } catch (error) {
         this.incorrectEntityType = true
+      }
+    },
+
+    cancelChange () {
+      this.changeDialog = false
+      this.newPassword = ''
+      this.confirmPassword = ''
+      this.password = ''
+      this.User.loginMsg = ''
+    },
+
+    async changePassword () {
+      if (this.newPassword.length < 8 || this.newPassword !== this.confirmPassword) return
+
+      try {
+        await this.User.changeTemporaryPassword({
+          identifier: this.identifier,
+          password: this.password,
+          newPassword: this.newPassword
+        })
+
+        this.changeDialog = false
+        this.newPassword = ''
+        this.confirmPassword = ''
+        this.password = ''
+        this.correctEntityType = true
+      } catch (error) {
+        Alert(error?.response)
       }
     }
   }
@@ -290,6 +382,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.change-card { width: 420px; max-width: 94vw; }
+
 .login-card {
   width: 100%;
   max-width: 300px;

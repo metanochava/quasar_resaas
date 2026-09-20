@@ -88,6 +88,7 @@
           <UserBranchesPanel :user-id="UserAdmin.form?.id" />
           <UserEntitiesPanel :user-id="UserAdmin.form?.id" />
           <UserPersonPanel :user-id="UserAdmin.form?.id" />
+          <s-user-security-panel :user-id="UserAdmin.form?.id" :username="UserAdmin.form?.username" />
         </div>
       </template>
 

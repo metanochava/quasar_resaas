@@ -114,6 +114,34 @@ export const useUserAdminStore = createBaseStore(
         )
       },
 
+      // ---- temporary password (User details > Security). The password itself
+      // is returned ONLY by viewTemporaryPassword() to the caller - it is
+      // never kept in this store (or any other): the dialog that asked holds
+      // it for as long as it is open. The backend enforces permission, tenant
+      // scope and audit on every call.
+      async fetchPasswordSecurity(userId) {
+        const { data } = await HTTPAuth.get(
+          url({ type: 'u', url: `${this.safeUrl}/${userId}/passwordSecurity/` })
+        )
+        return data
+      },
+
+      async viewTemporaryPassword(userId) {
+        const { data } = await HTTPAuth.post(
+          url({ type: 'u', url: `${this.safeUrl}/${userId}/viewTemporaryPassword/` }),
+          {}
+        )
+        return data
+      },
+
+      async regenerateTemporaryPassword(userId) {
+        const { data } = await HTTPAuth.post(
+          url({ type: 'u', url: `${this.safeUrl}/${userId}/regenerateTemporaryPassword/` }),
+          {}
+        )
+        return data
+      },
+
       async toggleGroup(group) {
         try {
           const id = this.row?.id

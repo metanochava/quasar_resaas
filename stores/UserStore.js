@@ -74,6 +74,7 @@ export const useUserStore = createBaseStore(
     manterLogado: false,
     redirect: '',
     loginMsg: '',
+    loginDetail: '',
     loading: false,
 
     Theme: {},
@@ -372,38 +373,75 @@ export const useUserStore = createBaseStore(
     async login(data, q) {
       this.loading = true
       this.loginMsg  = ''
+      this.loginDetail = ''
       this.access = ''
       const rsp = await HTTPClient.post(url({type: "u", url: "login/", params: {}}), data )
       .then(async res => {
         this.loading = false
-        this.data = res.data
-        this.access = res.data.tokens.access
-        this.refresh = res.data.tokens.refresh
-        setStorage('l', 'access', this.access,  365)
-        setStorage('l', 'refresh', this.refresh,  365)
-        if (this.manterLogado) {
-          setStorage('l', 'username', res.data.email)
-          setStorage('l', 'password', res.data.password)
-        } else {
-          deleteStorage('l', 'username')
-          deleteStorage('l', 'password')
+
+        // A TEMPORARY password gets no session: the user must choose a
+        // definitive one first (FormLogin.vue shows the change dialog and
+        // calls changeTemporaryPassword()).
+        if (res.data?.must_change_password) {
+          this.loginMsg = 'must_change'
+          return res
         }
-        this.loginMsg = 'good'
-        this.isLogin = true
-        // Vue watchers only fire on an actual value change - if
-        // isLogout stayed 'true' from a previous session's logout,
-        // the next logout()/401 setting it to 'true' again would be a
-        // same-value no-op and HeaderUser.vue's watcher would never
-        // fire, silently breaking the auto-redirect-to-login until a
-        // full page reload. Reset it here so it can flip again.
-        this.isLogout = false
-        await this.me()
+
+        await this.startSession(res.data)
       }).catch(err => {
         this.loading = false
         this.loginMsg = 'error'
 
+        // only the expired-temporary-password answer carries a message
+        // worth showing instead of the generic one
+        if (err?.response?.data?.code === 'temporary_password_expired') {
+          this.loginDetail = err.response.data.detail
+        }
       })
       return rsp
+    },
+
+    // First-login step: prove the temporary password, choose the definitive
+    // one; the answer carries the tokens, so the session starts right here.
+    async changeTemporaryPassword({ identifier, password, newPassword }) {
+      this.loading = true
+
+      try {
+        const res = await HTTPClient.post(
+          url({ type: 'u', url: 'password/change/temporary/', params: {} }),
+          { identifier, password, new_password: newPassword }
+        )
+
+        await this.startSession(res.data)
+        return res
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async startSession(data) {
+      this.data = data
+      this.access = data.tokens.access
+      this.refresh = data.tokens.refresh
+      setStorage('l', 'access', this.access,  365)
+      setStorage('l', 'refresh', this.refresh,  365)
+      if (this.manterLogado) {
+        setStorage('l', 'username', data.email)
+        setStorage('l', 'password', data.password)
+      } else {
+        deleteStorage('l', 'username')
+        deleteStorage('l', 'password')
+      }
+      this.loginMsg = 'good'
+      this.isLogin = true
+      // Vue watchers only fire on an actual value change - if
+      // isLogout stayed 'true' from a previous session's logout,
+      // the next logout()/401 setting it to 'true' again would be a
+      // same-value no-op and HeaderUser.vue's watcher would never
+      // fire, silently breaking the auto-redirect-to-login until a
+      // full page reload. Reset it here so it can flip again.
+      this.isLogout = false
+      await this.me()
     },
 
     async me() {

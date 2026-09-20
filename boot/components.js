@@ -17,6 +17,7 @@ import SelectComponent from './../components/engine/SelectComponent.vue'
 import MultiSelectComponent from './../components/engine/MultiSelectComponent.vue'
 import RelationPickerComponent from './../components/engine/RelationPickerComponent.vue'
 import UserGroupsPanel from './../components/user/UserGroupsPanel.vue'
+import UserSecurityPanel from './../components/user/UserSecurityPanel.vue'
 import DrawerComponent from './../components/engine/DrawerComponent.vue'
 import FieldComponent from './../components/engine/FieldComponent.vue'
 import FileComponent from './../components/engine/FileComponent.vue'
@@ -136,6 +137,9 @@ export default boot(({ app }) => {
 
   // profiles (Groups) of one user in the current Entity: list/assign/remove
   app.component('s-user-groups-panel', UserGroupsPanel)
+
+  // password state + audited view of a TEMPORARY password (User details)
+  app.component('s-user-security-panel', UserSecurityPanel)
 
   app.component('s-drawer', DrawerComponent)
 
