@@ -56,12 +56,9 @@ export const useUserStore = createBaseStore(
     Menus: [],
     search: '',
     AllMenus: [],
-    // Settings: the logged-in user's own account modal (profile/security).
-    // ThemeStudio: the entity-wide layout/branding modal. Deliberately
-    // separate booleans/dialogs - one is "my account", the other is
-    // "how this entity looks for everyone" (see components/
-    // UserAccountModal.vue vs components/theme/ThemeStudioEngine.vue).
-    Settings: false,
+    // ThemeStudio: the entity-wide layout/branding modal. The user's own
+    // account (profile/security) is no longer a modal: it is the page behind
+    // the route "account" (pages/user/UserAccountPage.vue).
     ThemeStudio: false,
     Permissions: new Set(),
     access: null,
@@ -320,10 +317,6 @@ export const useUserStore = createBaseStore(
     },
     selectGroup(group){
       this.Group = group
-    },
-    toggleSettings(){
-      this.Settings = !this.Settings
-      setStorage('l', 'settings', this.Settings)
     },
 
     // Troca menu_rtl (User > Entity > EntityType, ver

@@ -1,12 +1,13 @@
 <template>
-  <s-card class="user-account-modal">
-    <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
-      <div class="text-h6">{{ barTitle }}</div>
+  <!-- The logged-in user's own account (profile / security) - a page of its
+       own (route "account"), no longer a modal. -->
+  <q-page class="q-pa-sm">
+  <s-card class="user-account-page">
+    <q-card-section class="row items-center">
+      <div class="text-h6" data-test="account-title">{{ barTitle }}</div>
+    </q-card-section>
 
-      <q-space />
-
-      <s-btn flat dense icon="close" v-close-popup />
-    </q-bar>
+    <q-separator />
 
     <!-- =================================================
          OTP CONFIRMATION DIALOG (email/mobile changes)
@@ -113,25 +114,24 @@
                     :label="tdc('Email')"
                     dense
                     outlined
-                  >
-                    <template #append>
-                      <s-btn
-                        v-if="emailChanged"
-                        dense
-                        flat
-                        round
-                        icon="send"
-                        color="primary"
-                        :loading="requestingContactOtp && contactOtpChannel === 'email'"
-                        @click="requestContactOtp('email', profileForm.email)"
-                      >
-                        <s-tooltip>{{ tdc('Verify and update email') }}</s-tooltip>
-                      </s-btn>
-                    </template>
-                  </s-input>
+                    readonly
+                    data-test="profile-email"
+                  />
 
-                  <div v-if="emailChanged" class="text-caption text-grey-7">
+                  <!-- (s-input only supports its default slot, so no #append) -->
+                  <div class="row items-center text-caption text-grey-7">
                     {{ tdc('Confirming a new email requires a verification code') }}
+                    <s-btn
+                      flat
+                      dense
+                      no-caps
+                      size="sm"
+                      color="primary"
+                      icon="edit"
+                      :label="tdc('Change email')"
+                      data-test="go-change-email"
+                      @click="tab = 'security'"
+                    />
                   </div>
                 </q-card-section>
               </s-card>
@@ -254,6 +254,47 @@
                 </q-card-actions>
               </s-card>
 
+              <s-card flat bordered class="q-mb-md" data-test="change-email-card">
+                <q-card-section class="text-subtitle1">
+                  {{ tdc('Change email') }}
+                </q-card-section>
+
+                <q-card-section class="q-gutter-md">
+                  <div class="text-caption text-grey-7">
+                    {{ tdc('Current email') }}: {{ User.data?.email || '—' }}
+                  </div>
+
+                  <s-input
+                    v-model="newEmail"
+                    type="email"
+                    :label="tdc('New email')"
+                    dense
+                    outlined
+                    data-test="new-email"
+                  />
+
+                  <div v-if="newEmail && !isNewEmailValid" class="text-caption text-negative">
+                    {{ tdc('Invalid email') }}
+                  </div>
+
+                  <div class="text-caption text-grey-7">
+                    {{ tdc('A verification code will be sent to the new email. It only changes after you confirm the code.') }}
+                  </div>
+                </q-card-section>
+
+                <q-card-actions align="right">
+                  <s-btn
+                    color="primary"
+                    icon="mail"
+                    :label="tdc('Send verification code')"
+                    :loading="requestingContactOtp && contactOtpChannel === 'email'"
+                    :disable="!canSubmitEmail"
+                    data-test="send-email-code"
+                    @click="submitEmailChange"
+                  />
+                </q-card-actions>
+              </s-card>
+
               <s-card flat bordered>
                 <q-card-section class="text-subtitle1">
                   {{ tdc('Change phone number') }}
@@ -303,20 +344,21 @@
       </div>
     </q-card-section>
   </s-card>
+  </q-page>
 </template>
 
 <script>
 import { defineComponent } from "vue"
-import { HTTPAuth, url } from "../services/api"
-import { useUserStore } from "../stores/UserStore"
-import { tdc } from "../services/translation"
-import { COUNTRIES, countryLabel } from "../utils/countries"
-import { toE164, isValidE164, splitE164 } from "../utils/phone"
+import { HTTPAuth, url } from "../../services/api"
+import { useUserStore } from "../../stores/UserStore"
+import { tdc } from "../../services/translation"
+import { COUNTRIES, countryLabel } from "../../utils/countries"
+import { toE164, isValidE164, splitE164 } from "../../utils/phone"
 
-import OtpInput from "./OtpInput.vue"
+import OtpInput from "../../components/OtpInput.vue"
 
 export default defineComponent({
-  name: "UserAccountModal",
+  name: "UserAccountPage",
 
   components: {
     OtpInput
@@ -364,6 +406,8 @@ export default defineComponent({
         dial: "258",
         national: ""
       },
+
+      newEmail: "",
 
       contactOtpDialog: false,
       contactOtpChannel: "",
@@ -417,8 +461,14 @@ export default defineComponent({
       )
     },
 
-    emailChanged() {
-      return !!this.profileForm.email && this.profileForm.email !== (this.User.data?.email || "")
+    isNewEmailValid() {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.newEmail.trim())
+    },
+
+    canSubmitEmail() {
+      const next = this.newEmail.trim().toLowerCase()
+
+      return this.isNewEmailValid && next !== (this.User.data?.email || "").toLowerCase()
     }
   },
 
@@ -538,6 +588,13 @@ export default defineComponent({
       }
     },
 
+    // the code goes to the NEW address (that is what has to be proven); the
+    // email only changes after confirmContactOtp() succeeds
+    async submitEmailChange() {
+      if (!this.canSubmitEmail) return
+      await this.requestContactOtp("email", this.newEmail.trim().toLowerCase())
+    },
+
     async submitPhoneChange() {
       if (!this.isPhoneValid) return
       await this.requestContactOtp("mobile", this.fullPhoneNumber)
@@ -589,6 +646,7 @@ export default defineComponent({
 
         if (this.contactOtpChannel === "email") {
           this.profileForm.email = data.email || ""
+          this.newEmail = ""
         }
 
         this.contactOtpDialog = false
@@ -598,25 +656,12 @@ export default defineComponent({
         this.confirmingContactOtp = false
       }
     }
-  },
-
-  watch: {
-    "User.Settings" (val) {
-      if (val) this.loadProfile()
-    }
   }
 })
 </script>
 
 <style scoped>
-.user-account-modal {
-  max-height: 90vh;
-  overflow: hidden;
-}
-
 .account-tab-panels {
-  max-height: calc(90vh - 140px);
-  overflow-y: auto;
   overflow-x: hidden;
 }
 

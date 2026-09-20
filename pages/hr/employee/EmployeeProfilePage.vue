@@ -57,7 +57,7 @@
         >
           <q-tab name="personal" :label="tdc('Personal')" />
           <q-tab name="employment" :label="tdc('Employment')" />
-          <q-tab v-if="canListProfiles" name="profiles" data-test="tab-profiles">
+          <q-tab v-if="canListProfiles || canViewSecurity" name="profiles" data-test="tab-profiles">
             <div class="row items-center no-wrap q-gutter-xs">
               <span>{{ tdc('Profiles') }}</span>
               <q-badge v-if="userGroups.count.value" color="primary" data-test="profiles-count">
@@ -129,13 +129,26 @@
             </div>
           </q-tab-panel>
 
-          <!-- PROFILES: the Groups of the employee's user account in the current entity -->
-          <q-tab-panel v-if="canListProfiles" name="profiles" class="q-pa-md">
-            <s-user-groups-panel
-              :controller="userGroups"
-              :has-user="!!userId"
-              :subject-name="fullName"
-            />
+          <!-- PROFILES + SECURITY: the access of the employee's user account -
+               its Groups in the current entity, and the state of its password
+               (the same panel the User details use) -->
+          <q-tab-panel v-if="canListProfiles || canViewSecurity" name="profiles" class="q-pa-md">
+            <div class="row q-col-gutter-md">
+              <div v-if="canListProfiles" class="col-12" :class="{ 'col-md-7': canViewSecurity && userId }">
+                <s-user-groups-panel
+                  :controller="userGroups"
+                  :has-user="!!userId"
+                  :subject-name="fullName"
+                />
+              </div>
+
+              <div v-if="canViewSecurity && userId" class="col-12" :class="{ 'col-md-5': canListProfiles }" data-test="employee-security">
+                <s-user-security-panel
+                  :user-id="userId"
+                  :username="person?.user_data?.username || ''"
+                />
+              </div>
+            </div>
           </q-tab-panel>
 
           <!-- CONTRACT -->
@@ -1123,6 +1136,9 @@ const userId = computed(() => person.value?.user_data?.id || rawValue(person.val
 
 // UX only - the backend authorises every profile call
 const canListProfiles = computed(() => Session.can('list_branchusergroup'))
+// the password state of the account (view_user); revealing/regenerating a
+// temporary password have their own permissions inside the panel
+const canViewSecurity = computed(() => Session.can('view_user'))
 
 const userGroups = useUserGroups(() => userId.value, { enabled: () => canListProfiles.value })
 

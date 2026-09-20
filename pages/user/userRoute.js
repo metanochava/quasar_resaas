@@ -46,5 +46,18 @@ export let userRoutes = [
       icon: 'visibility',
       requiredRole: 'view_user',
     },
+  },
+  {
+    // the logged-in user's OWN account (profile / security) - it used to be
+    // a modal opened from the header menu. No requiredRole: every signed-in
+    // user manages their own account.
+    path: '/account',
+    name: 'account',
+    component: () => import('./UserAccountPage.vue'),
+    meta: {
+      title: tdc('My account'),
+      requiresAuth: true,
+      icon: 'settings',
+    },
   }
 ]

@@ -200,7 +200,8 @@
               flat
               color="secondary"
               v-close-popup
-              @click="User.toggleSettings()"
+              data-test="header-settings"
+              @click="$router.push({ name: 'account' })"
             >
               <s-tooltip>
                 {{ tdc('Settings') }}
