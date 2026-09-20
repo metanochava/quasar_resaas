@@ -17,7 +17,7 @@
       <q-menu>
 
         <q-list
-          dense
+          
           style="min-width: 155px"
         >
 
