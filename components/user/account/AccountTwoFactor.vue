@@ -93,9 +93,13 @@ async function regenerate(code) {
             data-test="two-factor-regenerate"
             @click="regenerateOpen = true"
           />
+
           <s-btn
             v-if="info.can_disable"
-            outline no-caps color="negative" icon="shield_off"
+            outline
+            no-caps
+            color="negative"
+            icon="lock_open"
             :label="tdc('Disable')"
             data-test="two-factor-disable"
             @click="disableOpen = true"
