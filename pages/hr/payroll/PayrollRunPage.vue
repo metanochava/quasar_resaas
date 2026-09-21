@@ -116,6 +116,7 @@ import { usePayrollPeriodStore } from '../../../stores/PayrollPeriodStore.js'
 import { usePayrollStore } from '../../../stores/PayrollStore.js'
 import { HTTPAuth, url } from '../../../services/api'
 import { tdc } from '../../../services/translation.js'
+import { errorMessage } from '../../../utils/apiContract'
 
 const PayrollPeriod = usePayrollPeriodStore()
 const Payroll = usePayrollStore()
@@ -180,7 +181,7 @@ async function doGenerate() {
   try {
     rows.value = await PayrollPeriod.generate(periodChoice.value)
   } catch (err) {
-    genError.value = err?.response?.data?.detail || tdc('Could not generate payroll for this period.')
+    genError.value = errorMessage(err) || tdc('Could not generate payroll for this period.')
   }
 }
 
@@ -189,7 +190,7 @@ async function doAction(row, action) {
     await Payroll[action === 'mark_paid' ? 'markPaid' : action](row.id)
     await loadPayrollsForPeriod()
   } catch (err) {
-    genError.value = err?.response?.data?.detail || tdc('Could not update this payroll.')
+    genError.value = errorMessage(err) || tdc('Could not update this payroll.')
   }
 }
 

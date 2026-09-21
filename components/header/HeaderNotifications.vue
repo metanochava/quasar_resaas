@@ -48,9 +48,20 @@
         <template #title>
           <div>
             <div class="text-subtitle2 text-weight-bold">
-              {{ tdc('Support & Feedback') }}
+              {{ tdc('Notifications') }}
             </div>
           </div>
+        </template>
+
+        <template #subheader>
+          <q-tabs v-model="tab" dense align="left" class="notification-tabs" data-test="notification-tabs">
+            <q-tab name="alerts" icon="notifications" :label="tdc('Alerts')" no-caps data-test="tab-alerts">
+              <q-badge v-if="Alerts.unreadCount" color="red" floating rounded>{{ Alerts.unreadCount }}</q-badge>
+            </q-tab>
+            <q-tab name="support" icon="support_agent" :label="tdc('Support & Feedback')" no-caps data-test="tab-support">
+              <q-badge v-if="unreadTotal" color="red" floating rounded>{{ unreadTotal }}</q-badge>
+            </q-tab>
+          </q-tabs>
         </template>
 
         <template #bar-actions>
@@ -70,7 +81,9 @@
         <!-- =================================================
              BODY
         ================================================== -->
-        <div class="chat-body">
+        <AlertHistoryPanel v-if="tab === 'alerts'" class="col" />
+
+        <div v-else class="chat-body">
 
           <!-- ===============================================
                LISTA DE CONVERSAS
@@ -413,6 +426,8 @@ import { Notify } from 'quasar'
 import { tdc } from '../../services/translation'
 import { groupLabel } from '../../utils/groupLabel'
 import { getFirebase } from 'quasar_resaas'
+import { useAlertStore } from '../../stores/AlertStore'
+import AlertHistoryPanel from './AlertHistoryPanel.vue'
 
 
 // =========================================================
@@ -435,12 +450,23 @@ let messagesCallback = null
 export default defineComponent({
   name: 'NotificationChat',
 
+  components: { AlertHistoryPanel },
+
+  setup () {
+    // the request alerts / errors history (see AlertStore) - the same header
+    // Notification shows it next to the support conversations
+    return { Alerts: useAlertStore() }
+  },
+
   data () {
     return {
       tdc,
       groupLabel,
 
       open: false,
+
+      // 'alerts' (what requests told the user) | 'support' (feedback conversations)
+      tab: 'alerts',
 
       search: '',
 
@@ -487,7 +513,7 @@ export default defineComponent({
 
   computed: {
     unreadCount () {
-      return this.unreadTotal
+      return this.unreadTotal + this.Alerts.unreadCount
     },
 
     filteredFeedback () {

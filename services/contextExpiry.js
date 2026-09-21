@@ -41,10 +41,19 @@ export async function errorDetail(error) {
   return data?.detail
 }
 
+// The stable code the backend publishes for this exact condition
+// (error.code, see utils/apiContract.js). The English text below is only the
+// fallback for a backend that predates the contract.
+export const CONTEXT_EXPIRED_CODE = 'resaas_context_expired'
+
 export async function isContextExpiredError(error) {
   const status = error?.response?.status
 
   if (status !== 403 && status !== 401) return false
+
+  const data = error?.response?.data
+
+  if (data?.error?.code === CONTEXT_EXPIRED_CODE || data?.code === CONTEXT_EXPIRED_CODE) return true
 
   return (await errorDetail(error)) === CONTEXT_EXPIRED_DETAIL
 }

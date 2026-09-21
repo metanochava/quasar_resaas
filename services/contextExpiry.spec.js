@@ -52,3 +52,23 @@ describe('isContextExpiredError', () => {
     expect(await isContextExpiredError(error)).toBe(false)
   })
 })
+
+describe('isContextExpiredError - the stable code, not the text', () => {
+  it('recognises the backend code even when the message is translated', async () => {
+    const error = { response: { status: 403, data: { error: { code: 'resaas_context_expired', message: 'O contexto RESAAS expirou.' }, detail: 'RESAAS context has expired.' } } }
+
+    expect(await isContextExpiredError(error)).toBe(true)
+  })
+
+  it('recognises the code alone (no legacy detail)', async () => {
+    expect(await isContextExpiredError({ response: { status: 403, data: { error: { code: 'resaas_context_expired', message: 'x' } } } })).toBe(true)
+  })
+
+  it('another 403 is not an expired context', async () => {
+    expect(await isContextExpiredError({ response: { status: 403, data: { error: { code: 'permission_denied', message: 'No.' } } } })).toBe(false)
+  })
+
+  it('still understands an older backend (the English detail)', async () => {
+    expect(await isContextExpiredError({ response: { status: 403, data: { detail: 'RESAAS context has expired.' } } })).toBe(true)
+  })
+})

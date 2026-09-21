@@ -1,4 +1,5 @@
 
+import { errorCode, errorMessage } from '../utils/apiContract'
 import { groupLabel } from '../utils/groupLabel'
 import { getStorage, setStorage, deleteStorage } from '../services/storage'
 import { HTTPAuth, HTTPClient, url } from '../services/api'
@@ -391,8 +392,8 @@ export const useUserStore = createBaseStore(
 
         // only the expired-temporary-password answer carries a message
         // worth showing instead of the generic one
-        if (err?.response?.data?.code === 'temporary_password_expired') {
-          this.loginDetail = err.response.data.detail
+        if (errorCode(err) === 'temporary_password_expired') {
+          this.loginDetail = errorMessage(err)
         }
       })
       return rsp

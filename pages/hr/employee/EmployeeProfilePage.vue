@@ -1089,6 +1089,7 @@ import { useJobPositionStore } from '../../../stores/JobPositionStore'
 import { useJobGradeStore } from '../../../stores/JobGradeStore'
 import { useBranchStore } from '../../../stores/BranchStore'
 import { tdc } from '../../../services/translation'
+import { errorMessage } from '../../../utils/apiContract'
 import { usePageTitle } from '../../../services/pageTitle'
 import { displayValue, rawValue } from '../../../utils/display'
 import PersonProfilePanel from '../../../components/person/PersonProfilePanel.vue'
@@ -1253,7 +1254,7 @@ async function submitLeaveRequest() {
     })
     leaveDialog.value = false
   } catch (err) {
-    leaveError.value = err?.response?.data?.detail
+    leaveError.value = errorMessage(err)
       || Object.values(err?.response?.data || {})[0]?.[0]
       || tdc('Could not submit this leave request.')
   }
@@ -1305,7 +1306,7 @@ async function doStartOnboarding() {
     await Employee.startOnboarding(employee.value.id, onboardingTemplateChoice.value)
     onboardingDialog.value = false
   } catch (err) {
-    onboardingError.value = err?.response?.data?.detail || tdc('Could not start onboarding.')
+    onboardingError.value = errorMessage(err) || tdc('Could not start onboarding.')
   }
 }
 
@@ -1319,7 +1320,7 @@ async function toggleOnboardingTask(task, done) {
       await Employee.reopenOnboardingTask(employee.value.id, task.id)
     }
   } catch (err) {
-    onboardingError.value = err?.response?.data?.detail || tdc('Could not update this task.')
+    onboardingError.value = errorMessage(err) || tdc('Could not update this task.')
   }
 }
 
@@ -1329,7 +1330,7 @@ async function doCompleteOnboarding() {
   try {
     await Employee.completeOnboarding(employee.value.id, Employee.onboarding.id)
   } catch (err) {
-    onboardingError.value = err?.response?.data?.detail || tdc('Could not complete this onboarding.')
+    onboardingError.value = errorMessage(err) || tdc('Could not complete this onboarding.')
   }
 }
 
@@ -1339,7 +1340,7 @@ async function doCancelOnboarding() {
   try {
     await Employee.cancelOnboarding(employee.value.id, Employee.onboarding.id)
   } catch (err) {
-    onboardingError.value = err?.response?.data?.detail || tdc('Could not cancel this onboarding.')
+    onboardingError.value = errorMessage(err) || tdc('Could not cancel this onboarding.')
   }
 }
 
@@ -1435,7 +1436,7 @@ async function submitPromotion() {
     await Employee.applyPromotion(employee.value.id, { ...promotionForm })
     promotionDialog.value = false
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not apply this promotion.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not apply this promotion.')
   }
 }
 
@@ -1460,7 +1461,7 @@ async function submitTransfer() {
     await Employee.applyTransfer(employee.value.id, { ...transferForm })
     transferDialog.value = false
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not apply this transfer.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not apply this transfer.')
   }
 }
 
@@ -1481,7 +1482,7 @@ async function submitResignation() {
     await Employee.submitResignation(employee.value.id, { ...resignationForm })
     resignationDialog.value = false
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not submit this resignation.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not submit this resignation.')
   }
 }
 
@@ -1491,7 +1492,7 @@ async function acceptResignation(resignationId) {
   try {
     await Employee.acceptResignation(employee.value.id, resignationId)
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not accept this resignation.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not accept this resignation.')
   }
 }
 
@@ -1501,7 +1502,7 @@ async function withdrawResignation(resignationId) {
   try {
     await Employee.withdrawResignation(employee.value.id, resignationId)
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not withdraw this resignation.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not withdraw this resignation.')
   }
 }
 
@@ -1522,7 +1523,7 @@ async function submitTermination() {
     await Employee.terminateEmployee(employee.value.id, { ...terminationForm })
     terminationDialog.value = false
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not terminate this employee.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not terminate this employee.')
   }
 }
 
@@ -1533,7 +1534,7 @@ async function doStartOffboarding() {
   try {
     await Employee.startOffboarding(employee.value.id)
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not start offboarding.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not start offboarding.')
   }
 }
 
@@ -1547,7 +1548,7 @@ async function toggleOffboardingTask(task, done) {
       await Employee.reopenOffboardingTask(employee.value.id, task.id)
     }
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not update this task.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not update this task.')
   }
 }
 
@@ -1557,7 +1558,7 @@ async function doCompleteOffboarding() {
   try {
     await Employee.completeOffboarding(employee.value.id, Employee.offboarding.id)
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not complete this offboarding.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not complete this offboarding.')
   }
 }
 
@@ -1567,7 +1568,7 @@ async function doCancelOffboarding() {
   try {
     await Employee.cancelOffboarding(employee.value.id, Employee.offboarding.id)
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not cancel this offboarding.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not cancel this offboarding.')
   }
 }
 
@@ -1588,7 +1589,7 @@ async function submitDisciplinaryCase() {
     await Employee.addDisciplinaryCase(employee.value.id, { ...disciplinaryForm })
     disciplinaryDialog.value = false
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not open this case.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not open this case.')
   }
 }
 
@@ -1612,7 +1613,7 @@ async function submitDisciplinaryAction() {
     )
     disciplinaryActionDialog.value = false
   } catch (err) {
-    lifecycleError.value = err?.response?.data?.detail || tdc('Could not add this action.')
+    lifecycleError.value = errorMessage(err) || tdc('Could not add this action.')
   }
 }
 
@@ -1669,7 +1670,7 @@ async function doUpdateGoalProgress() {
     )
     goalProgressDialog.value = false
   } catch (err) {
-    goalProgressError.value = err?.response?.data?.detail || tdc('Could not update this goal.')
+    goalProgressError.value = errorMessage(err) || tdc('Could not update this goal.')
   }
 }
 
@@ -1724,7 +1725,7 @@ async function doAddCertification() {
     })
     certificationDialog.value = false
   } catch (err) {
-    certificationError.value = err?.response?.data?.detail
+    certificationError.value = errorMessage(err)
       || Object.values(err?.response?.data || {})[0]?.[0]
       || tdc('Could not add this certification.')
   }
