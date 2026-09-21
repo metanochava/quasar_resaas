@@ -99,7 +99,7 @@ export const useEntityTypeStore = createBaseStore(
           this.loadingApps = true
 
           const [all, selected] = await Promise.all([
-            HTTPClient.get(url({
+            HTTPAuth.get(url({
               type: 'u',
               // This picker needs every app to render its checkboxes,
               // not one page at a time - page_size=0 (ResaasPagination)
@@ -108,7 +108,7 @@ export const useEntityTypeStore = createBaseStore(
               url: 'django_resaas/apps/',
               params: { page_size: 0 }
             })),
-            HTTPClient.get(url({
+            HTTPAuth.get(url({
               type: 'u',
               url: `django_resaas/entitytypes/${id}/apps/`
             }))
@@ -133,7 +133,7 @@ export const useEntityTypeStore = createBaseStore(
         const exists = this.hasApp(app.id)
         const endpoint = exists ? 'removeApp' : 'addApp'
 
-        await HTTPClient.post(
+        await HTTPAuth.post(
           url({
             type: 'u',
             url: `django_resaas/entitytypes/${id}/${endpoint}/`
@@ -161,8 +161,8 @@ export const useEntityTypeStore = createBaseStore(
           this.models.loadingModels = true
 
           const [all, selected] = await Promise.all([
-            HTTPClient.get(url({ type: 'u', url: 'django_resaas/models', params: {"entitytype" : this.row?.id} })),
-            HTTPClient.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/models` }))
+            HTTPAuth.get(url({ type: 'u', url: 'django_resaas/models', params: {"entitytype" : this.row?.id} })),
+            HTTPAuth.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/models` }))
           ])
 
           this.models.models = all.data || []
@@ -211,7 +211,7 @@ export const useEntityTypeStore = createBaseStore(
           this.models.savingPermissions = true
           this.models.status = 'saving'
 
-          await HTTPClient.post(url({
+          await HTTPAuth.post(url({
             type: 'u',
             url: `django_resaas/entitytypes/${id}/syncModels/`
           }), {
@@ -237,14 +237,14 @@ export const useEntityTypeStore = createBaseStore(
           this.loadingGroups = true
 
           const [all, selected] = await Promise.all([
-            HTTPClient.get(url({
+            HTTPAuth.get(url({
               type: 'u',
               // Same as loadApps() above - this picker needs every
               // group, page_size=0 opts out of GroupAPIView's pagination.
               url: 'auth/groups/',
               params: { page_size: 0 }
             })),
-            HTTPClient.get(url({
+            HTTPAuth.get(url({
               type: 'u',
               url: `django_resaas/entitytypes/${id}/groups/`
             }))
@@ -312,7 +312,7 @@ export const useEntityTypeStore = createBaseStore(
           const cleanName = String(name || '').trim()
           if (!cleanName) return
 
-          const res = await HTTPClient.post(
+          const res = await HTTPAuth.post(
             url({
               type: 'u',
               url: `django_resaas/entitytypes/${id}/createGroup/`
@@ -342,7 +342,7 @@ export const useEntityTypeStore = createBaseStore(
       // ===============================
       async getEntityTypes() {
         try {
-          const { data } = await HTTPClient.get(
+          const { data } = await HTTPAuth.get(
             url({ type: "u", url: "django_resaas/entitytypes", params: {'objects': 'alive'} })
           )
 

@@ -270,7 +270,7 @@ export const useUserStore = createBaseStore(
         const exists = this.hasGroup(group.id)
         const endpoint = exists ? 'removeGroup' : 'addGroup'
 
-        await HTTPClient.post(
+        await HTTPAuth.post(
           url({
             type: 'u',
             url: `django_resaas/users/${id}/${endpoint}/`

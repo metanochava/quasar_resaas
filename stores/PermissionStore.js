@@ -1,5 +1,5 @@
 import { createBaseStore } from '../base/base_store'
-import { HTTPClient, url } from '../services/api'
+import { HTTPAuth, url } from '../services/api'
 
 export const usePermissionStore = createBaseStore(
   'permission',
@@ -165,7 +165,7 @@ export const usePermissionStore = createBaseStore(
             )
           ]
 
-          await HTTPClient.post(
+          await HTTPAuth.post(
             url({
               type: 'u',
               url: 'auth/permissions/setGroupPermissions/'
