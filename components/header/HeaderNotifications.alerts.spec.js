@@ -93,4 +93,30 @@ describe('the header Notification shows the request alerts', () => {
 
     expect(wrapper.find('.q-badge').exists()).toBe(false)
   })
+
+  it('the tabs are centred and use the whole width of the dialog', async () => {
+    Alerts.add({ level: 'error', message: 'One.' })
+    const wrapper = mountHeader()
+    await wrapper.find('.q-btn').trigger('click')
+    await flushPromises()
+
+    const tabs = inBody('[data-test="notification-tabs"]')
+    expect(tabs.className).toContain('q-tabs--dense')
+    // "justify" = every tab takes an equal share of the full width
+    expect(tabs.querySelector('.q-tabs__content').className).toContain('q-tabs__content--align-justify')
+    // the sub-header itself has no padding, so the tabs run edge to edge
+    expect(inBody('[data-test="modal-subheader"]').className).toContain('s-modal-card__subheader--flush')
+    expect(tabs.querySelectorAll('.q-tab')).toHaveLength(2)
+  })
+
+  it('each tab shows its own unread count next to the label', async () => {
+    Alerts.add({ level: 'error', message: 'One.' })
+    Alerts.add({ level: 'info', message: 'Two.' })
+    const wrapper = mountHeader()
+    await wrapper.find('.q-btn').trigger('click')
+    await flushPromises()
+
+    expect(inBody('[data-test="tab-alerts-badge"]').textContent.trim()).toBe('2')
+    expect(inBody('[data-test="tab-support-badge"]')).toBeNull()
+  })
 })

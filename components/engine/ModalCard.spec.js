@@ -86,4 +86,15 @@ describe('ModalCard', () => {
     await wrapper.find('form').trigger('submit')
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
+
+  it('a sub-header is static, and can run edge to edge (tabs)', () => {
+    const plain = open({}, { subheader: () => h('span', 'tabs') })
+    expect(plain.find('[data-test="modal-subheader"]').classes()).not.toContain('s-modal-card__subheader--flush')
+
+    const flush = open({ subheaderFlush: true }, { subheader: () => h('span', 'tabs') })
+    expect(flush.find('[data-test="modal-subheader"]').classes()).toContain('s-modal-card__subheader--flush')
+
+    const body = flush.find('[data-test="modal-body"]').element
+    expect(body.contains(flush.find('[data-test="modal-subheader"]').element)).toBe(false)
+  })
 })

@@ -43,7 +43,9 @@ const props = defineProps({
   flush: { type: Boolean, default: false },
   // the footer slot lays itself out (e.g. an ActionForm bar) instead of the
   // default right-aligned row of buttons
-  footerRaw: { type: Boolean, default: false }
+  footerRaw: { type: Boolean, default: false },
+  // the sub-header (tabs, a full-width toolbar) runs edge to edge, without padding
+  subheaderFlush: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['close', 'submit'])
@@ -85,7 +87,7 @@ const cardStyle = computed(() => props.fullscreen
     </q-bar>
 
     <!-- static sub-header (search, filters, tabs): sits under the bar, never scrolls -->
-    <div v-if="$slots.subheader" class="s-modal-card__subheader" data-test="modal-subheader">
+    <div v-if="$slots.subheader" class="s-modal-card__subheader" :class="{ 's-modal-card__subheader--flush': subheaderFlush }" data-test="modal-subheader">
       <slot name="subheader" />
     </div>
 
@@ -112,6 +114,7 @@ const cardStyle = computed(() => props.fullscreen
 .s-modal-card__subheader { flex: 0 0 auto; }
 
 .s-modal-card__subheader { padding: 8px 16px; }
+.s-modal-card__subheader--flush { padding: 0; }
 
 .s-modal-card__content {
   flex: 1 1 auto;

@@ -42,6 +42,7 @@
       <s-modal-card
         width="min(1100px, 95vw)"
         flush
+        subheader-flush
         class="notification-chat"
         :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-grey-1'"
       >
@@ -54,12 +55,29 @@
         </template>
 
         <template #subheader>
-          <q-tabs v-model="tab" dense align="left" class="notification-tabs" data-test="notification-tabs">
-            <q-tab name="alerts" icon="notifications" :label="tdc('Alerts')" no-caps data-test="tab-alerts">
-              <q-badge v-if="Alerts.unreadCount" color="red" floating rounded>{{ Alerts.unreadCount }}</q-badge>
+          <!-- full width, centred: each tab takes half of the dialog -->
+          <q-tabs
+            v-model="tab"
+            dense
+            align="justify"
+            inline-label
+            no-caps
+            active-color="primary"
+            indicator-color="primary"
+            class="notification-tabs"
+            :class="$q.dark.isActive ? 'bg-dark text-grey-4' : 'bg-white text-grey-8'"
+            data-test="notification-tabs"
+          >
+            <q-tab name="alerts" icon="notifications" :label="tdc('Alerts')" class="notification-tab" data-test="tab-alerts">
+              <q-badge v-if="Alerts.unreadCount" color="red" rounded class="q-ml-sm" data-test="tab-alerts-badge">
+                {{ Alerts.unreadCount > 99 ? '99+' : Alerts.unreadCount }}
+              </q-badge>
             </q-tab>
-            <q-tab name="support" icon="support_agent" :label="tdc('Support & Feedback')" no-caps data-test="tab-support">
-              <q-badge v-if="unreadTotal" color="red" floating rounded>{{ unreadTotal }}</q-badge>
+
+            <q-tab name="support" icon="support_agent" :label="tdc('Support & Feedback')" class="notification-tab" data-test="tab-support">
+              <q-badge v-if="unreadTotal" color="red" rounded class="q-ml-sm" data-test="tab-support-badge">
+                {{ unreadTotal > 99 ? '99+' : unreadTotal }}
+              </q-badge>
             </q-tab>
           </q-tabs>
         </template>
@@ -1332,6 +1350,18 @@ export default defineComponent({
 /* =========================================================
    LAYOUT
 ========================================================= */
+
+/* the tabs: edge to edge, each one centred and taking half of the width */
+.notification-tabs {
+  width: 100%;
+  border-bottom: 1px solid rgba(120, 120, 120, 0.2);
+}
+
+.notification-tab {
+  min-height: 48px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
 
 /* fixed height: the header (q-bar) and the message input stay put, the lists scroll */
 .notification-chat {
