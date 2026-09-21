@@ -87,85 +87,79 @@ function done() {
 
 <template>
   <q-dialog :model-value="modelValue" persistent @update:model-value="value => !value && close()">
-    <s-card class="two-factor-dialog">
-      <q-card-section class="row items-center">
-        <div class="text-h6 col">{{ tdc('Set up two-factor authentication') }}</div>
-        <s-btn
-          v-if="!persistent && step === 'scan'"
-          flat round dense icon="close" :aria-label="tdc('Close')" data-test="setup-close" @click="close"
-        />
-      </q-card-section>
-
+    <s-modal-card
+      :title="tdc('Set up two-factor authentication')"
+      icon="phonelink_lock"
+      :closable="!persistent && step === 'scan'"
+      form
+      @close="close"
+      @submit="submit"
+    >
       <template v-if="step === 'scan'">
-        <q-card-section v-if="starting" class="text-center"><q-spinner size="32px" /></q-card-section>
+        <div v-if="starting" class="text-center"><q-spinner size="32px" /></div>
 
-        <q-card-section v-else-if="failed" class="text-center">
+        <div v-else-if="failed" class="text-center">
           <div class="text-negative q-mb-sm">{{ tdc('Could not start the setup.') }}</div>
-          <s-btn outline no-caps :label="tdc('Try again')" data-test="setup-retry" @click="start" />
-        </q-card-section>
+          <s-btn outline no-caps :label="tdc('Try again')" data-test="setup-retry" @click.prevent="start" />
+        </div>
 
-        <q-form v-else-if="setup" @submit.prevent="submit">
-          <q-card-section class="column q-gutter-y-md">
-            <div class="text-body2">
-              {{ tdc('Scan this QR code with an authenticator app, then enter the 6-digit code it shows.') }}
+        <div v-else-if="setup" class="column q-gutter-y-md">
+          <div class="text-body2">
+            {{ tdc('Scan this QR code with an authenticator app, then enter the 6-digit code it shows.') }}
+          </div>
+
+          <div class="text-center">
+            <img :src="setup.qr" :alt="tdc('QR code')" class="qr" data-test="setup-qr">
+          </div>
+
+          <div>
+            <div class="text-caption text-grey-7">{{ tdc('Or enter this key manually') }}</div>
+            <code class="manual-key" data-test="setup-secret">{{ setup.secret }}</code>
+            <div class="q-mt-xs">
+              <a :href="setup.otpauth_uri" class="text-caption" data-test="setup-link">{{ tdc('Open in authenticator app') }}</a>
             </div>
+          </div>
 
-            <div class="text-center">
-              <img :src="setup.qr" :alt="tdc('QR code')" class="qr" data-test="setup-qr">
-            </div>
-
-            <div>
-              <div class="text-caption text-grey-7">{{ tdc('Or enter this key manually') }}</div>
-              <code class="manual-key" data-test="setup-secret">{{ setup.secret }}</code>
-              <div class="q-mt-xs">
-                <a :href="setup.otpauth_uri" class="text-caption" data-test="setup-link">{{ tdc('Open in authenticator app') }}</a>
-              </div>
-            </div>
-
-            <s-input
-              v-model="code"
-              dense
-              outlined
-              inputmode="numeric"
-              autocomplete="one-time-code"
-              maxlength="7"
-              :label="tdc('Authentication code')"
-              data-test="setup-code"
-            />
-          </q-card-section>
-
-          <q-card-actions align="right" class="q-px-md q-pb-md">
-            <s-btn
-              type="submit"
-              unelevated
-              no-caps
-              color="primary"
-              :label="tdc('Verify and enable')"
-              :loading="confirming"
-              :disable="!validCode"
-              data-test="setup-submit"
-            />
-          </q-card-actions>
-        </q-form>
+          <s-input
+            v-model="code"
+            dense
+            outlined
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="7"
+            :label="tdc('Authentication code')"
+            data-test="setup-code"
+          />
+        </div>
       </template>
 
       <template v-else>
-        <q-card-section>
-          <div class="text-body2 q-mb-md">{{ tdc('Two-factor authentication is now enabled.') }}</div>
-          <RecoveryCodes :codes="codes" />
-          <q-checkbox v-model="saved" class="q-mt-md" :label="tdc('I have saved my recovery codes')" data-test="codes-saved" />
-        </q-card-section>
-
-        <q-card-actions align="right" class="q-px-md q-pb-md">
-          <s-btn unelevated no-caps color="primary" :label="tdc('Done')" :disable="!saved" data-test="setup-done" @click="done" />
-        </q-card-actions>
+        <div class="text-body2 q-mb-md">{{ tdc('Two-factor authentication is now enabled.') }}</div>
+        <RecoveryCodes :codes="codes" />
+        <q-checkbox v-model="saved" class="q-mt-md" :label="tdc('I have saved my recovery codes')" data-test="codes-saved" />
       </template>
-    </s-card>
+
+      <template v-if="step === 'scan' && setup && !starting" #footer>
+        <s-btn
+          type="submit"
+          unelevated
+          no-caps
+          color="primary"
+          :label="tdc('Verify and enable')"
+          :loading="confirming"
+          :disable="!validCode"
+          data-test="setup-submit"
+        />
+      </template>
+
+      <template v-else-if="step === 'codes'" #footer>
+        <s-btn type="button" unelevated no-caps color="primary" :label="tdc('Done')" :disable="!saved" data-test="setup-done" @click="done" />
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>
 
 <style scoped>
-.two-factor-dialog { width: 460px; max-width: 94vw; max-height: 94vh; overflow-y: auto; }
 .qr { width: 200px; height: 200px; background: #fff; padding: 8px; border-radius: 8px; }
 .manual-key { display: block; word-break: break-all; font-size: 14px; letter-spacing: .06em; user-select: all; }
 </style>

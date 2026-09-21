@@ -1,22 +1,5 @@
 <template>
-  <s-card flat bordered class="q-pa-sm generator-panel">
-
-    <q-card-section class="row items-center" dense>
-      <div class="text-h6">⚡ {{ tdc('Model Generator') }}</div>
-      <q-space />
-      <s-btn flat icon="visibility" :label="tdc('Generate Preview')" @click="generatePreview" />
-      <s-btn
-        color="primary" icon="save" :label="tdc('Apply Changes')"
-        :loading="applying"
-        :disable="!preview.model"
-        @click="submit"
-      />
-      <s-btn flat round dense icon="close" @click="$emit('close')" />
-    </q-card-section>
-
-    <q-separator />
-
-    <q-card-section>
+  <s-modal-card :title="`⚡ ${tdc('Model Generator')}`" icon="build" fullscreen @close="$emit('close')">
       <div class="row q-col-gutter-md">
         <div class="col-12 col-md-3">
           <s-select
@@ -64,9 +47,6 @@
           <s-btn class="full-width" color="secondary" icon="refresh" :label="tdc('Reload Model')" @click="reloadModelShema" />
         </div>
       </div>
-    </q-card-section>
-
-    <q-card-section>
       <div class="row q-col-gutter-md">
 
         <!-- ================= FIELDS ================= -->
@@ -285,9 +265,17 @@
           </div>
         </div>
       </div>
-    </q-card-section>
 
-  </s-card>
+    <template #footer>
+      <s-btn flat icon="visibility" :label="tdc('Generate Preview')" @click="generatePreview" />
+      <s-btn
+        color="primary" icon="save" :label="tdc('Apply Changes')"
+        :loading="applying"
+        :disable="!preview.model"
+        @click="submit"
+      />
+    </template>
+  </s-modal-card>
 </template>
 
 <script>

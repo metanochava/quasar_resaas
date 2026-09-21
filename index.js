@@ -92,6 +92,7 @@ export * from './services/storage.js'
 
 // Translation
 export * from './services/translation.js'
+export { sDialog } from './services/dialog.js'
 
 // Theme (compat: setSettings) + utilitários organizados em ../theme/
 export * from './services/theme.js'

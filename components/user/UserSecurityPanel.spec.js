@@ -15,6 +15,7 @@ import UserSecurityPanel from './UserSecurityPanel.vue'
 import BtnComponent from '../engine/BtnComponent.vue'
 import CardComponent from '../engine/CardComponent.vue'
 import TooltipComponent from '../engine/TooltipComponent.vue'
+import ModalCard from '../engine/ModalCard.vue'
 import { useUserAdminStore } from '../../stores/UserAdminStore'
 import { useUserStore } from '../../stores/UserStore'
 
@@ -35,7 +36,7 @@ function mountPanel(props = {}) {
     props: { userId: 'u1', username: 'joao.manuel', ...props },
     global: {
       plugins: [[Quasar, { plugins: { Dialog } }], pinia],
-      components: { 's-btn': BtnComponent, 's-card': CardComponent, 's-tooltip': TooltipComponent }
+      components: { 's-btn': BtnComponent, 's-card': CardComponent, 's-tooltip': TooltipComponent, 's-modal-card': ModalCard }
     },
     attachTo: document.body
   })
@@ -147,7 +148,7 @@ describe('UserSecurityPanel - viewing', () => {
 
     expect(admin.viewTemporaryPassword).toHaveBeenCalledWith('u1')
     expect(inBody('[data-test="revealed-password"]').textContent).toBe(SECRET)
-    expect(inBody('.reveal-card').textContent).toContain('This is a sensitive credential.')
+    expect(inBody('[data-test="modal-card"]').textContent).toContain('This is a sensitive credential.')
     // never on the page itself, never in the store
     expect(wrapper.text()).not.toContain(SECRET)
     expect(JSON.stringify(admin.$state)).not.toContain(SECRET)

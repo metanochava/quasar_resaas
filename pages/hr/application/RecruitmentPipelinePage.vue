@@ -139,12 +139,8 @@
 
     <!-- SCHEDULE INTERVIEW DIALOG -->
     <q-dialog v-model="interviewDialog">
-      <s-card style="width: min(420px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('Schedule interview') }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section class="q-gutter-md">
+      <s-modal-card :title="tdc('Schedule interview')" width="420px">
+        <div class="q-gutter-md">
           <q-input
             v-model="interviewForm.scheduledAt"
             type="datetime-local"
@@ -178,8 +174,10 @@
             dense
             :label="tdc('Notes')"
           />
-        </q-card-section>
-        <q-card-actions align="right">
+
+        </div>
+
+        <template #footer>
           <s-btn flat no-caps :label="tdc('Cancel')" v-close-popup />
           <s-btn
             color="primary"
@@ -188,20 +186,20 @@
             :loading="Application.workflowLoading"
             @click="confirmScheduleInterview"
           />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- HIRE CONFIRMATION DIALOG -->
     <q-dialog v-model="hireDialog">
-      <s-card style="width: min(420px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('Hire this candidate?') }}</div>
-          <div class="text-caption text-grey-7 q-mt-sm">
-            {{ tdc('This creates a real Employee record and cannot be undone from here.') }}
-          </div>
-        </q-card-section>
-        <q-card-actions align="right">
+      <s-modal-card :title="tdc('Hire this candidate?')" width="420px">
+        <div class="text-caption text-grey-7 q-mt-sm">
+          {{ tdc('This creates a real Employee record and cannot be undone from here.') }}
+        </div>
+
+
+        <template #footer>
           <s-btn flat no-caps :label="tdc('Cancel')" v-close-popup />
           <s-btn
             color="positive"
@@ -210,8 +208,9 @@
             :loading="Application.workflowLoading"
             @click="confirmHire"
           />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
   </q-page>
 </template>

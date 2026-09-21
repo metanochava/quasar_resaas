@@ -1,23 +1,10 @@
 <template>
-  <s-card class="column full-height">
-    <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-      <q-icon name="forum" size="22px" />
-      <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        {{ tdc('Notification Preferences') }}
-      </div>
-      <q-space />
-      <s-btn dense flat icon="close" v-close-popup>
-        <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-      </s-btn>
-    </q-bar>
-
-    <q-separator />
-
+  <s-modal-card :title="tdc('Notification Preferences')" icon="forum" width="min(900px, 95vw)">
     <div v-if="loading" class="flex flex-center q-pa-xl">
       <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
 
-    <q-card-section v-else class="col scroll">
+    <div v-else>
       <div class="text-caption text-grey q-mb-md">
         {{ tdc('A channel is allowed by default until explicitly turned off here - except Marketing, which is opt-in only.') }}
       </div>
@@ -43,8 +30,8 @@
           </tr>
         </tbody>
       </table>
-    </q-card-section>
-  </s-card>
+    </div>
+  </s-modal-card>
 </template>
 
 <script setup>

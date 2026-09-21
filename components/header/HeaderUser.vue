@@ -7,16 +7,8 @@
 
     <!-- CONFIRMAÇÃO DE LOGOUT -->
     <q-dialog v-model="pergunta" persistent>
-      <s-card class="logout-card" flat>
-        <q-card-section class="text-center">
-          <div class="text-h6 text-grey-9 dialog-title">
-            {{ tdc('Which one do you want to log out of') }}
-          </div>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions vertical class="q-pa-sm">
+      <s-modal-card :title="tdc('Which one do you want to log out of')" icon="logout" width="380px">
+        <div class="column q-gutter-y-sm">
           <s-btn
             v-if="User.Entity"
             flat
@@ -40,20 +32,17 @@
               {{ tdc(User.EntityType?.name) }}
             </span>
           </s-btn>
-        </q-card-actions>
+        </div>
 
-        <q-separator />
-
-        <q-card-actions>
+        <template #footer>
           <s-btn
             flat
             color="grey"
-            class="full-width"
             :label="tdc('Cancel')"
             v-close-popup
           />
-        </q-card-actions>
-      </s-card>
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- BOTÃO DO UTILIZADOR -->
@@ -437,17 +426,6 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.logout-card {
-  width: min(400px, calc(100vw - 24px));
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-.dialog-title {
-  max-width: 100%;
-  overflow-wrap: anywhere;
 }
 
 .user-menu-card {

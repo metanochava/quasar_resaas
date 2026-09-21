@@ -1,52 +1,29 @@
 <template>
   <q-dialog v-model="dialog" full-width full-height>
-    <s-card
-      class="column no-wrap"
-      style="height: 100vh;"
-    >
-
-      <!-- FIXED HEADER -->
-      <q-bar v-show="top"
-        class="pdf-header"
-        :class="$q.dark.isActive
-          ? 'bg-dark text-white'
-          : 'bg-primary text-white'"
-      >
-        <div class="text-subtitle1">
-          {{ title || 'Preview PDF' }}
-        </div>
-
-        <q-space />
-
+    <s-modal-card :title="title || tdc('Preview PDF')" icon="picture_as_pdf" fullscreen flush @close="dialog = false">
+      <template #bar-actions>
         <!-- DOWNLOAD -->
         <s-btn
           v-if="pdfUrl"
           dense
           flat
+          round
           icon="download"
           @click="downloadPdf"
         >
           <s-tooltip>{{ tdc('Download') }}</s-tooltip>
-
         </s-btn>
-
-        <!-- CLOSE -->
-        <s-btn dense flat icon="close" @click="dialog = false" />
-      </q-bar>
+      </template>
 
       <!-- BODY -->
-      <q-card-section
-        class="col q-pa-none"
-        style="min-height: 0;"
-      >
+      <div class="col" style="min-height: 0;">
         <iframe
           v-if="pdfUrl"
           :src="pdfUrl"
           class="pdf-frame"
         />
-      </q-card-section>
-
-    </s-card>
+      </div>
+    </s-modal-card>
   </q-dialog>
 </template>
 
@@ -97,12 +74,6 @@ iframe {
 
 body.body--dark iframe {
   background: #1e1e1e;
-}
-
-.pdf-header {
-  flex: 0 0 auto;
-  position: relative;
-  z-index: 10;
 }
 
 .pdf-frame {

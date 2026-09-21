@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { Dialog } from 'quasar'
 import { tdc } from '../../services/translation'
 import { HTTPAuth, url } from '../../services/api'
+import { sDialog } from '../../services/dialog'
 
 // Quais EntityTypes têm esta App activa + possibilidade de adicionar -
 // mesma relação/idioma já usado do lado inverso por
@@ -61,7 +61,7 @@ async function addEntityType(entityType) {
 }
 
 function confirmRemoveEntityType(entityType) {
-  Dialog.create({
+  sDialog({
     title: tdc('Confirm'),
     message: tdc('Remove this entity type from "{name}"?').replace('{name}', props.appName),
     cancel: true,
@@ -93,21 +93,8 @@ watch(() => [props.modelValue, props.appId], ([open]) => {
     :model-value="modelValue"
     @update:model-value="v => emit('update:modelValue', v)"
   >
-    <s-card class="et-dialog-card">
-      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-        <q-icon name="category" class="q-mr-sm" />
-        <div class="text-subtitle1 text-weight-bold">
-          {{ tdc('Entity Types') }} — {{ appName }}
-        </div>
-        <q-space />
-        <s-btn dense flat round icon="close" v-close-popup>
-          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-        </s-btn>
-      </q-bar>
-
-      <q-separator />
-
-      <q-card-section class="q-pb-sm">
+    <s-modal-card :title="`${tdc('Entity Types')} — ${appName}`" icon="category" width="480px">
+      <template #subheader>
         <s-select
           v-model="pickerValue"
           :api="entityTypesUrl"
@@ -117,45 +104,31 @@ watch(() => [props.modelValue, props.appId], ([open]) => {
           :loading="adding"
           @update:model-value="addEntityType"
         />
-      </q-card-section>
+      </template>
 
-      <q-card-section class="et-dialog-body">
-        <div v-if="loading" class="flex flex-center q-pa-xl">
-          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
-        </div>
+      <div v-if="loading" class="flex flex-center q-pa-xl">
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
+      </div>
 
-        <q-list v-else-if="linked.length" separator bordered>
-          <q-item v-for="et in linked" :key="et.id">
-            <q-item-section avatar>
-              <q-avatar color="primary" text-color="white" icon="category" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="text-weight-medium">{{ et.name }}</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <s-btn flat round dense icon="close" color="negative" @click="confirmRemoveEntityType(et)">
-                <s-tooltip>{{ tdc('Remove') }}</s-tooltip>
-              </s-btn>
-            </q-item-section>
-          </q-item>
-        </q-list>
+      <q-list v-else-if="linked.length" separator bordered>
+        <q-item v-for="et in linked" :key="et.id">
+          <q-item-section avatar>
+            <q-avatar color="primary" text-color="white" icon="category" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-weight-medium">{{ et.name }}</q-item-label>
+          </q-item-section>
+          <q-item-section side>
+            <s-btn flat round dense icon="close" color="negative" @click="confirmRemoveEntityType(et)">
+              <s-tooltip>{{ tdc('Remove') }}</s-tooltip>
+            </s-btn>
+          </q-item-section>
+        </q-item>
+      </q-list>
 
-        <div v-else class="text-center text-grey q-pa-md">
-          {{ tdc('No entity type has this module active yet') }}
-        </div>
-      </q-card-section>
-    </s-card>
+      <div v-else class="text-center text-grey q-pa-md">
+        {{ tdc('No entity type has this module active yet') }}
+      </div>
+    </s-modal-card>
   </q-dialog>
 </template>
-
-<style scoped>
-.et-dialog-card {
-  width: min(480px, 92vw);
-  max-height: 80vh;
-}
-
-.et-dialog-body {
-  max-height: calc(80vh - 130px);
-  overflow-y: auto;
-}
-</style>

@@ -11,7 +11,7 @@
 
     <!-- entity-wide layout/branding (Theme Studio) -->
     <q-dialog v-model="User.ThemeStudio" full-width full-height>
-      <s-card class="q-pa-md">
+      <s-modal-card :title="tdc('Theme Management')" icon="palette" fullscreen>
         <ThemeStudioEngine
           v-model:scope="themeStudioScope"
           allow-scope-select
@@ -25,25 +25,13 @@
           :layouts="LayoutSetting.rows"
           @saved="Entity.getLayoutSettings(User.Entity?.id)"
         />
-      </s-card>
+      </s-modal-card>
     </q-dialog>
 
     <q-dialog v-model="api_retorno_modal" full-width full-height>
-      <s-card>
-        <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
-          <q-toolbar-title>
-            <span class="text-weight-bold">API</span>
-          </q-toolbar-title>
-          <q-space />
-          <s-btn dense flat icon="close" v-close-popup />
-        </q-bar>
-
-        <q-separator />
-
-        <q-card-section class="scroll">
-          <!-- <ApiRetorno /> -->
-        </q-card-section>
-      </s-card>
+      <s-modal-card title="API" icon="api" fullscreen>
+        <!-- <ApiRetorno /> -->
+      </s-modal-card>
     </q-dialog>
 
     <!-- -------------------- HEADER -------------------- -->
@@ -189,6 +177,7 @@ import Rodape from '../components/footer/MainFooter.vue'
 
 import { defineComponent } from 'vue'
 import { barStyle, thumbStyle } from '../services/app'
+import { tdc } from '../services/translation'
 import { surfaceToStyle, surfaceOverlayStyle } from '../theme/surfaceToStyle'
 import UserPermissioes from '../components/UserPermissioes.vue'
 import PagePermissoes from '../components/PagePermissoes.vue'
@@ -226,7 +215,8 @@ export default defineComponent({
       Theme,
       LayoutSetting,
       barStyle,
-      thumbStyle
+      thumbStyle,
+      tdc
     }
   },
 

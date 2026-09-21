@@ -6,6 +6,7 @@ import { useUserStore } from '../../stores/UserStore'
 import { tdc } from '../../services/translation'
 import { groupLabel } from '../../utils/groupLabel'
 import { Alert, AlertSuccess } from '../../boot/alerts'
+import { sDialog } from '../../services/dialog'
 
 // The profiles (Groups) a user has in the CURRENT Entity - list, assign
 // (modal) and remove (with confirmation). Reused as-is by any page that
@@ -68,7 +69,7 @@ async function assign(group) {
 
 // ---------------- remove (confirmation) ----------------
 function confirmRemove(group) {
-  $q.dialog({
+  sDialog({
     title: tdc('Remove profile'),
     message: `${tdc('Remove the profile')} "${groupLabel(group)}" ${tdc('from')} ${props.subjectName || tdc('this user')}?`
       + (entityName.value ? ` (${entityName.value})` : ''),
@@ -173,70 +174,61 @@ function confirmRemove(group) {
 
     <!-- assign modal (stays inside the page) -->
     <q-dialog v-model="dialogOpen">
-      <s-card class="assign-card column no-wrap">
-        <q-card-section class="row items-center q-pb-none">
-          <div class="col">
-            <div class="text-h6">{{ tdc('Assign profile') }}</div>
-            <div v-if="subjectName" class="text-caption text-grey-7">
-              <q-icon name="person" size="16px" /> {{ subjectName }}
-              <template v-if="entityName"> · <q-icon name="business" size="16px" /> {{ entityName }}</template>
-            </div>
-          </div>
-          <s-btn flat round dense icon="close" data-test="assign-close" @click="dialogOpen = false" />
-        </q-card-section>
+      <s-modal-card :title="tdc('Assign profile')" icon="groups" width="520px" @close="dialogOpen = false">
+        <div v-if="subjectName" class="text-caption text-grey-7 q-mb-sm">
+          <q-icon name="person" size="16px" /> {{ subjectName }}
+          <template v-if="entityName"> · <q-icon name="business" size="16px" /> {{ entityName }}</template>
+        </div>
 
-        <q-card-section class="q-pb-none">
-          <s-input
-            v-model="search"
-            dense
-            outlined
-            clearable
-            type="search"
-            :placeholder="tdc('Search profile')"
-            data-test="assign-search"
-          />
-        </q-card-section>
+        <s-input
+          v-model="search"
+          dense
+          outlined
+          clearable
+          type="search"
+          :placeholder="tdc('Search profile')"
+          class="q-mb-md"
+          data-test="assign-search"
+        />
 
-        <q-card-section class="col scroll">
-          <div v-if="loadingAvailable" class="state-box" data-test="assign-loading">
-            <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="28px" />
-          </div>
+        <div v-if="loadingAvailable" class="state-box" data-test="assign-loading">
+          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="28px" />
+        </div>
 
-          <div v-else-if="availableFailed" class="state-box" data-test="assign-error">
-            <div class="text-subtitle2">{{ tdc('Could not load the profiles.') }}</div>
-            <s-btn flat dense color="primary" icon="refresh" :label="tdc('Try again')" @click="loadAvailable" />
-          </div>
+        <div v-else-if="availableFailed" class="state-box" data-test="assign-error">
+          <div class="text-subtitle2">{{ tdc('Could not load the profiles.') }}</div>
+          <s-btn flat dense color="primary" icon="refresh" :label="tdc('Try again')" @click="loadAvailable" />
+        </div>
 
-          <div v-else-if="!filteredAvailable.length" class="state-box" data-test="assign-empty">
-            <div class="text-subtitle2">{{ tdc('No results found') }}</div>
-          </div>
+        <div v-else-if="!filteredAvailable.length" class="state-box" data-test="assign-empty">
+          <div class="text-subtitle2">{{ tdc('No results found') }}</div>
+        </div>
 
-          <q-list v-else separator>
-            <q-item v-for="group in filteredAvailable" :key="group.id" data-test="assign-row">
-              <q-item-section avatar>
-                <q-icon :name="isAssigned(group) ? 'check_circle' : 'radio_button_unchecked'" :color="isAssigned(group) ? 'positive' : 'grey-6'" />
-              </q-item-section>
+        <q-list v-else separator>
+          <q-item v-for="group in filteredAvailable" :key="group.id" data-test="assign-row">
+            <q-item-section avatar>
+              <q-icon :name="isAssigned(group) ? 'check_circle' : 'radio_button_unchecked'" :color="isAssigned(group) ? 'positive' : 'grey-6'" />
+            </q-item-section>
 
-              <q-item-section>
-                <q-item-label>{{ groupLabel(group) }}</q-item-label>
-                <q-item-label v-if="isAssigned(group)" caption>{{ tdc('Already assigned') }}</q-item-label>
-              </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ groupLabel(group) }}</q-item-label>
+              <q-item-label v-if="isAssigned(group)" caption>{{ tdc('Already assigned') }}</q-item-label>
+            </q-item-section>
 
-              <q-item-section side>
-                <s-btn
-                  v-if="!isAssigned(group)"
-                  unelevated dense no-caps
-                  color="primary"
-                  :label="tdc('Assign')"
-                  :loading="isBusy(group)"
-                  data-test="assign-btn"
-                  @click="assign(group)"
-                />
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-card-section>
-      </s-card>
+            <q-item-section side>
+              <s-btn
+                v-if="!isAssigned(group)"
+                unelevated dense no-caps
+                color="primary"
+                :label="tdc('Assign')"
+                :loading="isBusy(group)"
+                data-test="assign-btn"
+                @click="assign(group)"
+              />
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </s-modal-card>
     </q-dialog>
   </div>
 </template>
@@ -251,5 +243,4 @@ function confirmRemove(group) {
   text-align: center;
   opacity: .8;
 }
-.assign-card { width: 520px; max-width: 94vw; max-height: 80vh; }
 </style>

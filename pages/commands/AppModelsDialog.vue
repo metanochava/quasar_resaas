@@ -51,56 +51,29 @@ watch(() => [props.modelValue, props.appName], ([open]) => {
     :model-value="modelValue"
     @update:model-value="v => emit('update:modelValue', v)"
   >
-    <s-card class="models-dialog-card">
-      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-        <q-icon name="view_module" class="q-mr-sm" />
-        <div class="text-subtitle1 text-weight-bold">
-          {{ tdc('Models') }} — {{ appName }}
-        </div>
-        <q-space />
-        <s-btn dense flat round icon="close" v-close-popup>
-          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-        </s-btn>
-      </q-bar>
+    <s-modal-card :title="`${tdc('Models')} — ${appName}`" icon="view_module" width="480px">
+      <div v-if="loading" class="flex flex-center q-pa-xl">
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
+      </div>
 
-      <q-separator />
+      <div v-else-if="error" class="text-negative text-center q-pa-md">
+        {{ error }}
+      </div>
 
-      <q-card-section class="models-dialog-body">
-        <div v-if="loading" class="flex flex-center q-pa-xl">
-          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
-        </div>
+      <q-list v-else-if="models.length" separator bordered>
+        <q-item v-for="m in models" :key="m">
+          <q-item-section avatar>
+            <q-avatar color="grey-4" text-color="dark" icon="table_chart" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-weight-medium">{{ m }}</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
 
-        <div v-else-if="error" class="text-negative text-center q-pa-md">
-          {{ error }}
-        </div>
-
-        <q-list v-else-if="models.length" separator bordered>
-          <q-item v-for="m in models" :key="m">
-            <q-item-section avatar>
-              <q-avatar color="grey-4" text-color="dark" icon="table_chart" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label class="text-weight-medium">{{ m }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-
-        <div v-else class="text-center text-grey q-pa-md">
-          {{ tdc('No models found for this module') }}
-        </div>
-      </q-card-section>
-    </s-card>
+      <div v-else class="text-center text-grey q-pa-md">
+        {{ tdc('No models found for this module') }}
+      </div>
+    </s-modal-card>
   </q-dialog>
 </template>
-
-<style scoped>
-.models-dialog-card {
-  width: min(480px, 92vw);
-  max-height: 80vh;
-}
-
-.models-dialog-body {
-  max-height: calc(80vh - 50px);
-  overflow-y: auto;
-}
-</style>

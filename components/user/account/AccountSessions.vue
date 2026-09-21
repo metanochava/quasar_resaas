@@ -5,6 +5,7 @@ import { useQuasar } from 'quasar'
 import { useAccountSessions } from '../../../composables/useAccountSessions'
 import { tdc } from '../../../services/translation'
 import { Alert, AlertSuccess } from '../../../boot/alerts'
+import { sDialog } from '../../../services/dialog'
 
 // Where the account is signed in. The backend lists the sessions whose refresh
 // token is still valid; ending one blacklists it. The current session cannot be
@@ -26,7 +27,7 @@ const iconFor = (device) => {
 const canEndOthers = computed(() => others.value.length > 0)
 
 function confirmEnd(session) {
-  $q.dialog({
+  sDialog({
     title: tdc('End session'),
     message: `${tdc('End the session on')} ${session.device || tdc('Unknown device')}?`,
     persistent: true,
@@ -44,7 +45,7 @@ function confirmEnd(session) {
 }
 
 function confirmEndOthers() {
-  $q.dialog({
+  sDialog({
     title: tdc('End all other sessions'),
     message: tdc('You will be signed out everywhere except on this device. Continue?'),
     persistent: true,

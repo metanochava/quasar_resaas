@@ -6,6 +6,7 @@ import { useUserStore } from './UserStore'
 import { profileSplint } from '../utils/profile'
 import { tdc } from '../services/translation'
 import { getStorage, setStorage } from '../services/storage'
+import { sDialog } from '../services/dialog'
 
 export const useEntityStore = createBaseStore(
   'entity',
@@ -697,7 +698,7 @@ export const useEntityStore = createBaseStore(
                 })
               )
 
-            q.dialog({
+            sDialog({
               title:
                 tdc(
                   'Select the Entity'

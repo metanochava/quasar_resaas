@@ -2,52 +2,24 @@
 
   <q-dialog v-model="dialog">
 
-    <q-card style="min-width:700px">
-
-      <!-- HEADER -->
-      <q-card-section :class="[$q.dark.isActive ? 'bg-dark ' : 'bg-transparent  ', 'row items-center' ]  ">
-
-        <div class="text-h6">
-
-          New Person
-
-        </div>
-
-        <q-space />
-
-        <s-btn
-          flat
-          round
-          dense
-          icon="close"
-          v-close-popup
-        />
-
-      </q-card-section>
-
-      <!-- FORM -->
-      <!-- <q-card-section> -->
-
-        <Form
-          :store="Person"
-          @saved="onSaved"
-        />
-
-      <!-- </q-card-section> -->
-
-      <q-card-section>
-        <AddressLocationPicker
-          :model-value="Person.form.address"
-          @update:model-value="Person.form = { ...Person.form, address: $event }"
-        />
-      </q-card-section>
-
-      <ActionForm
+    <s-modal-card :title="tdc('New person')" icon="person_add" width="760px" footer-raw>
+      <Form
         :store="Person"
-        :buttons="['cancel', 'reset', 'edit','delete', 'save']"
-        />
+        @saved="onSaved"
+      />
 
-    </q-card>
+      <AddressLocationPicker
+        :model-value="Person.form.address"
+        @update:model-value="Person.form = { ...Person.form, address: $event }"
+      />
+
+      <template #footer>
+        <ActionForm
+          :store="Person"
+          :buttons="['cancel', 'reset', 'edit','delete', 'save']"
+        />
+      </template>
+    </s-modal-card>
 
   </q-dialog>
 
@@ -56,6 +28,7 @@
 <script setup>
 
 import { computed, watch } from 'vue'
+import { tdc } from '../../services/translation'
 
 import  Form  from '../../components/engine/FormComponent.vue'
 import  ActionForm  from '../../components/auto/ActionForm.vue'

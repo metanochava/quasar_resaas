@@ -793,12 +793,8 @@
 
     <!-- NEW LEAVE REQUEST DIALOG -->
     <q-dialog v-model="leaveDialog">
-      <s-card style="width: min(420px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('New leave request') }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section class="q-gutter-md">
+      <s-modal-card :title="tdc('New leave request')" width="420px">
+        <div class="q-gutter-md">
           <s-select
             v-model="leaveForm.leave_type"
             :options="leaveTypeOptions"
@@ -811,8 +807,10 @@
           <q-input v-model="leaveForm.end_date" type="date" outlined :label="tdc('End date')" />
           <q-input v-model="leaveForm.reason" type="textarea" outlined :label="tdc('Reason')" />
           <div v-if="leaveError" class="text-negative text-caption">{{ leaveError }}</div>
-        </q-card-section>
-        <q-card-actions align="right">
+
+        </div>
+
+        <template #footer>
           <s-btn flat :label="tdc('Cancel')" v-close-popup />
           <s-btn
             color="primary"
@@ -820,18 +818,15 @@
             :loading="Employee.requestingLeave"
             @click="submitLeaveRequest"
           />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- START ONBOARDING DIALOG -->
     <q-dialog v-model="onboardingDialog">
-      <s-card style="width: min(420px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('Start onboarding') }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section class="q-gutter-md">
+      <s-modal-card :title="tdc('Start onboarding')" width="420px">
+        <div class="q-gutter-md">
           <s-select
             v-model="onboardingTemplateChoice"
             :options="onboardingTemplateOptions"
@@ -842,8 +837,10 @@
             :label="tdc('Template (optional)')"
           />
           <div v-if="onboardingError" class="text-negative text-caption">{{ onboardingError }}</div>
-        </q-card-section>
-        <q-card-actions align="right">
+
+        </div>
+
+        <template #footer>
           <s-btn flat :label="tdc('Cancel')" v-close-popup />
           <s-btn
             color="primary"
@@ -851,18 +848,15 @@
             :loading="Employee.onboardingActionLoading"
             @click="doStartOnboarding"
           />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- PROMOTION DIALOG -->
     <q-dialog v-model="promotionDialog">
-      <s-card style="width: min(460px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('Promote employee') }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section class="q-gutter-md">
+      <s-modal-card :title="tdc('Promote employee')" width="460px">
+        <div class="q-gutter-md">
           <s-select
             v-model="promotionForm.new_position"
             :options="jobPositionOptions"
@@ -878,22 +872,21 @@
           <q-input v-model="promotionForm.effective_date" type="date" outlined :label="tdc('Effective date')" />
           <q-input v-model="promotionForm.reason" type="textarea" outlined :label="tdc('Reason')" />
           <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
-        </q-card-section>
-        <q-card-actions align="right">
+
+        </div>
+
+        <template #footer>
           <s-btn flat :label="tdc('Cancel')" v-close-popup />
           <s-btn color="primary" :label="tdc('Promote')" :loading="Employee.lifecycleActionLoading" @click="submitPromotion" />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- TRANSFER DIALOG -->
     <q-dialog v-model="transferDialog">
-      <s-card style="width: min(460px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('Transfer employee') }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section class="q-gutter-md">
+      <s-modal-card :title="tdc('Transfer employee')" width="460px">
+        <div class="q-gutter-md">
           <s-select
             v-model="transferForm.to_branch"
             :options="branchOptions"
@@ -909,42 +902,40 @@
           <q-input v-model="transferForm.effective_date" type="date" outlined :label="tdc('Effective date')" />
           <q-input v-model="transferForm.reason" type="textarea" outlined :label="tdc('Reason')" />
           <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
-        </q-card-section>
-        <q-card-actions align="right">
+
+        </div>
+
+        <template #footer>
           <s-btn flat :label="tdc('Cancel')" v-close-popup />
           <s-btn color="primary" :label="tdc('Transfer')" :loading="Employee.lifecycleActionLoading" @click="submitTransfer" />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- RESIGNATION DIALOG -->
     <q-dialog v-model="resignationDialog">
-      <s-card style="width: min(420px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('Submit resignation') }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section class="q-gutter-md">
+      <s-modal-card :title="tdc('Submit resignation')" width="420px">
+        <div class="q-gutter-md">
           <q-input v-model="resignationForm.resignation_date" type="date" outlined :label="tdc('Resignation date')" />
           <q-input v-model="resignationForm.last_working_date" type="date" outlined :label="tdc('Last working date')" />
           <q-input v-model="resignationForm.reason" type="textarea" outlined :label="tdc('Reason')" />
           <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
-        </q-card-section>
-        <q-card-actions align="right">
+
+        </div>
+
+        <template #footer>
           <s-btn flat :label="tdc('Cancel')" v-close-popup />
           <s-btn color="primary" :label="tdc('Submit')" :loading="Employee.lifecycleActionLoading" @click="submitResignation" />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- TERMINATION DIALOG -->
     <q-dialog v-model="terminationDialog">
-      <s-card style="width: min(420px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('Terminate employee') }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section class="q-gutter-md">
+      <s-modal-card :title="tdc('Terminate employee')" width="420px">
+        <div class="q-gutter-md">
           <s-select
             v-model="terminationForm.termination_type"
             :options="terminationTypeOptions"
@@ -954,22 +945,21 @@
           <q-input v-model="terminationForm.termination_date" type="date" outlined :label="tdc('Termination date')" />
           <q-input v-model="terminationForm.reason" type="textarea" outlined :label="tdc('Reason')" />
           <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
-        </q-card-section>
-        <q-card-actions align="right">
+
+        </div>
+
+        <template #footer>
           <s-btn flat :label="tdc('Cancel')" v-close-popup />
           <s-btn color="negative" :label="tdc('Terminate')" :loading="Employee.lifecycleActionLoading" @click="submitTermination" />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- DISCIPLINARY CASE DIALOG -->
     <q-dialog v-model="disciplinaryDialog">
-      <s-card style="width: min(460px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('Open disciplinary case') }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section class="q-gutter-md">
+      <s-modal-card :title="tdc('Open disciplinary case')" width="460px">
+        <div class="q-gutter-md">
           <s-select
             v-model="disciplinaryForm.case_type"
             :options="disciplinaryCaseTypeOptions"
@@ -984,22 +974,21 @@
           />
           <q-input v-model="disciplinaryForm.description" type="textarea" outlined :label="tdc('Description')" />
           <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
-        </q-card-section>
-        <q-card-actions align="right">
+
+        </div>
+
+        <template #footer>
           <s-btn flat :label="tdc('Cancel')" v-close-popup />
           <s-btn color="negative" :label="tdc('Open case')" :loading="Employee.lifecycleActionLoading" @click="submitDisciplinaryCase" />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- DISCIPLINARY ACTION DIALOG -->
     <q-dialog v-model="disciplinaryActionDialog">
-      <s-card style="width: min(420px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('Add disciplinary action') }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section class="q-gutter-md">
+      <s-modal-card :title="tdc('Add disciplinary action')" width="420px">
+        <div class="q-gutter-md">
           <s-select
             v-model="disciplinaryActionForm.action_type"
             :options="disciplinaryActionTypeOptions"
@@ -1008,21 +997,20 @@
           />
           <q-input v-model="disciplinaryActionForm.notes" type="textarea" outlined :label="tdc('Notes')" />
           <div v-if="lifecycleError" class="text-negative text-caption">{{ lifecycleError }}</div>
-        </q-card-section>
-        <q-card-actions align="right">
+
+        </div>
+
+        <template #footer>
           <s-btn flat :label="tdc('Cancel')" v-close-popup />
           <s-btn color="primary" :label="tdc('Add')" :loading="Employee.lifecycleActionLoading" @click="submitDisciplinaryAction" />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <q-dialog v-model="goalProgressDialog">
-      <s-card style="width: min(420px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ goalProgressForm.title }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section class="q-gutter-md">
+      <s-modal-card :title="goalProgressForm.title" width="420px">
+        <div class="q-gutter-md">
           <div>
             <div class="text-caption text-grey-7 q-mb-xs">
               {{ tdc('Progress') }}: {{ goalProgressForm.progress }}%
@@ -1046,8 +1034,10 @@
             :label="tdc('Status (optional override)')"
           />
           <div v-if="goalProgressError" class="text-negative text-caption">{{ goalProgressError }}</div>
-        </q-card-section>
-        <q-card-actions align="right">
+
+        </div>
+
+        <template #footer>
           <s-btn flat :label="tdc('Cancel')" v-close-popup />
           <s-btn
             color="primary"
@@ -1055,25 +1045,24 @@
             :loading="Employee.performanceActionLoading"
             @click="doUpdateGoalProgress"
           />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- ADD CERTIFICATION DIALOG -->
     <q-dialog v-model="certificationDialog">
-      <s-card style="width: min(420px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('Add certification') }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section class="q-gutter-md">
+      <s-modal-card :title="tdc('Add certification')" width="420px">
+        <div class="q-gutter-md">
           <q-input v-model="certificationForm.name" outlined :label="tdc('Name')" />
           <q-input v-model="certificationForm.issued_by" outlined :label="tdc('Issued by')" />
           <q-input v-model="certificationForm.issued_at" type="date" outlined :label="tdc('Issued at')" />
           <q-input v-model="certificationForm.expires_at" type="date" outlined :label="tdc('Expires at (optional)')" />
           <div v-if="certificationError" class="text-negative text-caption">{{ certificationError }}</div>
-        </q-card-section>
-        <q-card-actions align="right">
+
+        </div>
+
+        <template #footer>
           <s-btn flat :label="tdc('Cancel')" v-close-popup />
           <s-btn
             color="primary"
@@ -1081,8 +1070,9 @@
             :loading="Employee.addingCertification"
             @click="doAddCertification"
           />
-        </q-card-actions>
-      </s-card>
+
+        </template>
+      </s-modal-card>
     </q-dialog>
   </q-page>
 </template>

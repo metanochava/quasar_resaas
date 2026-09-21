@@ -64,22 +64,17 @@
 
     <!-- REJECT DIALOG -->
     <q-dialog v-model="rejectDialog">
-      <s-card style="width: min(420px, 92vw);">
-        <q-card-section>
-          <div class="text-subtitle1">{{ tdc('Reject leave request') }}</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section>
-          <q-input
-            v-model="rejectionReason"
-            outlined
-            autogrow
-            :label="tdc('Reason')"
-            :error="rejectSubmitted && !rejectionReason"
-            :error-message="tdc('A rejection reason is required.')"
-          />
-        </q-card-section>
-        <q-card-actions align="right">
+      <s-modal-card :title="tdc('Reject leave request')" icon="event_busy" width="420px">
+        <q-input
+          v-model="rejectionReason"
+          outlined
+          autogrow
+          :label="tdc('Reason')"
+          :error="rejectSubmitted && !rejectionReason"
+          :error-message="tdc('A rejection reason is required.')"
+        />
+
+        <template #footer>
           <s-btn flat :label="tdc('Cancel')" v-close-popup />
           <s-btn
             color="negative"
@@ -87,8 +82,8 @@
             :loading="LeaveRequest.workflowLoading"
             @click="confirmReject"
           />
-        </q-card-actions>
-      </s-card>
+        </template>
+      </s-modal-card>
     </q-dialog>
   </q-page>
 </template>

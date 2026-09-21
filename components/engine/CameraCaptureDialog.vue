@@ -1,62 +1,54 @@
 <template>
   <q-dialog :model-value="modelValue" @update:model-value="v => emit('update:modelValue', v)" @hide="stopStream">
-    <s-card style="width: 100%; max-width: 480px">
-      <q-card-section class="row items-center q-pb-none">
-        <div class="text-h6">{{ tdc('Use camera') }}</div>
-        <q-space />
-        <q-btn flat round dense icon="close" @click="close" />
-      </q-card-section>
+    <s-modal-card :title="tdc('Use camera')" icon="photo_camera" width="480px" @close="close">
+      <s-select
+        v-if="videoDevices.length > 1"
+        v-model="selectedDeviceId"
+        dense
+        emit-value
+        map-options
+        :options="deviceOptions"
+        :label="tdc('Camera')"
+        class="q-mb-sm"
+        @update:model-value="startStream"
+      />
 
-      <q-card-section>
-        <s-select
-          v-if="videoDevices.length > 1"
-          v-model="selectedDeviceId"
-          dense
-          emit-value
-          map-options
-          :options="deviceOptions"
-          :label="tdc('Camera')"
-          class="q-mb-sm"
-          @update:model-value="startStream"
+      <div class="camera-box">
+        <video
+          v-show="!capturedPreviewUrl"
+          ref="videoEl"
+          autoplay
+          playsinline
+          muted
         />
+        <img v-if="capturedPreviewUrl" :src="capturedPreviewUrl" class="captured-frame">
+      </div>
 
-        <div class="camera-box">
-          <video
-            v-show="!capturedPreviewUrl"
-            ref="videoEl"
-            autoplay
-            playsinline
-            muted
-          />
-          <img v-if="capturedPreviewUrl" :src="capturedPreviewUrl" class="captured-frame">
-        </div>
+      <div v-if="starting" class="flex flex-center q-pa-md">
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
+      </div>
 
-        <div v-if="starting" class="flex flex-center q-pa-md">
-          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
-        </div>
+      <div v-if="errorMsg" class="text-negative text-caption q-mt-sm text-center">
+        {{ errorMsg }}
+      </div>
 
-        <div v-if="errorMsg" class="text-negative text-caption q-mt-sm text-center">
-          {{ errorMsg }}
-        </div>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <template v-if="!capturedPreviewUrl">
-          <s-btn
-            flat
-            color="primary"
-            icon="photo_camera"
-            :label="tdc('Capture')"
-            :disable="starting || !!errorMsg"
-            @click="capture"
-          />
-        </template>
-        <template v-else>
-          <s-btn flat color="grey-7" :label="tdc('Retake')" @click="retake" />
-          <s-btn flat color="primary" :label="tdc('Use photo')" @click="usePhoto" />
-        </template>
-      </q-card-actions>
-    </s-card>
+      <template #footer>
+      <template v-if="!capturedPreviewUrl">
+        <s-btn
+          flat
+          color="primary"
+          icon="photo_camera"
+          :label="tdc('Capture')"
+          :disable="starting || !!errorMsg"
+          @click="capture"
+        />
+      </template>
+      <template v-else>
+        <s-btn flat color="grey-7" :label="tdc('Retake')" @click="retake" />
+        <s-btn flat color="primary" :label="tdc('Use photo')" @click="usePhoto" />
+      </template>
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>
 

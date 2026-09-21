@@ -6,6 +6,7 @@ import BtnComponent from '../../engine/BtnComponent.vue'
 import InputComponent from '../../engine/InputComponent.vue'
 import CardComponent from '../../engine/CardComponent.vue'
 import TooltipComponent from '../../engine/TooltipComponent.vue'
+import ModalCard from '../../engine/ModalCard.vue'
 
 export const selectStub = { name: 's-select', props: ['modelValue', 'options'], template: '<div class="stub-select" />' }
 
@@ -17,6 +18,7 @@ export function globalConfig(pinia, extra = {}) {
       's-input': InputComponent,
       's-card': CardComponent,
       's-tooltip': TooltipComponent,
+      's-modal-card': ModalCard,
       's-select': selectStub
     },
     ...extra

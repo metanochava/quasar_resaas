@@ -145,27 +145,17 @@ async function save() {
   <q-dialog v-model="localModel" persistent>
 
     
-    <s-card style="min-width: 760px; max-width: 92vw;">
-      <!-- HEADER -->
-
-      <!-- HEADER -->
-      <q-bar class="row items-center justify-between" :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
-         <div class="text-h6">
-          {{ form?.id ? ('Edit') : tdc('New') }}
-        </div>
-        <s-btn dense flat icon="close" @click="close" >
-          <s-tooltip>{{('Close')}}</s-tooltip>
-        </s-btn>
-      </q-bar>
-
-      <q-separator />
-
-      <!-- BODY -->
-      <q-card-section v-if="!schema.length">
+    <s-modal-card
+      :title="form?.id ? tdc('Edit') : tdc('New')"
+      icon="edit_note"
+      width="760px"
+      @close="close"
+    >
+      <div v-if="!schema.length">
         <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
-      </q-card-section>
+      </div>
 
-      <q-card-section v-else class="row q-col-gutter-sm">
+      <div v-else class="row q-col-gutter-sm">
         
         <div v-for="f in generalFields" :key="f.name" class="col-6">
               <component
@@ -206,11 +196,9 @@ async function save() {
             </div>
         <q-linear-progress v-if="uploadProgress > 0" :value="uploadProgress/100" />
           
-      </q-card-section>
-      <q-separator />
+      </div>
 
-      <!-- ACTIONS -->
-      <q-card-actions align="right">
+      <template #footer>
         <s-btn flat label="Cancel" @click="close" />
         <s-btn color="primary" :loading="saving" label="Save" @click="save" />
 
@@ -218,10 +206,7 @@ async function save() {
           :store="Person"
           :buttons="['cancel', 'reset', 'edit', 'save']"
         />
-      </q-card-actions>
-
-
-
-    </s-card>
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>

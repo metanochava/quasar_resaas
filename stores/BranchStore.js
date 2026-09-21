@@ -5,6 +5,7 @@ import { getStorage, setStorage } from '../services/storage'
 import { useGroupStore } from './GroupStore'
 import { profileSplint } from '../utils/profile'
 import { tdc } from '../services/translation'
+import { sDialog } from '../services/dialog'
 
 export const useBranchStore = createBaseStore(
   'branch',
@@ -82,7 +83,7 @@ export const useBranchStore = createBaseStore(
             }
           )
 
-          q.dialog({
+          sDialog({
             title:
               tdc(
                 'Select the Branch'

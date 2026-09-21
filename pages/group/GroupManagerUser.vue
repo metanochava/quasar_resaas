@@ -2,31 +2,14 @@
 
 
   <!-- 🔥 MAIN CARD -->
-  <s-card class="column full-height group-manager-card">
-
-    <!-- HEADER -->
-    <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-      <q-icon name="groups" size="22px" />
-
-      <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        {{ tdc('Manage Groups of') }} {{ User.form?.username || User.row?.username || '' }}
-      </div>
-
-      <q-space />
-
+  <s-modal-card :title="`${tdc('Manage Groups of')} ${User.form?.username || User.row?.username || ''}`" icon="groups" fullscreen flush>
+    <template #bar-actions>
       <q-badge color="white" text-color="primary">
         {{ User.selectedGroups.length }} {{ tdc('active') }}
       </q-badge>
+    </template>
 
-      <s-btn dense flat icon="close" v-close-popup>
-        <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-      </s-btn>
-    </q-bar>
-
-    <q-separator />
-
-    <!-- FILTER -->
-    <q-card-section class="q-pa-md">
+    <template #subheader>
       <q-input
         v-model="User.groupSearch"
         dense
@@ -38,12 +21,9 @@
           <q-icon name="search" />
         </template>
       </q-input>
-    </q-card-section>
+    </template>
 
-    <q-separator />
-
-    <!-- LIST -->
-    <q-card-section class="col scroll q-pa-none">
+    <div class="col scroll" style="min-height: 0;">
 
       <div v-if="User.loadingGroups" class="flex flex-center q-pa-xl">
         <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
@@ -100,10 +80,8 @@
 
       </q-list>
 
-    </q-card-section>
-
-  </s-card>
-
+    </div>
+  </s-modal-card>
 </template>
 
 <script setup>
@@ -133,10 +111,6 @@ onMounted(init)
 </script>
 
 <style scoped>
-.group-manager-card {
-  overflow: hidden;
-}
-
 .group-item {
   transition: all 0.2s ease;
   border-left: 4px solid transparent;
@@ -145,24 +119,5 @@ onMounted(init)
 .group-item--active {
   background: rgba(25, 118, 210, 0.08);
   border-left-color: var(--q-primary);
-}
-
-.modal-card {
-  min-width: 70%;
-  max-width: 90vw;
-  height: 80vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.modal-body {
-  flex: 1;
-  overflow-y: auto;
 }
 </style>

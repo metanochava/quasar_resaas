@@ -103,77 +103,34 @@ async function save() {
     persistent
     @update:model-value="v => emit('update:modelValue', v)"
   >
-    <!-- column no-wrap + the .dialog-card max-height below is what lets
-         the middle q-card-section be the ONLY scrolling area - same
-         layout FormModal.vue/FormTwo.vue already use, so header and
-         footer stay put while a long related-model form scrolls. -->
-    <s-card class="dialog-card column no-wrap">
-      <q-bar
-        class="row items-center"
-        :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
-      >
-        <div class="text-h6">
-          {{ tdc(titleVerb) }} {{ tdc(relationConfig.model) }}
-        </div>
+    <s-modal-card
+      :title="`${tdc(titleVerb)} ${tdc(relationConfig.model)}`"
+      icon="edit_note"
+      width="760px"
+      footer-raw
+      @close="close"
+    >
+      <div v-if="!ready" class="flex flex-center q-pa-lg">
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
+      </div>
 
-        <q-space />
-
-        <s-btn flat round dense icon="close" @click="close">
-          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-        </s-btn>
-      </q-bar>
-
-      <q-separator />
-
-      <q-card-section class="scroll col dialog-body">
-        <div v-if="!ready" class="flex flex-center q-pa-lg">
-          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
-        </div>
-
-        <Form
-          v-else
-          ref="formRef"
-          :store="store"
-          :ignore-fields="ignoreFields"
-          :readonly="mode === 'view'"
-          @saved="onSaved"
-        />
-      </q-card-section>
-
-      <q-separator />
-
-      <ActionForm
+      <Form
+        v-else
+        ref="formRef"
         :store="store"
-        :buttons="buttons"
-        @cancel="close"
-        @save="save"
+        :ignore-fields="ignoreFields"
+        :readonly="mode === 'view'"
+        @saved="onSaved"
       />
-    </s-card>
+
+      <template #footer>
+        <ActionForm
+          :store="store"
+          :buttons="buttons"
+          @cancel="close"
+          @save="save"
+        />
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>
-
-<style scoped>
-.dialog-card {
-  min-width: 480px;
-  max-width: 95vw;
-  max-height: 90vh;
-  border-radius: 14px;
-}
-
-.dialog-body {
-  padding: 20px;
-}
-
-@media (max-width: 767px) {
-  .dialog-card {
-    min-width: 95vw;
-    width: 95vw;
-    max-width: 95vw;
-    max-height: 95vh;
-  }
-
-  .dialog-body {
-    padding: 10px;
-  }
-}
-</style>

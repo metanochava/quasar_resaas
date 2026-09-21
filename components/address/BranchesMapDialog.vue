@@ -6,49 +6,39 @@
     full-height
     @update:model-value="emit('update:modelValue', $event)"
   >
-    <s-card flat class="column no-wrap full-height branches-map-card">
-      <q-bar
-        :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
-      >
-        <q-icon name="map" size="20px" />
-        <div class="text-subtitle1 text-weight-bold q-ml-sm">
-          {{ title || tdc('Branches map') }}
-        </div>
-        <q-space />
+    <s-modal-card :title="title || tdc('Branches map')" icon="map" fullscreen flush>
+      <template #bar-actions>
         <q-badge v-if="!loading" color="white" text-color="primary" class="q-px-sm">
           {{ located.length }} / {{ branches.length }}
         </q-badge>
-        <s-btn dense flat round icon="close" class="q-ml-sm" v-close-popup />
-      </q-bar>
-
-      <q-separator />
+      </template>
 
       <div class="col relative-position">
-        <div v-if="hasMapsKey" ref="mapEl" class="absolute-full" />
+      <div v-if="hasMapsKey" ref="mapEl" class="absolute-full" />
 
-        <div v-else class="absolute-full column items-center justify-center q-pa-lg">
-          <q-icon name="map" size="48px" color="grey-5" class="q-mb-md" />
-          <div class="text-subtitle1 text-grey-7">
-            {{ tdc('Interactive map not configured for this deployment.') }}
-          </div>
-          <q-list bordered separator class="fallback-list q-mt-md" v-if="located.length">
-            <q-item v-for="b in located" :key="b.id">
-              <q-item-section avatar v-if="b.photo?.url">
-                <q-avatar square size="40px"><img :src="b.photo.url"></q-avatar>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>{{ b.name }}</q-item-label>
-                <q-item-label caption>{{ b.address?.full_address || b.description || '' }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
+      <div v-else class="absolute-full column items-center justify-center q-pa-lg">
+        <q-icon name="map" size="48px" color="grey-5" class="q-mb-md" />
+        <div class="text-subtitle1 text-grey-7">
+          {{ tdc('Interactive map not configured for this deployment.') }}
         </div>
-
-        <div v-if="loading" class="absolute-full flex flex-center map-loading-overlay">
-          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
-        </div>
+        <q-list bordered separator class="fallback-list q-mt-md" v-if="located.length">
+          <q-item v-for="b in located" :key="b.id">
+            <q-item-section avatar v-if="b.photo?.url">
+              <q-avatar square size="40px"><img :src="b.photo.url"></q-avatar>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ b.name }}</q-item-label>
+              <q-item-label caption>{{ b.address?.full_address || b.description || '' }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
       </div>
-    </s-card>
+
+      <div v-if="loading" class="absolute-full flex flex-center map-loading-overlay">
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
+      </div>
+      </div>
+    </s-modal-card>
   </q-dialog>
 </template>
 
@@ -201,10 +191,6 @@ const DARK_MAP_STYLE = [
 
 
 <style scoped>
-.branches-map-card {
-  width: 100%;
-  height: 100%;
-}
 
 .fallback-list {
   width: 100%;

@@ -116,88 +116,90 @@
     <!-- First login with a TEMPORARY password: choose a definitive one. No
          session exists until this succeeds. -->
     <q-dialog v-model="changeDialog" persistent>
-      <s-card class="change-card">
-        <q-card-section>
-          <div class="text-h6">{{ tdc('Choose your password') }}</div>
-          <div class="text-caption text-grey-7">
-            {{ tdc('Your temporary password must be replaced before you can continue.') }}
-          </div>
-        </q-card-section>
+      <s-modal-card
+        :title="tdc('Choose your password')"
+        icon="key"
+        width="420px"
+        form
+        :closable="false"
+        @submit="changePassword"
+      >
+        <div class="text-caption text-grey-7 q-mb-md">
+          {{ tdc('Your temporary password must be replaced before you can continue.') }}
+        </div>
 
-        <q-card-section>
-          <q-form class="q-gutter-md" @submit.prevent="changePassword">
-            <s-input
-              v-model="newPassword"
-              outlined
-              type="password"
-              autocomplete="new-password"
-              :label="tdc('New password')"
-              :rules="[v => (v && v.length >= 8) || tdc('The password must be at least 8 characters long')]"
-              data-test="new-password"
-            />
-            <s-input
-              v-model="confirmPassword"
-              outlined
-              type="password"
-              autocomplete="new-password"
-              :label="tdc('Confirm password')"
-              :rules="[v => v === newPassword || tdc('The passwords do not match')]"
-              data-test="confirm-password"
-            />
+        <div class="q-gutter-md">
+          <s-input
+            v-model="newPassword"
+            outlined
+            type="password"
+            autocomplete="new-password"
+            :label="tdc('New password')"
+            :rules="[v => (v && v.length >= 8) || tdc('The password must be at least 8 characters long')]"
+            data-test="new-password"
+          />
+          <s-input
+            v-model="confirmPassword"
+            outlined
+            type="password"
+            autocomplete="new-password"
+            :label="tdc('Confirm password')"
+            :rules="[v => v === newPassword || tdc('The passwords do not match')]"
+            data-test="confirm-password"
+          />
+        </div>
 
-            <div class="row justify-end q-gutter-sm">
-              <s-btn flat :label="tdc('Cancel')" :disable="User.loading" data-test="change-cancel" @click="cancelChange" />
-              <s-btn
-                type="submit"
-                unelevated
-                color="primary"
-                :label="tdc('Save password')"
-                :loading="User.loading"
-                data-test="change-submit"
-              />
-            </div>
-          </q-form>
-        </q-card-section>
-      </s-card>
+        <template #footer>
+          <s-btn flat :label="tdc('Cancel')" :disable="User.loading" data-test="change-cancel" @click="cancelChange" />
+          <s-btn
+            type="submit"
+            unelevated
+            color="primary"
+            :label="tdc('Save password')"
+            :loading="User.loading"
+            data-test="change-submit"
+          />
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- Two-factor is active on the account: the password alone gets no
          session, a code from the authenticator app (or a recovery code) does. -->
     <q-dialog :model-value="User.loginMsg === 'two_factor'" persistent>
-      <s-card class="change-card">
-        <q-card-section>
-          <div class="text-h6">{{ tdc('Two-factor authentication') }}</div>
-          <div class="text-caption text-grey-7">
-            {{ tdc('Enter the 6-digit code from your authenticator app, or a recovery code.') }}
-          </div>
-        </q-card-section>
+      <s-modal-card
+        :title="tdc('Two-factor authentication')"
+        icon="phonelink_lock"
+        width="420px"
+        form
+        :closable="false"
+        @submit="submitTwoFactor"
+      >
+        <div class="text-caption text-grey-7 q-mb-md">
+          {{ tdc('Enter the 6-digit code from your authenticator app, or a recovery code.') }}
+        </div>
 
-        <q-card-section>
-          <q-form class="q-gutter-md" @submit.prevent="submitTwoFactor">
-            <s-input
-              v-model="twoFactorCode"
-              outlined
-              autofocus
-              autocomplete="one-time-code"
-              :label="tdc('Authentication code or recovery code')"
-              data-test="two-factor-code"
-            />
+        <s-input
+          v-model="twoFactorCode"
+          outlined
+          autofocus
+          autocomplete="one-time-code"
+          :label="tdc('Authentication code or recovery code')"
+          data-test="two-factor-code"
+        />
 
-            <div class="row justify-end q-gutter-sm">
-              <s-btn flat :label="tdc('Cancel')" :disable="User.loading" data-test="two-factor-cancel" @click="cancelTwoFactor" />
-              <s-btn
-                type="submit"
-                unelevated
-                color="primary"
-                :label="tdc('Verify')"
-                :loading="User.loading"
-                :disable="twoFactorCode.trim().length < 6"
-                data-test="two-factor-submit"
-              />
-            </div>
-          </q-form>
-        </q-card-section>
-      </s-card>
+        <template #footer>
+          <s-btn flat :label="tdc('Cancel')" :disable="User.loading" data-test="two-factor-cancel" @click="cancelTwoFactor" />
+          <s-btn
+            type="submit"
+            unelevated
+            color="primary"
+            :label="tdc('Verify')"
+            :loading="User.loading"
+            :disable="twoFactorCode.trim().length < 6"
+            data-test="two-factor-submit"
+          />
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- The organisation REQUIRES two-factor and this account has none yet:
@@ -489,8 +491,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.change-card { width: 420px; max-width: 94vw; }
-
 .login-card {
   width: 100%;
   max-width: 300px;

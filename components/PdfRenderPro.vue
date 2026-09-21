@@ -1,45 +1,39 @@
 <template>
   <q-dialog v-model="dialog" maximized>
-    <q-card :class="$q.dark.isActive ? 'bg-grey-10 text-white' : 'bg-grey-3 text-dark'">
-
-      <!-- TOOLBAR -->
-      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
-
+    <s-modal-card :title="tdc('Preview PDF')" icon="picture_as_pdf" fullscreen flush @close="dialog = false" :class="$q.dark.isActive ? 'bg-grey-10 text-white' : 'bg-grey-3 text-dark'">
+      <template #bar-actions>
         <!-- ZOOM -->
-        <s-btn flat icon="zoom_out" @click="zoomOut" />
+        <s-btn flat dense icon="zoom_out" @click="zoomOut" />
         <span class="q-mx-sm">{{ Math.round(scale * 100) }}%</span>
-        <s-btn flat icon="zoom_in" @click="zoomIn" />
+        <s-btn flat dense icon="zoom_in" @click="zoomIn" />
 
         <q-separator vertical class="q-mx-sm" />
 
         <!-- PAGINA -->
-        <s-btn flat icon="chevron_left" @click="prevPage" />
+        <s-btn flat dense icon="chevron_left" @click="prevPage" />
         <span class="q-mx-sm">{{ page }} / {{ totalPages }}</span>
-        <s-btn flat icon="chevron_right" @click="nextPage" />
+        <s-btn flat dense icon="chevron_right" @click="nextPage" />
 
-        <q-space />
+        <q-separator vertical class="q-mx-sm" />
 
         <!-- DOWNLOAD -->
-        <s-btn flat icon="download" @click="downloadPdf" />
-
-        <!-- CLOSE -->
-        <s-btn flat icon="close" @click="dialog = false" />
-      </q-bar>
+        <s-btn flat dense icon="download" @click="downloadPdf" />
+      </template>
 
       <!-- VIEW -->
-      <q-card-section class="q-pa-none scroll" style="height: 100vh;">
+      <div class="col scroll" style="min-height: 0;">
         <div class="flex flex-center">
           <canvas ref="canvasRef"></canvas>
         </div>
-      </q-card-section>
-
-    </q-card>
+      </div>
+    </s-modal-card>
   </q-dialog>
 </template>
 
 <script setup>
 import { ref, watch, nextTick, computed } from 'vue'
 import * as pdfjsLib from 'pdfjs-dist'
+import { tdc } from '../services/translation'
 
 // worker
 pdfjsLib.GlobalWorkerOptions.workerSrc =

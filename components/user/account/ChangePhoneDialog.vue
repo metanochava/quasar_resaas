@@ -63,13 +63,8 @@ async function confirm(code) {
 
 <template>
   <q-dialog :model-value="modelValue && askingCode" persistent @update:model-value="value => !value && close()">
-    <s-card class="change-dialog">
-      <q-card-section class="row items-center">
-        <div class="text-h6 col">{{ tdc('Change phone number') }}</div>
-        <s-btn flat round dense icon="close" :aria-label="tdc('Close')" data-test="phone-close" @click="close" />
-      </q-card-section>
-
-      <q-card-section class="q-gutter-y-md">
+    <s-modal-card :title="tdc('Change phone number')" icon="phone_iphone" width="440px" @close="close">
+      <div class="q-gutter-y-md">
         <s-select
           v-model="dial"
           :options="countryOptions"
@@ -99,9 +94,9 @@ async function confirm(code) {
         <div class="text-caption text-grey-7" data-test="full-number">
           {{ tdc('Full number') }}: {{ fullNumber || '—' }}
         </div>
-      </q-card-section>
+      </div>
 
-      <q-card-actions align="right" class="q-px-md q-pb-md">
+      <template #footer>
         <s-btn flat no-caps :label="tdc('Cancel')" @click="close" />
         <s-btn
           unelevated
@@ -114,8 +109,8 @@ async function confirm(code) {
           data-test="send-phone-code"
           @click="send"
         />
-      </q-card-actions>
-    </s-card>
+      </template>
+    </s-modal-card>
   </q-dialog>
 
   <ContactOtpDialog
@@ -129,7 +124,3 @@ async function confirm(code) {
     @cancel="close"
   />
 </template>
-
-<style scoped>
-.change-dialog { width: 440px; max-width: 94vw; max-height: 94vh; overflow-y: auto; }
-</style>

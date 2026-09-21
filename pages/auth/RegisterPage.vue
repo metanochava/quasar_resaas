@@ -5,16 +5,8 @@
          OTP CONFIRMATION DIALOG
     ================================================== -->
     <q-dialog v-model="showOtpDialog" persistent>
-      <s-card square flat bordered class="text-center otp-card">
-        <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-          <div class="ellipsis">{{ identifier }}</div>
-          <q-space />
-          <s-btn dense flat icon="close" :disable="loading" v-close-popup @click="showOtpDialog = false">
-            <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-          </s-btn>
-        </q-bar>
-
-        <q-card-section>
+      <s-modal-card :title="identifier" icon="sms" width="360px" :close-disable="loading" @close="showOtpDialog = false">
+        <div class="text-center">
           <div class="text-subtitle2 q-mb-md">
             {{ tdc('Enter the code we sent to') }} {{ identifier }}
           </div>
@@ -24,30 +16,29 @@
           <div v-if="otpError" class="text-caption text-negative q-mt-sm">
             {{ otpError }}
           </div>
+        </div>
 
-          <s-btn
-            size="md"
-            color="positive"
-            dense
-            class="full-width q-mt-lg"
-            :disable="otp.length !== 6"
-            :loading="loading"
-            :label="tdc('Confirm')"
-            @click="completeRegistration(otp)"
-          />
-
+        <template #footer>
           <s-btn
             flat
             size="sm"
             color="grey-7"
             dense
-            class="full-width q-mt-sm"
             :disable="loading"
             :label="tdc('Resend code')"
             @click="requestOtp"
           />
-        </q-card-section>
-      </s-card>
+          <s-btn
+            size="md"
+            color="positive"
+            dense
+            :disable="otp.length !== 6"
+            :loading="loading"
+            :label="tdc('Confirm')"
+            @click="completeRegistration(otp)"
+          />
+        </template>
+      </s-modal-card>
     </q-dialog>
 
     <!-- =================================================

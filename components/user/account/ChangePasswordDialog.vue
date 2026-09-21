@@ -66,88 +66,84 @@ async function submit() {
 
 <template>
   <q-dialog :model-value="modelValue" persistent @update:model-value="value => !value && close()">
-    <s-card class="password-dialog">
-      <q-card-section class="row items-center">
-        <div class="text-h6 col">{{ tdc('Change password') }}</div>
-        <s-btn flat round dense icon="close" :aria-label="tdc('Close')" :disable="saving" data-test="password-close" @click="close" />
-      </q-card-section>
+    <s-modal-card
+      :title="tdc('Change password')"
+      icon="key"
+      form
+      :close-disable="saving"
+      @close="close"
+      @submit="submit"
+    >
+      <div class="q-gutter-y-md">
+        <s-input
+          v-model="current"
+          type="password"
+          autocomplete="current-password"
+          :label="tdc('Current password')"
+          dense
+          outlined
+          autofocus
+          data-test="current-password"
+        />
 
-      <q-form @submit.prevent="submit">
-        <q-card-section class="q-gutter-y-md">
+        <div>
           <s-input
-            v-model="current"
-            type="password"
-            autocomplete="current-password"
-            :label="tdc('Current password')"
-            dense
-            outlined
-            autofocus
-            data-test="current-password"
-          />
-
-          <div>
-            <s-input
-              v-model="next"
-              type="password"
-              autocomplete="new-password"
-              :label="tdc('New password')"
-              dense
-              outlined
-              data-test="next-password"
-            />
-
-            <div v-if="next" class="q-mt-sm" data-test="strength">
-              <q-linear-progress
-                :value="strength.percent / 100"
-                :color="barColor"
-                rounded
-                size="6px"
-                :aria-label="tdc('Password strength')"
-              />
-              <div class="text-caption q-mt-xs" data-test="strength-level">
-                {{ tdc('Password strength') }}: {{ tdc(strength.level) }}
-              </div>
-            </div>
-          </div>
-
-          <s-input
-            v-model="confirm"
+            v-model="next"
             type="password"
             autocomplete="new-password"
-            :label="tdc('Confirm password')"
+            :label="tdc('New password')"
             dense
             outlined
-            data-test="confirm-password"
+            data-test="next-password"
           />
 
-          <div v-if="mismatch" class="text-caption text-negative" role="alert" data-test="mismatch">
-            {{ tdc('The passwords do not match') }}
+          <div v-if="next" class="q-mt-sm" data-test="strength">
+            <q-linear-progress
+              :value="strength.percent / 100"
+              :color="barColor"
+              rounded
+              size="6px"
+              :aria-label="tdc('Password strength')"
+            />
+            <div class="text-caption q-mt-xs" data-test="strength-level">
+              {{ tdc('Password strength') }}: {{ tdc(strength.level) }}
+            </div>
           </div>
+        </div>
 
-          <div v-if="!Session.data?.email" class="text-caption text-grey-7">
-            {{ tdc('An email is required on your account to change the password') }}
-          </div>
-        </q-card-section>
+        <s-input
+          v-model="confirm"
+          type="password"
+          autocomplete="new-password"
+          :label="tdc('Confirm password')"
+          dense
+          outlined
+          data-test="confirm-password"
+        />
 
-        <q-card-actions align="right" class="q-px-md q-pb-md">
-          <s-btn flat no-caps :label="tdc('Cancel')" :disable="saving" data-test="password-cancel" @click="close" />
-          <s-btn
-            type="submit"
-            unelevated
-            no-caps
-            color="primary"
-            icon="lock_reset"
-            :label="tdc('Update password')"
-            :loading="saving"
-            :disable="!canSubmit"
-            data-test="password-submit"
-          />
-        </q-card-actions>
-      </q-form>
-    </s-card>
+        <div v-if="mismatch" class="text-caption text-negative" role="alert" data-test="mismatch">
+          {{ tdc('The passwords do not match') }}
+        </div>
+
+        <div v-if="!Session.data?.email" class="text-caption text-grey-7">
+          {{ tdc('An email is required on your account to change the password') }}
+        </div>
+      </div>
+
+      <template #footer>
+        <s-btn flat no-caps :label="tdc('Cancel')" :disable="saving" data-test="password-cancel" @click="close" />
+        <s-btn
+          type="submit"
+          unelevated
+          no-caps
+          color="primary"
+          icon="lock_reset"
+          :label="tdc('Update password')"
+          :loading="saving"
+          :disable="!canSubmit"
+          data-test="password-submit"
+        />
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>
-
-<style scoped>
-.password-dialog { width: 460px; max-width: 94vw; max-height: 94vh; overflow-y: auto; }
-</style>

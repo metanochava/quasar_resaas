@@ -1,118 +1,106 @@
 <template>
   <q-dialog :model-value="modelValue" persistent @update:model-value="v => emit('update:modelValue', v)">
-    <s-card class="match-dialog-card column no-wrap">
+    <s-modal-card :title="tdc('We found possible matches')" icon="people" width="900px" @close="cancel">
       <s-page-title :title="tdc('We found possible matches')" :active="modelValue" />
-      <q-bar class="row items-center" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-        <div class="text-h6">{{ tdc('We found possible matches') }}</div>
-        <q-space />
-        <s-btn flat round dense icon="close" @click="cancel">
-          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-        </s-btn>
-      </q-bar>
 
-      <q-separator />
+      <div class="text-body2 text-grey-7 q-mb-md">
+        {{ tdc('We found people already registered that may be the same person you are adding. Review the matches below before creating a new record.') }}
+      </div>
 
-      <q-card-section class="scroll col match-dialog-body">
-        <div class="text-body2 text-grey-7 q-mb-md">
-          {{ tdc('We found people already registered that may be the same person you are adding. Review the matches below before creating a new record.') }}
-        </div>
+      <div class="column q-gutter-md">
+        <s-card
+          v-for="candidate in candidates"
+          :key="candidate.id"
+          flat
+          bordered
+          class="match-candidate-card"
+        >
+          <q-card-section class="row items-start no-wrap q-gutter-md">
+            <q-avatar size="64px" square class="rounded-borders">
+              <img v-if="candidate.photo?.url" :src="candidate.photo.url">
+              <span v-else class="text-h6">{{ initialsOf(candidate) }}</span>
+            </q-avatar>
 
-        <div class="column q-gutter-md">
-          <s-card
-            v-for="candidate in candidates"
-            :key="candidate.id"
-            flat
-            bordered
-            class="match-candidate-card"
-          >
-            <q-card-section class="row items-start no-wrap q-gutter-md">
-              <q-avatar size="64px" square class="rounded-borders">
-                <img v-if="candidate.photo?.url" :src="candidate.photo.url">
-                <span v-else class="text-h6">{{ initialsOf(candidate) }}</span>
-              </q-avatar>
+            <div class="col">
+              <div class="text-subtitle1 text-weight-bold">
+                {{ candidate.full_name || [candidate.name, candidate.surname].filter(Boolean).join(' ') }}
+              </div>
+              <div v-if="candidate.preferred_name" class="text-caption text-grey-7">
+                {{ tdc('Preferred name') }}: {{ candidate.preferred_name }}
+              </div>
 
-              <div class="col">
-                <div class="text-subtitle1 text-weight-bold">
-                  {{ candidate.full_name || [candidate.name, candidate.surname].filter(Boolean).join(' ') }}
+              <div class="row q-col-gutter-x-md q-mt-xs text-body2">
+                <div v-if="candidate.date_of_birth" class="col-auto">
+                  <q-icon name="cake" size="16px" class="q-mr-xs" />
+                  {{ candidate.date_of_birth }}
+                  <span v-if="candidate.age != null" class="text-grey-7">({{ candidate.age }} {{ tdc('years') }})</span>
                 </div>
-                <div v-if="candidate.preferred_name" class="text-caption text-grey-7">
-                  {{ tdc('Preferred name') }}: {{ candidate.preferred_name }}
+                <div v-if="candidate.email" class="col-auto">
+                  <q-icon name="mail" size="16px" class="q-mr-xs" />
+                  {{ candidate.email }}
                 </div>
-
-                <div class="row q-col-gutter-x-md q-mt-xs text-body2">
-                  <div v-if="candidate.date_of_birth" class="col-auto">
-                    <q-icon name="cake" size="16px" class="q-mr-xs" />
-                    {{ candidate.date_of_birth }}
-                    <span v-if="candidate.age != null" class="text-grey-7">({{ candidate.age }} {{ tdc('years') }})</span>
-                  </div>
-                  <div v-if="candidate.email" class="col-auto">
-                    <q-icon name="mail" size="16px" class="q-mr-xs" />
-                    {{ candidate.email }}
-                  </div>
-                  <div v-if="candidate.phone" class="col-auto">
-                    <q-icon name="phone" size="16px" class="q-mr-xs" />
-                    {{ candidate.phone }}
-                  </div>
+                <div v-if="candidate.phone" class="col-auto">
+                  <q-icon name="phone" size="16px" class="q-mr-xs" />
+                  {{ candidate.phone }}
                 </div>
+              </div>
 
-                <div v-if="candidate.documents?.length" class="q-mt-xs text-body2">
-                  <q-icon name="badge" size="16px" class="q-mr-xs" />
-                  {{ candidate.documents.map(d => `${d.tipo_data?.name || tdc('Document')} ${d.numero}`).join(' · ') }}
-                </div>
+              <div v-if="candidate.documents?.length" class="q-mt-xs text-body2">
+                <q-icon name="badge" size="16px" class="q-mr-xs" />
+                {{ candidate.documents.map(d => `${d.tipo_data?.name || tdc('Document')} ${d.numero}`).join(' · ') }}
+              </div>
 
-                <div class="row q-gutter-xs q-mt-sm">
-                  <q-chip
-                    v-for="field in candidate.matched_fields"
-                    :key="field"
-                    dense
-                    square
-                    color="positive"
-                    text-color="white"
-                    icon="check"
-                  >
-                    {{ tdc(matchedFieldLabel(field)) }}
-                  </q-chip>
-                </div>
-
-                <div v-if="expanded[candidate.id]" class="q-mt-sm text-body2 text-grey-8">
-                  <div v-if="candidate.gender">{{ tdc('Gender') }}: {{ candidate.gender }}</div>
-                  <div v-if="candidate.marital_status">{{ tdc('Marital status') }}: {{ candidate.marital_status }}</div>
-                  <div v-if="candidate.nationality">{{ tdc('Nationality') }}: {{ candidate.nationality }}</div>
-                  <div v-if="candidate.alternative_phone">{{ tdc('Alternative phone') }}: {{ candidate.alternative_phone }}</div>
-                  <div v-if="candidate.address">
-                    {{ tdc('Address') }}:
-                    {{ [candidate.address.street, candidate.address.city, candidate.address.country].filter(Boolean).join(', ') }}
-                  </div>
-                </div>
-
-                <s-btn
-                  flat
+              <div class="row q-gutter-xs q-mt-sm">
+                <q-chip
+                  v-for="field in candidate.matched_fields"
+                  :key="field"
                   dense
-                  no-caps
-                  size="sm"
-                  color="primary"
-                  class="q-mt-xs q-px-none"
-                  :label="expanded[candidate.id] ? tdc('Hide details') : tdc('View details')"
-                  @click="toggleExpanded(candidate.id)"
-                />
+                  square
+                  color="positive"
+                  text-color="white"
+                  icon="check"
+                >
+                  {{ tdc(matchedFieldLabel(field)) }}
+                </q-chip>
+              </div>
+
+              <div v-if="expanded[candidate.id]" class="q-mt-sm text-body2 text-grey-8">
+                <div v-if="candidate.gender">{{ tdc('Gender') }}: {{ candidate.gender }}</div>
+                <div v-if="candidate.marital_status">{{ tdc('Marital status') }}: {{ candidate.marital_status }}</div>
+                <div v-if="candidate.nationality">{{ tdc('Nationality') }}: {{ candidate.nationality }}</div>
+                <div v-if="candidate.alternative_phone">{{ tdc('Alternative phone') }}: {{ candidate.alternative_phone }}</div>
+                <div v-if="candidate.address">
+                  {{ tdc('Address') }}:
+                  {{ [candidate.address.street, candidate.address.city, candidate.address.country].filter(Boolean).join(', ') }}
+                </div>
               </div>
 
               <s-btn
-                unelevated
+                flat
+                dense
+                no-caps
+                size="sm"
                 color="primary"
-                icon="how_to_reg"
-                :label="tdc('Use this person')"
-                @click="emit('select', candidate)"
+                class="q-mt-xs q-px-none"
+                :label="expanded[candidate.id] ? tdc('Hide details') : tdc('View details')"
+                @click="toggleExpanded(candidate.id)"
               />
-            </q-card-section>
-          </s-card>
-        </div>
-      </q-card-section>
+            </div>
 
-      <q-separator />
+            <s-btn
+              unelevated
+              color="primary"
+              icon="how_to_reg"
+              :label="tdc('Use this person')"
+              @click="emit('select', candidate)"
+            />
+          </q-card-section>
+        </s-card>
+      </div>
 
-      <q-card-actions align="between" class="q-pa-md">
+      <template #footer>
         <s-btn flat color="grey-7" :label="tdc('Cancel')" @click="cancel" />
+        <q-space />
         <s-btn
           outline
           color="primary"
@@ -120,8 +108,8 @@
           :label="tdc('Create new person anyway')"
           @click="emit('create-new')"
         />
-      </q-card-actions>
-    </s-card>
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>
 
@@ -171,31 +159,7 @@ function cancel() {
 </script>
 
 <style scoped>
-.match-dialog-card {
-  min-width: 640px;
-  max-width: 95vw;
-  max-height: 90vh;
-  border-radius: 14px;
-}
-
-.match-dialog-body {
-  padding: 20px;
-}
-
 .match-candidate-card {
   border-radius: 10px;
-}
-
-@media (max-width: 767px) {
-  .match-dialog-card {
-    min-width: 95vw;
-    width: 95vw;
-    max-width: 95vw;
-    max-height: 95vh;
-  }
-
-  .match-dialog-body {
-    padding: 10px;
-  }
 }
 </style>

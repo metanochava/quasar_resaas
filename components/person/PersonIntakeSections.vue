@@ -435,21 +435,11 @@
 
     <!-- All the data of the reused person -->
     <q-dialog v-model="detailOpen">
-      <s-card class="person-detail-card column no-wrap">
-        <q-bar class="bg-primary text-white">
-          <div class="text-subtitle1 ellipsis">{{ detail?.full_name }}</div>
-          <q-space />
-          <s-btn flat dense round icon="close" data-test="person-detail-close" @click="detailOpen = false">
-            <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-          </s-btn>
-        </q-bar>
+      <s-modal-card :title="detail?.full_name || tdc('Person')" icon="person" width="900px" @close="detailOpen = false">
+        <q-linear-progress v-if="detailLoading" indeterminate class="q-mb-md" />
 
-        <q-linear-progress v-if="detailLoading" indeterminate />
-
-        <div class="col scroll q-pa-md">
-          <s-person-profile v-if="detail" :person="detail" />
-        </div>
-      </s-card>
+        <s-person-profile v-if="detail" :person="detail" />
+      </s-modal-card>
     </q-dialog>
 
     <PersonMatchDialog
@@ -500,7 +490,6 @@ const canViewPerson = computed(() => User.can('view_person'))
 </script>
 
 <style scoped>
-.person-detail-card { width: 1100px; max-width: 96vw; height: 88vh; }
 .person-intake .contact-block + .contact-block {
   border-top: 1px solid rgba(128, 128, 128, .25);
 }

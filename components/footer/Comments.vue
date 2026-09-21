@@ -1,64 +1,36 @@
 <template>
-  <s-card>
-    <q-bar class="bg-primary text-white">
-      <q-icon name="feedback" />
-
-      <span class="q-ml-sm">
-        {{ tdc('Send comment or feedback') }}
-      </span>
-
-      <q-space />
-
-      <s-btn
-        dense
-        flat
-        round
-        icon="close"
-        v-close-popup
-      >
-        <s-tooltip>
-          {{ tdc('Close') }}
-        </s-tooltip>
-      </s-btn>
-    </q-bar>
-
+  <s-modal-card :title="tdc('Send comment or feedback')" icon="feedback" width="640px">
     <!-- EDITOR -->
-    <q-card-section>
-      <s-editor
-        v-model="comment_text"
-        outlined
-        dense
-        :placeholder="
-          tdc(
-            `Have feedback or suggestions? We would be happy to hear from you. Please do not include passwords, sensitive personal data, or confidential organizational information. <br>Need assistance? Visit the Help Center or contact your organization's support team.`
-          )
-        "
-      />
+    <s-editor
+      v-model="comment_text"
+      outlined
+      dense
+      :placeholder="
+        tdc(
+          `Have feedback or suggestions? We would be happy to hear from you. Please do not include passwords, sensitive personal data, or confidential organizational information. <br>Need assistance? Visit the Help Center or contact your organization's support team.`
+        )
+      "
+    />
 
-      <div
-        v-if="error"
-        class="text-negative text-caption q-mt-xs"
-      >
-        {{ tdc('This field is required.') }}
-      </div>
-    </q-card-section>
+    <div
+      v-if="error"
+      class="text-negative text-caption q-mt-xs"
+    >
+      {{ tdc('This field is required.') }}
+    </div>
 
     <!-- INFORMAÇÃO -->
-    <q-card-section class="q-pt-none">
-      <div
-        class="information-text text-caption text-grey-7"
-        v-html="
-          tdc(
-            'Some account, entity, branch, and system information may be collected and processed to provide support, diagnose and resolve technical issues, maintain security, and improve the quality of our services. This information may be shared with authorized administrators or service providers when necessary, in accordance with the applicable Privacy Policy and Terms of Service. <br><br>We may contact you by email or other authorized communication channels if additional information is required or to provide updates regarding your request. For privacy, data protection, or legal matters, please contact your organization or the appropriate system administrator.'
-          )
-        "
-      />
-    </q-card-section>
-
-    <q-separator />
+    <div
+      class="information-text text-caption text-grey-7 q-mt-md"
+      v-html="
+        tdc(
+          'Some account, entity, branch, and system information may be collected and processed to provide support, diagnose and resolve technical issues, maintain security, and improve the quality of our services. This information may be shared with authorized administrators or service providers when necessary, in accordance with the applicable Privacy Policy and Terms of Service. <br><br>We may contact you by email or other authorized communication channels if additional information is required or to provide updates regarding your request. For privacy, data protection, or legal matters, please contact your organization or the appropriate system administrator.'
+        )
+      "
+    />
 
     <!-- ACTIONS -->
-    <q-card-actions align="right">
+    <template #footer>
       <s-btn
         v-close-popup
         flat
@@ -77,8 +49,8 @@
       >
         {{ tdc('Send') }}
       </s-btn>
-    </q-card-actions>
-  </s-card>
+    </template>
+  </s-modal-card>
 </template>
 
 <script>

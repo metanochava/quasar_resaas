@@ -66,7 +66,7 @@ describe('TwoFactorSetupDialog', () => {
 
     // "Done" needs the acknowledgement; the dialog cannot be dismissed before it
     expect(inBody('[data-test="setup-done"]').disabled).toBe(true)
-    expect(inBody('[data-test="setup-close"]')).toBeNull()
+    expect(inBody('[data-test="modal-close"]')).toBeNull()
 
     const box = inBody('[data-test="codes-saved"]')
     box.click()
@@ -104,7 +104,7 @@ describe('TwoFactorSetupDialog', () => {
   it('a persistent dialog (sign-in enrolment) has no close button', async () => {
     await open({ persistent: true })
 
-    expect(inBody('[data-test="setup-close"]')).toBeNull()
+    expect(inBody('[data-test="modal-close"]')).toBeNull()
   })
 
   it('wipes the secret when closed', async () => {

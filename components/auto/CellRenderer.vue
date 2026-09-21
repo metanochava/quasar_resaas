@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { tdc } from '../../services/translation'
 
 const props = defineProps({
   value: null,
@@ -43,9 +44,9 @@ function openPreview() {
     />
 
     <q-dialog v-model="showPreview">
-      <q-card>
-        <img :src="imageUrl" style="max-width:100%;max-height:80vh" />
-      </q-card>
+      <s-modal-card :title="tdc('Preview')" icon="image" width="auto" flush>
+        <div class="text-center"><div class="text-center"><img :src="imageUrl" style="display:block;max-width:100%;max-height:80vh" /></div></div>
+      </s-modal-card>
     </q-dialog>
   </template>
 

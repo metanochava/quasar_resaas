@@ -121,22 +121,16 @@ function onPrimaryAction() {
     </s-card>
 
     <q-dialog v-model="fullscreen" maximized>
-      <s-card class="dashboard-widget-fullscreen">
-        <q-card-section class="row items-center justify-between">
-          <div class="text-h6">{{ tdc(widget.label) }}</div>
-          <q-btn flat dense round icon="close" v-close-popup />
-        </q-card-section>
-        <q-card-section>
-          <component
-            v-if="component && !isEmpty"
-            :is="component"
-            :widget="widget"
-            :data="data"
-            :loading="loading"
-          />
-          <WidgetEmpty v-else />
-        </q-card-section>
-      </s-card>
+      <s-modal-card :title="tdc(widget.label)" icon="dashboard" fullscreen>
+        <component
+          v-if="component && !isEmpty"
+          :is="component"
+          :widget="widget"
+          :data="data"
+          :loading="loading"
+        />
+        <WidgetEmpty v-else />
+      </s-modal-card>
     </q-dialog>
   </div>
 </template>

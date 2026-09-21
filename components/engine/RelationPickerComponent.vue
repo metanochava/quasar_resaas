@@ -297,26 +297,19 @@ const density = computed(() => attrs.dense ?? User.ps?.layout?.dense)
     </q-input>
 
     <q-dialog v-model="modalOpen" @show="onModalShow" @hide="onModalHide">
-      <s-card class="relation-modal">
-        <q-card-section class="row items-center q-pb-none">
-          <div class="text-subtitle1 text-weight-bold col">{{ fieldLabel || tdc('Search') }}</div>
-          <s-btn flat round dense icon="close" data-test="relation-modal-close" @click="modalOpen = false" />
-        </q-card-section>
-
-        <q-card-section>
-          <RelationSearchPanel
-            :search="search"
-            :query="query"
-            :min-chars="minChars"
-            :can-search="canSearch"
-            :can-add="canAdd"
-            :locked="locked"
-            @update:query="onQuery"
-            @choose="choose"
-            @create="openDialog('add')"
-          />
-        </q-card-section>
-      </s-card>
+      <s-modal-card :title="fieldLabel || tdc('Search')" icon="search" width="520px" @close="modalOpen = false">
+        <RelationSearchPanel
+          :search="search"
+          :query="query"
+          :min-chars="minChars"
+          :can-search="canSearch"
+          :can-add="canAdd"
+          :locked="locked"
+          @update:query="onQuery"
+          @choose="choose"
+          @create="openDialog('add')"
+        />
+      </s-modal-card>
     </q-dialog>
   </template>
 
@@ -434,7 +427,6 @@ const density = computed(() => attrs.dense ?? User.ps?.layout?.dense)
   font-weight: 700;
 }
 
-.relation-modal { width: 520px; max-width: 94vw; }
 .relation-trigger :deep(input) { cursor: pointer; }
 
 @media (max-width: 599px) {

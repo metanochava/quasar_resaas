@@ -141,7 +141,6 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { Dialog } from 'quasar'
 import { tdc } from '../../services/translation'
 import { HTTPAuth, url } from '../../services/api'
 import { useScaffoldIDEStore } from '../../stores/ScaffoldIDEStore'
@@ -153,6 +152,7 @@ import ProblemsPanel from '../../components/scaffold/ProblemsPanel.vue'
 import CommandRunnerPanel from '../../components/scaffold/CommandRunnerPanel.vue'
 import CodeEditor from '../../components/scaffold/CodeEditor.vue'
 import GeneratorPanel from '../../components/scaffold/GeneratorPanel.vue'
+import { sDialog } from '../../services/dialog'
 
 // Scaffold IDE (mega-prompt: "ScaffoldPage.vue deve deixar de ser
 // apenas uma página de comandos e passar a funcionar como um IDE
@@ -228,7 +228,7 @@ function requestClose(path) {
     return
   }
 
-  Dialog.create({
+  sDialog({
     title: tdc('Unsaved changes'),
     message: tdc('"{name}" has unsaved changes.').replace('{name}', fileLabel(path)),
     cancel: true,

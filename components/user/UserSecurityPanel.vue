@@ -7,6 +7,7 @@ import { useUserStore } from '../../stores/UserStore'
 import { tdc } from '../../services/translation'
 import { Alert, AlertSuccess } from '../../boot/alerts'
 import TwoFactorCard from './TwoFactorCard.vue'
+import { sDialog } from '../../services/dialog'
 
 // "Security" section of the User details: the state of the password and - only
 // while it is still TEMPORARY - the explicit, permission-gated, audited way to
@@ -121,7 +122,7 @@ async function copyRevealed() {
 
 // ---------- regenerate ----------
 function confirmRegenerate() {
-  $q.dialog({
+  sDialog({
     title: tdc('Generate a new temporary password'),
     message: tdc('The current temporary password will stop working and a new one will be created. Continue?'),
     persistent: true,
@@ -239,26 +240,21 @@ onBeforeUnmount(wipe)
 
     <!-- the password lives only here, only while open -->
     <q-dialog v-model="dialogOpen" persistent @hide="wipe">
-      <s-card class="reveal-card">
-        <q-card-section>
-          <div class="text-h6">{{ tdc('Temporary password') }}</div>
-          <div v-if="username" class="text-caption text-grey-7">{{ username }}</div>
-        </q-card-section>
+      <s-modal-card :title="tdc('Temporary password')" icon="key" width="420px" @close="dialogOpen = false">
+        <div v-if="username" class="text-caption text-grey-7 q-mb-sm">{{ username }}</div>
 
-        <q-card-section>
-          <div class="revealed" data-test="revealed-password">{{ revealed }}</div>
+        <div class="revealed" data-test="revealed-password">{{ revealed }}</div>
 
-          <div class="row items-center no-wrap text-caption q-mt-md text-warning">
-            <q-icon name="warning" size="18px" class="q-mr-xs" />
-            {{ tdc('This is a sensitive credential.') }}
-          </div>
-        </q-card-section>
+        <div class="row items-center no-wrap text-caption q-mt-md text-warning">
+          <q-icon name="warning" size="18px" class="q-mr-xs" />
+          {{ tdc('This is a sensitive credential.') }}
+        </div>
 
-        <q-card-actions align="between">
+        <template #footer>
           <s-btn flat no-caps icon="content_copy" :label="tdc('Copy')" data-test="reveal-copy" @click="copyRevealed" />
           <s-btn flat no-caps :label="tdc('Close')" data-test="reveal-close" @click="dialogOpen = false" />
-        </q-card-actions>
-      </s-card>
+        </template>
+      </s-modal-card>
     </q-dialog>
   </s-card>
 </template>
@@ -272,7 +268,6 @@ onBeforeUnmount(wipe)
   margin-bottom: 2px;
 }
 .field-value { font-size: 15px; font-weight: 500; }
-.reveal-card { width: 420px; max-width: 94vw; }
 .revealed {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 22px;

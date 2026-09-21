@@ -1,40 +1,6 @@
 <template>
-  <s-card flat class="column full-height notification-credentials-card">
-    <q-bar
-      :class="
-        $q.dark.isActive
-          ? 'bg-dark text-white'
-          : 'bg-primary text-white'
-      "
-    >
-      <q-icon name="forum" size="22px" />
-
-      <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        {{ tdc('Notification Providers') }} - {{ Entity.row?.name }}
-      </div>
-
-      <q-space />
-
-      <s-btn v-close-popup dense flat icon="close">
-        <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-      </s-btn>
-    </q-bar>
-
-    <q-separator />
-
-    <div
-      v-if="!isOwnActiveEntity"
-      class="col scroll"
-    >
-      <q-banner class="bg-warning text-dark q-ma-md">
-        {{ tdc('You can only manage notification provider credentials for your own active Entity.') }}
-      </q-banner>
-    </div>
-
-    <q-card-section
-      v-else
-      class="col scroll q-pa-md"
-    >
+  <s-modal-card :title="`${tdc('Notification Providers')} - ${Entity.row?.name}`" icon="forum" width="640px">
+    <div>
       <div v-if="loading" class="flex flex-center q-pa-lg">
         <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </div>
@@ -51,8 +17,8 @@
           @remove="onRemoveChannel(channel.key)"
         />
       </q-list>
-    </q-card-section>
-  </s-card>
+    </div>
+  </s-modal-card>
 </template>
 
 
@@ -228,11 +194,3 @@ onMounted(() => {
   }
 })
 </script>
-
-
-<style scoped>
-.notification-credentials-card {
-  width: 640px;
-  max-width: 100%;
-}
-</style>

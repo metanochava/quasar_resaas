@@ -3,59 +3,32 @@
     :model-value="modelValue"
     @update:model-value="emit('update:modelValue', $event)"
   >
-    <s-card style="min-width: 400px">
+    <s-modal-card
+      :title="isHardDelete ? tdc('Delete permanently?') : tdc('Confirm?')"
+      :icon="isHardDelete ? 'warning' : 'help'"
+      width="420px"
+      @close="close"
+    >
+      <div>
+        {{ tdc('Are you sure you want to delete:') }}
+      </div>
 
-      <!-- HEADER -->
-      <q-card-section class="row items-center q-gutter-sm">
+      <b v-if="row">
+        {{ row[props.id] || row?.value || row?.id }}
 
-        <q-icon
-          :name="isHardDelete ? 'warning' : 'help'"
-          :color="isHardDelete ? 'red' : 'orange'"
-          size="md"
-        />
+        <br />
 
-        <div class="text-h6">
-          {{
-            isHardDelete
-              ? tdc('Delete permanently?')
-              : tdc('Confirm?')
-          }}
-        </div>
+        {{ row[props.label]?.label || row?.name || row?.label || '' }}
+      </b>
 
-      </q-card-section>
+      <div
+        v-if="isHardDelete"
+        class="text-red q-mt-sm"
+      >
+        ⚠️ {{ tdc('This action cannot be undone') }}
+      </div>
 
-
-      <!-- BODY -->
-      <q-card-section>
-
-        <div>
-          {{ tdc('Are you sure you want to delete:') }}
-        </div>
-
-        <b v-if="row">
-
-          {{  row[props.id] || row?.value || row?.id }}
-
-          <br />
-
-          {{ row[props.label]?.label || row?.name || row?.label || '' }}
-
-        </b>
-
-
-        <div
-          v-if="isHardDelete"
-          class="text-red q-mt-sm"
-        >
-          ⚠️ {{ tdc('This action cannot be undone') }}
-        </div>
-
-      </q-card-section>
-
-
-      <!-- ACTIONS -->
-      <q-card-actions align="right">
-
+      <template #footer>
         <s-btn
           flat
           dense
@@ -73,10 +46,8 @@
           "
           @click="confirm"
         />
-
-      </q-card-actions>
-
-    </s-card>
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>
 

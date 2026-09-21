@@ -59,85 +59,76 @@
 
     <!-- ENROLLMENTS DIALOG -->
     <q-dialog v-model="sessionDialog">
-      <s-card style="width: min(560px, 94vw);">
-        <q-bar>
-          <div class="text-subtitle2">
-            {{ selectedSession?.course_data?.label || selectedSession?.course_data?.name }}
-          </div>
-          <q-space />
-          <s-btn dense flat icon="close" v-close-popup />
-        </q-bar>
-
-        <q-card-section class="row items-center q-col-gutter-sm">
-          <div class="col">
-            <s-select
-              v-model="enrollEmployeeChoice"
-              :options="employeeOptions"
-              emit-value
-              map-options
-              outlined
-              dense
-              :label="tdc('Enroll employee')"
-            />
-          </div>
-          <div class="col-auto">
-            <s-btn
-              color="primary"
-              icon="person_add"
-              :loading="TrainingSession.enrollmentActionLoading"
-              :disable="!enrollEmployeeChoice"
-              @click="doEnroll"
-            />
-          </div>
-        </q-card-section>
-
-        <div v-if="enrollError" class="text-negative text-caption q-px-md">{{ enrollError }}</div>
-
-        <q-separator />
-
-        <div v-if="TrainingSession.loadingEnrollments" class="flex flex-center q-pa-lg">
-          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
+      <s-modal-card :title="selectedSession?.course_data?.label || selectedSession?.course_data?.name || ''" icon="school" width="560px">
+        <template #subheader>
+          <div class="row items-center q-col-gutter-sm">
+        <div class="col">
+          <s-select
+            v-model="enrollEmployeeChoice"
+            :options="employeeOptions"
+            emit-value
+            map-options
+            outlined
+            dense
+            :label="tdc('Enroll employee')"
+          />
         </div>
-
-        <div v-else-if="!TrainingSession.enrollments.length" class="text-grey-6 q-pa-md">
-          {{ tdc('No one enrolled yet.') }}
+        <div class="col-auto">
+          <s-btn
+            color="primary"
+            icon="person_add"
+            :loading="TrainingSession.enrollmentActionLoading"
+            :disable="!enrollEmployeeChoice"
+            @click="doEnroll"
+          />
         </div>
+          </div>
+          <div v-if="enrollError" class="text-negative text-caption q-mt-xs">{{ enrollError }}</div>
+        </template>
 
-        <q-list v-else separator>
-          <q-item v-for="enrollment in TrainingSession.enrollments" :key="enrollment.id">
-            <q-item-section>
-              <q-item-label>{{ enrollment.employee_data?.label }}</q-item-label>
-              <q-item-label caption v-if="enrollment.score">
-                {{ tdc('Score') }}: {{ enrollment.score }}
-              </q-item-label>
-            </q-item-section>
+      <div v-if="TrainingSession.loadingEnrollments" class="flex flex-center q-pa-lg">
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
+      </div>
 
-            <q-item-section side>
-              <div class="row items-center q-gutter-sm">
-                <q-badge :color="enrollmentStatusColor(enrollment.status)">
-                  {{ enrollment.status?.label || enrollment.status }}
-                </q-badge>
-                <template v-if="['enrolled', 'attending'].includes(enrollment.status?.value || enrollment.status)">
-                  <s-btn
-                    flat dense round icon="check_circle" color="positive"
-                    :loading="TrainingSession.enrollmentActionLoading"
-                    @click="doMarkCompleted(enrollment)"
-                  >
-                    <s-tooltip>{{ tdc('Mark completed') }}</s-tooltip>
-                  </s-btn>
-                  <s-btn
-                    flat dense round icon="cancel" color="negative"
-                    :loading="TrainingSession.enrollmentActionLoading"
-                    @click="doMarkFailed(enrollment)"
-                  >
-                    <s-tooltip>{{ tdc('Mark failed') }}</s-tooltip>
-                  </s-btn>
-                </template>
-              </div>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </s-card>
+      <div v-else-if="!TrainingSession.enrollments.length" class="text-grey-6 q-pa-md">
+        {{ tdc('No one enrolled yet.') }}
+      </div>
+
+      <q-list v-else separator>
+        <q-item v-for="enrollment in TrainingSession.enrollments" :key="enrollment.id">
+          <q-item-section>
+            <q-item-label>{{ enrollment.employee_data?.label }}</q-item-label>
+            <q-item-label caption v-if="enrollment.score">
+              {{ tdc('Score') }}: {{ enrollment.score }}
+            </q-item-label>
+          </q-item-section>
+
+          <q-item-section side>
+            <div class="row items-center q-gutter-sm">
+              <q-badge :color="enrollmentStatusColor(enrollment.status)">
+                {{ enrollment.status?.label || enrollment.status }}
+              </q-badge>
+              <template v-if="['enrolled', 'attending'].includes(enrollment.status?.value || enrollment.status)">
+                <s-btn
+                  flat dense round icon="check_circle" color="positive"
+                  :loading="TrainingSession.enrollmentActionLoading"
+                  @click="doMarkCompleted(enrollment)"
+                >
+                  <s-tooltip>{{ tdc('Mark completed') }}</s-tooltip>
+                </s-btn>
+                <s-btn
+                  flat dense round icon="cancel" color="negative"
+                  :loading="TrainingSession.enrollmentActionLoading"
+                  @click="doMarkFailed(enrollment)"
+                >
+                  <s-tooltip>{{ tdc('Mark failed') }}</s-tooltip>
+                </s-btn>
+              </template>
+            </div>
+          </q-item-section>
+        </q-item>
+      </q-list>
+      </s-modal-card>
     </q-dialog>
   </q-page>
 </template>

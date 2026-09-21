@@ -1,36 +1,23 @@
 
 <template>
 
-    <s-card>
-        <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
-        &nbsp; {{tdc('')}} {{ app }}  | {{ model }} 
-        <q-space />
-        <s-btn dense flat icon="close" v-close-popup>
-            <s-tooltip>{{tdc('Close')}}</s-tooltip>
-        </s-btn>
-        </q-bar>
+    <s-modal-card :title="`${app} | ${model}`" icon="code" width="640px">
+        <s-input outlined
+            v-model="text_text"
+            class=""
+            dense
+            :placeholder="tdc('Write the action code here')"
+            type="textarea"
+            :rules="[ val => val && val.length > 0 || tdc('This field is required.')]"
+            />
 
-        <q-card-section >
-            <s-input outlined
-                v-model="text_text"
-                class=""
-                dense
-                :placeholder="tdc('Write the action code here')"
-                type="textarea"
-                :rules="[ val => val && val.length > 0 || tdc('This field is required.')]"
-                />
-        </q-card-section>
+        <div class="q-mt-md">{{accao}}</div>
 
-        <q-card-section >
-        {{accao}}
-        </q-card-section>
-        <q-separator />
-
-        <q-card-actions align="right">
+        <template #footer>
         <s-btn  v-close-popup   :color="$q.dark.isActive ? '' : 'dark'" >{{tdc('Cancel')}}</s-btn>
         <s-btn  :color="$q.dark.isActive ? 'primary' : 'primary'" type="submit" @click="save_text" > {{tdc('Submit')}}</s-btn>
-        </q-card-actions>
-    </s-card>
+        </template>
+    </s-modal-card>
 
 </template>
 

@@ -1,45 +1,12 @@
 <template>
-  <s-card class="column full-height app-card">
+  <s-modal-card :title="tdc('Apps Management')" icon="apps" fullscreen flush>
+    <template #bar-actions>
+      <q-badge color="white" text-color="primary">
+        {{ EntityType.selectedApps.length }} active
+      </q-badge>
+    </template>
 
-    <!-- 🔥 FIXED HEADER -->
-    <div class="app-header">
-
-      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
-        <q-icon name="view_app" class="q-mr-sm" />
-        <div class="text-subtitle1 text-weight-bold">
-          {{ tdc("Apps Management") }}
-        </div>
-        <q-space />
-        <q-badge color="white" text-color="primary">
-          {{ EntityType.selectedApps.length }} active
-        </q-badge>
-
-        <s-btn dense flat icon="close" v-close-popup >
-          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-        </s-btn>
-      </q-bar>
-
-      <q-separator />
-
-      <!-- 🔍 SEARCH (FIXED) -->
-      <div class="q-pa-sm bg-grey-2">
-        <q-input
-          v-model="search"
-          dense
-          outlined
-          clearable
-          placeholder="Search module..."
-        >
-          <template #prepend>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </div>
-
-    </div>
-
-    <!-- 🔥 LIST (SCROLLING) -->
-    <q-card-section class="app-body">
+    <div class="col scroll" style="min-height: 0;">
 
       <div v-if="EntityType.loadingApps" class="flex flex-center q-pa-xl">
         <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
@@ -107,9 +74,8 @@
         No module found
       </div>
 
-    </q-card-section>
-
-  </s-card>
+    </div>
+  </s-modal-card>
 </template>
 
 <script setup>
@@ -143,25 +109,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.app-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 🔥 FIXED HEADER */
-.app-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-/* 🔥 SCROLLING BODY */
-.app-body {
-  flex: 1;
-  overflow-y: auto;
-}
-
 /* 🔥 ITEM */
 .app-item {
   transition: all 0.2s ease;

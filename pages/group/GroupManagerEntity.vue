@@ -1,69 +1,34 @@
 <template>
   <q-dialog v-model="permissionsModal" @hide="Permission.resetChanges">
-    <q-card class="modal-card">
-      <div class="modal-header">
-        <q-bar
-          :class="
-            $q.dark.isActive
-              ? 'bg-dark text-white'
-              : 'bg-primary text-white'
-          "
-        >
-          <div class="text-subtitle2">
-            {{ tdc('Permissions') }} - {{ groupLabel(Group.row) }}
-          </div>
-
-          <q-space />
-          <s-btn v-close-popup dense flat icon="close" />
-        </q-bar>
-
-        <q-separator />
+    <s-modal-card
+      :title="`${tdc('Permissions')} - ${groupLabel(Group.row)}`"
+      icon="security"
+      width="min(1100px, 90vw)"
+      class="permissions-card"
+    >
+      <div v-if="!ready" class="flex flex-center q-pa-lg">
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
       </div>
 
-      <q-card-section class="modal-body">
-        <div v-if="!ready" class="flex flex-center q-pa-lg">
-          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
-        </div>
-
-        <PermissionManager
-          v-else
-          :AllPermissions="permissions"
-          :GroupPermissionsRe="Group.row?.permissions || []"
-          :Group="Group.row"
-          @saved="onPermissionsSaved"
-        />
-      </q-card-section>
-    </q-card>
+      <PermissionManager
+        v-else
+        :AllPermissions="permissions"
+        :GroupPermissionsRe="Group.row?.permissions || []"
+        :Group="Group.row"
+        @saved="onPermissionsSaved"
+      />
+    </s-modal-card>
   </q-dialog>
 
-  <s-card class="column full-height group-manager-card">
-    <q-bar
-      :class="
-        $q.dark.isActive
-          ? 'bg-dark text-white'
-          : 'bg-primary text-white'
-      "
-    >
-      <q-icon name="groups" size="22px" />
-
-      <div class="text-subtitle1 text-weight-bold q-ml-sm">
-        {{ tdc('Manage Groups of') }} {{ Entity.row.name }}
-      </div>
-
-      <q-space />
-
+  <s-modal-card :title="`${tdc('Manage Groups of')} ${Entity.row.name}`" icon="groups" fullscreen flush>
+    <template #bar-actions>
       <q-badge color="white" text-color="primary">
         {{ Entity.selectedGroups.length }} {{ tdc('active') }}
       </q-badge>
+    </template>
 
-      <s-btn v-close-popup dense flat icon="close">
-        <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-      </s-btn>
-    </q-bar>
-
-    <q-separator />
-
-    <q-card-section class="q-pa-md">
+    <template #subheader>
+      <div class="q-mb-sm">
       <div class="row q-col-gutter-sm items-center">
         <div class="col">
           <q-input
@@ -92,11 +57,8 @@
           />
         </div>
       </div>
-    </q-card-section>
+      </div>
 
-    <q-separator />
-
-    <q-card-section class="q-pa-md">
       <q-input
         v-model="Entity.groupSearch"
         dense
@@ -108,11 +70,9 @@
           <q-icon name="search" />
         </template>
       </q-input>
-    </q-card-section>
+    </template>
 
-    <q-separator />
-
-    <q-card-section class="col scroll q-pa-none">
+    <div class="col scroll" style="min-height: 0;">
       <div
         v-if="Entity.loadingGroups"
         class="flex flex-center q-pa-xl"
@@ -189,8 +149,8 @@
           </q-item-section>
         </q-item>
       </q-list>
-    </q-card-section>
-  </s-card>
+    </div>
+  </s-modal-card>
 </template>
 
 <script setup>
@@ -263,10 +223,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.group-manager-card {
-  overflow: hidden;
-}
-
 .group-item {
   border-left: 4px solid transparent;
   transition: all 0.2s ease;
@@ -277,22 +233,7 @@ onMounted(() => {
   border-left-color: var(--q-primary);
 }
 
-.modal-card {
-  display: flex;
-  flex-direction: column;
-  min-width: 70%;
-  max-width: 90vw;
+.permissions-card {
   height: 80vh;
-}
-
-.modal-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.modal-body {
-  flex: 1;
-  overflow-y: auto;
 }
 </style>

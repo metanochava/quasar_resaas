@@ -201,7 +201,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { Dialog } from 'quasar'
 import { useRouter } from 'vue-router'
 import { HTTPAuth, url } from '../../services/api'
 import { useUserStore } from '../../stores/UserStore'
@@ -209,6 +208,7 @@ import { tdc } from '../../services/translation'
 import FormSection from '../../components/auto/FormSection.vue'
 import AppModelsDialog from './AppModelsDialog.vue'
 import AppEntityTypesDialog from './AppEntityTypesDialog.vue'
+import { sDialog } from '../../services/dialog'
 
 // ---------------- STATE ----------------
 const router = useRouter()
@@ -369,7 +369,7 @@ async function createApp () {
 function confirmDelete(app) {
   if (isProtected(app)) return
 
-  Dialog.create({
+  sDialog({
     title: tdc('Confirm'),
     message: tdc('Are you sure you want to delete the module "{name}"?').replace('{name}', app),
     cancel: true,

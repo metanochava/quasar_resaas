@@ -16,72 +16,51 @@
     v-model="showSearchDialog"
     persistent
   >
-    <q-card
-      style="width: 900px; max-width: 95vw"
-      class="rounded-borders"
-    >
-      <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
-        <div class="text-h6">
-        {{ tdc('Search Person') }}
-        </div>
+    <s-modal-card :title="tdc('Search Person')" icon="person_search" width="900px" @close="closeSearchDialog">
+      <q-input
+        v-model="Person.search"
+        outlined
+        dense
+        clearable
+        debounce="500"
+        label="Search person"
+        @update:model-value="doSearch"
+      >
+        <template #prepend>
+          <q-icon name="search" />
+        </template>
+      </q-input>
 
-        <q-space />
+      <!-- LOADING -->
+      <div
+        v-if="Person.loading"
+        class="flex flex-center q-pa-lg"
+      >
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
+      </div>
 
-        <s-btn
-          flat
-          round
-          dense
-          icon="close"
-          @click="closeSearchDialog"
+      <!-- RESULTS -->
+      <div
+        v-else-if="Person.search"
+        class="q-mt-md"
+      >
+        <PersonCard
+          v-for="person in Person.rows"
+          :key="person.id"
+          :person="person"
+          class="q-mb-sm"
+          @select="selectPerson"
         />
-      </q-bar>
 
-      <q-card-section>
-        <q-input
-          v-model="Person.search"
-          outlined
-          dense
-          clearable
-          debounce="500"
-          label="Search person"
-          @update:model-value="doSearch"
-        >
-          <template #prepend>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-
-        <!-- LOADING -->
         <div
-          v-if="Person.loading"
-          class="flex flex-center q-pa-lg"
+          v-if="Person.rows.length === 0"
+          class="text-grey text-caption text-center q-pa-md"
         >
-          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
+          No person found
         </div>
+      </div>
 
-        <!-- RESULTS -->
-        <div
-          v-else-if="Person.search"
-          class="q-mt-md"
-        >
-          <PersonCard
-            v-for="person in Person.rows"
-            :key="person.id"
-            :person="person"
-            class="q-mb-sm"
-            @select="selectPerson"
-          />
-
-          <div
-            v-if="Person.rows.length === 0"
-            class="text-grey text-caption text-center q-pa-md"
-          >
-            No person found
-          </div>
-        </div>
-      </q-card-section>
-
-      <q-card-actions align="between" class="q-pa-md">
+      <template #footer>
         <s-btn
           flat
           color="grey"
@@ -89,7 +68,7 @@
           no-caps
           @click="closeSearchDialog"
         />
-
+        <q-space />
         <s-btn
           color="primary"
           icon="person_add"
@@ -97,8 +76,8 @@
           no-caps
           @click="openCreateDialog"
         />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </s-modal-card>
   </q-dialog>
 
   <!-- MODAL TO CREATE PERSON -->
@@ -106,39 +85,20 @@
     v-model="showCreateDialog"
     persistent
   >
-    <q-card
-      style="width: 900px; max-width: 95vw"
-      class="rounded-borders"
-    >
-      <q-bar class="row items-center " :class="$q.dark.isActive ? 'bg-dark text-white' : ' bg-primary text-white'">
-        <div class="text-h6">
-          Create Person
-        </div>
+    <s-modal-card :title="tdc('Create Person')" icon="person_add" width="900px" footer-raw @close="closeCreateDialog">
+      <Form
+        :store="Person"
+        :ignore-fields="ignoreFields"
+        @saved="onSaved"
+      />
 
-        <q-space />
-
-        <s-btn
-          flat
-          round
-          dense
-          icon="close"
-          @click="closeCreateDialog"
-        />
-      </q-bar>
-
-      <q-card-section>
-        <Form
-          :store="Person"
-          :ignore-fields="ignoreFields"
-          @saved="onSaved"
-        />
-
+      <template #footer>
         <ActionForm
           :store="Person"
           :buttons="['cancel', 'reset', 'edit', 'save']"
         />
-      </q-card-section>
-    </q-card>
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>
 

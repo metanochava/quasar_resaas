@@ -178,6 +178,7 @@ import { buildWritePayload, updateWithPayload } from '../../../utils/payload'
 import { tdc } from '../../../services/translation'
 import { usePageTitle } from '../../../services/pageTitle'
 import { Alert } from '../../../boot/alerts'
+import { sDialog } from '../../../services/dialog'
 
 // The Person half (personal data, contacts, address, documents, emergency
 // contacts, duplicate matching, edit load/diff-save) is the shared
@@ -232,7 +233,7 @@ function cancel() {
     return
   }
 
-  $q.dialog({
+  sDialog({
     title: tdc('Discard changes?'),
     message: tdc('The employee form has unsaved information. Are you sure you want to leave?'),
     persistent: true,

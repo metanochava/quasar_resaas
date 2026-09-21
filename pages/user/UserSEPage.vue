@@ -15,15 +15,7 @@
     <!-- ===================================================== -->
 
     <q-dialog v-model="openTheme" persistent full-height full-width>
-      <s-card class="q-pa-md">
-        <q-bar :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-          <q-toolbar-title>{{ tdc('Theme Management') }}</q-toolbar-title>
-          <q-space />
-          <s-btn dense flat round icon="close" @click="openTheme = false" />
-        </q-bar>
-
-        <q-separator />
-
+      <s-modal-card :title="tdc('Theme Management')" icon="palette" fullscreen @close="openTheme = false">
         <ThemeStudioEngine
           scope="user"
           :allow-scope-select="false"
@@ -33,7 +25,7 @@
           :layouts="LayoutSetting.rows"
           @saved="onThemeSaved"
         />
-      </s-card>
+      </s-modal-card>
     </q-dialog>
 
 

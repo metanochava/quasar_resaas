@@ -39,38 +39,21 @@
       transition-show="slide-left"
       transition-hide="slide-right"
     >
-      <q-card
-        square
+      <s-modal-card
+        width="min(1100px, 95vw)"
+        flush
         class="notification-chat"
-        :class="
-          $q.dark.isActive
-            ? 'bg-dark text-white'
-            : 'bg-grey-1'
-        "
+        :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-grey-1'"
       >
-        <!-- =================================================
-             HEADER
-        ================================================== -->
-        <q-bar class="chat-header text-white">
-          <q-avatar
-            color="white"
-            text-color="primary"
-            icon="support_agent"
-            size="36px"
-          />
-
-          <div class="q-ml-sm">
+        <template #title>
+          <div>
             <div class="text-subtitle2 text-weight-bold">
               {{ tdc('Support & Feedback') }}
             </div>
-
-            <div class="text-caption">
-              {{ tdc('Comments and conversations') }}
-            </div>
           </div>
+        </template>
 
-          <q-space />
-
+        <template #bar-actions>
           <s-btn
             flat
             round
@@ -82,19 +65,7 @@
               {{ tdc('Refresh') }}
             </s-tooltip>
           </s-btn>
-
-          <s-btn
-            flat
-            round
-            dense
-            icon="close"
-            v-close-popup
-          >
-            <s-tooltip>
-              {{ tdc('Close') }}
-            </s-tooltip>
-          </s-btn>
-        </q-bar>
+        </template>
 
         <!-- =================================================
              BODY
@@ -430,7 +401,7 @@
             </div>
           </div>
         </div>
-      </q-card>
+      </s-modal-card>
     </q-dialog>
   </div>
 </template>
@@ -1336,32 +1307,9 @@ export default defineComponent({
    LAYOUT
 ========================================================= */
 
+/* fixed height: the header (q-bar) and the message input stay put, the lists scroll */
 .notification-chat {
-  width: min(1100px, 95vw);
-
-  max-width: 1100px;
-
   height: min(850px, 92vh);
-
-  overflow: hidden;
-
-  border-radius: 0 !important;
-}
-
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-.chat-header {
-  height: 64px;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--q-primary),
-      #075e54
-    );
 }
 
 
@@ -1369,16 +1317,16 @@ export default defineComponent({
    BODY
 ========================================================= */
 
+/* fills what is left below the q-bar */
 .chat-body {
   display: grid;
 
   grid-template-columns:
     350px minmax(0, 1fr);
 
-  height:
-    calc(
-      min(850px, 92vh) - 64px
-    );
+  grid-template-rows: minmax(0, 1fr);
+
+  flex: 1 1 auto;
 
   min-height: 0;
 }
@@ -1389,7 +1337,13 @@ export default defineComponent({
 ========================================================= */
 
 .conversation-list {
+  display: flex;
+
+  flex-direction: column;
+
   min-width: 0;
+
+  min-height: 0;
 
   overflow: hidden;
 
@@ -1404,10 +1358,9 @@ export default defineComponent({
 }
 
 .conversation-scroll {
-  height:
-    calc(
-      min(850px, 92vh) - 129px
-    );
+  flex: 1 1 auto;
+
+  min-height: 0;
 }
 
 .conversation-active {

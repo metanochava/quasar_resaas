@@ -110,46 +110,29 @@ watch(() => [props.entityId, props.entityTypeId], load, { immediate: true })
 </script>
 
 <template>
-  <s-card class="column full-height">
-
-    <!-- ================= FIXED HEADER ================= -->
-    <q-bar class="row items-center" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-      <div class="text-h6">
-        {{ tdc('Models Management') }}
-      </div>
-
-      <q-space />
-
+  <s-modal-card :title="tdc('Models Management')" icon="table_chart" fullscreen flush>
+    <template #bar-actions>
       <q-badge color="white" text-color="primary">
         {{ linked.length }} {{ tdc('active') }}
       </q-badge>
+    </template>
 
-      <s-btn dense flat icon="close" v-close-popup>
-        <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-      </s-btn>
-    </q-bar>
+    <!-- static search: only the list below scrolls -->
+    <template #subheader>
+    <q-input
+      v-model="search"
+      outlined
+      dense
+      clearable
+      :label="tdc('Search')"
+    >
+      <template #prepend>
+        <q-icon name="search" />
+      </template>
+    </q-input>
+    </template>
 
-    <q-separator />
-
-    <!-- ================= FIXED SEARCH ================= -->
-    <q-card-section>
-      <q-input
-        v-model="search"
-        outlined
-        dense
-        clearable
-        :label="tdc('Search')"
-      >
-        <template #prepend>
-          <q-icon name="search" />
-        </template>
-      </q-input>
-    </q-card-section>
-
-    <q-separator />
-
-    <!-- ================= SCROLL (HERE ONLY) ================= -->
-    <q-card-section class="col scroll">
+    <div class="col scroll" style="min-height: 0;">
 
       <div v-if="loading" class="flex flex-center q-pa-xl">
         <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
@@ -230,7 +213,6 @@ watch(() => [props.entityId, props.entityTypeId], load, { immediate: true })
         {{ tdc("This entity's EntityType has no models yet") }}
       </div>
 
-    </q-card-section>
-
-  </s-card>
+    </div>
+  </s-modal-card>
 </template>

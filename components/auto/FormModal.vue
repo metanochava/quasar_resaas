@@ -87,91 +87,42 @@ function onSaved() {
 
 <template>
   <q-dialog v-model="open" persistent>
-    <s-card class="dialog-card column no-wrap">
-      <q-bar
-        class="row items-center justify-between"
-        :class="
-          $q.dark.isActive
-            ? 'bg-dark text-white'
-            : 'bg-primary text-white'
-        "
+    <s-modal-card :title="title" icon="edit_note" width="760px" footer-raw @close="close">
+      <div
+        v-if="!store?.fields?.length"
+        class="flex flex-center q-pa-lg"
       >
-        <div class="text-h5 text-weight-bold">
-          {{ title }}
-        </div>
+        <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
+      </div>
 
-        <q-space />
+      <div v-else>
+        <Form
+          ref="formRef"
+          :store="store"
+          :ignore-fields="ignoreFields"
+          @saved="onSaved"
+        />
 
-        <s-btn flat round dense icon="close" @click="close">
-          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-        </s-btn>
-      </q-bar>
+        <q-linear-progress
+          v-if="uploadProgress > 0"
+          :value="uploadProgress / 100"
+          color="primary"
+          class="q-mt-md"
+        />
+      </div>
 
-      <q-separator />
-
-      <q-card-section class="scroll col dialog-body">
-        <div
-          v-if="!store?.fields?.length"
-          class="flex flex-center q-pa-lg"
-        >
-          <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
-        </div>
-
-        <div v-else>
-          <Form
-            ref="formRef"
-            :store="store"
-            :ignore-fields="ignoreFields"
-            @saved="onSaved"
-          />
-
-          <q-linear-progress
-            v-if="uploadProgress > 0"
-            :value="uploadProgress / 100"
-            color="primary"
-            class="q-mt-md"
-          />
-        </div>
-      </q-card-section>
-
-      <q-separator />
-
-      <ActionForm
-        :store="store"
-        :schema="schema"
-        :buttons="['cancel', 'reset', 'edit', 'delete', 'save']"
-        @cancel="close"
-        @reset="onReset"
-        @edit="save"
-        @delete="onDelete"
-        @save="save"
-      />
-    </s-card>
+      <template #footer>
+        <ActionForm
+          :store="store"
+          :schema="schema"
+          :buttons="['cancel', 'reset', 'edit', 'delete', 'save']"
+          @cancel="close"
+          @reset="onReset"
+          @edit="save"
+          @delete="onDelete"
+          @save="save"
+        />
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>
-
-<style scoped>
-.dialog-card {
-  min-width: 760px;
-  max-width: 92vw;
-  max-height: 90vh;
-  border-radius: 14px;
-}
-
-.dialog-body {
-  padding: 16px 20px;
-}
-
-@media (max-width: 767px) {
-  .dialog-card {
-    min-width: 95vw;
-    width: 95vw;
-    max-width: 95vw;
-    max-height: 95vh;
-  }
-
-  .dialog-body {
-    padding: 10px;
-  }
-}
-</style>

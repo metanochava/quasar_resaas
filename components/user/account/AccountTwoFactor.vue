@@ -132,13 +132,13 @@ async function regenerate(code) {
     />
 
     <q-dialog v-model="codesOpen" persistent>
-      <s-card class="codes-dialog">
-        <q-card-section class="text-h6">{{ tdc('Your new recovery codes') }}</q-card-section>
-        <q-card-section><RecoveryCodes :codes="freshCodes" /></q-card-section>
-        <q-card-actions align="right" class="q-px-md q-pb-md">
+      <s-modal-card :title="tdc('Your new recovery codes')" icon="vpn_key" width="420px" :closable="false">
+        <RecoveryCodes :codes="freshCodes" />
+
+        <template #footer>
           <s-btn unelevated no-caps color="primary" :label="tdc('Done')" data-test="codes-done" @click="codesOpen = false" />
-        </q-card-actions>
-      </s-card>
+        </template>
+      </s-modal-card>
     </q-dialog>
   </s-card>
 </template>
@@ -146,5 +146,4 @@ async function regenerate(code) {
 <style scoped>
 .security-card { transition: border-color .15s ease; }
 .security-card:hover { border-color: var(--q-primary); }
-.codes-dialog { width: 420px; max-width: 94vw; }
 </style>

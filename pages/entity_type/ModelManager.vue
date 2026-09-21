@@ -45,19 +45,9 @@ function toggleGroup(models, checked) {
 </script>
 <template>
 
-  <s-card class="column full-height">
-
-    <!-- ================= FIXED HEADER ================= -->
-    <q-bar class="row items-center" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'">
-      <div class="text-h6">
-        {{ tdc("Models Management") }}
-      </div>
-
-      <q-space />
-
-      <!-- STATUS -->
+  <s-modal-card :title="tdc('Models Management')" icon="table_chart" fullscreen flush>
+    <template #bar-actions>
       <div class="row items-center q-gutter-sm">
-
         <q-icon v-if="EntityType.models.status === 'saving'" name="sync" class="routete" />
         <q-icon v-else-if="EntityType.models.status === 'saved'" name="check_circle" color="positive" />
         <q-icon v-else-if="EntityType.models.status === 'error'" name="error" color="negative" />
@@ -68,18 +58,10 @@ function toggleGroup(models, checked) {
           <span v-else-if="EntityType.models.status === 'error'">{{ tdc('Error saving') }}</span>
           <span v-else>{{ tdc('Pending changes') }}</span>
         </span>
-
       </div>
+    </template>
 
-      <s-btn dense flat icon="close" v-close-popup >
-        <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-      </s-btn>
-    </q-bar>
-
-    <q-separator />
-
-    <!-- ================= FIXED SEARCH ================= -->
-    <q-card-section>
+    <template #subheader>
       <q-input
         v-model="EntityType.models.permissionSearch"
         outlined
@@ -92,12 +74,9 @@ function toggleGroup(models, checked) {
           <q-icon name="search" />
         </template>
       </q-input>
-    </q-card-section>
+    </template>
 
-    <q-separator />
-
-    <!-- ================= SCROLL (HERE ONLY) ================= -->
-    <q-card-section class="col scroll">
+    <div class="col scroll" style="min-height: 0;">
 
       <div v-if="EntityType.models.loadingModels" class="flex flex-center q-pa-xl">
         <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
@@ -176,8 +155,6 @@ function toggleGroup(models, checked) {
 
       </q-list>
 
-    </q-card-section>
-
-  </s-card>
-
+    </div>
+  </s-modal-card>
 </template>

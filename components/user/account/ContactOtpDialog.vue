@@ -35,19 +35,23 @@ const locked = computed(() => confirming.value || resending.value)
     @update:model-value="value => emit('update:modelValue', value)"
     @keydown.esc="!locked && emit('cancel')"
   >
-    <s-card class="otp-dialog text-center" role="dialog" aria-modal="true" :aria-label="isEmail ? tdc('Verify your email') : tdc('Verify your phone')">
-      <q-card-section class="column items-center q-pt-lg">
-        <q-avatar size="56px" color="primary" text-color="white" :icon="isEmail ? 'mail' : 'sms'" />
-
-        <div class="text-h6 q-mt-md">{{ isEmail ? tdc('Verify your email') : tdc('Verify your phone') }}</div>
-
-        <div class="text-body2 text-grey-7 q-mt-xs">
+    <s-modal-card
+      :title="isEmail ? tdc('Verify your email') : tdc('Verify your phone')"
+      :icon="isEmail ? 'mail' : 'sms'"
+      width="420px"
+      :close-disable="locked"
+      role="dialog"
+      aria-modal="true"
+      @close="emit('cancel')"
+    >
+      <div class="column items-center text-center">
+        <div class="text-body2 text-grey-7">
           {{ tdc('We sent a 6-digit code to') }}
         </div>
         <div class="text-subtitle1 text-weight-medium" data-test="otp-target">{{ masked }}</div>
-      </q-card-section>
+      </div>
 
-      <q-card-section>
+      <div class="q-mt-md">
         <OtpInput
           :model-value="otp"
           :length="6"
@@ -64,9 +68,9 @@ const locked = computed(() => confirming.value || resending.value)
           <q-icon name="error_outline" size="16px" class="q-mr-xs" />
           {{ tdc('Invalid or expired code') }}
         </div>
-      </q-card-section>
+      </div>
 
-      <q-card-section class="q-pt-none">
+      <div class="q-mt-md text-center">
         <div class="text-caption text-grey-7">{{ tdc("Didn't receive it?") }}</div>
         <s-btn
           flat
@@ -80,9 +84,9 @@ const locked = computed(() => confirming.value || resending.value)
           data-test="otp-resend"
           @click="emit('resend')"
         />
-      </q-card-section>
+      </div>
 
-      <q-card-actions align="right" class="q-px-md q-pb-md">
+      <template #footer>
         <s-btn flat no-caps :label="tdc('Cancel')" :disable="locked" data-test="otp-cancel" @click="emit('cancel')" />
         <s-btn
           unelevated
@@ -94,11 +98,7 @@ const locked = computed(() => confirming.value || resending.value)
           data-test="otp-confirm"
           @click="emit('confirm', otp)"
         />
-      </q-card-actions>
-    </s-card>
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>
-
-<style scoped>
-.otp-dialog { width: 420px; max-width: 94vw; max-height: 94vh; overflow-y: auto; }
-</style>

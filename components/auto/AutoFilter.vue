@@ -108,25 +108,21 @@ function apply() {
 
 <template>
   <q-dialog v-model="localModel" persistent>
-    <s-card style="min-width:720px;max-width:92vw">
-      <q-bar :class="['row items-center justify-between',$q.dark.isActive?'bg-dark text-white':'bg-primary text-white']">
-        <div class="text-h6">{{ tdc('Filters') }}<span v-if="activeCount"> ({{ activeCount }})</span></div>
-        <s-btn dense flat icon="close" @click="close">
-          <s-tooltip>{{ tdc('Close') }}</s-tooltip>
-        </s-btn>
-      </q-bar>
-
-      <q-separator />
-
-      <q-card-section v-if="!fields.length" class="flex flex-center">
+    <s-modal-card
+      :title="tdc('Filters') + (activeCount ? ` (${activeCount})` : '')"
+      icon="filter_list"
+      width="720px"
+      @close="close"
+    >
+      <div v-if="!fields.length" class="flex flex-center">
         <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
-      </q-card-section>
+      </div>
 
-      <q-card-section v-else-if="!filterEnabled" class="text-center text-grey">
+      <div v-else-if="!filterEnabled" class="text-center text-grey">
         {{ tdc('Filters disabled') }}
-      </q-card-section>
+      </div>
 
-      <q-card-section v-else class="row q-col-gutter-sm">
+      <div v-else class="row q-col-gutter-sm">
         <div v-for="f in basicFields" :key="f.name" class="col-12 col-sm-6 col-md-4">
           <component
             :is="f.component || 's-input'"
@@ -148,15 +144,13 @@ function apply() {
             outlined
           />
         </div>
-      </q-card-section>
+      </div>
 
-      <q-separator />
-
-      <q-card-actions align="right">
+      <template #footer>
         <s-btn flat :label="tdc('Clear')" @click="clear" />
         <s-btn flat :label="tdc('Cancel')" @click="close" />
         <s-btn color="primary" :label="tdc('Apply')" :disable="!filterEnabled" @click="apply" />
-      </q-card-actions>
-    </s-card>
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>

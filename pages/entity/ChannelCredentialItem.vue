@@ -102,6 +102,7 @@ import { computed, reactive } from 'vue'
 import { useQuasar } from 'quasar'
 
 import { tdc } from '../../services/translation'
+import { sDialog } from '../../services/dialog'
 
 const props = defineProps({
   channel: { type: Object, required: true },
@@ -161,7 +162,7 @@ function save() {
 }
 
 function confirmRemove() {
-  $q.dialog({
+  sDialog({
     title: tdc('Remove override'),
     message: tdc('This entity will fall back to the platform-wide default for this channel. Continue?'),
     cancel: true,

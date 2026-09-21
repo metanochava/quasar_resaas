@@ -2,27 +2,16 @@
 <template>
   <div>
     <q-dialog v-model="pergunta" persistent class="row">
-        <s-card style="width: 400px;" flat>
+        <s-modal-card :title="tdc('Which one do you want to log out of')" icon="logout" width="400px">
+          <div class="column q-gutter-y-sm">
+            <s-btn flat class="full-width" color="primary" @click="logout(User?.Entity?.id)"> {{tdc(User?.Entity?.name)}}</s-btn>
+            <s-btn flat class="full-width" color="primary" @click="logout('x')"> {{tdc(User?.EntityType?.name)}}</s-btn>
+          </div>
 
-          <q-card-section class="row ">
-            <label class="text-h6 text-grey-9 text-center">
-              {{tdc('Which one do you want to log out of')}}
-            </label>
-          </q-card-section>
-          <q-separator />
-
-          <q-card-actions class="row" >
-            <s-btn flat   class="col-12" color="primary" type="submit" @click="logout(User?.Entity?.id)" > {{tdc(User?.Entity?.name)}}</s-btn>
-          </q-card-actions>
-
-          <q-card-actions class="row" >
-            <s-btn flat   class="col-12" color="primary" type="submit" @click="logout('x')" > {{tdc(User?.EntityType?.name)}}</s-btn>
-          </q-card-actions>
-          <q-separator/>
-          <q-card-actions class="row" >
-            <s-btn  class="col-12" flat v-close-popup>{{tdc('Cancel')}}</s-btn>
-          </q-card-actions>
-        </s-card>
+          <template #footer>
+            <s-btn flat v-close-popup>{{tdc('Cancel')}}</s-btn>
+          </template>
+        </s-modal-card>
 
     </q-dialog>
 

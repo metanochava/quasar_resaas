@@ -4,6 +4,7 @@ import { useUserStore } from './UserStore'
 import { setStorage } from '../services/storage'
 import { profileSplint } from '../utils/profile'
 import { tdc } from '../services/translation'
+import { sDialog } from '../services/dialog'
 
 
 export const useGroupStore = createBaseStore(
@@ -262,7 +263,7 @@ export const useGroupStore = createBaseStore(
           )
 
 
-          q.dialog({
+          sDialog({
             title:
               tdc(
                 'Select the Groups'

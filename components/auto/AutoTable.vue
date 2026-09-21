@@ -1777,19 +1777,16 @@ function filteredItems(row, field) {
 
 
           <q-dialog v-model="preview.show">
-
-            <q-card>
-
-              <img
+            <s-modal-card :title="tdc('Preview')" icon="image" width="auto" flush>
+              <div class="text-center"><img
                 :src="preview.url"
                 style="
+                  display:block;
                   max-width:100%;
                   max-height:80vh
                 "
-              />
-
-            </q-card>
-
+              /></div>
+            </s-modal-card>
           </q-dialog>
 
         </template>

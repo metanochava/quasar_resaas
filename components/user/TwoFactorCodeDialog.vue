@@ -48,45 +48,34 @@ async function send() {
 
 <template>
   <q-dialog :model-value="modelValue" persistent @update:model-value="value => !value && close()">
-    <s-card class="code-dialog">
-      <q-card-section class="row items-center">
-        <div class="text-h6 col">{{ title }}</div>
-        <s-btn flat round dense icon="close" :aria-label="tdc('Close')" :disable="busy" data-test="code-close" @click="close" />
-      </q-card-section>
+    <s-modal-card :title="title" icon="phonelink_lock" width="420px" form :close-disable="busy" @close="close" @submit="send">
+      <div class="column q-gutter-y-md">
+        <div v-if="message" class="text-body2">{{ message }}</div>
 
-      <q-form @submit.prevent="send">
-        <q-card-section class="column q-gutter-y-md">
-          <div v-if="message" class="text-body2">{{ message }}</div>
+        <s-input
+          v-model="code"
+          dense
+          outlined
+          autofocus
+          autocomplete="one-time-code"
+          :label="tdc('Authentication code or recovery code')"
+          data-test="code-input"
+        />
+      </div>
 
-          <s-input
-            v-model="code"
-            dense
-            outlined
-            autofocus
-            autocomplete="one-time-code"
-            :label="tdc('Authentication code or recovery code')"
-            data-test="code-input"
-          />
-        </q-card-section>
-
-        <q-card-actions align="right" class="q-px-md q-pb-md">
-          <s-btn flat no-caps :label="tdc('Cancel')" :disable="busy" data-test="code-cancel" @click="close" />
-          <s-btn
-            type="submit"
-            unelevated
-            no-caps
-            :color="color"
-            :label="action"
-            :loading="busy"
-            :disable="!canSubmit"
-            data-test="code-submit"
-          />
-        </q-card-actions>
-      </q-form>
-    </s-card>
+      <template #footer>
+        <s-btn flat no-caps :label="tdc('Cancel')" :disable="busy" data-test="code-cancel" @click="close" />
+        <s-btn
+          type="submit"
+          unelevated
+          no-caps
+          :color="color"
+          :label="action"
+          :loading="busy"
+          :disable="!canSubmit"
+          data-test="code-submit"
+        />
+      </template>
+    </s-modal-card>
   </q-dialog>
 </template>
-
-<style scoped>
-.code-dialog { width: 420px; max-width: 94vw; }
-</style>
