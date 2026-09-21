@@ -3,6 +3,7 @@ import { ref, watch, computed } from 'vue'
 import { HTTPAuth, url } from '../../services/api'
 import { parseFieldErrors } from '../../boot/alerts'
 import { resolveRules } from '../../utils/schema'
+import { toWriteValue } from '../../utils/payload'
 import FormSection from '../auto/FormSection.vue'
 
 
@@ -97,26 +98,8 @@ function resetForm() {
 
 
 // ---------------- NORMALIZE ----------------
-function normalizeValue(v) {
-  if (v instanceof File) return v
-
-  if (Array.isArray(v)) {
-    return v.map(x => {
-      if (x && typeof x === 'object') {
-        if ('value' in x) return x.value
-        if ('id' in x) return x.id
-      }
-      return x
-    })
-  }
-
-  if (v && typeof v === 'object') {
-    if ('value' in v) return v.value
-    if ('id' in v) return v.id
-  }
-
-  return v
-}
+// READ shape ({id, value, label}) -> the value the API accepts: the shared implementation.
+const normalizeValue = toWriteValue
 
 // ---------------- FILE DETECT ----------------
 function hasFiles() {

@@ -1,3 +1,4 @@
+import { unwrapChoice } from '../theme/unwrapChoice'
 import { HTTPAuth, url } from '../services/api'
 import { tdc } from '../services/translation'
 import { normalizeSchema, relationPickerComponent } from './schema'
@@ -97,10 +98,15 @@ function buildRulesFromSchemaField(f) {
     })
   }
 
+  // A length is a property of the VALUE. A choice loaded from the API is the object
+  // {id, value, label} until the select converts it (utils/choice.js): never measure the
+  // object ("[object Object]" is 15 characters).
+  const measured = (v) => String(unwrapChoice(v) ?? '')
+
   if (f.min_length != null) {
     rules.push(v =>
       v == null ||
-      String(v).length >= Number(f.min_length) ||
+      measured(v).length >= Number(f.min_length) ||
       `${label}: ${tdc('min length')} ${f.min_length}`
     )
   }
@@ -108,7 +114,7 @@ function buildRulesFromSchemaField(f) {
   if (f.max_length != null) {
     rules.push(v =>
       v == null ||
-      String(v).length <= Number(f.max_length) ||
+      measured(v).length <= Number(f.max_length) ||
       `${label}: ${tdc('max length')} ${f.max_length}`
     )
   }

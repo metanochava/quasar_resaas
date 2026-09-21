@@ -63,6 +63,35 @@ before rendering — this pattern is for building your own form (with
 [`s-auto-form`](../components/form.md) directly) when a field needs
 something `AutoCrud`'s defaults don't provide.
 
+### Choice fields (`choices`)
+
+A field with `choices` becomes an `s-select` with `emitValue` + `mapOptions` and
+`options` built from the choices. A choice travels in two shapes:
+
+| Shape | Example | Where |
+|---|---|---|
+| WRITE (the value) | `"required"` | what the select holds and what the API accepts back |
+| READ | `{ id: "required", value: "required", label: "Required" }` | what the serializer answers (`RepresentationMixin`) |
+
+`emit-value` turns an option into its value when the user picks one. The inverse
+(READ object -> value) used to be missing when a record was **loaded** for edit: the
+select still displayed the label (the object has one), but every length rule judged
+the object itself (`String(obj).length` is 15), so a `max_length: 10` choice showed
+"max length 10" until the user touched it. Now:
+
+- `s-select` converts a READ object to its value on the way in whenever it runs with
+  `emit-value` (`semanticValue()` in `utils/choice.js`), on first render and whenever
+  the value changes; the parent receives the plain value back. Relations (no
+  `emit-value`) keep their object, they are not choices.
+- `min_length` / `max_length` rules (`buildFormFromSchema`, `resolveRules`) measure
+  the value, never the object.
+- What a form sends is always the WRITE shape: `toWriteValue()` (`utils/payload.js`)
+  is the single normaliser used by `FormComponent`, `AutoForm` and
+  `buildWritePayload`.
+
+Do not special-case a field by name to work around this, and do not drop the length
+rule: fix the shape at the select.
+
 ### Relation fields
 
 A field whose `ui.isRelation` is `true` gets `props.onFilter` wired to a

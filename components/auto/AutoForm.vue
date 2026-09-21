@@ -5,6 +5,7 @@ import { ref, watch, computed } from 'vue'
 import { tdc } from '../../services/translation'
 import { HTTPAuth, url } from '../../services/api'
 import ActionForm from '../../components/auto/ActionForm.vue'
+import { toWriteValue } from '../../utils/payload'
         
 
 
@@ -84,7 +85,15 @@ function buildPayload() {
   )
 
   if (!hasFiles) {
-    return { data: form.value, config: {} }
+    // The form holds what the API READ back ({id, value, label} for a choice); the
+    // API accepts the value. Same normalisation FormComponent applies.
+    const data = {}
+
+    for (const [key, value] of Object.entries(form.value)) {
+      data[key] = toWriteValue(value)
+    }
+
+    return { data, config: {} }
   }
 
   const fd = new FormData()
@@ -97,7 +106,8 @@ function buildPayload() {
     } else if (Array.isArray(v) && v[0] instanceof File) {
       fd.append(k, v[0])
     } else if (typeof v === 'object') {
-      fd.append(k, JSON.stringify(v))
+      const value = toWriteValue(v)
+      fd.append(k, typeof value === 'object' ? JSON.stringify(value) : value)
     } else {
       fd.append(k, v)
     }

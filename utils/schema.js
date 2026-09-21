@@ -1,3 +1,5 @@
+import { unwrapChoice } from '../theme/unwrapChoice'
+
 export const RESAAS_SCHEMA_VERSION = '1.0'
 
 // Canonical defaults, mirroring django_resaas's ResaasSchemaBuilder
@@ -106,10 +108,12 @@ export function resolveRules(rules = []) {
     switch (r.type) {
       case 'required':
         return val => !!val || r.message
+      // a length is measured on the VALUE: a choice loaded from the API is still the
+      // READ object {id, value, label} until its select converts it (utils/choice.js)
       case 'min_length':
-        return val => !val || val.length >= r.value || r.message
+        return val => !val || String(unwrapChoice(val) ?? '').length >= r.value || r.message
       case 'max_length':
-        return val => !val || val.length <= r.value || r.message
+        return val => !val || String(unwrapChoice(val) ?? '').length <= r.value || r.message
       case 'min':
         return val => val == null || val >= r.value || r.message
       case 'max':

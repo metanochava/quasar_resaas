@@ -12,7 +12,9 @@
 //   exclude      names to leave out (e.g. locked or server-generated)
 const isFileType = (type) => ['FileField', 'ImageField'].includes(type)
 
-function normalize(value) {
+// READ shape -> the value the API accepts back. The ONE implementation: forms that
+// build their own payload (FormComponent, AutoForm) use this too.
+export function normalize(value) {
   if (Array.isArray(value)) return value.map(normalize)
 
   if (value && typeof value === 'object' && !(value instanceof File)) {
@@ -22,6 +24,8 @@ function normalize(value) {
 
   return value
 }
+
+export { normalize as toWriteValue }
 
 export function buildWritePayload(form, fields, { passthrough = [], exclude = [] } = {}) {
   const payload = {}

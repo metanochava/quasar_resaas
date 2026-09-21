@@ -88,6 +88,7 @@ import { useUserStore } from "../../stores/UserStore"
 import { tdc } from "../../services/translation"
 import { HTTPAuth } from "../../services/api"
 import { toRelationOption } from "../../utils/autoForm"
+import { semanticValue, isEmitValue } from "../../utils/choice"
 import RelationRecordDialog from "./RelationRecordDialog.vue"
 
 export default defineComponent({
@@ -161,8 +162,17 @@ export default defineComponent({
       return User.ps?.layout || {}
     })
 
+    // With `emit-value` the select holds the option's VALUE. A record loaded from the
+    // API brings the READ shape {id, value, label}: converted here (see utils/choice.js)
+    // so the select, and the rules it runs, always see the same semantic value the
+    // user's own selection would have produced.
+    const semantic = (value) => semanticValue(value, {
+      options: props.options,
+      emitValue: isEmitValue(attrs)
+    })
+
     const localValue = ref(
-      props.modelValue
+      semantic(props.modelValue)
     )
 
     // ==========================================================
@@ -308,7 +318,7 @@ export default defineComponent({
       () => props.modelValue,
       (value) => {
 
-        localValue.value = value
+        localValue.value = semantic(value)
 
       }
     )
