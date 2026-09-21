@@ -32,21 +32,53 @@ const passwordChangedAt = computed(() => {
     <div class="column q-gutter-y-md">
       <s-card flat bordered class="security-card">
         <q-card-section class="row items-center no-wrap">
-          <q-avatar size="44px" color="primary" text-color="white" icon="key" class="q-mr-md" />
+          <q-avatar
+            size="44px"
+            color="primary"
+            text-color="white"
+            icon="key"
+            class="q-mr-md"
+          />
+
           <div class="col">
-            <div class="text-subtitle1">{{ tdc('Password') }}</div>
-            <div class="text-caption text-grey-7">{{ tdc('Use a strong password that you do not use anywhere else.') }}</div>
-            <div v-if="passwordChangedAt" class="text-caption q-mt-xs" data-test="password-changed-at">
+            <div class="text-subtitle1">
+              {{ tdc('Password') }}
+            </div>
+
+            <div class="text-caption text-grey-7">
+              {{ tdc('Use a strong password that you do not use anywhere else.') }}
+            </div>
+
+            <div
+              v-if="passwordChangedAt"
+              class="text-caption q-mt-xs"
+              data-test="password-changed-at"
+            >
               {{ tdc('Last changed') }}: {{ passwordChangedAt }}
             </div>
           </div>
-          <s-btn outline dense no-caps color="primary" :label="tdc('Change')" data-test="open-password" @click="passwordDialog = true" />
+
+          <s-btn
+            outline
+            dense
+            no-caps
+            color="primary"
+            :label="tdc('Change')"
+            data-test="open-password"
+            @click="passwordDialog = true"
+          />
         </q-card-section>
       </s-card>
 
-      <SecurityActivity />
+      <div class="row q-col-gutter-md">
+        <div class="col-12 col-md-6">
+          <SecurityActivity />
+        </div>
 
-      <AccountTwoFactor />
+        <div class="col-12 col-md-6">
+          <AccountTwoFactor />
+        </div>
+      </div>
     </div>
 
     <ChangePasswordDialog v-model="passwordDialog" />
