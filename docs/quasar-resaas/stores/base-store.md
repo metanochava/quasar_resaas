@@ -75,10 +75,22 @@ backend doesn't silently stay at the local default of 10.
     `pages/saude`, which appends pages with `q-infinite-scroll`) can page the
     same store the main list uses without replacing its data. Use `loadData()`
     when the store's own list should change.
+-   `removeById(id)` / `patchById(id, payload)` — `DELETE` / `PATCH` one record by id
+    (`patchById` returns the server row). Like `fetchPage()` they are **state-free**:
+    `rows`, `row`, `form` and `pagination` are left alone, so a side list (the
+    `HistoryList` right-menu in `pages/saude`, which offers Edit / Reprint / Delete on its
+    own rows) can act without resetting the page's form or list. Use `remove()` / `update()`
+    when the store's own form should change.
 -   `create()` — `POST`, then **reloads the current page from the server**
     (`loadData()`) instead of unshifting the new row locally - a generic
     store has no way to know the list's real ordering/filters/page, and
     this keeps `pagination.rowsNumber` correct too.
+-   **Write payload.** `create()`, `update()` and `patchById()` send the form as JSON after
+    `toWriteShapes()` (`utils/payload.js`): a choice/relation still in its READ shape
+    `{id, value, label}` (a record loaded with `getById()` and sent back by a manual page that
+    binds `store.form` directly) becomes just its value. Only objects whose keys are exactly
+    `id`/`value`/`label` are unwrapped; a real nested object such as a Person's `address`
+    is sent as it is. When the form holds a `File`, the multipart path is used as before.
 -   `update({ method = 'patch' } = {})` — **`PATCH` by default**, since a
     form only rendering some of the schema's fields is normal and a `PUT`
     of a partial form would ask the backend to treat every missing field

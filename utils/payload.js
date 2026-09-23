@@ -27,6 +27,42 @@ export function normalize(value) {
 
 export { normalize as toWriteValue }
 
+// A READ-shaped choice/relation is EXACTLY {id?, value?, label?}. Anything with other
+// keys is a real nested object the serializer accepts as-is (a Person's `address`,
+// ...) and must not be collapsed to its id.
+const READ_SHAPE_KEYS = new Set(['id', 'value', 'label'])
+
+export function isReadShape(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  if (Object.getPrototypeOf(value) !== Object.prototype) return false
+
+  const keys = Object.keys(value)
+
+  return keys.length > 0
+    && keys.every(key => READ_SHAPE_KEYS.has(key))
+    && ('value' in value || 'id' in value)
+}
+
+const unwrapReadShape = (value) => ('value' in value ? value.value : value.id)
+
+// Shallow copy of a form where every READ-shaped choice/relation (and every one inside
+// an array) is replaced by the value the API accepts. Used by BaseStore for the JSON
+// request body, so a page that sends store.form as it was loaded (a manual form) still
+// sends a WRITE payload.
+export function toWriteShapes(form) {
+  const out = {}
+
+  for (const [key, value] of Object.entries(form || {})) {
+    if (Array.isArray(value)) {
+      out[key] = value.map(item => (isReadShape(item) ? unwrapReadShape(item) : item))
+    } else {
+      out[key] = isReadShape(value) ? unwrapReadShape(value) : value
+    }
+  }
+
+  return out
+}
+
 export function buildWritePayload(form, fields, { passthrough = [], exclude = [] } = {}) {
   const payload = {}
   const skipped = new Set(exclude)

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { buildWritePayload, updateWithPayload } from './payload'
+import { buildWritePayload, updateWithPayload, isReadShape, toWriteShapes } from './payload'
 
 const fields = [
   { name: 'id', type: 'UUIDField', read_only: true },
@@ -78,3 +78,38 @@ describe('updateWithPayload', () => {
     expect(store.form).toBe(loaded)
   })
 })
+
+describe('toWriteShapes (READ shape -> WRITE value in a request body)', () => {
+  const consulta = { id: 'f50a', value: 'f50a', label: 'António Zandamela' }
+
+  it('unwraps a relation/choice given as {id, value, label}', () => {
+    expect(toWriteShapes({ consulta, estado: { value: 'ativo', label: 'Ativo' }, medico: { id: 'm1', label: 'X' } }))
+      .toEqual({ consulta: 'f50a', estado: 'ativo', medico: 'm1' })
+  })
+
+  it('unwraps each READ-shaped item of an array and keeps plain items', () => {
+    expect(toWriteShapes({ tags: [{ id: 'a', value: 'a', label: 'A' }, 'b'] })).toEqual({ tags: ['a', 'b'] })
+  })
+
+  it('keeps nested objects that have other keys (a Person address is not a relation)', () => {
+    const address = { id: 'ad1', street: 'Rua 1', city: 'Maputo' }
+
+    expect(toWriteShapes({ address }).address).toBe(address)
+  })
+
+  it('leaves scalars, null, arrays of scalars and dates alone, without mutating the form', () => {
+    const date = new Date('2026-01-01')
+    const form = { name: 'x', n: 3, none: null, list: [1, 2], date, consulta }
+
+    expect(toWriteShapes(form)).toEqual({ name: 'x', n: 3, none: null, list: [1, 2], date, consulta: 'f50a' })
+    expect(form.consulta).toBe(consulta)
+  })
+
+  it('isReadShape is strict', () => {
+    expect(isReadShape({ id: '1', label: 'x' })).toBe(true)
+    expect(isReadShape({ label: 'only a label' })).toBe(false)
+    expect(isReadShape({ id: '1', street: 'x' })).toBe(false)
+    expect(isReadShape([])).toBe(false)
+  })
+})
+

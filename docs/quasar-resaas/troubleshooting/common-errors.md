@@ -49,3 +49,12 @@ only ever sets `User.Entity`. It never assigns `Entity.row`, which is
 [BaseStore](../stores/base-store.md)'s own field, touched only by `getById()`/`create()`/
 `update()`. Use `User.Entity?.id`, not `Entity.row?.id`, anywhere after calling `getSettings()`
 (login redirects on public marketing sites being the most common place this is needed).
+
+## `"{'id': ..., 'value': ..., 'label': ...}" is not a valid UUID.` on save
+
+A relation field reached the API in its READ shape (`{id, value, label}`) instead of its id.
+`BaseStore.create()/update()/patchById()` unwrap such values automatically
+(`toWriteShapes`, see [BaseStore](../stores/base-store.md)); if you still see this error, the
+request did not go through the store (a direct `HTTPAuth.post/patch` with a raw `form`/`row`) -
+build the payload with `buildWritePayload()` or `toWriteShapes()` from `utils/payload.js`.
+

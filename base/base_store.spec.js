@@ -922,3 +922,76 @@ describe('createBaseStore - fetchPage', () => {
     expect((await store.fetchPage({ page: 2 })).hasNext).toBe(false)
   })
 })
+
+describe('createBaseStore - removeById / patchById', () => {
+  it('deletes by id without touching rows, row or form', async () => {
+    httpDelete.mockResolvedValueOnce({})
+    const store = createBaseStore('history-remove-by-id', { app: 'saude', model: 'Consulta' })()
+    store.rows = [{ id: '1' }]
+    store.row = { id: '1' }
+    store.form = { id: '1' }
+
+    await store.removeById('1')
+
+    expect(httpDelete.mock.calls[0][0]).toBe('saude/consultas/1/')
+    expect(store.rows).toEqual([{ id: '1' }])
+    expect(store.row).toEqual({ id: '1' })
+    expect(store.form).toEqual({ id: '1' })
+    expect(httpGet).not.toHaveBeenCalled()
+  })
+
+  it('patches by id and returns the server row, leaving the store state alone', async () => {
+    httpPatch.mockResolvedValueOnce({ data: { id: '1', data_limite: '2026-10-01' } })
+    const store = createBaseStore('history-patch-by-id', { app: 'saude', model: 'AtestadoMedico' })()
+    store.row = { id: 'other' }
+
+    const updated = await store.patchById('1', { data_limite: '2026-10-01' })
+
+    expect(updated).toEqual({ id: '1', data_limite: '2026-10-01' })
+    expect(httpPatch.mock.calls[0][1]).toEqual({ data_limite: '2026-10-01' })
+    expect(store.row).toEqual({ id: 'other' })
+  })
+
+  it('does nothing when there is no id to delete', async () => {
+    await createBaseStore('history-remove-no-id', { app: 'saude', model: 'Consulta' })().removeById(null)
+
+    expect(httpDelete).not.toHaveBeenCalled()
+  })
+})
+
+describe('createBaseStore - write payload shape', () => {
+  const consulta = { id: 'f50a', value: 'f50a', label: 'António Zandamela' }
+
+  it('update() sends the id of a relation loaded as {id, value, label} (manual forms send store.form)', async () => {
+    httpPatch.mockResolvedValueOnce({ data: { id: '1' } })
+    httpGet.mockResolvedValue({ data: { results: [], count: 0 } })
+    const store = createBaseStore('payload-update', { app: 'saude', model: 'AtestadoMedico' })()
+    store.form = { id: '1', consulta, comparecer: 'Ao serviço' }
+
+    await store.update()
+
+    expect(httpPatch.mock.calls[0][1]).toEqual({ id: '1', consulta: 'f50a', comparecer: 'Ao serviço' })
+  })
+
+  it('create() sends the id too and keeps a nested object as it is', async () => {
+    httpPost.mockResolvedValueOnce({ data: { id: '9' } })
+    httpGet.mockResolvedValue({ data: { results: [], count: 0 } })
+    const store = createBaseStore('payload-create', { app: 'saude', model: 'AtestadoMedico' })()
+    const address = { id: 'ad1', street: 'Rua 1' }
+    store.form = { consulta, address }
+
+    await store.create()
+
+    expect(httpPost.mock.calls[0][1]).toEqual({ consulta: 'f50a', address })
+  })
+
+  it('patchById() sends a WRITE payload as well', async () => {
+    httpPatch.mockResolvedValueOnce({ data: { id: '1' } })
+    const store = createBaseStore('payload-patch-by-id', { app: 'saude', model: 'AtestadoMedico' })()
+
+    await store.patchById('1', { consulta })
+
+    expect(httpPatch.mock.calls[0][1]).toEqual({ consulta: 'f50a' })
+  })
+})
+

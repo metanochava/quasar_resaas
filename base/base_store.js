@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { buildFormFromSchema } from './../utils/autoForm'
 import { HTTPAuth, url, HTTPAuthBlob } from '../services/api'
 import { parseFieldErrors } from '../boot/alerts'
+import { toWriteShapes } from '../utils/payload'
 
 // Mesma normalização de FormComponent.vue's normalizeValue() - uma
 // relação já resolvida no form como {id, ...}/{value, ...} tem de
@@ -57,7 +58,7 @@ function toFormData(form) {
 }
 
 export function buildRequestPayload(form) {
-  return hasFileValue(form) ? toFormData(form) : form
+  return hasFileValue(form) ? toFormData(form) : toWriteShapes(form)
 }
 
 export function createBaseStore(name, config, extend = {}) {
@@ -358,6 +359,31 @@ export function createBaseStore(name, config, extend = {}) {
           count: data.count ?? rows.length,
           hasNext: Boolean(data.next)
         }
+      },
+
+      // =========================
+      // WRITE BY ID (no store state touched)
+      // =========================
+      // For side lists (right-menu history) acting on one of their own rows:
+      // like fetchPage(), they never touch rows/row/form/pagination, so the
+      // page's own list and form are not replaced or reset behind its back.
+      async removeById(id) {
+        this.assertConfig()
+
+        if (!id) return
+
+        await HTTPAuth.delete(url({ type: 'u', url: `${this.safeUrl}/${id}/` }))
+      },
+
+      async patchById(id, payload = {}) {
+        this.assertConfig()
+
+        const { data } = await HTTPAuth.patch(
+          url({ type: 'u', url: `${this.safeUrl}/${id}/` }),
+          buildRequestPayload(payload)
+        )
+
+        return data
       },
 
       // =========================
