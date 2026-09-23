@@ -895,3 +895,30 @@ describe('createBaseStore - HTTP error resilience (FASE 3 - P2.8/P2.9/P2.10)', (
     })
   })
 })
+
+describe('createBaseStore - fetchPage', () => {
+  it('returns one page without touching rows, pagination or loading', async () => {
+    httpGet.mockResolvedValueOnce({
+      data: { results: [{ id: '1' }, { id: '2' }], count: 45, next: 'http://x/?page=2' },
+    })
+
+    const useHistoryStore = createBaseStore('history-fetch-page', { app: 'saude', model: 'Consulta' })
+    const store = useHistoryStore()
+    store.rows = [{ id: 'kept' }]
+
+    const page = await store.fetchPage({ page: 1, page_size: 20, ordering: '-created_at' })
+
+    expect(page).toEqual({ rows: [{ id: '1' }, { id: '2' }], count: 45, hasNext: true })
+    expect(httpGet.mock.calls[0][0]).toContain('page=1&page_size=20&ordering=-created_at')
+    expect(store.rows).toEqual([{ id: 'kept' }])
+    expect(store.loading).toBe(false)
+  })
+
+  it('reports no next page on the last page', async () => {
+    httpGet.mockResolvedValueOnce({ data: { results: [{ id: '3' }], count: 21, next: null } })
+
+    const store = createBaseStore('history-fetch-last', { app: 'saude', model: 'Consulta' })()
+
+    expect((await store.fetchPage({ page: 2 })).hasNext).toBe(false)
+  })
+})

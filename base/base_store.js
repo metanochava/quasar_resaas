@@ -339,6 +339,28 @@ export function createBaseStore(name, config, extend = {}) {
       },
 
       // =========================
+      // FETCH PAGE (read-only)
+      // =========================
+      // One page of the collection WITHOUT touching rows/pagination/loading.
+      // For side lists that accumulate pages themselves (infinite scroll in a
+      // right menu) while the main list keeps using this same store.
+      async fetchPage(params = {}) {
+        this.assertConfig()
+
+        const { data } = await HTTPAuth.get(
+          url({ type: 'u', url: this.safeUrl, params })
+        )
+
+        const rows = data.results || data
+
+        return {
+          rows,
+          count: data.count ?? rows.length,
+          hasNext: Boolean(data.next)
+        }
+      },
+
+      // =========================
       // GET BY ID
       // =========================
       getRow(){

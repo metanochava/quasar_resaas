@@ -68,6 +68,13 @@ backend doesn't silently stay at the local default of 10.
     `refreshRow()` for a row-only refresh, `loadData()` for a list-only
     refresh, or both together - see
     [Creating a new frontend resource](../development/creating-resource.md).
+-   `fetchPage(params)` — one page of the collection (`GET safeUrl` with the
+    given `params`, e.g. `{ page, page_size, ordering }`) returned as
+    `{ rows, count, hasNext }`. **Read-only**: it never touches `rows`,
+    `pagination` or `loading`, so a side list (e.g. the `RightMenu` history in
+    `pages/saude`, which appends pages with `q-infinite-scroll`) can page the
+    same store the main list uses without replacing its data. Use `loadData()`
+    when the store's own list should change.
 -   `create()` — `POST`, then **reloads the current page from the server**
     (`loadData()`) instead of unshifting the new row locally - a generic
     store has no way to know the list's real ordering/filters/page, and
