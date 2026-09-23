@@ -49,6 +49,7 @@ import { useRoute } from 'vue-router'
 import { useDisciplinaryCaseStore } from '../../../stores/DisciplinaryCaseStore.js'
 import { HTTPAuth, url } from '../../../services/api.js'
 import { tdc } from '../../../services/translation.js'
+import { errorMessage } from '../../../utils/apiContract.js'
 import FormTwo from '../../../components/auto/FormTwo.vue'
 
 const route = useRoute()
@@ -92,7 +93,7 @@ async function doAction(action) {
     )
     DisciplinaryCase.row = await DisciplinaryCase.getById(DisciplinaryCase.row.id)
   } catch (err) {
-    actionError.value = err?.response?.data?.detail || tdc('Could not update this case.')
+    actionError.value = errorMessage(err) || tdc('Could not update this case.')
   } finally {
     actionLoading.value = false
   }

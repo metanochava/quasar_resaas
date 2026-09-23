@@ -139,6 +139,7 @@ import { useRoute } from 'vue-router'
 import { useTrainingSessionStore } from '../../../stores/TrainingSessionStore.js'
 import { useEmployeeStore } from '../../../stores/EmployeeStore.js'
 import { tdc } from '../../../services/translation.js'
+import { errorMessage } from '../../../utils/apiContract.js'
 
 const route = useRoute()
 const TrainingSession = useTrainingSessionStore()
@@ -204,7 +205,7 @@ async function doEnroll() {
     await TrainingSession.enroll(selectedSession.value.id, enrollEmployeeChoice.value)
     enrollEmployeeChoice.value = null
   } catch (err) {
-    enrollError.value = err?.response?.data?.detail || tdc('Could not enroll this employee.')
+    enrollError.value = errorMessage(err) || tdc('Could not enroll this employee.')
   }
 }
 

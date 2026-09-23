@@ -45,6 +45,60 @@ The active tenant lives in three `UserStore` fields: `Entity`, `Branch`,
 if `Entity.id` exists; otherwise it clears the context
 (`clearResaasContext()`).
 
+## Resolving the tenant from a public domain (`EntityStore.getSettings()`)
+
+`Entity.getSettings()` (`stores/EntityStore.js`) is a **different, earlier** tenant-resolution
+path than the `X-RESAAS-Context` flow above — it exists for public-facing sites (marketing pages
+served without any login) that need to know which `Entity` they belong to, and pick up that
+Entity's branding, before any session/token exists:
+
+```js
+async getSettings() {
+  const { data } = await HTTPClient.get(url({ type: 'u', url: 'site' }))
+  // HTTPClient - no auth header, no X-RESAAS-Context: this must work pre-session
+
+  this.Theme = data.theme || {}
+  this.LayoutSettings = data.layout_settings || {}
+  this.AnimationSettings = data.animation_settings || {}
+  this.Typography = data.typography || {}
+
+  User.Entity = data.entity || null
+  ...
+}
+```
+
+It calls the **public** backend endpoint `GET {app}/site/` (`SiteAPIView`, `AllowAny`), which
+resolves the `Entity` by matching the request's `Origin` header against `Entity.site` — see
+[django_resaas: Resolução de tenant por domínio](../../django-resaas/architecture/multi-tenancy.md#resolução-de-tenant-por-domínio-endpoint-público-site).
+No `entity` key in the response (unmatched domain, or no `Origin` sent) means `User.Entity` is
+set to `null` — the request still comes back `200`, so callers must check `User.Entity?.id`, not
+the HTTP status.
+
+> [!WARNING]
+> **`getSettings()` never touches `Entity.row`.** It only sets `User.Entity` (plus the Entity
+> store's own `Theme`/`LayoutSettings`/`AnimationSettings`/`Typography` scalars). `this.row` is
+> [BaseStore](base-store.md)'s generic-CRUD field — it is only ever assigned by `getById()`,
+> `create()`, `update()` (and cleared by `invalidateRow()`). Reading `Entity.row?.id` right after
+> `getSettings()` (e.g. to build a login-redirect URL) is always `undefined`; use
+> `User.Entity?.id` instead. This was a real, shipped bug in more than one public-site layout
+> (`src/sites/*/layouts/MainLayout*.vue` in the host app) before being found and fixed — search
+> for `Entity?.row?.id` before reusing this pattern in a new site.
+
+Typical usage, mirrored across every public site tree that has its own layout (one per business
+domain, not part of this library):
+
+```js
+// src/sites/<site>/layouts/MainLayout.vue
+async mounted() {
+  await this.Entity.getSettings()
+  if (this.User.Entity?.id) {
+    // Entity resolved for this domain - theme/typography above are already in User.*
+  } else {
+    // no Entity matches this Origin - site.py had no match, or Origin wasn't sent
+  }
+}
+```
+
 ## `services/tenantContext.js`
 
 Generates and stores the context token sent to the backend:

@@ -64,6 +64,52 @@ if hasattr(Model, "branch_id"):
 > de tenant têm de ser reaplicados — caso contrário a troca alarga silenciosamente o queryset
 > para além da entity/branch atual.
 
+## Resolução de tenant por domínio (endpoint público `/site`)
+
+Além do `X-RESAAS-Context` (pedidos autenticados, acima), o `django_resaas` expõe um segundo
+mecanismo de resolução de tenant, para sites públicos/marketing que ainda não têm nenhuma sessão:
+
+`SiteAPIView` — `django_resaas.saas.data.entity.views.site.SiteAPIView`
+(`saas/data/entity/views/site.py`), método `GET`, **PÚBLICO** explícito
+(`permission_classes = (permissions.AllowAny,)`).
+
+Em vez de ler `entity_id` de um cabeçalho, resolve a `Entity` a partir do cabeçalho HTTP `Origin`
+do pedido, comparando-o com o campo `Entity.site` (`URLField`):
+
+```python
+netloc = urlparse(origin).netloc
+
+entity = Entity.objects.filter(
+    Q(site=f"http://{netloc}")  | Q(site=f"http://{netloc}/") |
+    Q(site=f"https://{netloc}") | Q(site=f"https://{netloc}/")
+).first()
+```
+
+> [!WARNING]
+> `Entity.site` está gravado **com** esquema (ex.: `http://clinicaamal.co.mz`), mas nem sempre com
+> o esquema que o site realmente usa em produção (linhas reais observadas usam `http://` mesmo
+> para domínios servidos por `https`). Uma versão anterior desta view comparava
+> `urlparse(origin).netloc` (esquema já removido) diretamente contra `Entity.site` (que ainda tem
+> o esquema) — a comparação nunca podia corresponder a nada, e a Entity nunca era encontrada. A
+> correção compara pelo `netloc`, aceitando ambos os esquemas e uma barra final opcional, em vez de
+> assumir que o esquema gravado reflete o do pedido.
+
+Se não houver `Origin` ou nenhuma `Entity` corresponder, a resposta é `200` (não `404`) sem a
+chave `entity` (`ApiResponse.all(request, Origin="Desconhecida")`) — quem consome este endpoint
+deve verificar a presença de `data.entity`, nunca o status code, para decidir se o domínio foi
+resolvido.
+
+Quando encontra a `Entity`, devolve também `theme`/`typography`/`layout_settings`/
+`animation_settings`, com o mesmo fallback já usado noutros pontos do RESAAS
+(`entity.theme or entity.entity_type.theme`, etc.) — ver
+[Models & RESAAS](../models/resaas-config.md).
+
+No frontend, este endpoint é consumido por `EntityStore.getSettings()`
+(`quasar_resaas/stores/EntityStore.js`) — ver
+[UserStore & tenant context #resolving-the-tenant-from-a-public-domain-entitystoregetsettings](../../quasar-resaas/stores/user-context.md#resolving-the-tenant-from-a-public-domain-entitystoregetsettings)
+para o lado frontend do contrato, incluindo uma armadilha conhecida (`Entity.row` nunca é
+preenchido por este fluxo).
+
 ## Objetivo
 
 A finalidade é impedir que um pedido de uma entidade acabe, por acidente, a aceder a dados

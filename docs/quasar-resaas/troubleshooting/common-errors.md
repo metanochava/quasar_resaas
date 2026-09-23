@@ -40,3 +40,12 @@ The response interceptor in `services/api.js` automatically calls `useUserStore(
 
 > [!TIP]
 > If an action seems to "do nothing" with no visible message, check the browser console first before assuming the request was never made.
+
+## `Entity.row.id` (or `Entity.row?.id`) is always `undefined` after `getSettings()`
+
+`EntityStore.getSettings()` (the public, pre-session domain-to-tenant resolver — see
+[UserStore & tenant context](../stores/user-context.md#resolving-the-tenant-from-a-public-domain-entitystoregetsettings))
+only ever sets `User.Entity`. It never assigns `Entity.row`, which is
+[BaseStore](../stores/base-store.md)'s own field, touched only by `getById()`/`create()`/
+`update()`. Use `User.Entity?.id`, not `Entity.row?.id`, anywhere after calling `getSettings()`
+(login redirects on public marketing sites being the most common place this is needed).

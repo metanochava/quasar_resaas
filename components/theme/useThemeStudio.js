@@ -2,6 +2,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { Notify } from 'quasar'
 
 import { tdc } from '../../services/translation'
+import { errorMessage } from '../../utils/apiContract'
 import { resolveEffectiveConfig } from '../../theme/resolveEffectiveConfig.js'
 import { surfaceToStyle, surfacesToList } from '../../theme/surfaceToStyle.js'
 import { unwrapChoice } from '../../theme/unwrapChoice.js'
@@ -422,9 +423,7 @@ export function useThemeStudio(props, emit) {
         type: 'negative',
         icon: 'error',
         message: (
-          error?.response?.data?.detail ||
-          error?.response?.data?.error ||
-          error?.response?.data?.message ||
+          errorMessage(error) ||
           error?.message ||
           tdc('Unable to update appearance settings.')
         ),
