@@ -42,6 +42,30 @@ permissão, endpoint) fiquem visíveis através do output `actions`/`permissions
 `ResaasSchemaBuilder`. Avisa e sai mais cedo se `VIEW_REGISTRY` estiver vazio (nenhuma view foi
 registada/importada ainda).
 
+## `mark_editable_groups`
+
+```bash
+python manage.py mark_editable_groups          # simulação: lista o que mudaria
+python manage.py mark_editable_groups --apply  # grava
+```
+
+Marca grupos existentes como `editable`. Só os grupos editáveis podem ter as
+permissões alteradas pelos administradores da própria Entity; ver
+[Permissões -> Gestão das permissões de grupo](../security/permissions.md). Os
+grupos criados antes dessa regra têm todos `editable=False`, por isso só o nível
+plataforma os podia alterar.
+
+Um grupo só é marcado quando **tudo** isto se verifica
+(`group_access_service.editable_eligibility()`):
+
+- está ligado a exactamente uma Entity (`EntityGroup`);
+- não é grupo-modelo de um EntityType (`EntityTypeGroup`);
+- nenhum utilizador de outra Entity o tem (`BranchUserGroup`);
+- não tem a permissão de plataforma `change_entitytype` (ex.: Root).
+
+Todos os outros grupos são listados com o motivo por que ficaram iguais. O comando
+é idempotente, nunca põe `editable=False`, e nunca altera permissões nem ligações.
+
 ## `sync_language`
 
 ```bash

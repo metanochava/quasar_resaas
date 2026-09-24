@@ -60,6 +60,8 @@ por esta ordem:
    - ser `editable`, senão `403 group_not_editable`. Só um grupo que uma Entity cria para si
      (`EntityAPIView.createGroup`) tem `editable=True`. Os grupos do bootstrap e os grupos-modelo
      não têm, e o cliente não pode mudar a marca (só de leitura no `GroupSerializer`).
+     Os grupos que já existiam podem ser marcados com `manage.py mark_editable_groups`
+     (simulação por omissão).
    - não ser partilhado com outra Entity nem ser grupo-modelo de um EntityType, senão
      `403 group_shared`.
 3. **Sem escalada por delegação.** Todas as permissões que o pedido acrescenta **ou retira** têm de
@@ -91,6 +93,34 @@ exige a sua permissão no contexto actual. Uma acção sem permissão mapeada é
 | `DELETE auth/groups/{id}/` | `delete_group` | grupo alterável; nunca o grupo activo de quem pede (`400 cannot_delete_active_group`) |
 | `POST {id}/addPermission/` | `change_group` | grupo alterável. Um codename que já existe fora do content type `custom` → `409 permission_codename_exists` (a autorização compara codenames, por isso daria a capacidade real). Criar uma permissão custom nova exige `add_permission`; juntar uma custom já existente é uma atribuição (regra 3). |
 | `POST {id}/removePermission/` | `change_group` | grupo alterável; retirar exige ter a permissão (regra 3) |
+
+### Viewsets antigas: permissões por acção (`ActionPermissionMixin`)
+
+O `ExplicitAccessMixin` só decide quem **chega** a um `ModelViewSet` simples
+(autenticado, ou público para acções seguras listadas). O `ActionPermissionMixin`
+(`saas/core/base/access.py`) acrescenta o que o `BaseAPIView` faz: cada acção exige a
+sua permissão no contexto assinado, e uma acção não declarada é recusada (`403
+permission_denied`). As acções em `membership_actions` não exigem permissão, e o
+`get_queryset` da view tem de as limitar aos objectos do próprio utilizador.
+`is_membership_request()` pode decidir isto por pedido.
+
+| View | Sem permissão (pertença) | Tudo o resto |
+|---|---|---|
+| `EntityAPIView` (`django_resaas/entitys/`) | as Entities do próprio utilizador: lista, detalhe, branches, apps/modelos activos, leituras de branding; `create` (registo self-service de uma Entity **nova**) | a sua permissão (`change_entity`, `add_entityuser`, `add_entitygroup`, ...) **e** só na Entity do contexto assinado (outra dá `404`), excepto ao nível plataforma (`change_entitytype`) |
+| `EntityTypeAPIView` (`django_resaas/entitytypes/`) | leituras de branding (públicas); o **próprio** EntityType: detalhe, apps, modelos, grupos, permissões; `user_entitys` (só as Entities próprias) | leituras de outros tipos e listas que atravessam tenants (`entitys`, `branches_map`) exigem `view_entitytype`; todas as escritas são de nível plataforma |
+
+O `EntityAPIView.addGroup` só liga um grupo que seja modelo do EntityType da própria
+Entity (senão `403 group_not_in_entity_type`, excepto ao nível plataforma). Ligar
+qualquer grupo, por exemplo o Root, permitiria aos administradores da Entity
+atribuí-lo através de `users/{id}/addGroup/`.
+
+### Endpoints de deploy (`deploy/*`)
+
+**PÚBLICOS por desenho** (webhook do GitHub / operações), autenticados por um token
+partilhado: cabeçalho `X-Deploy-Token` (preferido) ou `?token=` (mantido para os
+webhooks existentes), comparado em tempo constante. **Não há token por omissão**: sem
+`settings.DEPLOY_TOKEN` todas as chamadas são recusadas. `deploy/github/` e
+`deploy/rollback/` alteram o servidor e são **só POST** (`405` em GET).
 
 ### Endpoints removidos
 

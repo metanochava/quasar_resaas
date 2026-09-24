@@ -113,6 +113,12 @@ O decorator só anexa metadados ao método; o `ActionSyncService` (corrido a par
   permissão partilhada/explícita nunca é reescrito automaticamente (ao contrário do caso de
   convenção por omissão, onde É mantido em sincronia com o label/model da action, enquanto a
   permissão for gerida pelo RESAAS).
+- **Aplicação**: num `BaseAPIView`, o `permission=` explícito é também o codename que o
+  `initial()` verifica (senão `{action}_{model}`), por isso o que o schema publica e o que o
+  backend verifica são sempre a mesma permissão. Use uma permissão **do próprio model da view**.
+  A sincronização procura-a (ou cria-a) no ContentType desse model, por isso um codename de outro
+  model acabaria duplicado aí. Várias actions do mesmo model podem partilhar um codename (ex.:
+  `lab_parameters` reutiliza `lab_evolution_paciente`).
 - **Manual vs. decorator**: uma linha `ModelExtraAction` com `managed_by="manual"` (o padrão para
   qualquer coisa criada fora do `ActionSyncService`, ex. à mão via admin) nunca pode ser tomada
   silenciosamente por um decorator com a mesma identidade `app.model.action` — sincronizar levanta
