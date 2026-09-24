@@ -22,6 +22,12 @@ destroy + patient -> delete_patient
 
 Uma cache por pedido evita verificações repetidas do mesmo codename durante o mesmo pedido.
 
+## Permissões por campo
+
+Um model pode também proteger campos individuais (ex.: `Contract.salary`) com permissões próprias
+de `view`/`change`, por cima da permissão da action - ver
+[Field-level permissions](field-permissions.md).
+
 ## Módulo
 
 Além da própria permissão, a aplicação verifica se o módulo correspondente está ativo para a

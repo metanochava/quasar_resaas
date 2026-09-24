@@ -47,6 +47,7 @@ export const docsNav = {
     { section: 'Components', slug: 'components/button', title: 's-btn' },
 
     { section: 'Features', slug: 'features/permissions', title: 'Permissions' },
+    { section: 'Features', slug: 'features/errors-and-alerts', title: 'Errors and alerts' },
     { section: 'Features', slug: 'features/translation', title: 'Translation' },
     { section: 'Features', slug: 'features/custom-fields', title: 'Customizing fields' },
 
@@ -77,8 +78,10 @@ export const docsNav = {
     { section: 'API', slug: 'api/filters-pagination', title: 'Filters & pagination' },
     { section: 'API', slug: 'api/schema-contract', title: 'Schema 1.0 contract' },
     { section: 'API', slug: 'api/public-api-reference', title: 'Public API reference' },
+    { section: 'API', slug: 'api/errors-and-alerts', title: 'Errors and alerts' },
 
     { section: 'Security', slug: 'security/permissions', title: 'Permissions' },
+    { section: 'Security', slug: 'security/field-permissions', title: 'Field-level permissions' },
 
     { section: 'Features', slug: 'features/soft-delete', title: 'Soft delete' },
     { section: 'Features', slug: 'features/files-pdf', title: 'Files & PDF' },

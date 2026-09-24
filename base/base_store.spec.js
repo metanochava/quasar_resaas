@@ -995,3 +995,45 @@ describe('createBaseStore - write payload shape', () => {
   })
 })
 
+
+describe('createBaseStore - field-level authorization', () => {
+  const salary = {
+    name: 'salary',
+    permissions: { view: 'view_contract_salary', change: 'change_contract_salary' },
+  }
+
+  function mockContractSchema() {
+    buildFormFromSchema.mockResolvedValue({
+      fields: [{ name: 'start_date' }, salary],
+      actions: [], config: {}, permissions: {}, pdf: {},
+    })
+  }
+
+  it('hides a restricted field the current user cannot view or change', async () => {
+    mockContractSchema()
+    const { useUserStore } = await import('../stores/UserStore')
+    useUserStore().Permissions = new Set()
+
+    const store = createBaseStore('contract-fa-hidden', { app: 'hr', model: 'Contract' })()
+    await store.loadSchema()
+
+    expect(store.fields.map(f => f.name)).toEqual(['start_date'])
+  })
+
+  it('refreshFieldAccess re-applies the CURRENT permissions to the cached schema (group switch)', async () => {
+    mockContractSchema()
+    const { useUserStore } = await import('../stores/UserStore')
+    const User = useUserStore()
+    User.Permissions = new Set(['view_contract_salary', 'change_contract_salary'])
+
+    const store = createBaseStore('contract-fa-refresh', { app: 'hr', model: 'Contract' })()
+    await store.loadSchemaOnce()
+    expect(store.fields.find(f => f.name === 'salary').read_only).toBeUndefined()
+
+    User.Permissions = new Set(['view_contract_salary'])
+    store.refreshFieldAccess()
+
+    expect(store.fields.find(f => f.name === 'salary').read_only).toBe(true)
+    expect(buildFormFromSchema).toHaveBeenCalledTimes(1)
+  })
+})

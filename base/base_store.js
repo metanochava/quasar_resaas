@@ -3,6 +3,20 @@ import { buildFormFromSchema } from './../utils/autoForm'
 import { HTTPAuth, url, HTTPAuthBlob } from '../services/api'
 import { parseFieldErrors } from '../boot/alerts'
 import { toWriteShapes } from '../utils/payload'
+import { applyFieldAccess } from '../utils/fieldAccess'
+import { useUserStore } from '../stores/UserStore'
+
+// User.can for field-level authorization (utils/fieldAccess.js). Resolved
+// lazily - UserStore itself is built on this module - and fails closed
+// (restricted fields hidden) when no store is available.
+function userCan() {
+  try {
+    const User = useUserStore()
+    return perm => User.can(perm)
+  } catch {
+    return () => false
+  }
+}
 
 // Mesma normalização de FormComponent.vue's normalizeValue() - uma
 // relação já resolvida no form como {id, ...}/{value, ...} tem de
@@ -95,6 +109,10 @@ export function createBaseStore(name, config, extend = {}) {
         // the safeUrl getter below prefers this over the app/model
         // convention whenever it's available
         schemaEndpoint: null,
+        // fields exactly as the schema returned them; `fields` is this
+        // list after field-level authorization for the current user
+        // (refreshFieldAccess)
+        _schemaFields: [],
         fields: [],
         rows: [],
         showPdf: false,
@@ -253,6 +271,8 @@ export function createBaseStore(name, config, extend = {}) {
         await this.runHook('beforeInit')
 
         await this.loadSchemaOnce()
+        // the schema is cached, the user's permissions are not (group switch)
+        this.refreshFieldAccess()
         await this.loadData()
 
         await this.runHook('afterInit')
@@ -271,7 +291,8 @@ export function createBaseStore(name, config, extend = {}) {
           model: this.safeModel
         })
 
-        this.fields = rsp?.fields || []
+        this._schemaFields = rsp?.fields || []
+        this.fields = applyFieldAccess(this._schemaFields, userCan())
         this.actions = rsp?.actions || []
         this.config = rsp?.config || {}
         this.permissions = rsp?.permissions || {}
@@ -287,6 +308,13 @@ export function createBaseStore(name, config, extend = {}) {
         }
 
         await this.runHook('afterSchema', this.fields)
+      },
+
+      // Re-applies field-level authorization (utils/fieldAccess.js) to the
+      // cached schema fields with the user's CURRENT permissions.
+      refreshFieldAccess() {
+        if (!this._schemaFields?.length) return
+        this.fields = applyFieldAccess(this._schemaFields, userCan())
       },
 
       async loadSchemaOnce() {

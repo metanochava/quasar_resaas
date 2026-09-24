@@ -32,6 +32,42 @@ to decide which actions to show (edit, delete, create) — see
 [Form](../components/form.md) for how the modal form it opens
 (`s-auto-form`) is gated the same way.
 
+## Field-level permissions
+
+A schema field can carry its own permissions (backend:
+[Field-level permissions](../../django-resaas/security/field-permissions.md)):
+
+```json
+{"name": "salary", "permissions": {"view": "view_contract_salary", "change": "change_contract_salary"}}
+```
+
+`utils/fieldAccess.js` turns them into UX with `User.can()`.
+`applyFieldAccess(fields, can)` returns a new list and never mutates the schema:
+
+| User holds | Field in `store.fields` |
+|---|---|
+| view + change | unchanged |
+| view only | `read_only: true`, `props.readonly`, no rules (never sent by `buildWritePayload`, never prefilled by `resetForm`) |
+| change only | `write_only: true` (AutoCrud shows no column for it) |
+| neither | removed |
+
+It is applied where the schema becomes `fields`:
+
+- `BaseStore.loadSchema()` keeps the raw list in `_schemaFields` and sets `fields` from it.
+  `init()` calls `refreshFieldAccess()` on every call, so a group switch
+  (`User.selectContext`) takes effect the next time a page initialises its store, without
+  reloading the schema. Call `store.refreshFieldAccess()` yourself if a page stays mounted
+  across a context switch.
+- `s-auto-crud` applies it to its own `fields`.
+
+A manual form that renders `<s-input v-model="Contract.form.salary">` directly bypasses
+`store.fields`. Hide it with `User.can('view_contract_salary')`.
+
+This is UX only. The serializer hides the value and answers `403` with
+`error.code === 'field_permission_denied'` (`error.details.fields` lists the fields) when a
+payload changes a field the current group may not write. Re-sending the unchanged value, which is
+what a whole-form PATCH does, is accepted.
+
 ## Routes
 
 By convention, each route's `meta.requiredRole` is the route's own name

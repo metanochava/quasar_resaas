@@ -19,6 +19,7 @@ Esta pasta contém a documentação técnica do framework backend
 -   [Pesquisa](api/search.md)
 -   [Filtros e paginação](api/filters-pagination.md)
 -   [Permissões](security/permissions.md)
+-   [Field-level permissions](security/field-permissions.md)
 -   [Soft delete](features/soft-delete.md)
 -   [Ficheiros e PDF](features/files-pdf.md)
 -   [Notificações (Email/SMS/WhatsApp)](features/notifications.md)

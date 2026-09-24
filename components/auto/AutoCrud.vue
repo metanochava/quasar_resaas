@@ -63,6 +63,7 @@ import {
   resolvePdfDetailEndpoint
 } from '../../utils/schema'
 import { useUserStore } from '../../stores/UserStore'
+import { applyFieldAccess } from '../../utils/fieldAccess'
 
 const User = useUserStore()
 const emit = defineEmits(['runaction'])
@@ -137,7 +138,9 @@ const columns = computed(() => [
     headerClasses: 'text-left'
   },
 
-  ...fields.value.map(field => ({
+  // a write_only field (field-level authorization: may change, may not
+  // view) has no value to show in a column
+  ...fields.value.filter(field => !field.write_only).map(field => ({
     name: field.name,
     label: field.label,
     field: field.name,
@@ -202,7 +205,7 @@ async function init() {
   }
 
   schema.value = data.schema
-  fields.value = data.fields
+  fields.value = applyFieldAccess(data.fields, perm => User.can(perm))
   actions.value = [...data.actions, ...props.extraActions]
   config.value = data.config
 
@@ -215,7 +218,7 @@ async function init() {
   })
 
   Object.assign(store, {
-    fields: data.fields,
+    fields: fields.value,
     app: props.app,
     model: props.model
   })
