@@ -86,6 +86,26 @@ describe('sDialog', () => {
     expect(onOk).toHaveBeenCalledWith('b')
   })
 
+  it('a prompt resolves with the typed text and is blocked until it is valid', async () => {
+    const onOk = vi.fn()
+
+    sDialog({
+      title: 'Reject sample',
+      cancel: true,
+      prompt: { model: '', type: 'textarea', label: 'Reason', isValid: (v) => !!v?.trim() }
+    }).onOk(onOk)
+    await flushPromises()
+
+    expect(inBody('[data-test="dialog-ok"]').disabled).toBe(true)
+    const input = document.body.querySelector('.q-dialog textarea')
+    input.value = 'Haemolysed'
+    input.dispatchEvent(new Event('input'))
+    await flushPromises()
+    await click('[data-test="dialog-ok"]')
+
+    expect(onOk).toHaveBeenCalledWith('Haemolysed')
+  })
+
   it('the bar close button cancels', async () => {
     const onCancel = vi.fn()
     sDialog({ title: 'Sure?' }).onCancel(onCancel)

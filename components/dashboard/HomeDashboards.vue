@@ -28,7 +28,11 @@ const Entidade = useEntityStore()
 const Dashboard = useDashboardStore()
 
 const entityTypeName = computed(() => {
-  const fromEntity = User.Entity?.entity_type?.label || User.Entity?.entity_type?.name
+  // userEntitys (the list the Entity is picked from) sends entity_type;
+  // before it did it only sent the old key entityType, and an Entity saved
+  // in localStorage by then still has only that one
+  const type = User.Entity?.entity_type || User.Entity?.entityType
+  const fromEntity = type?.label || type?.name
   const fromCrudRow = TipoEntidade.row?.name
 
   return (fromEntity || fromCrudRow || '').toLowerCase() || null

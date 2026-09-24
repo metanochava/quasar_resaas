@@ -53,6 +53,7 @@ export * from './stores/DashboardStore.js'
 // =========================================================
 
 export * from './base/base_store.js'
+export { clearPersistedStates, isStorageAvailable, getUserPreference, setUserPreference } from './base/persistence.js'
 
 
 // =========================================================

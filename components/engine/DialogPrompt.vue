@@ -8,8 +8,9 @@ import ModalCard from './ModalCard.vue'
 // dialog in the ONE RESAAS modal pattern (q-bar header, static footer) instead of
 // Quasar's bare Dialog-plugin card. It accepts the options the plugin call sites
 // already pass - title, message, persistent, ok, cancel and options { type:
-// 'radio' | 'checkbox', model, items } - and resolves like the plugin does:
-// onOk(value) receives the chosen model, onCancel / onDismiss as usual.
+// 'radio' | 'checkbox', model, items } or prompt { model, type, label, isValid }
+// (a text answer, e.g. a reason) - and resolves like the plugin does:
+// onOk(value) receives the chosen model / typed text, onCancel / onDismiss as usual.
 const props = defineProps({
   title: { type: String, default: '' },
   message: { type: String, default: '' },
@@ -18,6 +19,7 @@ const props = defineProps({
   ok: { type: [Boolean, Object, String], default: true },
   cancel: { type: [Boolean, Object, String], default: false },
   options: { type: Object, default: null },
+  prompt: { type: Object, default: null },
   icon: { type: String, default: '' }
 })
 
@@ -25,10 +27,11 @@ defineEmits([...useDialogPluginComponent.emits])
 
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 
-const model = ref(props.options ? props.options.model : null)
+const answer = props.prompt || props.options
+const model = ref(answer ? answer.model ?? null : null)
 
 const isChoice = computed(() => !!props.options?.items?.length)
-const valid = computed(() => (props.options?.isValid ? props.options.isValid(model.value) : true))
+const valid = computed(() => (answer?.isValid ? answer.isValid(model.value) : true))
 
 function button(spec, fallbackLabel, fallbackColor) {
   const custom = spec && typeof spec === 'object' ? spec : {}
@@ -42,7 +45,7 @@ const cancelButton = computed(() => (props.cancel ? button(props.cancel === true
 
 function confirm() {
   if (!valid.value) return
-  onDialogOK(props.options ? model.value : undefined)
+  onDialogOK(answer ? model.value : undefined)
 }
 </script>
 
@@ -59,6 +62,17 @@ function confirm() {
         :options="options.items"
         :class="{ 'q-mt-md': !!message }"
         data-test="dialog-choice"
+      />
+
+      <s-input
+        v-if="prompt"
+        v-model="model"
+        :type="prompt.type || 'text'"
+        :label="prompt.label"
+        autofocus
+        :autogrow="prompt.type === 'textarea'"
+        :class="{ 'q-mt-md': !!message }"
+        data-test="dialog-prompt"
       />
 
       <template #footer>

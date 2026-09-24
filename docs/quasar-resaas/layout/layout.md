@@ -30,8 +30,12 @@ q-layout
 
 Layout state lives in `UserStore`: `User.LeftTop` / `User.RightTop` control
 the drawers and are persisted to `localStorage`
-(`ui_left_menu`/`ui_right_menu`), as is the last visited route
-(`last_route`) and the scroll position.
+(`ui_left_menu`/`ui_right_menu`), as is the scroll position. The last
+visited route is stored **per user** (`getUserPreference`/`setUserPreference`,
+key `resaas:v1:user:<id>:pref:last_route`) and restored only for that user.
+Another user signing in on the same browser never lands on it, and logout
+removes it ([Persistence](../stores/persistence.md#logout)). The old shared
+`last_route` key is deleted on the next load.
 
 Global dialogs also live here, as two deliberately separate modals/toggles
 — "my account" and "how this entity looks for everyone" are not the same

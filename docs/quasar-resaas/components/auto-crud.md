@@ -94,9 +94,42 @@ An action declared on the backend with `@resaas_action(...)` shows up in
   and reloads the list afterward.
 
 If `action.autorequest` is not `true`, `AutoCrud` only emits `runaction` (a
-component event, not the schema field) with `(action, row)` — the host page
-is expected to open its own dialog/flow and call `loadData()` (exposed
-implicitly via the same list refresh path) when it's done.
+component event, not the schema field) with `(action, row)`. The host page
+opens its own dialog/flow and, when it's done, refreshes the list through the
+`reload()` method `AutoCrud` exposes (template ref). An action without a body
+should be declared with `autorequest=True` on the backend instead: it then needs
+no page code at all.
+
+```vue
+<s-auto-crud ref="crud" app="saude" model="Itempedidoexamemedico" @runaction="onRunAction" />
+
+<script setup>
+import { ref } from 'vue'
+import { HTTPAuth, url, tdc, sDialog } from 'quasar_resaas'
+
+const crud = ref(null)
+
+function onRunAction (action, row) {
+  if (action.action !== 'reject_sample') return
+  // sDialog `prompt`: a text answer in the RESAAS modal pattern
+  sDialog({
+    title: tdc('Reject sample'),
+    cancel: true,
+    prompt: { model: '', type: 'textarea', label: tdc('Reason'), isValid: (v) => !!v?.trim() }
+  }).onOk(async (reason) => {
+    await HTTPAuth.post(url({ type: 'u', url: `saude/itempedidoexamemedicos/${row.id}/reject_sample/` }), { reason })
+    crud.value.reload()
+  })
+}
+</script>
+```
+
+`sDialog()` (`services/dialog.js`, rendered by `components/engine/DialogPrompt.vue`)
+accepts, next to `title`, `message`, `ok`, `cancel` and the choice `options`, a
+`prompt: { model, type, label, isValid }` option: an `s-input` (`type: 'textarea'`
+for long text). OK stays disabled while `isValid(value)` is false, and `onOk` receives
+the typed text. The action's permission and state rules stay on the backend:
+the button in the menu only follows `User.can(action.permission)`.
 
 ## PDF
 

@@ -142,6 +142,15 @@ bound to the store. Available hooks:
 `beforeUpdate/afterUpdate`, `beforeDelete/afterDelete`. This is the preferred
 extension point rather than overriding an entire action.
 
+## Persistence (`extend.persist`)
+
+Opt-in: `createBaseStore(name, config, { persist: true })` keeps `search`,
+`filters` and `pagination` in localStorage across reloads, per user +
+Entity + Branch. `include`, `scope`, `version`/`migrate`, `ttl` and
+`debounce` refine it. API payloads (`rows`, `row`, `form`), schema-derived
+state and security fields are never saved by default. A store without
+`persist` is unchanged. See [Persistence](persistence.md).
+
 ## Extending the store
 
 `createBaseStore(name, config, extend)`'s third argument has two distinct

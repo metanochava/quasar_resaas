@@ -5,6 +5,14 @@ export const usePermissionStore = createBaseStore(
   'permission',
   { app: 'auth', model: 'Permission' },
   {
+    // the permission search of the group editor survives F5 (UX only: the
+    // permissions themselves are never persisted - base/persistence.js)
+    persist: {
+      include: ['search'],
+      scope: 'user',
+      ttl: 7 * 24 * 60 * 60 * 1000
+    },
+
     state: () => ({
       allPermissions: [],
       groupPermissions: [],

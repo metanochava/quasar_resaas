@@ -440,4 +440,7 @@ watch(
   },
   { immediate: true }
 )
+
+// pages that run their own actions (@runaction) refresh the list after them
+defineExpose({ reload: () => loadData() })
 </script>

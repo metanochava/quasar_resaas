@@ -160,6 +160,7 @@ import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import { useEntityStore } from '../stores/EntityStore'
 import { useThemeStore } from '../stores/ThemeStore'
 import { useLayoutSettingStore } from '../stores/LayoutSettingStore'
+import { getUserPreference, setUserPreference } from '../base/persistence'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
@@ -271,8 +272,10 @@ export default defineComponent({
     $route(to) {
       const ignore = ['authwelcome','welcome','login']
 
+      // per user (base/persistence.js): another user signing in on this
+      // browser never lands on this user's last page (and its ids)
       if (!ignore.includes(to.name)) {
-        localStorage.setItem('last_route', to.fullPath)
+        setUserPreference(this.User?.data?.id, 'last_route', to.fullPath)
       }
     },
 
@@ -372,8 +375,9 @@ export default defineComponent({
       await this.Entity.getLayoutSettings(this.User?.Entity?.id)
     }
 
-    // 🔥 RESTORE ROUTE
-    const lastRoute = localStorage.getItem('last_route')
+    // 🔥 RESTORE ROUTE (this user's own; the old shared key is dropped)
+    try { localStorage.removeItem('last_route') } catch { /* storage unavailable */ }
+    const lastRoute = getUserPreference(this.User?.data?.id, 'last_route')
     if (lastRoute && lastRoute !== this.$route.fullPath) {
       this.$router.replace(lastRoute)
     }

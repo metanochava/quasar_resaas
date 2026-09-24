@@ -1,4 +1,7 @@
 import { defineStore } from 'pinia'
+import { watch } from 'vue'
+// before UserStore: UserStore is itself built by createBaseStore (circular import)
+import { attachPersistence, isPersistedField, normalizePersistOptions } from './persistence'
 import { buildFormFromSchema } from './../utils/autoForm'
 import { HTTPAuth, url, HTTPAuthBlob } from '../services/api'
 import { parseFieldErrors } from '../boot/alerts'
@@ -75,7 +78,39 @@ export function buildRequestPayload(form) {
   return hasFileValue(form) ? toFormData(form) : toWriteShapes(form)
 }
 
+// Who the persisted state belongs to (base/persistence.js keys): the signed-in
+// user and the selected Entity/Branch, read from UserStore. Only a namespace
+// for UX state - the backend still validates the session and the
+// X-RESAAS-Context on every request.
+function persistIdentity(pinia) {
+  try {
+    const User = useUserStore(pinia)
+    return {
+      userId: User.data?.id ?? null,
+      entityId: User.Entity?.id ?? null,
+      branchId: User.Branch?.id ?? null
+    }
+  } catch {
+    return {}
+  }
+}
+
+function watchPersistIdentity(pinia, callback) {
+  try {
+    const User = useUserStore(pinia)
+    watch(() => [User.data?.id, User.Entity?.id, User.Branch?.id].join('|'), callback, { flush: 'sync' })
+  } catch {
+    // no UserStore (isolated tests): the identity never changes
+  }
+}
+
+// extend.persist (optional, opt-in): keep part of the state in localStorage
+// across reloads - see base/persistence.js and
+// docs/quasar-resaas/stores/persistence.md. Without it the store is exactly
+// the plain Pinia store it always was.
 export function createBaseStore(name, config, extend = {}) {
+
+  const persistOptions = normalizePersistOptions(extend.persist, name)
 
   // 🔥 IMMUTABLE CONFIG (NEVER CHANGES)
   const BASE_CONFIG = Object.freeze({
@@ -84,66 +119,68 @@ export function createBaseStore(name, config, extend = {}) {
     model: config.model
   })
 
-  return defineStore(name, {
+  // =========================
+  // STATE
+  // =========================
+  const buildState = () => {
+    const extended = extend.state ? extend.state() : {}
 
-    // =========================
-    // STATE
-    // =========================
-    state: () => {
-      const extended = extend.state ? extend.state() : {}
+    return {
+      // 🔥 FIXED CONFIG
+      _config: BASE_CONFIG,
 
-      return {
-        // 🔥 FIXED CONFIG
-        _config: BASE_CONFIG,
+      // 🔥 DERIVED (never rely on them directly)
+      url: BASE_CONFIG.url,
+      app: BASE_CONFIG.app,
+      model: BASE_CONFIG.model,
 
-        // 🔥 DERIVED (never rely on them directly)
-        url: BASE_CONFIG.url,
-        app: BASE_CONFIG.app,
-        model: BASE_CONFIG.model,
+      loading: false,
+      saving: false,
 
-        loading: false,
-        saving: false,
+      _schemaLoaded: false,
+      // set from schema.model.endpoint once loadSchema() resolves;
+      // the safeUrl getter below prefers this over the app/model
+      // convention whenever it's available
+      schemaEndpoint: null,
+      // fields exactly as the schema returned them; `fields` is this
+      // list after field-level authorization for the current user
+      // (refreshFieldAccess)
+      _schemaFields: [],
+      fields: [],
+      rows: [],
+      showPdf: false,
+      pdf: null,
+      row: null,
+      form: {},
 
-        _schemaLoaded: false,
-        // set from schema.model.endpoint once loadSchema() resolves;
-        // the safeUrl getter below prefers this over the app/model
-        // convention whenever it's available
-        schemaEndpoint: null,
-        // fields exactly as the schema returned them; `fields` is this
-        // list after field-level authorization for the current user
-        // (refreshFieldAccess)
-        _schemaFields: [],
-        fields: [],
-        rows: [],
-        showPdf: false,
-        pdf: null,
-        row: null,
-        form: {},
+      // Backend validation errors from the last failed create/update,
+      // as {field: "message"} (see parseFieldErrors in boot/alerts.js)
+      // - ready to bind straight onto an s-input's :error-message,
+      // never the raw DRF {field: [...]} shape.
+      errors: {},
 
-        // Backend validation errors from the last failed create/update,
-        // as {field: "message"} (see parseFieldErrors in boot/alerts.js)
-        // - ready to bind straight onto an s-input's :error-message,
-        // never the raw DRF {field: [...]} shape.
-        errors: {},
+      actions: [],
+      config: {},
+      permissions: {},
+      pdfConfig: {},
+      paginationConfig: {},
 
-        actions: [],
-        config: {},
-        permissions: {},
-        pdfConfig: {},
-        paginationConfig: {},
+      search: '',
+      filters: {},
 
-        search: '',
-        filters: {},
+      pagination: {
+        page: 1,
+        rowsPerPage: 10,
+        rowsNumber: 0
+      },
 
-        pagination: {
-          page: 1,
-          rowsPerPage: 10,
-          rowsNumber: 0
-        },
+      ...extended
+    }
+  }
 
-        ...extended
-      }
-    },
+  const useStore = defineStore(name, {
+
+    state: buildState,
 
     // =========================
     // GETTERS (SEMPRE USAR ESTES)
@@ -303,7 +340,8 @@ export function createBaseStore(name, config, extend = {}) {
         // was being silently dropped - the backend is supposed to be the
         // authority here too, so seed the live pagination cursor from it.
         this.paginationConfig = rsp?.pagination || {}
-        if (this.paginationConfig.page_size) {
+        // a page size restored from the user's persisted state wins
+        if (this.paginationConfig.page_size && !isPersistedField(this, 'pagination')) {
           this.pagination.rowsPerPage = this.paginationConfig.page_size
         }
 
@@ -686,4 +724,20 @@ export function createBaseStore(name, config, extend = {}) {
       ...(extend.actions || {})
     }
   })
+
+  if (!persistOptions) return useStore
+
+  function usePersistedStore(pinia, hot) {
+    const store = useStore(pinia, hot)
+    if (!store.$persist) {
+      attachPersistence(store, persistOptions, {
+        identity: () => persistIdentity(store._p),
+        watchIdentity: callback => watchPersistIdentity(store._p, callback),
+        initialState: buildState
+      })
+    }
+    return store
+  }
+  usePersistedStore.$id = useStore.$id
+  return usePersistedStore
 }

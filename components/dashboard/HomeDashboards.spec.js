@@ -13,9 +13,9 @@ import HomeDashboards from './HomeDashboards.vue'
 import { useUserStore } from '../../stores/UserStore'
 import { useDashboardStore } from '../../stores/DashboardStore'
 
-function setup(dashboards) {
+function setup(dashboards, entity = { entity_type: { label: 'saude' }, dashboard: { value: 'Auto' } }) {
   const User = useUserStore()
-  User.Entity = { entity_type: { label: 'saude' }, dashboard: { value: 'Auto' } }
+  User.Entity = entity
   User.refreshResaasContext = vi.fn().mockResolvedValue()
 
   const Dashboard = useDashboardStore()
@@ -54,6 +54,16 @@ describe('HomeDashboards - dashboards of the EntityType module', () => {
     const tabs = w.findAll('[data-test="home-dashboard-tabs"] .q-tab')
     expect(tabs.map((t) => t.text())).toEqual(['Reception', 'Clinic'])
     expect(w.find('[data-test="renderer"]').text()).toBe('saude_reception')
+  })
+
+  it('an Entity saved from the old userEntitys payload (entityType only) still gets its dashboard', async () => {
+    const w = setup(
+      [{ name: 'saude_doctor', module: 'saude', label: 'My Patients', order: 3 }, { name: 'hr', module: 'hr', label: 'HR', order: 5 }],
+      { id: 'amal', entityType: { id: 't1', value: 't1', label: 'Saude' }, dashboard: { id: 'Auto', value: 'Auto', label: 'Auto' } }
+    )
+    await flushPromises()
+
+    expect(w.find('[data-test="renderer"]').text()).toBe('saude_doctor')
   })
 
   it('never offers a dashboard of another module', async () => {

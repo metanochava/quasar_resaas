@@ -7,7 +7,7 @@ library, companion to the `django_resaas` backend.
 
 -   **Getting started** — [Installation](getting-started/installation.md), [Quick start](getting-started/quick-start.md)
 -   **Architecture** — [Overview](architecture/overview.md), [Data flow](architecture/data-flow.md)
--   **Stores** — [BaseStore](stores/base-store.md), [UserStore & context](stores/user-context.md)
+-   **Stores** — [BaseStore](stores/base-store.md), [UserStore & context](stores/user-context.md), [Persistence (`persist`)](stores/persistence.md)
 -   **Components** — [Form](components/form.md), [ActionForm](components/action-form.md), [AutoCrud](components/auto-crud.md), [s-btn](components/button.md)
 -   **Features** — [Permissions](features/permissions.md), [Translation](features/translation.md), [Customizing fields](features/custom-fields.md)
 -   **Routing** — [Router](routing/routes.md)

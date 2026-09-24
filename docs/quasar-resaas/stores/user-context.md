@@ -17,7 +17,12 @@ multi-tenancy on the frontend side.
 -   `logout(x)` — `x === 'N'` does only a local logout (e.g. a 401 coming
     from the interceptor); otherwise it calls `POST logout/` and clears all
     related storage (theme, tokens, entity/branch/group, permissions,
-    "keep session" credentials).
+    "keep session" credentials) and the user's persisted store state
+    ([Persistence](persistence.md#logout)). The local cleanup runs even when
+    the request fails. The profile (`Group`) and `Permissions` never survive
+    a logout. `logout(entityId)` ("log out of this Entity") keeps only
+    `userEntity` as the hint for the next sign-in; `logout('x')` keeps no
+    Entity.
 -   `loadFromStorage()` — restores the entire state (theme, typography,
     entity/branch/group, tokens, permissions) from
     `localStorage`/`sessionStorage` on app startup.
@@ -44,6 +49,16 @@ The active tenant lives in three `UserStore` fields: `Entity`, `Branch`,
 `refreshResaasContext()` calls `createResaasContext` (see below) only
 if `Entity.id` exists; otherwise it clears the context
 (`clearResaasContext()`).
+
+The stored Entity/Branch/Group are **preferences**, not authorization. When
+`POST resaas/context/` refuses them, `discardContextSelection()` clears them
+in memory and in localStorage (`userEntity`, `userBranch`, `userGroup`,
+`userBranchs`, `userGroups`) together with the context token, and the user
+picks an allowed one. A refusal is `403` (no access to that
+Entity/Branch/Group) or `400` (it no longer exists). The next call finds no
+Entity and makes no request, so a refused selection is never retried in a
+loop. This covers an Entity kept by a previous user's
+`logout(entityId)`. A network error or a `5xx` keeps the selection.
 
 ## Resolving the tenant from a public domain (`EntityStore.getSettings()`)
 

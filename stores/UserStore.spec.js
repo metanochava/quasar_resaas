@@ -90,3 +90,107 @@ describe('UserStore.refreshResaasContext', () => {
     expect(createResaasContext).not.toHaveBeenCalled()
   })
 })
+
+// ------------------------------------------------------------------
+// A stored Entity/Branch/Group is a preference, never an authorization:
+// when the backend refuses to issue a context for it, it is discarded.
+// ------------------------------------------------------------------
+
+const refused = status => Object.assign(new Error('refused'), { response: { status } })
+
+describe('UserStore - refused context selection', () => {
+  beforeEach(() => localStorage.clear())
+
+  it.each([403, 400])('a %s from resaas/context discards the selection (memory and storage)', async (status) => {
+    createResaasContext.mockRejectedValue(refused(status))
+    const User = useUserStore()
+    User.Entity = { id: 'entity-of-another-user' }
+    User.Branch = { id: 'b1' }
+    User.Group = { id: 'g1' }
+    for (const key of ['userEntity', 'userBranch', 'userGroup', 'userBranchs', 'userGroups']) {
+      localStorage.setItem(key, '{"id":"x"}')
+    }
+
+    await expect(User.refreshResaasContext()).rejects.toThrow('refused')
+
+    expect([User.Entity, User.Branch, User.Group, User.ResaasContext]).toEqual([null, null, null, null])
+    for (const key of ['userEntity', 'userBranch', 'userGroup', 'userBranchs', 'userGroups']) {
+      expect(localStorage.getItem(key)).toBeNull()
+    }
+  })
+
+  it('does not retry a refused selection (no loop)', async () => {
+    createResaasContext.mockRejectedValue(refused(403))
+    const User = useUserStore()
+    User.Entity = { id: 'e1' }
+
+    await User.refreshResaasContext().catch(() => {})
+    await User.refreshResaasContext()
+    await User.renewResaasContextQuietly()
+
+    expect(createResaasContext).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    ['a server error', Object.assign(new Error('boom'), { response: { status: 500 } })],
+    ['a network error', new Error('Network Error')]
+  ])('%s keeps the selection', async (_, error) => {
+    createResaasContext.mockRejectedValue(error)
+    const User = useUserStore()
+    User.Entity = { id: 'e1' }
+    localStorage.setItem('userEntity', '{"id":"e1"}')
+
+    await expect(User.refreshResaasContext()).rejects.toThrow()
+
+    expect(User.Entity).toEqual({ id: 'e1' })
+    expect(localStorage.getItem('userEntity')).toBe('{"id":"e1"}')
+  })
+})
+
+describe('UserStore.logout - what survives', () => {
+  beforeEach(() => localStorage.clear())
+
+  async function signedInAndLogout(arg, { fail = false } = {}) {
+    const { HTTPAuth } = await import('../services/api')
+    fail ? HTTPAuth.post.mockRejectedValueOnce(new Error('offline')) : HTTPAuth.post.mockResolvedValueOnce({ data: {} })
+    const User = useUserStore()
+    User.data = { id: 'u1' }
+    User.Entity = { id: 'e1', name: 'Clinic' }
+    User.Group = { id: 'g1', name: 'Doctor' }
+    User.Permissions = new Set(['view_patient'])
+    localStorage.setItem('userEntity', JSON.stringify(User.Entity))
+    localStorage.setItem('userGroup', JSON.stringify(User.Group))
+    localStorage.setItem('access', 'token')
+    await User.logout(arg)
+    return User
+  }
+
+  it('never writes the profile back (no "[object Object]") and clears it in memory', async () => {
+    const User = await signedInAndLogout('e1')
+
+    expect(localStorage.getItem('userGroup')).toBeNull()
+    expect(User.Group).toBeNull()
+    expect(User.can('view_patient')).toBe(false)
+  })
+
+  it('"log out of this Entity" keeps only the Entity as the login hint', async () => {
+    await signedInAndLogout('e1')
+
+    expect(JSON.parse(localStorage.getItem('userEntity'))).toEqual({ id: 'e1', name: 'Clinic' })
+    expect(localStorage.getItem('access')).toBeNull()
+  })
+
+  it('"log out of the Entity type" keeps no Entity', async () => {
+    await signedInAndLogout('x')
+
+    expect(localStorage.getItem('userEntity')).toBeNull()
+  })
+
+  it('a failed logout request still clears the session on the device', async () => {
+    const User = await signedInAndLogout('x', { fail: true })
+
+    expect(localStorage.getItem('access')).toBeNull()
+    expect(User.data).toBeNull()
+    expect(User.isLogout).toBe(true)
+  })
+})

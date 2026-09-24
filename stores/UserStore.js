@@ -6,6 +6,7 @@ import { HTTPAuth, HTTPClient, url } from '../services/api'
 import { useLanguageStore } from  './LanguageStore'
 
 import { createBaseStore } from '../base/base_store'
+import { clearPersistedStates } from '../base/persistence'
 import { setSettings } from '../services/theme'
 import { JSONSafeParse } from '../utils/json'
 
@@ -28,6 +29,34 @@ import { createResaasContext,  clearResaasContext, getResaasContext } from '../s
 // and any component calling this method directly collapse into the same
 // in-flight request.
 let resaasContextRefreshPromise = null
+
+// The backend refuses to issue a context for a selection the user may not
+// use: 403 (no access to that Entity/Branch/Group) or 400 (it no longer
+// exists). A network error or a 5xx says nothing about the selection.
+function isRefusedSelection(error) {
+  const status = error?.response?.status
+  return status === 400 || status === 403
+}
+
+// One in-flight context request shared by every caller (see above). A
+// refused selection (e.g. the Entity kept by a previous logout that this
+// user does not belong to) is discarded instead of being retried forever:
+// the user picks an allowed one.
+function issueResaasContext(User) {
+  if (!resaasContextRefreshPromise) {
+    resaasContextRefreshPromise = createResaasContext({
+      entity: User.Entity,
+      branch: User.Branch,
+      group: User.Group
+    })
+      .catch(error => {
+        if (isRefusedSelection(error)) User.discardContextSelection()
+        throw error
+      })
+      .finally(() => { resaasContextRefreshPromise = null })
+  }
+  return resaasContextRefreshPromise
+}
 
 
 
@@ -167,15 +196,7 @@ export const useUserStore = createBaseStore(
         return null
       }
 
-      if (!resaasContextRefreshPromise) {
-        resaasContextRefreshPromise = createResaasContext({
-          entity: this.Entity,
-          branch: this.Branch,
-          group: this.Group
-        }).finally(() => { resaasContextRefreshPromise = null })
-      }
-
-      const data = await resaasContextRefreshPromise
+      const data = await issueResaasContext(this)
 
       this.ResaasContext = data.token
 
@@ -191,15 +212,22 @@ export const useUserStore = createBaseStore(
     async renewResaasContextQuietly() {
       if (!this.Entity?.id) return null
 
-      if (!resaasContextRefreshPromise) {
-        resaasContextRefreshPromise = createResaasContext({
-          entity: this.Entity,
-          branch: this.Branch,
-          group: this.Group
-        }).finally(() => { resaasContextRefreshPromise = null })
+      return issueResaasContext(this)
+    },
+    // Drops the selected Entity/Branch/Group (memory and localStorage) and the
+    // context token. localStorage only ever held a preference: the backend
+    // decides which tenant a user may use.
+    discardContextSelection() {
+      this.Entity = null
+      this.Branch = null
+      this.Group = null
+      this.Branchs = []
+      this.Groups = []
+      this.ResaasContext = null
+      clearResaasContext()
+      for (const key of ['userEntity', 'userBranch', 'userGroup', 'userBranchs', 'userGroups']) {
+        deleteStorage('l', key)
       }
-
-      return resaasContextRefreshPromise
     },
     async selectContext({ entity, branch = null, group = null }) {
       this.Entity = entity || null
@@ -611,8 +639,15 @@ export const useUserStore = createBaseStore(
         return
       }
 
-      const rsp = await HTTPAuth.post(url({type: "u", url: "logout/", params: {}}), {refresh: this.refresh} )
-      .then(res => {
+      // persisted BaseStore state of this user (filters, searches... of every
+      // Entity/Branch) goes with the session; global preferences stay
+      const userId = this.data?.id
+
+      // The local cleanup runs whether or not the server answered: a failed
+      // logout request must not leave the session (tokens) on the device.
+      const clearLocalSession = () => {
+        if (userId) clearPersistedStates({ userId })
+
         this.data = null
         this.refresh = null
         this.access = null
@@ -653,17 +688,24 @@ export const useUserStore = createBaseStore(
 
 
 
-        if (x !== 'x') {
+        // "log out of this Entity" keeps it as the login hint for the next
+        // sign-in; it is only a preference - if the next user may not use it,
+        // the backend refuses the context and it is discarded
+        // (issueResaasContext). The profile (Group) belonged to this session
+        // and never survives it.
+        if (x !== 'x' && userEntity) {
           setStorage('l', 'userEntity', userEntity)
         }
+        this.Group = null
+        this.Permissions = new Set()
 
-        setStorage('l', 'userGroup', this.Group)
         this.isLogout = true
         this.isLogin = false
-      }).catch(err => {
-        this.isLogout = true
-        this.isLogin = false
-      })
+      }
+
+      const rsp = await HTTPAuth.post(url({type: "u", url: "logout/", params: {}}), {refresh: this.refresh} )
+        .then(clearLocalSession)
+        .catch(clearLocalSession)
 
       return rsp
     }
