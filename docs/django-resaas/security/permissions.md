@@ -34,7 +34,8 @@ report = group_creator([{"name": "Registered Nurse", "permissions": ["view_pacie
 ```
 
 - **Idempotente e aditivo.** Um Group que já existe (pelo nome) é reutilizado, nunca duplicado; `rename_from`
-  renomeia um nome antigo no lugar (mesmo `id`, relações mantidas). As permissões por omissão são
+  renomeia um nome antigo no lugar (mesmo `id`, relações mantidas). Aceita um nome antigo ou uma **lista**
+  (ex.: `{"Doctor": ["General Practitioner", "Médico Geral"]}`): o primeiro que existir é renomeado. As permissões por omissão são
   **acrescentadas**; as que um administrador juntou nunca são retiradas.
 - **Só codenames reais.** Um codename que não existe **não é criado nem atribuído**. Fica registado num aviso
   e listado no relatório devolvido (`permissions_missing`). O relatório tem também `groups_created`,
