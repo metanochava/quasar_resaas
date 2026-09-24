@@ -88,14 +88,35 @@ The real admin screen is `pages/permission/PermissionManager.vue`, bound to
     filter (`this.search`).
 -   `hasPermission(id)` / `appState()` / `modelState()` — state
     (checked/indeterminate) for the per-app and per-model checkboxes.
--   `toggle(permission)` — calls `POST .../permissions/:id/addToGroup/`
-    or `.../removeFromGroup/`, with optimistic rollback on error.
+-   `toggle(permission)` / `toggleModel()` / `toggleApp()` — change the
+    selection **locally** only and mark the store `dirty`.
+-   `saveGroupPermissions()` — sends the whole selection in one request,
+    `POST auth/permissions/setGroupPermissions/` (`{group, permissions}`);
+    `resetChanges()` discards it.
 
 ```text
 q-checkbox (app)   ──toggleApp()──┐
-q-checkbox (model) ──toggle()─────┼──> HTTPClient.post(...)
-                                   └──> groupPermissions updated
+q-checkbox (model) ──toggle()─────┴──> groupPermissions (local, dirty)
+Save ──saveGroupPermissions()──> POST auth/permissions/setGroupPermissions/
 ```
+
+The backend decides whether the save is allowed. It answers `403` or `404` with a stable
+`error.code`, and the message is shown through the normal alert funnel:
+
+| `error.code` | When |
+|---|---|
+| `permission_denied` | the current group lacks `change_group` |
+| `group_not_in_entity` (404) | the group doesn't belong to the current Entity |
+| `group_not_editable` | the group isn't `editable` (bootstrap/template groups) |
+| `group_shared` | the group is shared with another Entity or is an EntityType template |
+| `permission_not_held` | the save adds or removes a permission the current group doesn't hold (`error.details.permissions`) |
+
+The last four only apply without `change_entitytype` (platform level, held by Root).
+
+The group lists (`GroupStore`, the profile picker in `UserAdminStore.loadGroups()`) receive only the
+current Entity's groups unless the user is platform level. The EntityType template picker
+(`EntityTypeStore.loadGroups()`) therefore shows every group only to platform-level users. See
+[django_resaas: Permissions → Managing group permissions](../../django-resaas/security/permissions.md).
 
 > [!WARNING]
 > `components/UserPermissioes.vue` and `components/PagePermissoes.vue` exist
