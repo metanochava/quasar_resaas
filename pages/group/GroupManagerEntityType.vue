@@ -28,6 +28,20 @@
     </template>
 
     <template #subheader>
+      <!-- entity type -> profiles -> permissions, as JSON (and PDF) -->
+      <PermissionsTransfer
+        :base-path="`django_resaas/entitytypes/${EntityType.row.id}`"
+        :file-name="`${EntityType.row.name}-profiles`"
+        format="json"
+        pdf-action="profiles_pdf"
+        data-action="profiles_json"
+        import-action="import_profiles"
+        view-permission="view_entitytype"
+        change-permission="change_entitytype"
+        import-title="Import profiles (JSON)"
+        import-hint="A JSON with this entity type's profiles and their permissions. New profiles are created; profiles not in the file are not changed. A file downloaded here can be edited and imported back."
+        @imported="EntityType.loadGroups(EntityType.row.id)"
+      />
       <div class="q-mb-sm">
       <div class="row q-col-gutter-sm items-center">
         <div class="col">
@@ -166,6 +180,7 @@ import { tdc } from '../../services/translation'
 import { groupLabel } from '../../utils/groupLabel'
 
 import PermissionManager from '../permission/PermissionManager.vue'
+import PermissionsTransfer from '../permission/PermissionsTransfer.vue'
 
 const props = defineProps({
   entityTypeId: [String, Number]

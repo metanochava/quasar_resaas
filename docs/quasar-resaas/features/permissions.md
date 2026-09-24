@@ -113,6 +113,22 @@ The backend decides whether the save is allowed. It answers `403` or `404` with 
 
 The last four only apply without `change_entitytype` (platform level, held by Root).
 
+**Export / import on the group page** (`change_group/:id`, `pages/group/GroupSEPage.vue`):
+`pages/permission/PermissionsTransfer.vue`, above the `PermissionManager`, offers **Download PDF** /
+**Download CSV** (shown with `view_group`) and **Import CSV** (shown with `change_group`).
+The same component is configured by props (`base-path`, `format` `csv|json`, the three action
+names, `view-permission` / `change-permission`). The EntityType group manager
+(`GroupManagerEntityType.vue`) uses it with `format="json"` for **EntityType -> profiles ->
+permissions** (`view_entitytype` / `change_entitytype`) and reloads the type's groups after an
+import. Row errors (CSV, `details.rows`) and profile errors (JSON, `details.profiles`) are listed
+the same way.
+The import opens an `s-modal-card` with the file (`s-file`) and the mode (add to the current
+permissions / replace them with the file). Rows in error are listed in the dialog and
+nothing is changed. On success the page reloads the group's permissions. The page now loads
+them itself (`auth/groups/{id}/permissions/`): the group detail doesn't carry them, so
+before this the manager opened with nothing checked. The backend rules are in
+[django_resaas: Permissions -> Groups themselves](../../django-resaas/security/permissions.md).
+
 The group lists (`GroupStore`, the profile picker in `UserAdminStore.loadGroups()`) receive only the
 current Entity's groups unless the user is platform level. The EntityType template picker
 (`EntityTypeStore.loadGroups()`) therefore shows every group only to platform-level users. See

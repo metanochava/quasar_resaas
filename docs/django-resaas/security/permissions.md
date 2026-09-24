@@ -94,6 +94,20 @@ exige a sua permissão no contexto actual. Uma acção sem permissão mapeada é
 | `DELETE auth/groups/{id}/` | `delete_group` | grupo alterável; nunca o grupo activo de quem pede (`400 cannot_delete_active_group`) |
 | `POST {id}/addPermission/` | `change_group` | grupo alterável. Um codename que já existe fora do content type `custom` → `409 permission_codename_exists` (a autorização compara codenames, por isso daria a capacidade real). Criar uma permissão custom nova exige `add_permission`; juntar uma custom já existente é uma atribuição (regra 3). |
 | `POST {id}/removePermission/` | `change_group` | grupo alterável; retirar exige ter a permissão (regra 3) |
+| `GET {id}/permissions_csv/` | `view_group` | grupo visível; CSV `app, model, codename, name` (UTF-8 com BOM); células que começam por `= + - @` levam `'` à frente (sem fórmulas na folha de cálculo) |
+| `GET {id}/permissions_pdf/` | `view_group` | grupo visível; o PDF de lista genérico (`django_resaas/pdf/list.html`) com o branding da Entity |
+| `POST {id}/import_permissions/` (multipart `file`, `mode=add\|replace`) | `change_group` | grupo alterável (regra 2) + sem escalada (regra 3) em cada permissão acrescentada **ou retirada** |
+
+**Import CSV** (`saas/core/services/group_permissions_io_service.py`): a coluna
+`codename` é obrigatória; `app` desfaz a ambiguidade de um codename que existe em várias
+apps (ex.: `view_group` em `django_resaas` e `auth`). O ficheiro é validado **antes** de
+qualquer alteração. Uma linha desconhecida ou ambígua devolve `400 invalid_rows` com
+`error.details.rows` (`{linha: [mensagem]}`), e nada é aplicado. `mode=add` (por omissão)
+só acrescenta; `replace` deixa o grupo exactamente com as permissões do ficheiro. Os
+limites são 1 MB e 5000 linhas, em UTF-8. A resposta é
+`{mode, added, removed, unchanged, total}`. A alteração fica auditada
+(`GROUP_PERMISSIONS_IMPORTED`). Um ficheiro descarregado com `permissions_csv` pode ser
+editado e importado de volta.
 
 ### Viewsets antigas: permissões por acção (`ActionPermissionMixin`)
 
@@ -109,6 +123,28 @@ permission_denied`). As acções em `membership_actions` não exigem permissão,
 |---|---|---|
 | `EntityAPIView` (`django_resaas/entitys/`) | as Entities do próprio utilizador: lista, detalhe, branches, apps/modelos activos, leituras de branding; `create` (registo self-service de uma Entity **nova**) | a sua permissão (`change_entity`, `add_entityuser`, `add_entitygroup`, ...) **e** só na Entity do contexto assinado (outra dá `404`), excepto ao nível plataforma (`change_entitytype`) |
 | `EntityTypeAPIView` (`django_resaas/entitytypes/`) | leituras de branding (públicas); o **próprio** EntityType: detalhe, apps, modelos, grupos, permissões; `user_entitys` (só as Entities próprias) | leituras de outros tipos e listas que atravessam tenants (`entitys`, `branches_map`) exigem `view_entitytype`; todas as escritas são de nível plataforma |
+
+**Exportar / importar perfis de um EntityType** (EntityType -> perfis-modelo -> permissões, em
+JSON por causa do aninhamento; `saas/core/services/entity_type_profiles_io_service.py`, construído
+sobre as funções de grupo de `group_permissions_io_service`):
+
+| Acção | Permissão | Notas |
+|---|---|---|
+| `GET entitytypes/{id}/profiles_json/` | `view_entitytype` (ou o próprio tipo) | `{"format": "resaas.entity_type_profiles", "version": 1, "entity_type", "profiles": [{"name", "permissions": [{app, model, codename, name}]}]}` |
+| `GET entitytypes/{id}/profiles_pdf/` | `view_entitytype` (ou o próprio tipo) | PDF de lista genérico: perfil, app, modelo, codename, nome |
+| `POST entitytypes/{id}/import_profiles/` (multipart `file`, `mode=add\|replace`) | `change_entitytype` | ver abaixo |
+
+Import: o ficheiro inteiro é validado primeiro (`400 invalid_profiles`,
+`error.details.profiles` com chave `profiles[i] <nome>`), e nada muda se algum perfil estiver
+errado. Um perfil que não existe é criado e ligado como modelo do tipo. O `mode` aplica-se a
+cada perfil **listado** (`add` / `replace` das suas permissões); os perfis fora do ficheiro nunca
+são tocados. As permissões podem ser `{"app", "codename"}` ou só o codename (`app` é necessário
+quando o codename existe em várias apps). **Recusado**: um perfil de plataforma (que tem
+`change_entitytype`, ex.: Root) e a própria permissão `change_entitytype`, porque um modelo é
+herdado por todas as Entities do tipo. As regras de grupo aplicam-se também a cada perfil: nenhuma
+permissão acrescentada ou retirada que quem importa não tenha. Limites: 2 MB, 200 perfis.
+Auditado (`ENTITY_TYPE_PROFILES_IMPORTED`). Um ficheiro exportado importa-se de volta sem
+alterações.
 
 O `EntityAPIView.addGroup` só liga um grupo que seja modelo do EntityType da própria
 Entity (senão `403 group_not_in_entity_type`, excepto ao nível plataforma). Ligar

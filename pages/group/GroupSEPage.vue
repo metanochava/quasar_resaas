@@ -22,6 +22,19 @@
       </template>
 
       <template #right v-if="Group.form?.id">
+        <PermissionsTransfer
+          :base-path="`auth/groups/${Group.form.id}`"
+          :file-name="`${Group.form.name}-permissions`"
+          format="csv"
+          pdf-action="permissions_pdf"
+          data-action="permissions_csv"
+          import-action="import_permissions"
+          view-permission="view_group"
+          change-permission="change_group"
+          import-title="Import permissions (CSV)"
+          import-hint="Use a CSV with a codename column (and app when a codename exists in several apps). A file downloaded here can be edited and imported back."
+          @imported="loadGroupPermissions"
+        />
         <PermissionManager
           :AllPermissions="permissions"
           :GroupPermissionsRe="Group.form.permissions"
@@ -39,6 +52,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGroupStore } from '../../stores/GroupStore.js'
 import PermissionManager from '../permission/PermissionManager.vue'
+import PermissionsTransfer from '../permission/PermissionsTransfer.vue'
 import FormTwo from '../../components/auto/FormTwo.vue'
 import { HTTPAuth, url } from '../../services/api.js'
 
@@ -73,10 +87,22 @@ async function load(id) {
 
   if (String(Group.row?.id) === String(id)) {
     Group.form = Group.row
+    await loadGroupPermissions()
     return
   }
 
   Group.row = await Group.getById(id)
+  await loadGroupPermissions()
+}
+
+// The group's own permissions for PermissionManager: the group detail
+// (GroupSerializer) doesn't carry them, so without this the page opened with
+// nothing checked. Also reloaded after a CSV import.
+async function loadGroupPermissions () {
+  const id = Group.form?.id || route.params.id
+  if (!id) return
+  const { data } = await HTTPAuth.get(url({ type: 'u', url: `auth/groups/${id}/permissions/` }))
+  Group.form = { ...Group.form, permissions: data || [] }
 }
 
 // ---------------- INIT ----------------
