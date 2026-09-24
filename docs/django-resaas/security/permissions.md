@@ -22,6 +22,28 @@ destroy + patient -> delete_patient
 
 Uma cache por pedido evita verificações repetidas do mesmo codename durante o mesmo pedido.
 
+## Perfis-modelo (`group_creator`)
+
+Os módulos trazem perfis por omissão (Groups com um conjunto de permissões) através de
+`saas/core/utils/group_creator.py`, chamado no seu `post_migrate` (ex.: `saude/apps.py` com
+`saude/profiles.py`):
+
+```python
+report = group_creator([{"name": "Registered Nurse", "permissions": ["view_paciente", "add_dadovital"]}],
+                       rename_from={"Registered Nurse": "Enfermeiro"})
+```
+
+- **Idempotente e aditivo.** Um Group que já existe (pelo nome) é reutilizado, nunca duplicado; `rename_from`
+  renomeia um nome antigo no lugar (mesmo `id`, relações mantidas). As permissões por omissão são
+  **acrescentadas**; as que um administrador juntou nunca são retiradas.
+- **Só codenames reais.** Um codename que não existe **não é criado nem atribuído**. Fica registado num aviso
+  e listado no relatório devolvido (`permissions_missing`). O relatório tem também `groups_created`,
+  `groups_reused`, `groups_renamed`, `permissions_assigned` e `permissions_already_assigned` por perfil.
+- **Ordem.** As permissões que o próprio módulo cria (ex.: de dashboards) têm de existir antes do seed dos
+  perfis: ligar esse receiver de `post_migrate` primeiro.
+- Os perfis são **Groups globais** ligados ao EntityType como modelos (ver *Gestão das permissões de grupo*):
+  alterar as suas permissões é uma operação de nível plataforma.
+
 ## Gestão das permissões de grupo
 
 Os registos `Group` são **globais**: o mesmo grupo (ex.: o `Admin` do bootstrap) pode estar ligado a

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import { useUserStore } from '../../stores/UserStore'
 import { useEntityTypeStore } from '../../stores/EntityTypeStore'
@@ -7,6 +7,7 @@ import { useEntityStore } from '../../stores/EntityStore'
 import { useDashboardStore } from '../../stores/DashboardStore'
 import DashboardRenderer from './DashboardRenderer.vue'
 import DashboardComponent from '../DashboardComponent.vue'
+import { tdc } from '../../services/translation'
 
 // User.Entity já fica populado logo a seguir ao login
 // (UserStore.selectContext()/EntityStore.select_()) - Entity.entity_type
@@ -41,10 +42,34 @@ const entityTypeName = computed(() => {
 // this EntityType; DashboardComponent (the older custom-widget
 // registry) stays the fallback otherwise, same as before this had a
 // matching dashboard to render at all.
+//
+// A module can declare several dashboards (django_resaas: DASHBOARD +
+// DASHBOARDS, e.g. saude's Reception/Nursing/Doctor). The list the backend
+// returns is already filtered by module + permission, so every dashboard of
+// this EntityType's module in it is one the user may open: they become
+// tabs, the first by `order` being the default. Which ones a user gets is
+// decided by permissions only - never by the profile's name.
+const moduleDashboards = computed(() => {
+  if (!entityTypeName.value) return []
+  return Dashboard.dashboards
+    .filter((d) => (d.module || d.name) === entityTypeName.value)
+    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
+})
+
+// per-viewer convenience only (last tab picked); never required
+const HOME_TAB_KEY = 'homeDashboardTab'
+function readTab() {
+  try { return localStorage.getItem(HOME_TAB_KEY) } catch { return null }
+}
+const chosen = ref(readTab())
+watch(chosen, (name) => {
+  try { name ? localStorage.setItem(HOME_TAB_KEY, name) : localStorage.removeItem(HOME_TAB_KEY) } catch { /* storage unavailable */ }
+})
+
 const selected = computed(() => {
-  if (!entityTypeName.value) return null
-  const exists = Dashboard.dashboards.some((d) => d.name === entityTypeName.value)
-  return exists ? entityTypeName.value : null
+  const list = moduleDashboards.value
+  if (!list.length) return null
+  return list.some((d) => d.name === chosen.value) ? chosen.value : list[0].name
 })
 
 // Always reload on mount - this only ever mounts on the 'home' route
@@ -104,7 +129,29 @@ watch(() => User.ResaasContext, () => {
   </div>
 
   <div v-else class="flex flex-center q-pa-xs">
-    <DashboardRenderer v-show="User.Entity?.dashboard?.value=='Auto'" :name="selected" />
+    <div v-show="User.Entity?.dashboard?.value=='Auto'" class="full-width">
+      <q-tabs
+        v-if="moduleDashboards.length > 1"
+        :model-value="selected"
+        dense
+        inline-label
+        outside-arrows
+        mobile-arrows
+        align="left"
+        class="q-mb-sm"
+        data-test="home-dashboard-tabs"
+        @update:model-value="chosen = $event"
+      >
+        <q-tab
+          v-for="d in moduleDashboards"
+          :key="d.name"
+          :name="d.name"
+          :icon="d.icon || undefined"
+          :label="tdc(d.label)"
+        />
+      </q-tabs>
+      <DashboardRenderer :key="selected" :name="selected" />
+    </div>
     <DashboardComponent v-show="User.Entity?.dashboard?.value=='Manual'" />
   </div>
   
