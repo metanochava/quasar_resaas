@@ -455,6 +455,15 @@ export function createBaseStore(name, config, extend = {}) {
       // =========================
       // GET BY ID
       // =========================
+      // true while `field` holds what was restored from localStorage (persist)
+      // and has not been loaded from the backend yet in this session. A
+      // restored `row` is a snapshot for the first paint only: getById()
+      // always asks the backend for it (the record may have changed, or the
+      // user may no longer have access).
+      persistRestored(field) {
+        return isPersistedField(this, field)
+      },
+
       getRow(){
         return this.row
       },
@@ -473,7 +482,7 @@ export function createBaseStore(name, config, extend = {}) {
 
         const { force = false } = options
 
-        if (!force && this.row?.id === id) return this.row
+        if (!force && this.row?.id === id && !this.persistRestored('row')) return this.row
 
         this.loading = true
 
@@ -484,10 +493,26 @@ export function createBaseStore(name, config, extend = {}) {
 
           this.row = data
           this.form = { ...data }
+          // from now on row/form come from the backend, not from storage
+          this.$persist?.restored.delete('row')
+          this.$persist?.restored.delete('form')
 
           await this.runHook('afterGet', data)
 
           return data
+
+        } catch (error) {
+          // a restored snapshot the backend refuses (deleted, or no longer
+          // accessible to this user/tenant) must not stay on screen or in
+          // storage
+          const status = error?.response?.status
+          if (this.persistRestored('row') && [403, 404].includes(status)) {
+            this.row = null
+            this.form = {}
+            this.$persist?.restored.delete('row')
+            this.$persist?.restored.delete('form')
+          }
+          throw error
 
         } finally {
           this.loading = false

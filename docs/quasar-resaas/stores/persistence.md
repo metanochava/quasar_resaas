@@ -72,6 +72,42 @@ and `Date` (restored as a `Date`). `undefined` is dropped.
 Finance) must not list `rows`/`row`/`form` or search texts that contain
 names in `include`. localStorage stays on the device after the tab closes.
 
+## Persisting `row` and `form`
+
+`row` (the current record) and `form` are saved only when the store lists
+them in `include`. When a store does:
+
+- **A restored `row` is a snapshot.** It is shown on the first paint.
+  `store.persistRestored('row')` is `true` until the backend has sent the
+  record again. `getById()` always asks the backend for a restored row (its
+  normal "same id: no request" cache applies again only after that).
+- If the backend refuses the record (`403`/`404`: deleted, or no longer
+  accessible to this user/tenant), `row` and `form` are cleared, on screen and
+  in storage.
+- Pages that skip `getById()` when `row.id` already matches the route must
+  also check `persistRestored('row')`. Otherwise a snapshot is never
+  revalidated.
+- Keep the TTL short and the scope `branch` for personal or clinical records.
+  Logout removes them.
+
+Real use: `pacienteStore.js` (dev/front, Health) persists
+`include: ['row', 'form', 'personDraft']`, `scope: 'branch'`, `ttl: 8 h`:
+
+- the patient header and every page built on it keep the current patient
+  after F5, and `PacienteVPage`/`PacienteHeaderPage` revalidate it;
+- `PacienteSEPage` (add patient) restores a draft of the **patient fields**
+  after F5. Only a `form` without `id` counts as a draft: a `form` with an
+  `id` is an existing patient and never prefills a new one. The draft is
+  cleared after a successful save or on "Discard".
+- The Person part of the form is kept as `personDraft`: while adding a
+  patient, the page stores `usePersonIntake().draftState()` there (personal
+  data, contacts, documents, the existing person picked) and puts it back
+  with `restoreDraft()` after F5. `PersonStore` itself is not persisted: it is
+  shared with other pages (HR, edit pages) and must not carry one page's
+  draft into another. Files (photo, document scans) cannot be kept by a
+  browser, so they must be chosen again. The draft is never written while
+  editing an existing patient, and is cleared on save or "Discard".
+
 ## Scopes and keys
 
 Every key is built by `buildStorageKey()`:
@@ -158,6 +194,7 @@ persist: {
 | Member | Effect |
 |---|---|
 | `store.$hydrated` | `true` once the store read its record (or found none) for the current identity |
+| `store.persistRestored(field)` | `true` while `field` holds what was restored from storage and has not been loaded from the backend in this session |
 | `store.$reset()` | Pinia's reset of the whole runtime state; the persisted copy follows like any change (defaults written) |
 | `store.$clearPersistedState()` | removes the record; the runtime state stays as it is and is saved again on the next change |
 | `store.$resetPersisted()` | removes the record **and** puts the persisted fields back to their defaults |

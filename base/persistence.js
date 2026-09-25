@@ -390,28 +390,28 @@ function hookUnload() {
   window.addEventListener('pagehide', () => controllers.forEach(c => c.flush()))
 }
 
-// Attaches persistence to a store instance (once). `identity()` returns
-// { userId, entityId, branchId } (reactive source: UserStore); `watchIdentity`
-// registers a callback run when it changes; `initialState()` gives a fresh
-// default state (used to reset the persisted fields on a scope change).
-export function attachPersistence(store, options, { identity, watchIdentity, initialState }) {
-  if (!options || store.$persist) return store
-
+// ------------------------------------------------------------
+// Core: one persisted record bound to some state. `target.read()` returns the current state object,
+// `target.write(partial)` replaces those fields, `target.initial()` gives the
+// defaults. `identity()` / `watchIdentity(cb)` come from UserStore.
+// ------------------------------------------------------------
+export function createPersistedState(target, options, { identity, watchIdentity, onRekey }) {
   let key = null
   let timer = null
   let lastWritten = null
   let createdAt = null
   let suppress = false
+  let hydrated = false
   const restored = new Set()
 
-  const current = () => pickPersisted(store.$state, options.include)
+  const current = () => pickPersisted(target.read(), options.include)
 
   function write() {
     timer = null
     if (!key) return
     const body = serializePersistedState(current())
     if (body === null || body === lastWritten) return
-    const written = writePersistedState(key, options, store.$state, { createdAt })
+    const written = writePersistedState(key, options, target.read(), { createdAt })
     if (written !== null) {
       lastWritten = written
       createdAt = createdAt || Date.now()
@@ -432,30 +432,22 @@ export function attachPersistence(store, options, { identity, watchIdentity, ini
     write()
   }
 
-  // replaces the fields (an object $patch would MERGE nested objects: old
-  // filters of another scope would survive)
-  function patchSilently(state) {
+  function writeSilently(state) {
     suppress = true
-    try {
-      store.$patch(target => {
-        for (const [field, value] of Object.entries(state)) target[field] = value
-      })
-    } finally {
-      suppress = false
-    }
+    try { target.write(state) } finally { suppress = false }
   }
 
   function hydrate() {
     key = buildStorageKey({ store: options.store, scope: options.scope, identity: identity() })
     lastWritten = null
     createdAt = null
-    store.$hydrated = false
+    hydrated = false
     restored.clear()
     if (!key) return
 
     const record = readPersistedState(key, options)
     if (record) {
-      patchSilently(record.state)
+      writeSilently(record.state)
       Object.keys(record.state).forEach(field => restored.add(field))
       createdAt = record.createdAt || null
       log('debug', `hydrated ${options.store}`)
@@ -465,7 +457,7 @@ export function attachPersistence(store, options, { identity, watchIdentity, ini
       lastWritten = null
       write() // saved again as the current version
     }
-    store.$hydrated = true
+    hydrated = true
   }
 
   // scope change (login, logout, other Entity/Branch): the old namespace
@@ -477,8 +469,9 @@ export function attachPersistence(store, options, { identity, watchIdentity, ini
     // (the batched watcher has not run yet)
     if (timer) { clearTimeout(timer); timer = null }
     write()
-    patchSilently(pickPersisted(initialState(), options.include))
+    writeSilently(pickPersisted(target.initial(), options.include))
     hydrate()
+    onRekey?.()
   }
 
   const controller = {
@@ -495,25 +488,63 @@ export function attachPersistence(store, options, { identity, watchIdentity, ini
   controllers.add(controller)
   hookUnload()
 
-  // not state: markRaw keeps it out of Pinia's reactivity and $state
-  store.$persist = markRaw({ options, key: () => key, flush, restored })
-  store.$clearPersistedState = () => {
-    if (timer) { clearTimeout(timer); timer = null }
-    if (key) removeRaw(key)
-    lastWritten = serializePersistedState(current()) // not re-written until it changes
-  }
-  store.$resetPersisted = () => {
-    store.$clearPersistedState()
-    patchSilently(pickPersisted(initialState(), options.include))
-    lastWritten = serializePersistedState(current())
+  // only the persisted fields are watched (a whole-state deep watch would
+  // traverse rows too); the default 'pre' flush batches a tick's mutations
+  function start() {
+    watch(() => options.include.map(field => target.read()[field]), schedule, { deep: true })
+    if (options.scope !== 'global') watchIdentity(rekey)
   }
 
-  hydrate()
-  // only the persisted fields are watched ($subscribe would deep-traverse the
-  // whole state - rows included); the default 'pre' flush batches the
-  // mutations of one tick into one callback
-  watch(() => options.include.map(field => store.$state[field]), schedule, { deep: true })
-  if (options.scope !== 'global') watchIdentity(rekey)
+  return {
+    options,
+    restored,
+    key: () => key,
+    isHydrated: () => hydrated,
+    hydrate,
+    start,
+    flush,
+    clear() {
+      if (timer) { clearTimeout(timer); timer = null }
+      if (key) removeRaw(key)
+      lastWritten = serializePersistedState(current()) // not re-written until it changes
+    },
+    reset() {
+      this.clear()
+      writeSilently(pickPersisted(target.initial(), options.include))
+      lastWritten = serializePersistedState(current())
+    }
+  }
+}
+
+// Attaches persistence to a store instance (once). `identity()` returns
+// { userId, entityId, branchId } (reactive source: UserStore); `watchIdentity`
+// registers a callback run when it changes; `initialState()` gives a fresh
+// default state (used to reset the persisted fields on a scope change).
+export function attachPersistence(store, options, { identity, watchIdentity, initialState }) {
+  if (!options || store.$persist) return store
+
+  const persisted = createPersistedState({
+    read: () => store.$state,
+    // replaces the fields (an object $patch would MERGE nested objects: old
+    // filters of another scope would survive)
+    write: state => store.$patch(target => {
+      for (const [field, value] of Object.entries(state)) target[field] = value
+    }),
+    initial: initialState
+  }, options, {
+    identity,
+    watchIdentity,
+    onRekey: () => { store.$hydrated = persisted.isHydrated() }
+  })
+
+  // not state: markRaw keeps it out of Pinia's reactivity and $state
+  store.$persist = markRaw({ options, key: persisted.key, flush: persisted.flush, restored: persisted.restored })
+  store.$clearPersistedState = () => persisted.clear()
+  store.$resetPersisted = () => persisted.reset()
+
+  persisted.hydrate()
+  store.$hydrated = persisted.isHydrated()
+  persisted.start()
 
   return store
 }

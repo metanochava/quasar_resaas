@@ -321,3 +321,48 @@ describe('usePersonIntake - viewing the reused person', () => {
     expect(intake.detailOpen.value).toBe(false)
   })
 })
+
+describe('usePersonIntake - draft (kept across reloads by the page)', () => {
+  it('draftState is plain data: person form, contacts and documents, without ids of rows, keys or files', () => {
+    intake.Person.form = { id: 'x', name: 'Ana', surname: 'Silva', photo: new File(['x'], 'p.png') }
+    intake.addContact()
+    intake.contacts.value[0].name = 'Mother'
+    intake.addDocument()
+    Object.assign(intake.documents.value[0], { tipo: { label: 'BI', value: 't1' }, numero: '123', arquivo: new File(['x'], 'bi.pdf') })
+
+    const draft = intake.draftState()
+
+    expect(draft.person).toEqual({ name: 'Ana', surname: 'Silva' })
+    expect(draft.contacts[0]).not.toHaveProperty('_key')
+    expect(draft.contacts[0].name).toBe('Mother')
+    expect(draft.documents[0]).not.toHaveProperty('arquivo')
+    expect(draft.documents[0].numero).toBe('123')
+  })
+
+  it('restoreDraft puts it back in a fresh intake (new row keys, files to choose again)', () => {
+    intake.Person.form = { name: 'Ana' }
+    intake.addContact()
+    intake.contacts.value[0].name = 'Mother'
+    intake.addDocument()
+    intake.documents.value[0].numero = '123'
+    const saved = JSON.parse(JSON.stringify(intake.draftState()))
+
+    setActivePinia(createPinia())
+    const fresh = usePersonIntake()
+    fresh.reset({ withBlankContact: false })
+    fresh.restoreDraft(saved)
+
+    expect(fresh.Person.form.name).toBe('Ana')
+    expect(fresh.contacts.value[0].name).toBe('Mother')
+    expect(fresh.contacts.value[0]._key).toBeTruthy()
+    expect(fresh.documents.value[0]).toMatchObject({ numero: '123', arquivo: null })
+    expect(fresh.hasUnsavedData()).toBe(true)
+  })
+
+  it('restoreDraft ignores nothing/garbage', () => {
+    intake.restoreDraft(null)
+    intake.restoreDraft('x')
+
+    expect(intake.contacts.value).toEqual([])
+  })
+})

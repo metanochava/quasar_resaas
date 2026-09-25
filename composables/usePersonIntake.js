@@ -389,6 +389,30 @@ export function usePersonIntake() {
     if (withBlankContact) addContact()
   }
 
+  // ---------------- draft (create pages) ----------------
+  // What the user typed so far, as plain data, for a page that keeps a draft
+  // across reloads (e.g. pacienteStore's persisted personDraft). Files (the
+  // photo, document scans) are not part of it: a browser cannot store them,
+  // they have to be chosen again.
+  function draftState() {
+    return {
+      person: omit(Person.form, ['id', 'photo']),
+      contacts: contacts.value.map(c => omit(c, ['_key'])),
+      documents: documents.value.map(d => omit(d, ['_key', 'arquivo'])),
+      selectedPerson: selectedPerson.value,
+      matchResolved: matchResolved.value
+    }
+  }
+
+  function restoreDraft(draft) {
+    if (!draft || typeof draft !== 'object') return
+    Person.form = { ...Person.form, ...(draft.person || {}) }
+    contacts.value = (draft.contacts || []).map(c => ({ ...c, _key: ++contactKeySeq }))
+    documents.value = (draft.documents || []).map(d => ({ ...d, arquivo: null, _key: ++documentKeySeq }))
+    selectedPerson.value = draft.selectedPerson || null
+    matchResolved.value = !!draft.matchResolved
+  }
+
   function hasUnsavedData() {
     return !!(
       selectedPerson.value ||
@@ -413,6 +437,6 @@ export function usePersonIntake() {
     // create / edit
     registrationPayload, loadExisting, saveExisting,
     // lifecycle
-    init, reset, hasUnsavedData
+    init, reset, hasUnsavedData, draftState, restoreDraft
   }
 }

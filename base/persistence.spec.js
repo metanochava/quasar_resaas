@@ -573,3 +573,81 @@ describe('per-user preferences (e.g. last_route)', () => {
     expect(Object.keys(localStorage)).toEqual(['resaas:v1:user:u2:pref:last_route'])
   })
 })
+
+// ------------------------------------------------------------------ row / form
+
+describe('persisting row and form (explicit include)', () => {
+  const useRecord = () => define({ include: ['row', 'form'], scope: 'branch', debounce: 0 })
+
+  it('row and form survive a reload, per branch', async () => {
+    const useThing = useRecord()
+    signIn('u1', 'e1', 'b1')
+    const store = useThing()
+    store.row = { id: 'p1', name: 'Ana' }
+    store.form = { id: 'p1', name: 'Ana (edited)' }
+    await settle()
+
+    reload()
+    signIn('u1', 'e1', 'b1')
+    const again = useThing()
+    expect(again.row).toEqual({ id: 'p1', name: 'Ana' })
+    expect(again.form).toEqual({ id: 'p1', name: 'Ana (edited)' })
+
+    signIn('u1', 'e1', 'b2')
+    expect(again.row).toBeNull()
+  })
+
+  it('a restored row is a snapshot: getById asks the backend, then caches as before', async () => {
+    const useThing = useRecord()
+    signIn()
+    const store = useThing()
+    store.row = { id: 'p1', name: 'old' }
+    await settle()
+
+    reload()
+    signIn()
+    const again = useThing()
+    expect(again.persistRestored('row')).toBe(true)
+    HTTPAuth.get.mockResolvedValueOnce({ data: { id: 'p1', name: 'fresh' } })
+
+    await again.getById('p1')
+    expect(HTTPAuth.get).toHaveBeenCalledTimes(1)
+    expect(again.row.name).toBe('fresh')
+    expect(again.persistRestored('row')).toBe(false)
+
+    await again.getById('p1') // same id, now from the backend: cached
+    expect(HTTPAuth.get).toHaveBeenCalledTimes(1)
+  })
+
+  it('a restored row the backend refuses (403/404) is dropped from screen and storage', async () => {
+    const useThing = useRecord()
+    signIn()
+    const store = useThing()
+    store.row = { id: 'gone' }
+    await settle()
+
+    reload()
+    signIn()
+    const again = useThing()
+    HTTPAuth.get.mockRejectedValueOnce(Object.assign(new Error('nf'), { response: { status: 404 } }))
+
+    await expect(again.getById('gone')).rejects.toThrow()
+    await settle()
+
+    expect(again.row).toBeNull()
+    expect(stored(keyOf(again)).state.row).toBeNull()
+  })
+
+  it('without include, row and form are still never persisted', async () => {
+    signIn()
+    const store = define(true)()
+    store.row = { id: 'p1' }
+    store.form = { name: 'x' }
+    store.setSearch('something saved')
+    store.$persist.flush()
+
+    expect(stored(keyOf(store)).state.search).toBe('something saved')
+    expect(stored(keyOf(store)).state).not.toHaveProperty('row')
+    expect(stored(keyOf(store)).state).not.toHaveProperty('form')
+  })
+})
