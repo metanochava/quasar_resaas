@@ -201,7 +201,7 @@ persist: {
 | `store.$persist.flush()` | writes a pending change now |
 | `clearPersistedStates({ userId })` | removes every user/entity/branch record of a user (logout) |
 | `clearPersistedStates({ all: true })` | removes every record written by this module |
-| `getUserPreference(userId, name)` / `setUserPreference(userId, name, value)` | one per-user UI value outside a store (e.g. `last_route`), key `resaas:v1:user:<id>:pref:<name>`, removed at logout with the rest; no user = nothing read or written |
+| `getUserPreference(userId, name)` / `setUserPreference(userId, name, value)` | one per-user UI value outside a store, key `resaas:v1:user:<id>:pref:<name>`, removed at logout with the rest; no user = nothing read or written. Used for `last_route` (MainLayout) and for the position of the Health right-menu history lists (dev/front `HistoryList.vue`, `history:<list>:<entity>:<branch>` = the page and record at the top, so the list reopens there after F5 and loads newer pages upwards) |
 
 ## Logout
 

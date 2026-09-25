@@ -77,3 +77,41 @@ describe('resolveDashboardAction', () => {
     expect(spy).toHaveBeenCalledWith({ type: 'export', name: 'export_csv' }, { foo: 'bar' })
   })
 })
+
+describe('dialog actions open a registered dashboard dialog', () => {
+  it('opens the component registered under action.dialog with the row as context', async () => {
+    const { registerDashboardDialog, openDialog, closeDashboardDialog } = await import('./dashboardDialogs')
+    const Component = { name: 'VitalsDialog', render: () => null }
+    registerDashboardDialog('demo.vitals', Component)
+    const onRefresh = vi.fn()
+
+    resolveDashboardAction({ type: 'dialog', dialog: 'demo.vitals' }, { context: { id: 'a1' }, onRefresh })
+
+    expect(openDialog.value.component.name).toBe('VitalsDialog')
+    expect(openDialog.value.context).toEqual({ id: 'a1' })
+    openDialog.value.onSaved()
+    expect(onRefresh).toHaveBeenCalled()
+    closeDashboardDialog()
+    expect(openDialog.value).toBeNull()
+  })
+
+  it('an unregistered dialog opens nothing (warning only)', async () => {
+    const { openDialog } = await import('./dashboardDialogs')
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    resolveDashboardAction({ type: 'dialog', dialog: 'nobody.registered' }, { context: {} })
+
+    expect(openDialog.value).toBeNull()
+    expect(warn).toHaveBeenCalled()
+  })
+
+  it('a widget handling onDialog itself wins', async () => {
+    const { openDialog } = await import('./dashboardDialogs')
+    const onDialog = vi.fn()
+
+    resolveDashboardAction({ type: 'dialog', dialog: 'demo.vitals' }, { onDialog })
+
+    expect(onDialog).toHaveBeenCalled()
+    expect(openDialog.value).toBeNull()
+  })
+})

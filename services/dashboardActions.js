@@ -10,6 +10,8 @@
 // uma action que chega aqui já está autorizada; este ficheiro só
 // resolve NAVEGAÇÃO, nunca decide segurança.
 
+import { openDashboardDialog } from './dashboardDialogs'
+
 const handlers = {}
 
 export function registerActionHandler(type, handler) {
@@ -75,6 +77,9 @@ registerActionHandler('fullscreen', (action, { onFullscreen } = {}) => {
   onFullscreen?.(action)
 })
 
-registerActionHandler('dialog', (action, { onDialog } = {}) => {
-  onDialog?.(action)
+// a widget may handle it itself (onDialog); otherwise the dialog registered
+// under action.dialog opens with the row/item as context
+registerActionHandler('dialog', (action, { onDialog, context, onRefresh } = {}) => {
+  if (onDialog) return onDialog(action)
+  return openDashboardDialog(action, { context, onSaved: onRefresh })
 })

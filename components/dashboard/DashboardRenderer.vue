@@ -7,6 +7,7 @@ import { useUserStore } from '../../stores/UserStore'
 import DashboardHeader from './DashboardHeader.vue'
 import DashboardFilters from './DashboardFilters.vue'
 import WidgetContainer from './WidgetContainer.vue'
+import DashboardDialogHost from './DashboardDialogHost.vue'
 
 // Ponto de entrada único do motor - não conhece 'saude', 'hr', 'demo'
 // nem nenhum módulo de negócio: só sabe pedir um dashboard pelo nome
@@ -118,6 +119,8 @@ onUnmounted(() => Dashboard.reset())
       <div v-else class="text-caption text-grey-6 q-pa-md">
         {{ tdc('No widgets available') }}
       </div>
+
+      <DashboardDialogHost />
     </template>
   </q-page>
 </template>
