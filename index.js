@@ -191,6 +191,7 @@ export {
   resolveDashboardAction,
   registerActionHandler,
   resolveTemplate,
+  actionApplies,
 } from './services/dashboardActions.js'
 
 

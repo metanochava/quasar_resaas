@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
 import { useDashboardStore } from '../../stores/DashboardStore'
-import { resolveDashboardAction } from '../../services/dashboardActions'
+import { resolveDashboardAction, actionApplies } from '../../services/dashboardActions'
 
 const props = defineProps({
   widget: { type: Object, required: true },
@@ -33,8 +33,15 @@ const columns = computed(() => {
 })
 
 function runRowAction(action, row) {
-  resolveDashboardAction(action, { router, context: row, onRefresh: () => Dashboard.reloadWidget(props.widget.name) })
+  resolveDashboardAction(action, {
+    router,
+    context: row,
+    onRefresh: () => Dashboard.reloadWidget(props.widget.name),
+    onChanged: () => Dashboard.loadAllWidgets()
+  })
 }
+
+const actionsFor = (row) => rowActions.value.filter((action) => actionApplies(action, row))
 
 // Paginação sempre no servidor - nunca carregar a tabela inteira só
 // para paginar no browser (o backend já devolve páginas de
@@ -73,14 +80,18 @@ function onRequest(evt) {
 
     <template v-if="rowActions.length" #body-cell-__actions="cellProps">
       <q-td :props="cellProps">
-        <q-btn
-          v-for="action in rowActions" :key="action.name"
-          flat dense round size="sm"
-          :icon="action.icon || 'chevron_right'"
-          @click="runRowAction(action, cellProps.row)"
-        >
-          <s-tooltip v-if="action.tooltip">{{ tdc(action.tooltip) }}</s-tooltip>
-        </q-btn>
+        <div class="row no-wrap justify-end q-gutter-x-xs">
+          <s-btn
+            v-for="action in actionsFor(cellProps.row)" :key="action.name"
+            flat round size="md"
+            :color="action.color || 'primary'"
+            :icon="action.icon || 'chevron_right'"
+            :data-test="`row-action-${action.name}`"
+            @click="runRowAction(action, cellProps.row)"
+          >
+            <s-tooltip v-if="action.tooltip">{{ tdc(action.tooltip) }}</s-tooltip>
+          </s-btn>
+        </div>
       </q-td>
     </template>
   </q-table>

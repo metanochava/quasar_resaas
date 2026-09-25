@@ -1,5 +1,16 @@
 import { describe, it, expect, vi } from 'vitest'
-import { resolveDashboardAction, resolveTemplate, registerActionHandler } from './dashboardActions'
+const request = vi.fn()
+const dialogHandlers = {}
+vi.mock('./api', () => ({ HTTPAuth: { request: (...a) => request(...a) }, url: ({ url }) => url }))
+vi.mock('./dialog', () => ({
+  sDialog: () => {
+    const chain = { onOk: (fn) => { dialogHandlers.ok = fn; return chain }, onCancel: (fn) => { dialogHandlers.cancel = fn; return chain } }
+    return chain
+  }
+}))
+vi.mock('../boot/alerts', () => ({ AlertSuccess: vi.fn() }))
+
+import { resolveDashboardAction, resolveTemplate, registerActionHandler, actionApplies } from './dashboardActions'
 
 describe('resolveTemplate', () => {
   it('substitutes {key} placeholders from context', () => {
@@ -113,5 +124,50 @@ describe('dialog actions open a registered dashboard dialog', () => {
 
     expect(onDialog).toHaveBeenCalled()
     expect(openDialog.value).toBeNull()
+  })
+})
+
+
+describe('request actions and "when"', () => {
+  const checkIn = {
+    name: 'check_in', type: 'request',
+    request: { method: 'post', endpoint: 'saude/agendas/{id}/check_in/' },
+    when: { field: 'estado', in: ['marcada', 'confirmada'] }
+  }
+
+  it('applies only to the rows whose field is in the list', () => {
+    expect(actionApplies(checkIn, { estado: 'marcada' })).toBe(true)
+    expect(actionApplies(checkIn, { estado: 'em_espera' })).toBe(false)
+    expect(actionApplies({ name: 'x', type: 'refresh' }, {})).toBe(true)
+  })
+
+  it('posts to the endpoint of the row, then reloads (onChanged first)', async () => {
+    request.mockReset(); request.mockResolvedValue({ data: {} })
+    const onChanged = vi.fn(); const onRefresh = vi.fn()
+
+    const ran = await resolveDashboardAction(checkIn, { context: { id: 'a1' }, onChanged, onRefresh })
+
+    expect(ran).toBe(true)
+    expect(request).toHaveBeenCalledWith({ method: 'POST', url: 'saude/agendas/a1/check_in/', data: {} })
+    expect(onChanged).toHaveBeenCalled()
+    expect(onRefresh).not.toHaveBeenCalled()
+  })
+
+  it('a refused request (409...) reloads nothing', async () => {
+    request.mockReset(); request.mockRejectedValue({ response: { status: 409 } })
+    const onChanged = vi.fn()
+
+    expect(await resolveDashboardAction(checkIn, { context: { id: 'a1' }, onChanged })).toBe(false)
+    expect(onChanged).not.toHaveBeenCalled()
+  })
+
+  it('with confirm, nothing is sent until the user confirms', async () => {
+    request.mockReset(); request.mockResolvedValue({ data: {} })
+    const pending = resolveDashboardAction({ ...checkIn, confirm: 'Sure?' }, { context: { id: 'a1' } })
+
+    expect(request).not.toHaveBeenCalled()
+    await dialogHandlers.ok()
+    expect(await pending).toBe(true)
+    expect(request).toHaveBeenCalledTimes(1)
   })
 })

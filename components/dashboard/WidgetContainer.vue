@@ -55,6 +55,7 @@ function runAction(action) {
     router,
     context: data.value,
     onRefresh: reload,
+    onChanged: () => Dashboard.loadAllWidgets(),
     onFullscreen: () => { fullscreen.value = true },
   })
 }
@@ -85,15 +86,18 @@ function onPrimaryAction() {
         </div>
 
         <div class="row items-center no-wrap">
-          <q-btn
+          <s-btn
             v-for="action in widget.actions || []" :key="action.name"
-            flat dense round size="sm"
+            flat round size="md"
+            :color="action.color || 'primary'"
             :icon="action.icon || 'more_horiz'"
             @click="runAction(action)"
           >
             <s-tooltip v-if="action.tooltip">{{ tdc(action.tooltip) }}</s-tooltip>
-          </q-btn>
-          <q-btn flat dense round size="sm" icon="refresh" :disable="loading" @click="reload" />
+          </s-btn>
+          <s-btn flat round size="md" icon="refresh" :disable="loading" @click="reload">
+            <s-tooltip>{{ tdc('Refresh') }}</s-tooltip>
+          </s-btn>
         </div>
       </q-card-section>
 

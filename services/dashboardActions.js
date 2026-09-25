@@ -11,6 +11,10 @@
 // resolve NAVEGAÇÃO, nunca decide segurança.
 
 import { openDashboardDialog } from './dashboardDialogs'
+import { HTTPAuth, url } from './api'
+import { sDialog } from './dialog'
+import { tdc } from './translation'
+import { AlertSuccess } from '../boot/alerts'
 
 const handlers = {}
 
@@ -45,7 +49,16 @@ export function resolveTemplate(value, context) {
   return value
 }
 
-// handlers: { router, context, onRefresh, onFullscreen, onDialog }
+// "when": { field, in: [...] } - the action applies only to the rows/items
+// whose `field` is one of the values (e.g. check-in only while scheduled).
+// UX only: the backend still refuses a transition that is not allowed.
+export function actionApplies(action, context) {
+  const when = action?.when
+  if (!when?.field || !Array.isArray(when.in)) return true
+  return when.in.includes(context?.[when.field])
+}
+
+// handlers: { router, context, onRefresh, onChanged, onFullscreen, onDialog }
 export function resolveDashboardAction(action, handlerContext = {}) {
   if (!action) return
 
@@ -82,4 +95,38 @@ registerActionHandler('fullscreen', (action, { onFullscreen } = {}) => {
 registerActionHandler('dialog', (action, { onDialog, context, onRefresh } = {}) => {
   if (onDialog) return onDialog(action)
   return openDashboardDialog(action, { context, onSaved: onRefresh })
+})
+
+// A write to the backend ({field} placeholders from the row/item), with an
+// optional confirmation. Errors go through the normal alert funnel (the
+// HTTPAuth interceptor); on success `onChanged` (e.g. reload every widget:
+// counters change too) or `onRefresh` runs. Resolves true when it ran.
+registerActionHandler('request', (action, { context, onRefresh, onChanged } = {}) => {
+  const run = async () => {
+    try {
+      await HTTPAuth.request({
+        method: String(action.request?.method || 'POST').toUpperCase(),
+        url: url({ type: 'u', url: resolveTemplate(action.request?.endpoint, context) }),
+        data: {}
+      })
+    } catch {
+      return false
+    }
+    if (action.success) AlertSuccess(tdc(action.success))
+    await (onChanged || onRefresh)?.(action)
+    return true
+  }
+
+  if (!action.confirm) return run()
+
+  return new Promise((resolve) => {
+    sDialog({
+      title: tdc(action.tooltip || action.name),
+      message: tdc(action.confirm),
+      persistent: true,
+      cancel: true
+    })
+      .onOk(async () => resolve(await run()))
+      .onCancel(() => resolve(false))
+  })
 })
