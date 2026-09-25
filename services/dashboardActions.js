@@ -16,7 +16,11 @@ import { sDialog } from './dialog'
 import { tdc } from './translation'
 import { AlertSuccess } from '../boot/alerts'
 
-const handlers = {}
+// shared by every copy of this module (prebundle + source files), so a
+// handler registered by the app reaches the widgets - see dashboardDialogs.js
+const HANDLERS_KEY = Symbol.for('quasar_resaas.dashboardActionHandlers')
+if (!globalThis[HANDLERS_KEY]) globalThis[HANDLERS_KEY] = {}
+const handlers = globalThis[HANDLERS_KEY]
 
 export function registerActionHandler(type, handler) {
   handlers[type] = handler

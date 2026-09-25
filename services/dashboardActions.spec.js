@@ -171,3 +171,16 @@ describe('request actions and "when"', () => {
     expect(request).toHaveBeenCalledTimes(1)
   })
 })
+
+describe('registries shared by every copy of the modules', () => {
+  it('a dialog registered through one module instance opens from another', async () => {
+    const first = await import('./dashboardDialogs')
+    vi.resetModules()
+    const second = await import('./dashboardDialogs?copy')
+
+    first.registerDashboardDialog('demo.shared', { name: 'Shared', render: () => null })
+
+    expect(second.getDashboardDialog('demo.shared')?.name).toBe('Shared')
+    expect(second.openDialog).toBe(first.openDialog)
+  })
+})

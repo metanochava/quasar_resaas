@@ -12,7 +12,17 @@
 // by permission and still authorizes whatever the dialog sends.
 import { markRaw, shallowRef } from 'vue'
 
-const dialogs = {}
+// One registry and one "open dialog" per page, whatever copy of this module
+// is running: the app may import quasar_resaas through Vite's prebundle
+// while the dashboard components come from the source files (auto-imports),
+// two module instances. Same Symbol.for pattern as services/dashboardRegistry.js.
+const DIALOGS_KEY = Symbol.for('quasar_resaas.dashboardDialogs')
+const OPEN_KEY = Symbol.for('quasar_resaas.dashboardDialogs.open')
+
+if (!globalThis[DIALOGS_KEY]) globalThis[DIALOGS_KEY] = {}
+if (!globalThis[OPEN_KEY]) globalThis[OPEN_KEY] = shallowRef(null)
+
+const dialogs = globalThis[DIALOGS_KEY]
 
 export function registerDashboardDialog(name, component) {
   dialogs[name] = markRaw(component)
@@ -23,7 +33,7 @@ export function getDashboardDialog(name) {
 }
 
 // the dialog on screen: { component, action, context, onSaved } | null
-export const openDialog = shallowRef(null)
+export const openDialog = globalThis[OPEN_KEY]
 
 export function openDashboardDialog(action, { context = null, onSaved = null } = {}) {
   const component = getDashboardDialog(action?.dialog)
