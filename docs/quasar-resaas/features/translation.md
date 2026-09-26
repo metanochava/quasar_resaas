@@ -57,6 +57,24 @@ TraducaoMap = { "nome": "Nome", "data de nascimento": "Birth date", ... }
 `HeaderLanguage.vue` triggers the switch:
 `Language.change(lang)` → `this.current = lang; this.setTraducao(lang)`.
 
+## Backend messages (`Translate.tdc`)
+
+Messages the backend translates (API errors and alerts, PDF texts) use
+`Translate.tdc(request, text)` (`django_resaas/saas/core/utils/translate.py`).
+It follows the same two rules as the frontend:
+
+- **Language:** the `L` header that `services/api.js` sends carries the
+  **Language id**. `Translate.tdc` resolves it to the code (`pt-pt`, …) that
+  the `<app>/lang/<code>.py` modules and the `Translation` rows are keyed by.
+  A code is accepted too. Until 2026-09-25 only a code worked, so every
+  backend message stayed in English.
+- **Key:** an exact match first. If there is none, the key is matched
+  regardless of case and surrounding spaces, as `tdc()` does with its
+  lowercase `TraducaoMap` ("Latest vital signs" finds "Latest Vital Signs").
+
+Translations are cached for an hour (`translation:<code>`). A key added to a
+`lang/*.py` module shows up after the cache expires or is cleared.
+
 ## `toPlural(word, count)`
 
 A complementary utility, also in `services/translation.js`: pluralizes a

@@ -122,7 +122,7 @@ permission_denied`). As acções em `membership_actions` não exigem permissão,
 | View | Sem permissão (pertença) | Tudo o resto |
 |---|---|---|
 | `EntityAPIView` (`django_resaas/entitys/`) | as Entities do próprio utilizador: lista, detalhe, branches, apps/modelos activos, leituras de branding; `create` (registo self-service de uma Entity **nova**) | a sua permissão (`change_entity`, `add_entityuser`, `add_entitygroup`, ...) **e** só na Entity do contexto assinado (outra dá `404`), excepto ao nível plataforma (`change_entitytype`) |
-| `EntityTypeAPIView` (`django_resaas/entitytypes/`) | leituras de branding (públicas); o **próprio** EntityType: detalhe, apps, modelos, grupos, permissões; `user_entitys` (só as Entities próprias) | leituras de outros tipos e listas que atravessam tenants (`entitys`, `branches_map`) exigem `view_entitytype`; todas as escritas são de nível plataforma |
+| `EntityTypeAPIView` (`django_resaas/entitytypes/`) | **a lista do catálogo (`GET entitytypes/`) é PÚBLICA**, só leitura: tipos activos com `id`, `name`, `label`, `icon`, `ordem` (`EntityTypePublicSerializer`; menu de serviços do cabeçalho, ecrã de login) - todos os campos e os tipos apagados exigem `list_entitytype`; leituras de branding (públicas); o **próprio** EntityType: detalhe, apps, modelos, grupos, permissões; `user_entitys` (só as Entities próprias) | leituras de outros tipos e listas que atravessam tenants (`entitys`, `branches_map`) exigem `view_entitytype`; todas as escritas são de nível plataforma |
 
 **Exportar / importar perfis de um EntityType** (EntityType -> perfis-modelo -> permissões, em
 JSON por causa do aninhamento; `saas/core/services/entity_type_profiles_io_service.py`, construído
