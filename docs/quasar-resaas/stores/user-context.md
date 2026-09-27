@@ -84,7 +84,7 @@ async getSettings() {
 
 It calls the **public** backend endpoint `GET {app}/site/` (`SiteAPIView`, `AllowAny`), which
 resolves the `Entity` by matching the request's `Origin` header against `Entity.site` — see
-[django_resaas: Resolução de tenant por domínio](../../django-resaas/architecture/multi-tenancy.md#resolução-de-tenant-por-domínio-endpoint-público-site).
+[django_resaas: Public sites — which Entity a site belongs to](https://github.com/metanochava/django_resaas/blob/main/docs/features/public-sites.md#which-entity-a-site-belongs-to).
 No `entity` key in the response (unmatched domain, or no `Origin` sent) means `User.Entity` is
 set to `null` — the request still comes back `200`, so callers must check `User.Entity?.id`, not
 the HTTP status.

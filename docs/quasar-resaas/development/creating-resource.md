@@ -39,7 +39,7 @@ if (id) selectedRow.value = (await HTTPAuth.get(url({ type:'u', url:`${module}/$
 ```
 
 > [!WARNING]
-> `buildFormFromSchema` in `utils/autoForm.js` expects `{ app, model }`, not `{ module, schemaPath }` — see [common errors](../troubleshooting/common-errors.md#app-model-required) before copying this file for a new resource.
+> `buildFormFromSchema` in `utils/autoForm.js` expects `{ app, model }`, not `{ module, schemaPath }` — see [common errors](../troubleshooting/common-errors.md#appmodel-required) before copying this file for a new resource.
 
 ## 2. Routes
 

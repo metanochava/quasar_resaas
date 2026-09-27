@@ -43,7 +43,7 @@ There is no `can`/`module` prop — permissions are checked internally via
 
 | Event | Payload | Fired when |
 |---|---|---|
-| `runaction` | `(action, row)` | A custom `@resaas_action` was triggered and `action.autorequest` is **not** `true` — see [Custom actions](#custom-actions-resaasaction) below |
+| `runaction` | `(action, row)` | A custom `@resaas_action` was triggered and `action.autorequest` is **not** `true` — see [Custom actions](#custom-actions-resaas_action) below |
 
 ## Lifecycle
 

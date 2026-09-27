@@ -60,7 +60,7 @@ and converts each field (`ForeignKey`, `CharField`, `IntegerField`, …) into Qu
 GET django_resaas/relations/?model={relation}&search={term}
 ```
 
-Throws `app/model required` if `app` or `model` aren't passed — see [troubleshooting](../troubleshooting/common-errors.md#app-model-required).
+Throws `app/model required` if `app` or `model` aren't passed — see [troubleshooting](../troubleshooting/common-errors.md#appmodel-required).
 
 ## See also
 
