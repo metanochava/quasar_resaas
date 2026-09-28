@@ -11,7 +11,8 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { tdc } from '../services/translation'
+import { tdc, toPlural } from '../services/translation'
+import { matchesSearch } from '../utils/highlight'
 import { useUserStore } from '../stores/UserStore'
 
 export default defineComponent({
@@ -41,23 +42,24 @@ export default defineComponent({
 
   methods: {
 
+    // a menu matches by what the user reads (translated, as shown - plural in
+    // the submenus) or by its canonical name; case- and accent-insensitive.
+    // A matching group keeps all its children; otherwise only the matching path.
     filterMenuRecursive(menu, search) {
       if (!search) return menu
-      search = search.toLowerCase()
 
       return menu
         .map(item => {
+          const match = [item.menu, tdc(item.menu), toPlural(tdc(item.menu))]
+            .some(text => matchesSearch(text, search))
+
+          if (match) return { ...item }
+
           const children = item.submenu
             ? this.filterMenuRecursive(item.submenu, search)
             : []
 
-          const match = item.menu?.toLowerCase().includes(search)
-
-          if (match || children.length) {
-            return { ...item, submenu: children }
-          }
-
-          return null
+          return children.length ? { ...item, submenu: children } : null
         })
         .filter(Boolean)
     },

@@ -115,6 +115,8 @@
             "
             expand-icon="chevron_right"
             expand-icon-class="white"
+            :model-value="!!opened[App.menu]"
+            @update:model-value="opened[App.menu] = $event"
           >
 
             <template #header>
@@ -125,7 +127,7 @@
 
               <q-item-section>
                 <div class="ellipsis">
-                  {{ tdc(App.menu) }}
+                  <HighlightText :text="tdc(App.menu)" :search="User.search" />
                 </div>
               </q-item-section>
 
@@ -153,6 +155,7 @@ import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
 
 import SubMenu from './SubMenu.vue'
+import HighlightText from './engine/HighlightText.vue'
 
 import {
   barStyle,
@@ -169,7 +172,26 @@ export default defineComponent({
   name: 'LeftMenuSegundo',
 
   components: {
-    SubMenu
+    SubMenu,
+    HighlightText
+  },
+
+  data () {
+    // which apps are open: while searching, every app left by the filter
+    // (they all hold a match); closed again when the search is cleared
+    return { opened: {} }
+  },
+
+  watch: {
+    'User.Menus': {
+      immediate: true,
+      handler () {
+        const searching = !!(this.User.search || '').trim()
+        this.opened = searching
+          ? Object.fromEntries((this.User.Menus || []).map(App => [App.menu, true]))
+          : {}
+      }
+    }
   },
 
   setup () {

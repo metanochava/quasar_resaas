@@ -5,6 +5,7 @@
       icon="security"
       width="min(1100px, 90vw)"
       class="permissions-card"
+      flush
     >
       <div v-if="!ready" class="flex flex-center q-pa-lg">
         <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />

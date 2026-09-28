@@ -37,6 +37,20 @@ Another user signing in on the same browser never lands on it, and logout
 removes it ([Persistence](../stores/persistence.md#logout)). The old shared
 `last_route` key is deleted on the next load.
 
+### Left menu search
+
+`SearchMenu.vue` (the field on top of the left menu) filters `User.AllMenus`
+into `User.Menus` as the user types (`User.search`):
+
+- A menu matches by what the user reads (its translated label, and the plural
+  shown in the submenus) or by its canonical name. The match is case- and
+  accent-insensitive (`utils/highlight.js`). A matching group keeps all its
+  children; otherwise only the path to a match is kept.
+- `LeftMenuSegundo.vue` opens every app left by the filter, and `SubMenu.vue`
+  shows sub-menus inline instead of as a popup while searching. Clearing the
+  search closes them again.
+- The matching part of each label is highlighted (`HighlightText`).
+
 Global dialogs also live here, as two deliberately separate modals/toggles
 — "my account" and "how this entity looks for everyone" are not the same
 screen:

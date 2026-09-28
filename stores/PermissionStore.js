@@ -1,5 +1,6 @@
 import { createBaseStore } from '../base/base_store'
 import { HTTPAuth, url } from '../services/api'
+import { matchesSearch, normalizeSearch } from '../utils/highlight'
 
 export const usePermissionStore = createBaseStore(
   'permission',
@@ -36,21 +37,15 @@ export const usePermissionStore = createBaseStore(
       },
 
       buildApps() {
-        const search = (this.search || '').toLowerCase()
+        const search = normalizeSearch(this.search)
 
         const grouped = this.allPermissions
           .filter((permission) => {
             if (!search) return true
 
-            const label = (
-              permission.content_type?.label || ''
-            ).toLowerCase()
-
-            const codename = (
-              permission.codename || ''
-            ).toLowerCase()
-
-            return label.includes(search) || codename.includes(search)
+            // case- and accent-insensitive, like the highlight
+            return matchesSearch(permission.content_type?.label, search) ||
+              matchesSearch(permission.codename, search)
           })
           .reduce((apps, permission) => {
             const [app = 'No App', model = 'No Model'] = (

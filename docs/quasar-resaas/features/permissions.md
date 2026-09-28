@@ -85,7 +85,8 @@ The real admin screen is `pages/permission/PermissionManager.vue`, bound to
     permissions and the selected group's own.
 -   `buildApps()` — groups permissions by app/model (from
     `content_type.label`, format `"App | Model"`) and applies the search
-    filter (`this.search`).
+    filter (`this.search`: app, model or codename, case- and
+    accent-insensitive — `utils/highlight.js`).
 -   `hasPermission(id)` / `appState()` / `modelState()` — state
     (checked/indeterminate) for the per-app and per-model checkboxes.
 -   `toggle(permission)` / `toggleModel()` / `toggleApp()` — change the
@@ -93,6 +94,21 @@ The real admin screen is `pages/permission/PermissionManager.vue`, bound to
 -   `saveGroupPermissions()` — sends the whole selection in one request,
     `POST auth/permissions/setGroupPermissions/` (`{group, permissions}`);
     `resetChanges()` discards it.
+
+On screen (`PermissionManager.vue`):
+
+-   The search field and the footer (dirty state, Cancel changes, Save
+    permissions) are static; only the list scrolls. The component fills the
+    height it is given, so a modal hosting it is a `flush`
+    [`s-modal-card`](../components/modal-card.md) with a height (the group
+    managers use 80vh).
+-   While searching, every app section left by the filter opens, and the
+    matching text (app, model, permission) is highlighted
+    (`HighlightText`). A permission found by its own codename gets the
+    `warning` checkbox colour. Clearing the search closes the sections.
+-   Inside an app, one cell per model, sized to the screen:
+    `col-12 col-sm-6 col-md-4 col-xl-3`. The permissions of a model sit two
+    per row, and the codename is in each checkbox's tooltip.
 
 ```text
 q-checkbox (app)   ──toggleApp()──┐

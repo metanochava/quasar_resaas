@@ -1,13 +1,15 @@
 <template>
-  <q-page class="column full-height">
-    <div class="q-pa-sm">
+  <!-- search and footer are static; only the list scrolls (the parent gives the height:
+       a flush s-modal-card, or any flex column) -->
+  <div class="permission-manager column no-wrap">
+    <div class="q-pa-sm col-auto" data-test="permissions-search">
       <div class="row q-col-gutter-sm items-center">
         <div class="col">
           <q-input
             v-model="Permission.search"
             dense
             outlined
-            label="Search"
+            :label="tdc('Search')"
             @update:model-value="Permission.buildApps"
           >
             <template #append>
@@ -26,7 +28,7 @@
 
     <q-separator />
 
-    <div class="col scroll q-pa-sm">
+    <div class="permission-manager__list scroll q-pa-sm" data-test="permissions-list">
       <q-card
         v-for="(models, appName) in Permission.apps"
         :key="appName"
@@ -34,7 +36,14 @@
         flat
         bordered
       >
-        <q-expansion-item expand-separator>
+        <!-- while searching, every section with a match (the list only keeps
+             matches) opens; the user can still close one -->
+        <q-expansion-item
+          expand-separator
+          :model-value="!!opened[appName]"
+          :data-test="`permissions-app-${appName}`"
+          @update:model-value="opened[appName] = $event"
+        >
           <template #header>
             <q-item-section avatar>
               <q-checkbox
@@ -46,57 +55,65 @@
             </q-item-section>
 
             <q-item-section>
-              <div class="text-bold text-primary">{{ appName }}</div>
+              <div class="text-bold text-primary">
+                <HighlightText :text="appName" :search="Permission.search" />
+              </div>
               <div class="text-caption text-grey">
-                {{ Object.keys(models).length }} models
+                {{ Object.keys(models).length }} {{ tdc('models') }}
               </div>
             </q-item-section>
           </template>
 
-          <div
-            v-for="(perms, modelName) in models"
-            :key="modelName"
-            class="q-pa-sm"
-          >
-            <div class="row items-center">
-              <div class="col-12 text-center">
+          <!-- one cell per model, sized to the screen -->
+          <div class="row q-col-gutter-sm q-pa-sm">
+            <div
+              v-for="(perms, modelName) in models"
+              :key="modelName"
+              class="col-12 col-sm-6 col-md-4 col-xl-3"
+            >
+              <div class="permission-manager__model q-pa-sm full-height">
                 <q-checkbox
                   :model-value="Permission.modelState(perms).checked"
                   :indeterminate="Permission.modelState(perms).indeterminate"
                   :disable="Permission.loadingPermission"
+                  dense
                   @update:model-value="Permission.toggleModel(perms, $event)"
                 >
-                  <div class="text-bold">
-                    {{ modelName }}
-                    <span class="text-grey">
-                      {{ perms.length }} permissions
-                    </span>
-                  </div>
+                  <span class="text-bold">
+                    <HighlightText :text="modelName" :search="Permission.search" />
+                  </span>
+                  <span class="text-grey q-ml-xs">{{ perms.length }}</span>
                 </q-checkbox>
-              </div>
 
-              <div class="col-12 row q-gutter-sm">
-                <q-checkbox
-                  v-for="perm in orderPermissions(perms)"
-                  :key="perm.id"
-                  :model-value="Permission.hasPermission(perm.id)"
-                  :label="label(perm.codename, modelName)"
-                  :disable="Permission.loadingPermission"
-                  dense
-                  @update:model-value="Permission.toggle(perm)"
-                />
+                <q-separator class="q-my-xs" />
+
+                <div class="row q-col-gutter-xs">
+                  <div
+                    v-for="perm in orderPermissions(perms)"
+                    :key="perm.id"
+                    class="col-6"
+                  >
+                    <q-checkbox
+                      :model-value="Permission.hasPermission(perm.id)"
+                      :disable="Permission.loadingPermission"
+                      :color="isMatch(perm, modelName) ? 'warning' : 'primary'"
+                      dense
+                      @update:model-value="Permission.toggle(perm)"
+                    >
+                      <HighlightText :text="label(perm.codename, modelName)" :search="Permission.search" />
+                      <s-tooltip>{{ perm.codename }}</s-tooltip>
+                    </q-checkbox>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <q-separator class="q-my-sm" />
           </div>
         </q-expansion-item>
       </q-card>
     </div>
 
     <q-separator />
-
-    <div class="q-pa-sm row items-center q-gutter-sm">
+    <div class="q-pa-sm row items-center q-gutter-sm col-auto" data-test="permissions-footer">
       <div class="col">
         <div
           v-if="Permission.dirty"
@@ -113,7 +130,7 @@
       </div>
 
       <div class="col-auto">
-        <q-btn
+        <s-btn
           flat
           no-caps
           icon="undo"
@@ -125,7 +142,7 @@
       </div>
 
       <div class="col-auto">
-        <q-btn
+        <s-btn
           unelevated
           no-caps
           color="primary"
@@ -137,12 +154,15 @@
         />
       </div>
     </div>
-  </q-page>
+  </div>
 </template>
 
 <script setup>
-import { watch } from 'vue'
+import { reactive, watch } from 'vue'
 import { usePermissionStore } from '../../stores/PermissionStore'
+import { tdc } from '../../services/translation'
+import { matchesSearch } from '../../utils/highlight'
+import HighlightText from '../../components/engine/HighlightText.vue'
 
 const props = defineProps({
   AllPermissions: {
@@ -177,6 +197,26 @@ watch(
   },
   { immediate: true }
 )
+
+// which app sections are open: all the (filtered) ones while searching,
+// closed again when the search is cleared
+const opened = reactive({})
+
+watch(
+  () => [Permission.search, Permission.apps],
+  ([search]) => {
+    for (const app of Object.keys(opened)) delete opened[app]
+    if ((search || '').trim()) {
+      for (const app of Object.keys(Permission.apps || {})) opened[app] = true
+    }
+  }
+)
+
+// a permission the search found by its own codename (not only by its model)
+function isMatch(perm, modelName) {
+  return matchesSearch(perm.codename, Permission.search) ||
+    matchesSearch(label(perm.codename, modelName), Permission.search)
+}
 
 async function save() {
   if (await Permission.saveGroupPermissions()) {
@@ -216,3 +256,26 @@ function label(codename, modelName) {
     .replace(/_$/, '')
 }
 </script>
+
+<style scoped>
+/* fills the height it is given; the list takes what is left and scrolls */
+.permission-manager {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.permission-manager__list {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.permission-manager__model {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+}
+
+.body--dark .permission-manager__model {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+</style>
