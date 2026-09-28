@@ -106,8 +106,8 @@ On screen (`PermissionManager.vue`):
     matching text (app, model, permission) is highlighted
     (`HighlightText`). A permission found by its own codename gets the
     `warning` checkbox colour. Clearing the search closes the sections.
--   Inside an app, one cell per model, sized to the screen:
-    `col-12 col-sm-6 col-md-4 col-xl-3`. The permissions of a model sit two
+-   Inside an app, one cell per model: the full width on small screens,
+    half from medium screens up (`col-12 col-md-6`). The permissions of a model sit two
     per row, and the codename is in each checkbox's tooltip.
 
 ```text

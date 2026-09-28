@@ -69,7 +69,7 @@
             <div
               v-for="(perms, modelName) in models"
               :key="modelName"
-              class="col-12 col-sm-6 col-md-4 col-xl-3"
+              class="col-12 col-md-6"
             >
               <div class="permission-manager__model q-pa-sm full-height">
                 <q-checkbox
