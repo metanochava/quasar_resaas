@@ -72,7 +72,7 @@ describe('ModalCard', () => {
 
   it('fullscreen fills the dialog; otherwise the height is capped so header and footer stay reachable', () => {
     expect(open({ fullscreen: true }).find('[data-test="modal-card"]').attributes('style')).toContain('height: 100%')
-    expect(open({ width: '520px' }).find('[data-test="modal-card"]').attributes('style')).toContain('max-height: 94vh')
+    expect(open({ width: '520px' }).find('[data-test="modal-card"]').attributes('style')).toContain('max-height: min(94vh, calc(100vh - 48px))')
   })
 
   it('form wraps body and footer so a footer submit button submits it', async () => {

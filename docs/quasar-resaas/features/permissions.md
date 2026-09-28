@@ -111,7 +111,8 @@ The backend decides whether the save is allowed. It answers `403` or `404` with 
 | `group_shared` | the group is shared with another Entity or is an EntityType template |
 | `permission_not_held` | the save adds or removes a permission the current group doesn't hold (`error.details.permissions`) |
 
-The last four only apply without `change_entitytype` (platform level, held by Root).
+The last four only apply without `change_entitytype` (platform level, held by Root): Root can give
+any permission to any profile, even one its own group doesn't hold.
 
 **Export / import on the group page** (`change_group/:id`, `pages/group/GroupSEPage.vue`):
 `pages/permission/PermissionsTransfer.vue`, above the `PermissionManager`, offers **Download PDF** /

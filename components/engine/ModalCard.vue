@@ -57,7 +57,10 @@ const parentCloses = computed(() => !!instance?.vnode?.props?.onClose)
 
 const cardStyle = computed(() => props.fullscreen
   ? { width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%' }
-  : { width: props.width, minWidth: '280px', maxWidth: '96vw', maxHeight: '94vh' })
+  // q-dialog pads its content by 24px on each side: never taller or wider than
+  // what is left, or the header / the footer would leave the screen (short
+  // screens, phones in landscape)
+  : { width: props.width, minWidth: '280px', maxWidth: 'min(96vw, calc(100vw - 48px))', maxHeight: 'min(94vh, calc(100vh - 48px))' })
 </script>
 
 <template>
