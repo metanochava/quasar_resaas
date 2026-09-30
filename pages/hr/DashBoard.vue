@@ -52,18 +52,14 @@
                 {{ tdc('No data') }}
               </div>
 
-              <div v-for="(d, i) in byDepartment" :key="d.label" class="q-mb-sm">
-                <div class="row items-center justify-between text-caption q-mb-xs">
-                  <span>{{ d.label }}</span>
-                  <span class="text-weight-medium">{{ d.value }}</span>
-                </div>
-                <div class="bar-track">
-                  <div
-                    class="bar-fill"
-                    :style="{ width: d.pct + '%', background: chartColors[i % chartColors.length] }"
-                  />
-                </div>
-              </div>
+              <s-chart
+                v-else
+                type="bar"
+                horizontal
+                :labels="byDepartment.map(d => d.label)"
+                :series="[{ name: 'Employees', data: byDepartment.map(d => d.value) }]"
+                :height="Math.max(200, byDepartment.length * 34 + 60)"
+              />
             </q-card-section>
           </s-card>
         </div>
@@ -75,33 +71,17 @@
                 {{ tdc("Today's Attendance") }}
               </div>
 
-              <div class="row items-center q-col-gutter-md">
-                <div class="col-5">
-                  <svg viewBox="0 0 42 42" class="donut-chart">
-                    <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="rgba(128,128,128,.15)" stroke-width="6" />
-                    <circle
-                      v-for="seg in attendanceDonut" :key="seg.label"
-                      cx="21" cy="21" r="15.9"
-                      fill="transparent"
-                      :stroke="seg.color"
-                      stroke-width="6"
-                      stroke-linecap="round"
-                      :stroke-dasharray="`${seg.pct} ${100 - seg.pct}`"
-                      :stroke-dashoffset="seg.dashoffset"
-                    />
-                    <text x="21" y="24" text-anchor="middle" class="donut-center">{{ attendanceTotal }}</text>
-                  </svg>
-                </div>
-                <div class="col-7">
-                  <div v-for="seg in attendanceDonut" :key="'l' + seg.label" class="row items-center q-mb-xs">
-                    <div class="legend-dot" :style="{ background: seg.color }" />
-                    <div class="text-caption q-ml-xs">{{ tdc(seg.label) }} — {{ seg.value }}</div>
-                  </div>
-                  <div v-if="!attendanceTotal" class="text-caption text-grey-6">
-                    {{ tdc('No records for today') }}
-                  </div>
-                </div>
+              <div v-if="!attendanceTotal" class="text-caption text-grey-6">
+                {{ tdc('No records for today') }}
               </div>
+              <s-chart
+                v-else
+                type="donut"
+                :labels="attendanceDonut.map(d => d.label)"
+                :series="attendanceDonut.map(d => d.value)"
+                :colors="attendanceDonut.map(d => d.color)"
+                :height="260"
+              />
             </q-card-section>
           </s-card>
         </div>
@@ -118,30 +98,17 @@
                 {{ tdc('Contracts by Type') }}
               </div>
 
-              <div class="row items-center q-col-gutter-md">
-                <div class="col-5">
-                  <svg viewBox="0 0 42 42" class="donut-chart">
-                    <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="rgba(128,128,128,.15)" stroke-width="6" />
-                    <circle
-                      v-for="seg in contractDonut" :key="seg.label"
-                      cx="21" cy="21" r="15.9"
-                      fill="transparent"
-                      :stroke="seg.color"
-                      stroke-width="6"
-                      stroke-linecap="round"
-                      :stroke-dasharray="`${seg.pct} ${100 - seg.pct}`"
-                      :stroke-dashoffset="seg.dashoffset"
-                    />
-                    <text x="21" y="24" text-anchor="middle" class="donut-center">{{ contracts.length }}</text>
-                  </svg>
-                </div>
-                <div class="col-7">
-                  <div v-for="seg in contractDonut" :key="'l' + seg.label" class="row items-center q-mb-xs">
-                    <div class="legend-dot" :style="{ background: seg.color }" />
-                    <div class="text-caption q-ml-xs">{{ tdc(seg.label) }} — {{ seg.value }}</div>
-                  </div>
-                </div>
+              <div v-if="!contracts.length" class="text-caption text-grey-6">
+                {{ tdc('No data') }}
               </div>
+              <s-chart
+                v-else
+                type="donut"
+                :labels="contractDonut.map(d => d.label)"
+                :series="contractDonut.map(d => d.value)"
+                :colors="contractDonut.map(d => d.color)"
+                :height="260"
+              />
             </q-card-section>
           </s-card>
         </div>
@@ -153,15 +120,14 @@
                 {{ tdc('Payroll by Status') }}
               </div>
 
-              <div v-for="d in payrollByStatus" :key="d.label" class="q-mb-sm">
-                <div class="row items-center justify-between text-caption q-mb-xs">
-                  <span>{{ tdc(d.label) }}</span>
-                  <span class="text-weight-medium">{{ d.value }}</span>
-                </div>
-                <div class="bar-track">
-                  <div class="bar-fill" :style="{ width: d.pct + '%', background: d.color }" />
-                </div>
-              </div>
+              <s-chart
+                type="bar"
+                horizontal
+                :labels="payrollByStatus.map(d => d.label)"
+                :series="[{ name: 'Payrolls', data: payrollByStatus.map(d => d.value) }]"
+                :colors="payrollByStatus.map(d => d.color)"
+                :height="220"
+              />
             </q-card-section>
           </s-card>
         </div>
@@ -379,11 +345,6 @@ const todayLabel = new Date().toLocaleDateString(undefined, {
   weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
 })
 
-const chartColors = [
-  'var(--q-primary)', 'var(--q-secondary)', 'var(--q-accent)',
-  'var(--q-info)', 'var(--q-warning)', 'var(--q-positive)'
-]
-
 onMounted(async () => {
   loading.value = true
 
@@ -449,15 +410,7 @@ const byDepartment = computed(() => {
 })
 
 function buildDonut(items) {
-  const total = items.reduce((sum, i) => sum + i.value, 0) || 1
-  let cumulative = 0
-
-  return items.map(i => {
-    const pct = (i.value / total) * 100
-    const seg = { ...i, pct, dashoffset: 25 - cumulative }
-    cumulative += pct
-    return seg
-  })
+  return items
 }
 
 const attendanceToday = computed(() => Attendance.rows.filter(a => a.date === todayISO))
@@ -467,9 +420,9 @@ const lateToday = computed(() => attendanceToday.value.filter(a => a.status === 
 const absentToday = computed(() => attendanceToday.value.filter(a => a.status === 'absent').length)
 
 const attendanceDonut = computed(() => buildDonut([
-  { label: 'Present', value: presentToday.value, color: 'var(--q-positive)' },
-  { label: 'Late', value: lateToday.value, color: 'var(--q-warning)' },
-  { label: 'Absent', value: absentToday.value, color: 'var(--q-negative)' }
+  { label: 'Present', value: presentToday.value, color: 'positive' },
+  { label: 'Late', value: lateToday.value, color: 'warning' },
+  { label: 'Absent', value: absentToday.value, color: 'negative' }
 ]))
 
 const contractDonut = computed(() => {
@@ -477,9 +430,9 @@ const contractDonut = computed(() => {
   contracts.value.forEach(c => { if (counts[c.contract_type] !== undefined) counts[c.contract_type]++ })
 
   return buildDonut([
-    { label: 'Full Time', value: counts.full_time, color: 'var(--q-primary)' },
-    { label: 'Part Time', value: counts.part_time, color: 'var(--q-info)' },
-    { label: 'Temporary', value: counts.temporary, color: 'var(--q-accent)' }
+    { label: 'Full Time', value: counts.full_time, color: 'primary' },
+    { label: 'Part Time', value: counts.part_time, color: 'info' },
+    { label: 'Temporary', value: counts.temporary, color: 'accent' }
   ])
 })
 
@@ -493,9 +446,9 @@ const payrollByStatus = computed(() => {
 
   const order = [
     { key: 'draft', label: 'Draft', color: 'rgba(128,128,128,.6)' },
-    { key: 'processed', label: 'Processed', color: 'var(--q-info)' },
-    { key: 'paid', label: 'Paid', color: 'var(--q-positive)' },
-    { key: 'cancelled', label: 'Cancelled', color: 'var(--q-negative)' }
+    { key: 'processed', label: 'Processed', color: 'info' },
+    { key: 'paid', label: 'Paid', color: 'positive' },
+    { key: 'cancelled', label: 'Cancelled', color: 'negative' }
   ]
 
   const max = Math.max(1, ...order.map(o => counts[o.key] || 0))
@@ -615,31 +568,6 @@ const quickLinks = [
   box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
 }
 
-.bar-track {
-  height: 10px;
-  border-radius: 6px;
-  background: rgba(128, 128, 128, .15);
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  border-radius: 6px;
-  transition: width .4s ease;
-}
 
-.donut-chart {
-  width: 100%;
-}
-.donut-center {
-  font-size: 8px;
-  font-weight: 700;
-  fill: currentColor;
-}
 
-.legend-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
 </style>

@@ -8,6 +8,7 @@ import { boot } from 'quasar/wrappers'
 import BtnComponent from './../components/engine/BtnComponent.vue'
 import CardComponent from './../components/engine/CardComponent.vue'
 import ModalCard from './../components/engine/ModalCard.vue'
+import ChartComponent from './../components/engine/ChartComponent.vue'
 import TooltipComponent from './../components/engine/TooltipComponent.vue'
 import InputComponent from './../components/engine/InputComponent.vue'
 import DateComponent from './../components/engine/DateComponent.vue'
@@ -185,6 +186,7 @@ export default boot(({ app }) => {
 
   app.component('s-confirm-delete',  ConfirmDeleteDialog  )
   app.component('s-modal-card', ModalCard)
+  app.component('s-chart', ChartComponent)
 
 
   // =======================================================

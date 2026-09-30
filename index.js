@@ -70,6 +70,7 @@ export * from './utils/schema.js'
 export * from './utils/display.js'
 export * from './utils/payload.js'
 export * from './utils/groupLabel.js'
+export * from './utils/chartTheme.js'
 // Named (not `export *`): `parseFieldErrors`/`buildErrorMessage` are already
 // re-exported via `./boot/alerts.js` below - a second `export *` for the same
 // names here would make both ambiguous and silently drop them from the

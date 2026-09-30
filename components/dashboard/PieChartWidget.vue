@@ -1,94 +1,37 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { tdc } from '../../services/translation'
 import { resolveDashboardAction } from '../../services/dashboardActions'
 
+// pie_chart widget - same contract {labels, series} as bar_chart/line_chart:
+// a pie only makes sense with ONE series (the slices ARE the categories), so
+// series[0] is used; series[0].colors (optional, parallel to labels) asks for
+// semantic colours per slice ('positive', 'negative', ...). A donut with the
+// total in the middle unless widget.donut === false. Rendered by s-chart.
 const props = defineProps({
-  widget: { type: Object, required: true },
+  widget: { type: Object, default: () => ({}) },
   data: { type: Object, required: true },
 })
 
 const router = useRouter()
 
-function onSliceClick(slice, i) {
+const first = computed(() => (props.data.series || [])[0] || {})
+
+function onSelect({ index, label }) {
   if (!props.widget.item_action) return
-  const code = props.data.codes?.[i] ?? slice.label
-  resolveDashboardAction(props.widget.item_action, { router, context: { code, label: slice.label } })
+  const code = props.data.codes?.[index] ?? props.data.labels?.[index] ?? label
+  resolveDashboardAction(props.widget.item_action, { router, context: { code, label: props.data.labels?.[index] ?? label } })
 }
-
-// Mesmo contrato {labels, series} de bar_chart/line_chart (pedido:
-// "usa estrutura equivalente") - um pie só tem sentido com uma série
-// (as fatias SÃO as categorias), por isso usa-se só series[0].
-const chartColors = [
-  'var(--q-primary)', 'var(--q-secondary)', 'var(--q-accent)',
-  'var(--q-info)', 'var(--q-warning)', 'var(--q-positive)', 'var(--q-negative)',
-]
-
-const values = computed(() => (props.data.series || [])[0]?.data || [])
-const total = computed(() => values.value.reduce((sum, v) => sum + Number(v), 0) || 1)
-
-const slices = computed(() => {
-  let cursor = 0
-  return (props.data.labels || []).map((label, i) => {
-    const value = Number(values.value[i]) || 0
-    const pct = (value / total.value) * 100
-    const slice = { label, value, pct, start: cursor, color: chartColors[i % chartColors.length] }
-    cursor += pct
-    return slice
-  })
-})
-
-const gradient = computed(() =>
-  `conic-gradient(${slices.value.map((s) => `${s.color} ${s.start}% ${s.start + s.pct}%`).join(', ')})`
-)
-
-const isDonut = computed(() => props.widget.donut !== false)
 </script>
 
 <template>
-  <div class="row items-center q-gutter-md">
-    <div class="pie" :style="{ background: gradient }">
-      <div v-if="isDonut" class="pie-hole" />
-    </div>
-
-    <div class="col column q-gutter-xs">
-      <div
-        v-for="(slice, i) in slices" :key="slice.label"
-        class="row items-center justify-between text-caption"
-        :class="{ 'cursor-pointer': !!widget.item_action }"
-        @click="onSliceClick(slice, i)"
-      >
-        <div class="row items-center q-gutter-xs">
-          <div class="legend-dot" :style="{ background: slice.color }" />
-          <span>{{ tdc(slice.label) }}</span>
-        </div>
-        <span class="text-weight-medium">{{ slice.value }} ({{ slice.pct.toFixed(0) }}%)</span>
-      </div>
-    </div>
-  </div>
+  <s-chart
+    :type="widget.donut === false ? 'pie' : 'donut'"
+    :labels="data.labels || []"
+    :series="first.data || []"
+    :colors="first.colors || []"
+    :height="widget.height || 280"
+    :class="{ 'cursor-pointer': !!widget.item_action }"
+    @select="onSelect"
+  />
 </template>
-
-<style scoped>
-.pie {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  position: relative;
-}
-.pie-hole {
-  position: absolute;
-  inset: 22px;
-  border-radius: 50%;
-  background: #fff;
-}
-body.body--dark .pie-hole {
-  background: var(--q-dark-page, #1d1d1d);
-}
-.legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-</style>
