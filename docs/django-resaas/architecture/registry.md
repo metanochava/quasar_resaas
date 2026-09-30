@@ -1,9 +1,10 @@
-# Registo de views
+# View registry
 
-Toda a subclasse de `BaseAPIView` regista-se com `@register_view(name=None, module=None)`
-(`core/base/views.py`). `registerView` é o nome original em camelCase que todos os pontos de
-código já existentes usam (`hr/views/*.py` e afins) e continua a ser um simples alias —
-`registerView = register_view` — nada se parte; código novo pode usar qualquer um dos dois.
+Every `BaseAPIView` subclass registers itself with `@register_view(name=None, module=None)`
+(`core/base/views.py`). That is the canonical name, used by new code and the
+scaffold. `registerView` is the original camelCase name: it remains a supported
+alias (`registerView = register_view`, covered by a test) because applications
+decorate their views with it.
 
 ```python
 @register_view("patients")
@@ -12,7 +13,7 @@ class PatientAPIView(BaseAPIView):
     serializer_class = PatientSerializer
 ```
 
-## O que o decorator faz
+## What the decorator does
 
 ```python
 VIEW_REGISTRY: dict[str, dict[str, type]] = {}
@@ -22,31 +23,32 @@ def register_view(name=None, module=None):
         key = name or cls.__name__.lower().replace('apiview', '') + 's'
         module_name = module or cls.__module__.split(".")[0]
         VIEW_REGISTRY.setdefault(module_name, {})[key] = cls
-        cls.module_name = module_name  # usado por BaseAPIView.initial() - ver api/base-api-view.md
+        cls.module_name = module_name  # used by BaseAPIView.initial() - see api/base-api-view.md
         return cls
     return decorator
 ```
 
-Duas coisas independentes acontecem: a classe é adicionada a `VIEW_REGISTRY`
-(`{module_name: {key: ViewClass}}`), e `cls.module_name` é definido — o mesmo atributo que
-`BaseAPIView.initial()` verifica contra `EntityApp` para a ativação de módulo.
+Two independent things happen: the class is added to `VIEW_REGISTRY`
+(`{module_name: {key: ViewClass}}`), and `cls.module_name` is set - the
+same attribute `BaseAPIView.initial()` checks against `EntityApp` for
+module activation.
 
-## A cadeia: View → VIEW_REGISTRY → ActionSyncService → Schema
+## The chain: View -> VIEW_REGISTRY -> ActionSyncService -> Schema
 
 ```text
 @register_view + @resaas_action
         |
         v
-   VIEW_REGISTRY               (preenchido em tempo de importação - ver a nota
-        |                       "quando é que isto é realmente preenchido" abaixo)
+   VIEW_REGISTRY               (populated at import time - see the
+        |                       "when is this actually populated" note below)
         v
 ActionSyncService.sync_registry(VIEW_REGISTRY)
-        |                       (sinal post_migrate / manage.py sync_actions)
+        |                       (post_migrate signal / manage.py sync_actions)
         v
-  ModelExtraAction + Permission   (ver ../security/permissions.md para as
-        |                          regras de ownership manual/decorator)
+  ModelExtraAction + Permission   (see ../security/permissions.md for
+        |                          the manual/decorator ownership rules)
         v
-ResaasSchemaBuilder.build()      (por model, em tempo de pedido - ver
+ResaasSchemaBuilder.build()      (per model, at request time - see
         |                          schema-contract.md)
         v
   Schema 1.0 "actions"
@@ -55,15 +57,16 @@ ResaasSchemaBuilder.build()      (por model, em tempo de pedido - ver
    quasar_resaas (frontend)
 ```
 
-## Quando é que VIEW_REGISTRY é realmente preenchido
+## When `VIEW_REGISTRY` is actually populated
 
-`@register_view` só corre quando o seu módulo é *importado*. O `dev/urls.py` importa todas as
-views (diretamente ou via `views/__init__.py` de cada app, ex.: `hr/views/__init__.py`) como
-efeito secundário de construir o router — ver o comentário no topo de `dev/urls.py` para o porquê
-de `build_saas_urls()` correr especificamente *depois* dos `include(...)` acima. Um processo que
-nunca toca no `ROOT_URLCONF` (um `manage.py migrate` isolado, por exemplo) pode nunca preencher
-`VIEW_REGISTRY`.
+`@register_view` only runs when its module is *imported*. `dev/urls.py`
+imports every view (directly or via each app's own `views/__init__.py`,
+e.g. `notifications/views/__init__.py`) as a side effect of building the router -
+see the comment at the top of `dev/urls.py` for why `build_saas_urls()`
+specifically runs *after* the `include(...)` calls. A process that never
+touches `ROOT_URLCONF` (a bare `manage.py migrate`, for instance) may
+never populate `VIEW_REGISTRY` at all.
 
 > [!NOTE]
-> Quando isso acontece, `sync_resaas_actions` (o recetor do `post_migrate`) não faz nada
-> silenciosamente — isto é uma limitação conhecida, não algo que esta fase tenha alterado.
+> When that happens, `sync_resaas_actions` (the `post_migrate` receiver) silently no-ops -
+> this is a known limitation, not something this phase changed.

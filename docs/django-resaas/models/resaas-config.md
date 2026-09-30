@@ -1,10 +1,10 @@
 # Models & `class RESAAS`
 
-Qualquer model pode declarar uma `class RESAAS` aninhada para configurar como o framework o trata
-— pesquisa, rotulagem, e cada secção configurável do [contrato Schema 1.0](../api/schema-contract.md).
-Todos os atributos são opcionais; o framework recorre a um valor por omissão sensato para o que
-não for definido. Nada aqui faz efeito sem o model ter também uma view registada — ver
-[Criar um novo recurso](../development/creating-resource.md).
+Any model can declare a nested `class RESAAS` to configure how the framework treats it — search,
+labeling, and every overridable section of the [Schema 1.0 contract](../api/schema-contract.md).
+Every attribute is optional; the framework falls back to a sane default for anything you don't
+set. Nothing here does anything unless the model also has a registered view — see
+[Creating a new resource](../development/creating-resource.md).
 
 ```python
 class Product(BaseModel):
@@ -20,62 +20,60 @@ class Product(BaseModel):
 
 ## `label_field` / `value_field`
 
-`label_field` (string) nomeia o(s) campo(s) usados para construir uma representação legível da
-instância — para opções de select/autocomplete, títulos de PDF, etc. Suporta vários campos,
-separados por espaço, vírgula ou pipe:
+`label_field` (string) names the field(s) used to build a human-readable representation of an
+instance — for select/autocomplete options, PDF titles, etc. Multiple fields are supported,
+separated by a space, comma or pipe:
 
 ```python
 class RESAAS:
-    label_field = "name surname"   # -> ["name", "surname"], juntos no momento de renderizar
+    label_field = "name surname"   # -> ["name", "surname"], joined at render time
 ```
 
-`value_field` tem por omissão `"id"` e raramente precisa de ser alterado — é o campo usado como
-valor subjacente na mesma representação label/value.
+`value_field` defaults to `"id"` and rarely needs overriding — it's the field used as the
+underlying value in the same label/value representation.
 
 ## `search_fields`
 
-Lista explícita dos campos que `?search=` deve corresponder (`icontains`, unidos com OR). Suporta
-travessia de relações com a sintaxe `__` do Django, desde que todos os passos exceto o último
-sejam um campo de relação e o último seja um campo `Char`/`Text`/`Email`:
+Explicit list of fields `?search=` should match (`icontains`, OR'd together). Supports relation
+traversal with Django's `__` lookup syntax, as long as every step except the last is a relation
+field and the last step is a `Char`/`Text`/`Email` field:
 
 ```python
 class RESAAS:
-    search_fields = ["code", "employee__person__full_name"]
+    search_fields = ["code", "person__full_name"]
 ```
 
-Se omitido, a pesquisa recorre a todos os campos `Char`/`Text`/`Email` diretos **do próprio
-model** — não percorre relações no modo de fallback. Declarar `search_fields` explicitamente
-sempre que pesquisar através de uma relação importar. Comportamento completo em
-[Pesquisa](../api/search.md).
+If omitted, search falls back to every direct `Char`/`Text`/`Email` field **on the model itself**
+— it does not traverse relations in fallback mode. Declare `search_fields` explicitly whenever
+searching across a relation matters. Full behavior in [Search](../api/search.md).
 
 ## `crud`
 
-Booleano, por omissão `True`. Alimenta `ui.crud` no schema — uma convenção do frontend para
-"mostrar o ecrã CRUD padrão para este model". Definir como `False` não desativa a API em si, só
-sinaliza a uma UI orientada por schema que este model não deve ganhar um ecrã CRUD genérico.
+Boolean, default `True`. Feeds `ui.crud` in the schema — a frontend convention for "show the
+standard CRUD screen for this model." Setting it to `False` doesn't disable the API itself, only
+signals to a schema-driven UI that this model isn't meant to get a generic CRUD screen.
 
 ## `icon`
 
-String (ex.: um nome de ícone Quasar/Material como `"mdi-package-variant"`), passada diretamente
-para `ui.icon` no schema. `None` se não definido.
+String (e.g. a Quasar/Material icon name like `"mdi-package-variant"`), fed straight into
+`ui.icon` in the schema. `None` if unset.
 
 ## `routes`
 
-Dicionário que sobrepõe a convenção por omissão `{verbo}_{model}` para nomes de rota — fundido
-sobre o valor por omissão, não substituído (definir uma chave deixa as restantes no seu valor por
-omissão):
+Dict overriding the default `{verb}_{model}` route-name convention — merged over the default, not
+replaced (setting one key leaves the others at their default):
 
 ```python
 class RESAAS:
-    routes = {"list": "browse_product"}   # só "list" muda; add/change/view ficam por omissão
+    routes = {"list": "browse_product"}   # only "list" changes; add/change/view stay default
 ```
 
 ## `ui`, `filters`, `pagination`, `pdf`
 
-Cada um é um dicionário, fundido superficialmente sobre os valores por omissão da respetiva secção
-no schema — ver [O contrato Schema 1.0](../api/schema-contract.md) para a forma exata por omissão
-de cada um e o que cada chave controla. Por exemplo, para mudar o tamanho de página por omissão e
-desativar a exportação em PDF da lista para um model:
+Each is a dict, shallow-merged over its section's defaults in the schema — see
+[Schema 1.0 contract](../api/schema-contract.md) for the exact default shape of each and what
+every key controls. For example, to change the default page size and disable the PDF list export
+for one model:
 
 ```python
 class RESAAS:
@@ -83,8 +81,26 @@ class RESAAS:
     pdf = {"list": False}
 ```
 
-## Recomendação
+## `fields`
 
-Declarar `search_fields` explicitamente em qualquer model com mais do que uns poucos campos de
-texto, ou onde pesquisar através de uma relação importa — confiar no fallback automático muda
-silenciosamente o comportamento assim que um novo `CharField` é acrescentado ao model.
+Per-field metadata, keyed by field name. Among the keys the schema reads: `read_only` /
+`write_only` (describe a field the serializer only outputs / only accepts), `initial`,
+`relation_variant`, and file options (`accept`, `max_size`, `multiple`). The
+`permissions` key gates the field with its own permissions, and the backend enforces it:
+
+```python
+class RESAAS:
+    fields = {
+        "salary": {
+            "permissions": {"view": "view_contract_salary", "change": "change_contract_salary"},
+        },
+    }
+```
+
+See [Field-level permissions](../security/field-permissions.md).
+
+## Recommendation
+
+Declare `search_fields` explicitly on any model with more than a couple of text fields, or where
+search across a relation matters — relying on the automatic fallback silently changes behavior
+the moment a new `CharField` is added to the model.

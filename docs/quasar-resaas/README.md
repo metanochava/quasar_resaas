@@ -9,7 +9,7 @@ library, companion to the `django_resaas` backend.
 -   **Architecture** — [Overview](architecture/overview.md), [Data flow](architecture/data-flow.md)
 -   **Stores** — [BaseStore](stores/base-store.md), [UserStore & context](stores/user-context.md), [Persistence (`persist`)](stores/persistence.md)
 -   **Components** — [Form](components/form.md), [ActionForm](components/action-form.md), [AutoCrud](components/auto-crud.md), [s-btn](components/button.md), [s-modal-card](components/modal-card.md), [s-chart](components/chart.md)
--   **Features** — [Permissions](features/permissions.md), [Translation](features/translation.md), [Customizing fields](features/custom-fields.md)
+-   **Features** — [Permissions](features/permissions.md), [Entitlements](features/entitlements.md), [Translation](features/translation.md), [Customizing fields](features/custom-fields.md)
 -   **Routing** — [Router](routing/routes.md)
 -   **Layout** — [Layout](layout/layout.md)
 -   **API** — [API & headers](api/backend-integration.md), [Public exports](api/public-exports.md)

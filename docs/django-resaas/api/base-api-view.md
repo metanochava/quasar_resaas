@@ -1,26 +1,26 @@
 # BaseAPIView
 
-`BaseAPIView` é a base comum das APIs REST do framework.
+`BaseAPIView` is the common base for the REST APIs.
 
-## Principais responsabilidades
+## Main responsibilities
 
-- CRUD através de `ModelViewSet`;
-- filtros;
-- ordenação;
-- pesquisa dinâmica;
-- permissões;
-- multi-tenancy;
-- auditoria;
-- soft delete;
-- restore;
-- hard delete;
-- select mode.
+-   CRUD through `ModelViewSet`;
+-   filters;
+-   ordering;
+-   dynamic search;
+-   permissions;
+-   multi-tenancy;
+-   auditing;
+-   soft delete;
+-   restore;
+-   hard delete;
+-   select mode.
 
-## Mapeamento de permissões
+## Permission mapping
 
-Exemplo:
+Example:
 
-```python
+``` python
 permission_action_map = {
     "list": "list",
     "retrieve": "view",
@@ -33,71 +33,85 @@ permission_action_map = {
 }
 ```
 
-Para um model `Patient`, a criação pode exigir `add_patient`, a alteração `change_patient` e a
-remoção `delete_patient`.
+For a `Patient` model, creation may require `add_patient`, updating
+`change_patient` and removal `delete_patient`.
 
 ## Queryset
 
-`get_queryset()` tem de ser o ponto central que garante isolamento por tenant antes de listar e
-pesquisar. A sua própria sequência é: aplicar os filtros `entity_id`/`branch_id` -> trocar o
-manager se `?objects=` for pedido -> **reaplicar** `entity_id`/`branch_id` (o manager trocado não
-é, por si só, delimitado por tenant) -> aplicar pesquisa dinâmica.
+`get_queryset()` must be the central point that guarantees tenant
+isolation before listing and search. Its own list is: apply
+`entity_id`/`branch_id` filters -> switch manager for `?objects=` if
+requested -> **re-apply** `entity_id`/`branch_id` (the switched manager
+isn't tenant-scoped by itself) -> apply dynamic search.
+
+## New objects are `Active`
+
+`perform_create` saves `state="Active"` when the model has a `state` field and the client did not
+send one (an explicit `state` is respected). This is deliberately done in the view: `TimeModel.state`
+still defaults to `"Inactive"`, so rows created from the shell, the admin, fixtures or imports are
+unchanged. Rows created before this change keep the state they have; nothing is migrated.
+Tests: `saas/tests/test_admin_state_actions.py`.
 
 ## `?objects=` (soft delete)
 
-Todo o `BaseModel`/`SoftBaseModel` usa um manager de soft delete por omissão (`.objects` só
-devolve linhas não apagadas). Os endpoints de listagem/detalhe aceitam um parâmetro de query para
-ver além disso, sempre ainda delimitado por tenant:
+Every `BaseModel`/`SoftBaseModel` uses a soft-delete manager by default
+(`.objects` only returns non-deleted rows). The list/retrieve endpoints
+accept a query param to look past that, always still tenant-scoped:
 
-- `?objects=all` — usa `Model.all_objects` (ativas + soft-deleted).
-- `?objects=deleted` — usa `Model.deleted_objects` (só soft-deleted).
-- ausente — o manager normal `.objects` (só ativas).
+- `?objects=all` - uses `Model.all_objects` (active + soft-deleted).
+- `?objects=deleted` - uses `Model.deleted_objects` (soft-deleted only).
+- absent - the normal `.objects` manager (active only).
 
-Apagar através da API (`DELETE .../<id>/`) é um **soft** delete (`instance.delete()` define
-`deleted_at`). Duas actions dedicadas tratam do resto:
+Deleting through the API (`DELETE .../<id>/`) is a **soft** delete
+(`instance.delete()` sets `deleted_at`). Two dedicated actions handle the
+rest:
 
-- `POST .../<id>/restore/` — limpa `deleted_at`. Localizada via `all_objects`, ainda filtrada por
-  `entity_id`/`branch_id`, pelo que restaurar a linha de outro tenant dá 404 tal como obtê-la dá.
-- `DELETE .../<id>/hard_delete/` — remove a linha permanentemente (mesma localização delimitada
-  por tenant).
+- `POST .../<id>/restore/` - clears `deleted_at`. Looked up through
+  `all_objects`, still filtered by `entity_id`/`branch_id`, so restoring
+  another tenant's row 404s exactly like retrieving one does.
+- `DELETE .../<id>/hard_delete/` - permanently removes the row (same
+  tenant-scoped lookup).
 
-Ver `src/django_resaas/tests/test_soft_delete.py` para o comportamento exato e testado
-(incluindo que um `GET .../<id>/` simples numa linha soft-deleted dá 404, mas
-`GET .../<id>/?objects=all` tem sucesso).
+See `src/django_resaas/tests/test_soft_delete.py` for the exact,
+tested behavior (including that a soft-deleted row's plain
+`GET .../<id>/` 404s, but `GET .../<id>/?objects=all` succeeds).
 
-## Ativação de módulo
+## Module activation
 
-Antes de tudo isto, `initial()` exige um contexto de tenant válido no pedido — um cabeçalho
-`X-RESAAS-Context` em falta ou ilegível (ver [Multi-tenancy](../architecture/multi-tenancy.md))
-levanta `PermissionDenied` de imediato, antes de as verificações de `module_name`/permissão sequer
-correrem.
+Before any of this, `initial()` requires a valid tenant context on the request at all — a missing
+or undecodable `X-RESAAS-Context` header (see [Multi-tenancy](../architecture/multi-tenancy.md))
+raises `PermissionDenied` immediately, before `module_name`/permission checks even run.
 
-`initial()` exige que `self.module_name` esteja definido (via `@registerView(...)` — ver
-[Criar um novo recurso](../development/creating-resource.md)) e verifica
-`EntityApp.objects.filter(entity_id=request.entity_id, app__name=module_name, state="Active").exists()`
-antes de mais nada correr.
+`initial()` requires `self.module_name` to be set (via `@register_view(...)`
+- see [`../development/creating-resource.md`](../development/creating-resource.md))
+and checks `EntityApp.objects.filter(entity_id=request.entity_id,
+app__name=module_name, state="Active").exists()` before anything else
+runs.
 
 > [!WARNING]
-> Uma view sem `module_name` definido, ou um tenant que não tenha ativado esse módulo, é
-> rejeitado antes de o queryset sequer ser tocado — ver
+> A view without `module_name` set, or a tenant that hasn't activated that module, gets
+> rejected before the queryset is ever touched - see
 > `src/django_resaas/tests/test_module_activation.py`.
 
-## Pesquisa, filtros, paginação
+## Search, filters, pagination
 
-- Pesquisa: `?search=...` corresponde a `RESAAS.search_fields` quando o model os declara (suporta
-  travessia de relações com `__`), caso contrário recorre a todos os campos `Char/Text/EmailField`
-  diretos no próprio model — o fallback não percorre relações. Ver [`search.md`](search.md).
-- Filtros: `DjangoFilterBackend` + `OrderingFilter` estão sempre ativos (ver
-  [`filters-pagination.md`](filters-pagination.md)).
-- Paginação: `ResaasPagination` (`DEFAULT_PAGINATION_CLASS`), cujo `page_size` um model pode
-  sobrepor via `RESAAS.pagination` — é isto que o `pagination.page_size` do `Schema 1.0` reflete
-  (ver [`schema-contract.md`](schema-contract.md)).
+- Search: `?search=...` matches `RESAAS.search_fields` when the model
+  declares them (supports `__` relation traversal), otherwise falls back
+  to every direct `Char/Text/EmailField` on the model itself — the
+  fallback does not traverse relations. See [`search.md`](search.md).
+- Filters: `DjangoFilterBackend` + `OrderingFilter` are always active
+  (see [`filters-pagination.md`](filters-pagination.md)).
+- Pagination: `ResaasPagination` (`DEFAULT_PAGINATION_CLASS`), whose
+  `page_size` a model can override via `RESAAS.pagination` - this is
+  what `Schema 1.0`'s `pagination.page_size` reflects
+  (see [`schema-contract.md`](schema-contract.md)).
 
-## Actions personalizadas
+## Custom actions
 
-Métodos `@resaas_action(...)` declarados numa subclasse de `BaseAPIView` tornam-se tanto actions
-reais do DRF (roteáveis, com permissão verificada) como entradas na lista `actions` do
-`Schema 1.0`, mantidas sincronizadas pelo `ActionSyncService` — ver
-[Criar um novo recurso](../development/creating-resource.md) para os argumentos do decorator e as
-regras de ownership manual/decorator, e [`schema-contract.md`](schema-contract.md) para a forma
-exata que o frontend recebe.
+`@resaas_action(...)` methods declared on a `BaseAPIView` subclass become
+both real DRF actions (routable, permission-checked) and entries in
+`Schema 1.0`'s `actions` list, kept in sync by `ActionSyncService` - see
+[`../development/creating-resource.md`](../development/creating-resource.md)
+for the decorator's arguments and the manual/decorator ownership rules,
+and [`schema-contract.md`](schema-contract.md) for the exact shape the
+frontend receives.

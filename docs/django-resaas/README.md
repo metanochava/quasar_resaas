@@ -1,36 +1,43 @@
-# Documentação do django_resaas
+# django_resaas Documentation
 
-Esta pasta contém a documentação técnica do framework backend
-`django_resaas`.
+This folder contains the technical documentation for the `django_resaas`
+backend framework.
 
-## Navegação
+## Navigation
 
--   [Instalação](getting-started/installation.md)
--   [Início rápido](getting-started/quick-start.md)
--   [Arquitetura](architecture/overview.md)
+-   [Installation](getting-started/installation.md)
+-   [Quick start](getting-started/quick-start.md)
+-   [Architecture](architecture/overview.md)
 -   [Multi-tenancy](architecture/multi-tenancy.md)
--   [Ciclo de uma requisição](architecture/request-lifecycle.md)
+-   [Request lifecycle](architecture/request-lifecycle.md)
 -   [Middleware](architecture/middleware.md)
--   [Registo de views](architecture/registry.md)
--   [Models e RESAAS](models/resaas-config.md)
--   [O contrato Schema 1.0](api/schema-contract.md)
--   [Referência pública da API](api/public-api-reference.md)
+-   [View registry](architecture/registry.md)
+-   [Dynamic dashboards saas](architecture/dashboards.md)
+-   [Models and RESAAS](models/resaas-config.md)
+-   [Schema 1.0 contract](api/schema-contract.md)
+-   [Public API reference](api/public-api-reference.md)
 -   [BaseAPIView](api/base-api-view.md)
--   [Pesquisa](api/search.md)
--   [Filtros e paginação](api/filters-pagination.md)
--   [Permissões](security/permissions.md)
+-   [Errors and alerts](api/errors-and-alerts.md)
+-   [Search](api/search.md)
+-   [Filters and pagination](api/filters-pagination.md)
+-   [Permissions](security/permissions.md)
 -   [Field-level permissions](security/field-permissions.md)
+-   [Entitlements (features, capacities, modules)](security/entitlements.md)
 -   [Soft delete](features/soft-delete.md)
--   [Ficheiros e PDF](features/files-pdf.md)
--   [Notificações (Email/SMS/WhatsApp)](features/notifications.md)
--   [Criar um novo recurso](development/creating-resource.md)
--   [Comandos de gestão](development/management-commands.md)
--   [A app hr](hr/overview.md)
--   [Git Flow e releases](deployment/releases.md)
+-   [Files and PDF](features/files-pdf.md)
+-   [Notifications (Email/SMS/WhatsApp)](features/notifications.md)
+-   [Public sites and their contact form](features/public-sites.md)
+-   [Creating a new resource](development/creating-resource.md)
+-   [Building a module](development/building-a-module.md)
+-   [Minimal example app](../src/dev/README.md)
+-   [Management commands](development/management-commands.md)
+-   [Consolidation progress](development/consolidation-progress.md)
+-   [Git flow and releases](deployment/releases.md)
+-   [Upgrading (shipped migrations)](deployment/upgrading.md)
 -   [Troubleshooting](troubleshooting/common-errors.md)
 
-## Objetivo
+## Purpose
 
-O `django_resaas` fornece uma base reutilizável para aplicações
-Django/DRF com CRUD, multi-tenancy, permissões, pesquisa, filtros,
-serialização dinâmica e funcionalidades comuns.
+`django_resaas` provides a reusable base for Django/DRF applications with
+CRUD, multi-tenancy, permissions, search, filters, dynamic serialization
+and other common features.

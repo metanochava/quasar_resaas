@@ -1,28 +1,44 @@
-# Instalação
+# Installation
 
-O `django_resaas` é uma app Django reutilizável: encaixa-se num projeto Django normal em vez de
-correr como um. Esta página mostra a ligação desde um projeto em branco até um servidor a
-responder a pedidos reais da API. Para a versão totalmente funcional de tudo o que se segue —
-model real, chamadas `curl` reais — ver `src/dev/README.md`, a app de exemplo do próprio projeto.
+`django_resaas` is a reusable Django app: it plugs into a normal Django project rather than
+running as one. This page wires it up from a blank project to a server that answers real API
+requests. Every snippet below matches the framework's own runnable example project,
+[`src/dev/`](../../src/dev/README.md) (`settings.py`, `urls.py`), which the test suite runs — when
+in doubt, copy from there.
 
-## 1. Instalar
+## 1. Install
+
+`django_resaas` is published on PyPI (Python 3.9+; it pins Django 5.2 and DRF 3.16):
 
 ```bash
+python -m venv venv && source venv/bin/activate
 pip install django_resaas
+django-admin startproject myproject
 ```
 
 ## 2. `settings.py`
 
 ```python
+from datetime import timedelta
+from corsheaders.defaults import default_headers
+
 AUTH_USER_MODEL = 'django_resaas.User'
 
 MY_APPS = [
-    'django_resaas',
-    'hr',                   # módulo próprio do framework - ver hr/overview.md
-    'sua_app',               # a(s) sua(s) app(s)
+    'django_resaas.saas',            # the core: tenants, users, groups, schema, CRUD engine
+    'django_resaas.notifications',   # email / SMS / WhatsApp outbox
+    'your_app',                      # your own app(s) / modules
 ]
 
+# modules activated for every new EntityType, besides the framework's own
+# (optional; default [] - e.g. ["your_app"])
+RESAAS_DEFAULT_MODULES = []
+
+# entitlements (optional; not set = nothing restricted) - see security/entitlements.md
+# RESAAS_ENTITLEMENTS = {"features": {...}, "capacities": {"branches": 3, "users": 20}}
+
 INSTALLED_APPS = MY_APPS + [
+    'djmoney',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -33,92 +49,129 @@ INSTALLED_APPS = MY_APPS + [
     'django_filters',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
-    # ... valores por omissão do Django ...
-    'django_resaas.core.middleware.file_access.FileAccessMiddleware',
-    'django_resaas.core.middleware.tenant.TenantContextMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_resaas.saas.core.middleware.file_access.FileAccessMiddleware',
+    'django_resaas.saas.core.middleware.tenant.TenantContextMiddleware',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    # empty on purpose: views declare their own access (BaseAPIView is protected by
+    # default; anything public says so explicitly) - see security/permissions.md
     'DEFAULT_PERMISSION_CLASSES': (),
+    # every error answers {"error": {code?, message, details}} - see api/errors-and-alerts
+    'EXCEPTION_HANDLER': 'django_resaas.saas.core.exceptions.handler.resaas_exception_handler',
+    'NON_FIELD_ERRORS_KEY': 'error',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
 }
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+# The frontend (quasar_resaas) runs on another origin and sends its own headers on every
+# request: L (language), X-RESAAS-Context (signed tenant context), FEK/FEP (frontend keys).
+# Without them in CORS_ALLOW_HEADERS the browser blocks every call.
+CORS_ALLOWED_ORIGINS = ['http://localhost:9000']          # your frontend's origin(s)
+CORS_ALLOW_HEADERS = list(default_headers) + ['FEK', 'FEP', 'L', 'x-resaas-context']
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'mediafiles'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 ```
 
-> [!NOTE]
-> O `hr` não é opcional na prática: `django_resaas/urls.py` faz `include('hr.urls')`
-> incondicionalmente, pelo que qualquer projeto que instale `django_resaas` precisa também
-> de `hr` instalado — ver [`hr/overview.md`](../hr/overview.md).
+`TenantContextMiddleware` resolves the tenant (Entity / Branch / Group) of every request from its
+signed `X-RESAAS-Context` header; `FileAccessMiddleware` protects uploaded files. A third one,
+`FrontEndMiddleware` (`django_resaas.saas.core.middleware.front_end.FrontEndMiddleware`), is
+optional: add it to require the `FEK`/`FEP` frontend credentials — see
+[Middleware](../architecture/middleware.md).
 
-`TenantContextMiddleware` e `FileAccessMiddleware` são os dois middlewares ativos por omissão —
-ver [`architecture/middleware.md`](../architecture/middleware.md) para o que cada um faz e para o
-terceiro (`FrontEndMiddleware`) que existe mas não vem ligado por omissão.
+Email, notifications (`NOTIFICATIONS_ENABLED`, the outbox settings) and Celery are optional and
+off by default; `src/dev/settings.py` lists every setting with its environment variable, and
+[Notifications](../features/notifications.md) explains when you need them.
 
 ## 3. `urls.py`
 
 ```python
-from django.urls import path, include
-from django_resaas.core.utils.autoload_urls import build_saas_urls
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
+
+from django_resaas.saas.core.utils.autoload_urls import build_saas_urls
 
 urlpatterns = [
     path('api/', include('django_resaas.urls')),
-    path('api/sua_app/', include('sua_app.urls')),
+    path('api/your_app/', include('your_app.urls')),   # only if your app has hand-written URLs
+    path('admin/', admin.site.urls),
 ]
 
-# TEM de correr depois dos include() acima - ver architecture/registry.md
+# every @register_view class becomes a route: /api/<module>/<name>/
 router, extra_patterns = build_saas_urls()
 urlpatterns += [path('api/', include(router.urls))]
 urlpatterns += extra_patterns
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
-`build_saas_urls()` percorre o `VIEW_REGISTRY`, que só fica preenchido depois de cada classe
-`@register_view` ser efetivamente importada — o que acontece como efeito secundário dos
-`include()` acima correrem primeiro. A ordem importa aqui; ver
-[`architecture/registry.md`](../architecture/registry.md#quando-e-que-view_registry-e-realmente-preenchido)
-para o porquê.
+`build_saas_urls()` walks `VIEW_REGISTRY`; call it after the `include()`s above so every
+`@register_view` class has been imported — see
+[View registry](../architecture/registry.md#when-view_registry-is-actually-populated).
 
-## 4. Migrar e inicializar
+## 4. Migrate and bootstrap
 
 ```bash
 python manage.py migrate
-python manage.py create_entity   # interativo: superuser + tenant + grupo Admin
-python manage.py migrate         # outra vez - ver abaixo
+python manage.py resaas_setup    # languages, frontend defaults, translations (safe to repeat)
+python manage.py create_entity   # interactive: superuser + first tenant (Entity/Branch) + Admin group
+python manage.py migrate         # again - see below
 ```
 
 > [!WARNING]
-> O segundo `migrate` não é um erro. As permissões de CRUD (`list_<model>`, `add_<model>`,
-> ...) são criadas por um sinal `post_migrate` que não faz nada até existir pelo menos um
-> `EntityType` — o `create_entity` é o que cria o primeiro. Correr `migrate` outra vez
-> (idempotente — não aplica migrações novas) dispara o sinal de novo, agora que a condição
-> está satisfeita. Sem este passo, todos os pedidos falham a autorização, sem permissões
-> disponíveis para atribuir a nenhum grupo.
+> The second `migrate` is not a typo. CRUD permissions (`list_<model>`, `add_<model>`, ...)
+> are created by a `post_migrate` signal that no-ops until at least one `EntityType` exists —
+> `create_entity` is what creates the first one. Re-running `migrate` (idempotent — it
+> applies no new migrations) fires that signal again now that the guard condition is met.
+> Skip this step and every request will fail authorization with no permissions available to
+> grant to any group.
 
-`create_root` é a alternativa para um ambiente novo de raiz (superuser + estrutura de tenant
-completa numa só vez); `create_entity` serve para acrescentar outra entidade/sucursal a uma
-instalação já existente. Ambos em
-[`development/management-commands.md`](../development/management-commands.md).
+`create_root` is the non-interactive alternative for a brand-new environment (superuser + full
+default tenant structure in one command); `create_entity` also adds another entity/branch under
+an existing setup. `resaas_doctor` checks an installation. All are covered in
+[Management commands](../development/management-commands.md).
 
-## 5. Correr
+## 5. Run it
 
 ```bash
 python manage.py runserver 0.0.0.0:7002
 ```
 
-A partir daqui, seguir para [Início rápido](quick-start.md) para registar o primeiro model de
-ponta a ponta, ou ir direto a
-[Criar um novo recurso](../development/creating-resource.md) para o guia de referência.
+`GET http://localhost:7002/api/django_resaas/languages/` should answer with the languages
+`resaas_setup` loaded. From here, continue to [Quick start](quick-start.md) to register your
+first model end to end, or go straight to [Creating a new resource](../development/creating-resource.md).
 
-## Metade frontend
+## Frontend half
 
-Esta página cobre apenas o backend. O pacote frontend, `quasar_resaas` (Vue 3 + Quasar), tem a sua
-própria documentação de instalação — mude para o produto `quasar_resaas` no topo da barra lateral
-se estiver a ler isto a partir do visualizador de documentação.
+This page only covers the backend. The companion frontend package, `quasar_resaas` (Vue 3 +
+Quasar), has its own installation guide — `docs/quasar-resaas/getting-started/installation.md`
+in that repository (the documentation site shows both).

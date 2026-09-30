@@ -1,4 +1,5 @@
 import { boot } from 'quasar/wrappers'
+import { defineAsyncComponent } from 'vue'
 
 
 // =========================================================
@@ -56,7 +57,8 @@ import AllLogo from './../components/AllLogo.vue'
 import TopMenu from './../components/TopMenu.vue'
 
 import PdfRender from './../components/PdfRender.vue'
-import PdfRenderPro from './../components/PdfRenderPro.vue'
+// pdfjs-dist is heavy and only this viewer needs it: load it on first use
+const PdfRenderPro = defineAsyncComponent(() => import('./../components/PdfRenderPro.vue'))
 
 import HeaderBrand from './../components/header/HeaderBrand.vue'
 

@@ -167,8 +167,8 @@ extension points, and they answer different questions:
   side-effect) without changing what the base action itself does.
 
 ```js
-export const useEmployeeStore = createBaseStore('employee', {
-  app: 'hr', model: 'Employee'
+export const useProductStore = createBaseStore('product', {
+  app: 'your_app', model: 'Product'
 }, {
   actions: {
     // completely replaces the base loadData()

@@ -1,76 +1,74 @@
-# Troubleshooting do Backend
+# Backend Troubleshooting
 
 ## `RESAAS context is required.` (403)
 
-O `initial()` rejeita qualquer pedido sem nenhum `request.tenant_context` descodificado. Verificar:
+`initial()` rejects any request with no decoded `request.tenant_context` at all. Check:
 
-1. Se o cabeçalho `X-RESAAS-Context` está mesmo a ser enviado.
-2. Se o token foi emitido por `POST /api/resaas/context/` e não expirou.
-3. Se `ResaasContextService.decode(token)` não está a falhar em silêncio — uma falha de
-   descodificação cai em `request.tenant_context_error` e levanta o seu próprio
-   `PermissionDenied`, mais específico, antes deste. Ver [Multi-tenancy](../architecture/multi-tenancy.md).
+1. The `X-RESAAS-Context` header is actually being sent.
+2. The token was issued by `POST /api/resaas/context/` and hasn't expired.
+3. `ResaasContextService.decode(token)` isn't failing silently — a decode failure lands in
+   `request.tenant_context_error` and raises its own, more specific `PermissionDenied` before this
+   one does. See [Multi-tenancy](../architecture/multi-tenancy.md).
 
-## `Module '<nome>' is not active.` (403)
+## `Module '<name>' is not active.` (403)
 
-A app está instalada e a sua view registada, mas o tenant não a ativou:
+The app is installed and its view is registered, but the tenant hasn't activated it:
 
 ```python
-from django_resaas.models.app import App
-from django_resaas.models.entity_app import EntityApp
+from django_resaas.saas.models.app import App
+from django_resaas.saas.models.entity_app import EntityApp
 
-app, _ = App.objects.get_or_create(name="<nome>", defaults={"state": "Active"})
-EntityApp.objects.get_or_create(entity=minha_entidade, app=app, defaults={"state": "Active"})
+app, _ = App.objects.get_or_create(name="<name>", defaults={"state": "Active"})
+EntityApp.objects.get_or_create(entity=my_entity, app=app, defaults={"state": "Active"})
 ```
 
-Ver [BaseAPIView#ativação-de-módulo](../api/base-api-view.md#ativação-de-módulo). A ativação é
-por entidade — ativar para um tenant nunca ativa para outro.
+See [BaseAPIView#module-activation](../api/base-api-view.md#module-activation). Activation is
+per-entity — activating for one tenant never activates it for another.
 
-## `Module '<nome>' is not defined.` (403)
+## `Module '<name>' is not defined.` (403)
 
-A view não tem nenhum `module_name` definido — nunca foi decorada com `@register_view(...)` /
-`@registerView(...)`, ou o decorator foi aplicado sem este módulo ter sido importado antes de
-`build_saas_urls()` correr. Ver
-[Registo de views#quando-é-que-view_registry-é-realmente-preenchido](../architecture/registry.md#quando-é-que-view_registry-é-realmente-preenchido).
+The view has no `module_name` set at all — it was never decorated with `@register_view(...)` /
+`@registerView(...)`, or the decorator was applied without importing this module before
+`build_saas_urls()` runs. See
+[View registry#when-view_registry-is-actually-populated](../architecture/registry.md#when-view_registry-is-actually-populated).
 
-## `Unauthorized` (403) numa action que devia ser permitida
+## `Unauthorized` (403) on an action that should be allowed
 
-1. Confirmar que o codename esperado realmente existe:
-   `Permission.objects.filter(content_type__model="<model>", codename="<prefixo>_<model>")`.
-2. Confirmar que o grupo do utilizador o tem, para a branch *atual* — `check_permission()` resolve
-   permissões por branch/entity/entity_type, não globalmente. Ver [Permissões](../security/permissions.md).
+1. Confirm the expected codename actually exists:
+   `Permission.objects.filter(content_type__model="<model>", codename="<prefix>_<model>")`.
+2. Confirm the user's group has it, for the *current* branch — `check_permission()` resolves
+   permissions per branch/entity/entity_type, not globally. See [Permissions](../security/permissions.md).
 3. > [!TIP]
-   > A cache de permissões por pedido (`request._perm_cache`) só vive durante esse único
-   > pedido — atribuir uma permissão faz efeito no pedido seguinte, não retroativamente.
+   > The per-request permission cache (`request._perm_cache`) only lives for that one
+   > request — granting a permission takes effect on the next request, not retroactively.
 
-## `django.core.exceptions.ValidationError` ao gravar, mencionando "explicit entity and branch"
+## `django.core.exceptions.ValidationError` on save, mentioning "explicit entity and branch"
 
-Uma instância de `BaseModel` foi gravada sem `entity`/`branch` definidos, fora da API (shell,
-management command, sinal, migração, fixture). Isto é intencional —
-`BaseModel.ensure_tenant()` nunca adivinha um tenant. Definir ambos explicitamente antes de
-gravar. Ver [Multi-tenancy#regra-de-ouro-o-tenant-nunca-é-adivinhado](../architecture/multi-tenancy.md#regra-de-ouro-o-tenant-nunca-é-adivinhado).
+A `BaseModel` instance was saved without `entity`/`branch` set, outside the API (shell,
+management command, signal, migration, fixture). This is intentional —
+`BaseModel.ensure_tenant()` never guesses a tenant. Set both explicitly before saving. See
+[Multi-tenancy#golden-rule-the-tenant-is-never-guessed](../architecture/multi-tenancy.md#golden-rule-the-tenant-is-never-guessed).
 
-## A pesquisa devolve todos os registos, ou nenhum
+## Search returns every record, or none
 
-1. Confirmar que `search` está mesmo a chegar em `request.query_params` (um nome de parâmetro mal
-   escrito, ex. `?q=` em vez de `?search=`, é silenciosamente ignorado — uma pesquisa vazia é um
-   no-op, não um erro).
-2. Se `RESAAS.search_fields` estiver declarado, confirmar que os nomes dos campos estão bem
-   escritos — uma entrada inválida é silenciosamente ignorada em vez de levantar erro, pelo que um
-   erro de digitação apenas estreita, em silêncio, o que é pesquisado. Ver [Pesquisa](../api/search.md).
-3. Sem `search_fields`, só os campos `Char`/`Text`/`Email` diretos do próprio model são
-   pesquisados — uma relação não corresponde a menos que `search_fields` seja declarado
-   explicitamente.
-4. Inspecionar o SQL real com `print(qs.query)` se o acima não explicar.
+1. Confirm `search` is actually arriving in `request.query_params` (a typo'd param name, e.g.
+   `?q=` instead of `?search=`, is silently ignored — an empty search is a no-op, not an error).
+2. If `RESAAS.search_fields` is declared, confirm the field names are spelled correctly — an
+   invalid entry is silently skipped rather than raising, so a typo just quietly narrows what's
+   searched. See [Search](../api/search.md).
+3. Without `search_fields`, only direct `Char`/`Text`/`Email` fields on the model itself are
+   searched — a relation won't match unless `search_fields` is declared explicitly.
+4. Inspect the actual SQL with `print(qs.query)` if the above doesn't explain it.
 
-## `ImproperlyConfigured` do `sync_actions` / `post_migrate`
+## `ImproperlyConfigured` from `sync_actions` / `post_migrate`
 
-Um `@resaas_action` foi declarado com a mesma identidade `app`/`model`/`action` de uma linha
-`ModelExtraAction` já existente cujo `managed_by` é `"manual"`. A sincronização recusa-se a tomar
-silenciosamente uma linha criada manualmente. Renomear a action, ou definir
-`managed_by="decorator"` na linha existente primeiro, se entregá-la ao decorator for intencional.
-Ver [Permissões#permissões-de-actions-personalizadas-e-ownership](../security/permissions.md#permissões-de-actions-personalizadas-e-ownership).
+A `@resaas_action` was declared with the same `app`/`model`/`action` identity as an existing
+`ModelExtraAction` row whose `managed_by` is `"manual"`. The sync refuses to silently take over a
+manually-created row. Either rename the action, or set `managed_by="decorator"` on the existing
+row yourself first if handing it to the decorator is intentional. See
+[Permissions#custom-action-permissions-and-ownership](../security/permissions.md#custom-action-permissions-and-ownership).
 
 ## `Fatal: There is an existing release branch`
 
-Resolver ou apagar a branch `release/x.y.z` existente antes de começar outra — ver
-[Git flow e releases](../deployment/releases.md#antes-de-começar-uma-release).
+Resolve or delete the existing `release/x.y.z` branch before starting another one — see
+[Git flow and releases](../deployment/releases.md#before-starting-a-release).

@@ -5,7 +5,7 @@ create/edit dialog, delete/restore, custom actions, PDF — for one schema, in
 one tag, with **zero** custom Vue code:
 
 ```vue
-<s-auto-crud app="hr" model="Employee" route="view_employee" />
+<s-auto-crud app="your_app" model="Product" route="view_product" />
 ```
 
 It's the component behind the "generic scaffold/crud" routes and behind
@@ -27,8 +27,8 @@ or writes this state.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `app` | `String` | — (required) | Backend app label, e.g. `'hr'` |
-| `model` | `String` | — (required) | Model name, e.g. `'Employee'` |
+| `app` | `String` | — (required) | Backend app label, e.g. `'your_app'` |
+| `model` | `String` | — (required) | Model name, e.g. `'Product'` |
 | `route` | `String \| Object` | `null` | Passed through; not read internally by `AutoCrud` itself, but pages set it for consistency with the router `meta.requiredRole` convention |
 | `ignoreFields` | `Array` | `['created_at', 'updated_at', 'created_by', 'updated_by']` | Fields hidden from the table/form |
 | `ignoreFieldsFilter` | `Array` | same as above | Fields hidden from the filter dialog |

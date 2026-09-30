@@ -1,21 +1,22 @@
-# Início Rápido
+# Quick Start
 
-Um percurso guiado pelo fluxo completo do `django_resaas`, de ponta a ponta: um model → uma API
-CRUD completa, delimitada por tenant, autorizada por permissão, descrita por um schema — sem nada
-escrito à mão além do model, do seu serializer e da sua view. Espelha a própria app de exemplo do
-framework, `dev/demo`, cujo comportamento é validado por `dev/demo/tests/test_flow.py` — esse
-teste é o que o CI realmente corre contra este fluxo.
+A guided walk through the full `django_resaas` flow, end to end: one model → full CRUD API,
+scoped by tenant, authorized by permission, described by a schema — with nothing hand-written
+beyond the model, its serializer and its view. This mirrors the framework's own example app,
+[`dev/demo`](../../src/dev/demo), whose behavior is asserted by
+[`dev/demo/tests/test_flow.py`](../../src/dev/demo/tests/test_flow.py) — that test is what CI
+actually runs against this exact flow.
 
-Completar primeiro a [Instalação](installation.md).
+Complete [Installation](installation.md) first.
 
 ## 1. Model
 
 ```python
-# sua_app/models/product.py
+# your_app/models/product.py
 from django.db import models
-from django_resaas.core.base.models import BaseModel
+from django_resaas.saas.core.base.models import BaseModel
 
-class Product(BaseModel):          # entity/branch, soft delete, created/updated_by - tudo grátis
+class Product(BaseModel):          # entity/branch, soft delete, created/updated_by - all free
     name = models.CharField(max_length=150)
     sku = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -28,18 +29,18 @@ class Product(BaseModel):          # entity/branch, soft delete, created/updated
 ```
 
 ```bash
-python manage.py makemigrations sua_app
+python manage.py makemigrations your_app
 python manage.py migrate
 ```
 
-Ver [Models & RESAAS](../models/resaas-config.md) para todos os atributos de `class RESAAS`.
+See [Models & RESAAS](../models/resaas-config.md) for every `class RESAAS` attribute.
 
 ## 2. Serializer
 
 ```python
-# sua_app/serializers/product.py
-from django_resaas.core.base.serializers import BaseSerializer
-from sua_app.models.product import Product
+# your_app/serializers/product.py
+from django_resaas.saas.core.base.serializers import BaseSerializer
+from your_app.models.product import Product
 
 class ProductSerializer(BaseSerializer):
     class Meta:
@@ -47,99 +48,126 @@ class ProductSerializer(BaseSerializer):
         fields = "__all__"
 ```
 
-O `BaseSerializer` já marca `id`/`entity`/`branch`/`created_by`/`updated_by`/`created_at`/
-`updated_at`/`deleted_at` como só de leitura — ver
-[Referência pública da API](../api/public-api-reference.md).
+`BaseSerializer` already marks `id`/`entity`/`branch`/`created_by`/`updated_by`/`created_at`/
+`updated_at`/`deleted_at` read-only — see
+[Public API reference](../api/public-api-reference.md#baseserializer---django_resaassaascorebaseserializersbaseserializer).
 
 ## 3. View
 
 ```python
-# sua_app/views/product.py
-from django_resaas.core.base.views import BaseAPIView, register_view
-from sua_app.models.product import Product
-from sua_app.serializers.product import ProductSerializer
+# your_app/views/product.py
+from django_resaas.saas.core.base.views import BaseAPIView, register_view
+from your_app.models.product import Product
+from your_app.serializers.product import ProductSerializer
 
-@register_view(module="sua_app")
+@register_view(module="your_app")
 class ProductAPIView(BaseAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 ```
 
-É praticamente tudo. Já tem CRUD completo, paginação, ordenação, `?search=`, soft delete/restore/
-hard delete, e um endpoint de schema — ver [Criar um novo recurso](../development/creating-resource.md)
-para o percurso completo (actions personalizadas, rotas, permissões, testes) e
-[BaseAPIView](../api/base-api-view.md) para o que cada uma dessas coisas faz por dentro.
-
-## 4. Ativar o módulo numa entidade
-
-Uma app só fica utilizável para um tenant depois de ativada explicitamente. O `create_entity`
-(da Instalação) só ativa o `hr` por omissão — qualquer outra app, incluindo esta, precisa do
-mesmo tratamento:
+`@register_view` only runs when the module is imported. Import the views when the app
+starts, or the route does not exist (404):
 
 ```python
-from django_resaas.models.app import App
-from django_resaas.models.entity_app import EntityApp
+# your_app/views/__init__.py
+from .product import ProductAPIView  # noqa: F401  (runs @register_view)
+```
 
-app, _ = App.objects.get_or_create(name="sua_app", defaults={"state": "Active"})
-EntityApp.objects.get_or_create(entity=minha_entidade, app=app, defaults={"state": "Active"})
+```python
+# your_app/apps.py
+from django.apps import AppConfig
+
+
+class YourAppConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "your_app"
+
+    def ready(self):
+        from . import views  # noqa: F401
+```
+
+With `models/` as a package, `your_app/models/__init__.py` imports the model too
+(`from .product import Product`), so that `makemigrations` finds it.
+
+That's the whole app. It already has full CRUD, pagination, ordering, `?search=`, soft
+delete/restore/hard delete, and a schema endpoint — see
+[Creating a new resource](../development/creating-resource.md) for the complete walkthrough
+(custom actions, routing, permissions, tests) and [BaseAPIView](../api/base-api-view.md) for what
+each of those does under the hood.
+
+## 4. Activate the module for a tenant
+
+An app only becomes usable for a tenant once explicitly activated. A new Entity gets the
+framework's own apps plus whatever `settings.RESAAS_DEFAULT_MODULES` lists (default: none) — any
+other app, including this one, needs the same treatment:
+
+```python
+from django_resaas.saas.models.app import App
+from django_resaas.saas.models.entity_app import EntityApp
+
+app, _ = App.objects.get_or_create(name="your_app", defaults={"state": "Active"})
+EntityApp.objects.get_or_create(entity=my_entity, app=app, defaults={"state": "Active"})
 ```
 
 > [!WARNING]
-> Sem isto, `BaseAPIView.initial()` rejeita todos os pedidos aos endpoints de `sua_app` com
-> um 403, para qualquer tenant que não o tenha feito — ver
+> Without this, `BaseAPIView.initial()` rejects every request to `your_app`'s endpoints with
+> a 403, for every tenant that hasn't run it — see
 > [BaseAPIView#module-activation](../api/base-api-view.md#module-activation).
 
-## 5. Chamar a API
+## 5. Call it
 
-Todo o pedido autenticado precisa de três cabeçalhos: um JWT, um contexto de tenant assinado, e um
-id de idioma. Obter os dois primeiros uma única vez:
+Every authenticated request needs three headers: a JWT, a signed tenant context, and a language
+id. Get the first two once:
 
 ```bash
-# 1. login
+# 1. log in
 curl -X POST http://localhost:7002/api/login/ \
   -H "Content-Type: application/json" \
-  -d '{"identifier": "voce@exemplo.com", "password": "..."}'
-# -> {"access": "...", "refresh": "...", ...}
+  -d '{"identifier": "you@example.com", "password": "..."}'
+# -> {"id": "...", "username": "...", ..., "tokens": {"refresh": "...", "access": "..."}}
+#    JWT = tokens.access
 
-# 2. emitir um contexto de tenant assinado (entity/branch/group criados no create_entity)
+# 2. issue a signed tenant context (entity/branch/group you created via create_entity)
 curl -X POST http://localhost:7002/api/resaas/context/ \
   -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
   -d '{"entity_id": "<entity-uuid>", "branch_id": "<branch-uuid>", "group_id": "<root-group-uuid>"}'
 # -> {"token": "<context-token>", "context": {...}}
 ```
 
-Depois, em cada pedido:
+Then, on every request:
 
 ```bash
-# schema - o que um frontend precisa para renderizar este recurso
+# schema - what a frontend needs to render this resource
 curl -H "Authorization: Bearer $JWT" -H "X-RESAAS-Context: $CTX" -H "L: 1" \
-     http://localhost:7002/api/django_resaas/resaasapps/sua_app/product/schema/
+     http://localhost:7002/api/django_resaas/resaasapps/your_app/product/schema/
 
-# listar
+# list
 curl -H "Authorization: Bearer $JWT" -H "X-RESAAS-Context: $CTX" -H "L: 1" \
-     http://localhost:7002/api/sua_app/products/
+     http://localhost:7002/api/your_app/products/
 
-# criar
+# create
 curl -X POST -H "Authorization: Bearer $JWT" -H "X-RESAAS-Context: $CTX" -H "L: 1" \
      -H "Content-Type: application/json" \
      -d '{"name": "Widget", "sku": "WID-1", "price": "9.99"}' \
-     http://localhost:7002/api/sua_app/products/
+     http://localhost:7002/api/your_app/products/
 ```
 
-Ver [Multi-tenancy](../architecture/multi-tenancy.md) para o que o token de contexto transporta e
-como é validado em cada pedido.
+See [Multi-tenancy](../architecture/multi-tenancy.md) for what the context token carries and how
+it's validated on every request.
 
-## O que isto prova
+## What this proves
 
-- **Multi-tenancy** — `Product` herda `entity`/`branch` de `BaseModel` e é automaticamente
-  delimitado ao tenant do contexto assinado do pedido; ver [Multi-tenancy](../architecture/multi-tenancy.md).
-- **Autorização** — o pedido é rejeitado a menos que o grupo do utilizador tenha a permissão
-  `list_product`/`add_product`/... gerada automaticamente, para a sucursal ativa; ver
-  [Permissões](../security/permissions.md).
-- **Soft delete** — `DELETE` não remove a linha; `?objects=all` e `POST .../restore/` trazem-na de
-  volta; ver [Soft delete](../features/soft-delete.md).
-- **Pesquisa dinâmica** — `?search=widget` corresponde a `RESAAS.search_fields`; ver
-  [Pesquisa](../api/search.md).
-- **O contrato Schema 1.0** — a resposta do endpoint de schema corresponde exatamente a
-  [O contrato Schema 1.0](../api/schema-contract.md): `ui.icon`, `filters.search_fields` e
-  `model.endpoint` vêm diretamente da configuração `RESAAS` de `Product`.
+- **Multi-tenancy** — `Product` inherits `entity`/`branch` from `BaseModel` and is automatically
+  scoped to the tenant in the request's signed context; see
+  [Multi-tenancy](../architecture/multi-tenancy.md).
+- **Authorization** — the request is rejected unless the user's group has the auto-generated
+  `list_product`/`add_product`/... permission for the active branch; see
+  [Permissions](../security/permissions.md).
+- **Soft delete** — `DELETE` doesn't remove the row; `?objects=all` and `POST .../restore/` bring
+  it back; see [Soft delete](../features/soft-delete.md).
+- **Dynamic search** — `?search=widget` matches `RESAAS.search_fields`; see
+  [Search](../api/search.md).
+- **The Schema 1.0 contract** — the schema endpoint's response matches
+  [Schema 1.0 contract](../api/schema-contract.md) exactly: `ui.icon`, `filters.search_fields` and
+  `model.endpoint` all come straight from `Product`'s `RESAAS` config.

@@ -1,14 +1,14 @@
-# Arquitetura do Backend
+# Backend Architecture
 
-O `django_resaas` assenta num pequeno conjunto de classes base partilhadas por cima do Django/DRF,
-para que cada recurso ganhe multi-tenancy, permissões, soft delete, pesquisa, filtros, paginação e
-um schema legível por máquina de graça, em vez de cada app reimplementar tudo isto.
+`django_resaas` layers a small set of shared base classes on top of Django/DRF so that every
+resource gets multi-tenancy, permissions, soft delete, search, filters, pagination and a
+machine-readable schema for free, instead of each app reimplementing them.
 
 ```text
-Cliente / Frontend
+Client / Frontend
        |
        v
- Cabeçalhos X-RESAAS-Context, L
+ X-RESAAS-Context, L headers
        |
        v
 TenantContextMiddleware        (architecture/middleware.md)
@@ -19,8 +19,8 @@ TenantContextMiddleware        (architecture/middleware.md)
        v
    BaseAPIView                 (api/base-api-view.md)
        |
-       +---- initial(): módulo ativo? permissão concedida?  (security/permissions.md)
-       +---- get_queryset(): delimitação entity/branch, ?objects=, ?search=
+       +---- initial(): module active? permission granted?  (security/permissions.md)
+       +---- get_queryset(): entity/branch scoping, ?objects=, ?search=
        |
        v
    BaseSerializer               (api/public-api-reference.md)
@@ -29,48 +29,47 @@ TenantContextMiddleware        (architecture/middleware.md)
      Model                      (BaseModel / TimeModel / SoftBaseModel)
        |
        v
-    Base de dados
+    Database
 ```
 
-## Responsabilidades
+## Responsibilities
 
 ### Middleware
 
-O `TenantContextMiddleware` descodifica o cabeçalho assinado `X-RESAAS-Context` para
-`request.entity_id`/`branch_id`/`entity_type_id`/`group_id`, e o cabeçalho `L` para
-`request.lang_id`, em cada pedido, antes de qualquer código de view correr. O
-`FileAccessMiddleware` protege separadamente o acesso direto a ficheiros de media. Ver
-[Middleware](middleware.md).
+`TenantContextMiddleware` decodes the signed `X-RESAAS-Context` header into
+`request.entity_id`/`branch_id`/`entity_type_id`/`group_id` and the `L` header into
+`request.lang_id`, on every request, before any view code runs. `FileAccessMiddleware` separately
+gates direct access to uploaded media. See [Middleware](middleware.md).
 
 ### View (`BaseAPIView`)
 
-Recebe o pedido, confirma que o módulo do tenant está ativo e que o utilizador está autorizado
-(`initial()`), constrói um queryset delimitado por tenant, opcionalmente ciente de soft delete,
-opcionalmente pesquisado (`get_queryset()`), e coordena o serializer e a resposta. Ver
+Receives the request, confirms the tenant's module is active and the user is authorized
+(`initial()`), builds a tenant-scoped, optionally soft-delete-aware, optionally searched queryset
+(`get_queryset()`), and coordinates the serializer and response. See
 [BaseAPIView](../api/base-api-view.md).
 
 ### Serializer (`BaseSerializer`)
 
-Valida os dados de entrada e transforma instâncias Django em dados no formato da API, com
-`entity`/`branch`/`created_by`/`updated_by`/timestamps só de leitura por omissão. Ver
-[Referência pública da API](../api/public-api-reference.md).
+Validates input data and turns Django instances into API-shaped data, with `entity`/`branch`/
+`created_by`/`updated_by`/timestamps read-only by default. See
+[Public API reference](../api/public-api-reference.md).
 
 ### Model (`BaseModel`)
 
-Representa dados persistentes. `BaseModel` (via `TimeModel`/`SoftBaseModel`) acrescenta
-delimitação por tenant, soft delete e campos de auditoria a qualquer model que o herde — ver
+Represents persistent data. `BaseModel` (via `TimeModel`/`SoftBaseModel`) adds tenant scoping,
+soft delete, and audit fields to any model that inherits it — see
 [Multi-tenancy](multi-tenancy.md).
 
 ### Schema (`ResaasSchemaBuilder`)
 
-Transforma um model e os campos do seu serializer no contrato JSON declarativo Schema 1.0, que um
-frontend consome para renderizar um ecrã CRUD completo sem fixar nenhuma dessas convenções do lado
-do cliente. Ver [O contrato Schema 1.0](../api/schema-contract.md).
+Turns a model plus its serializer fields into the declarative Schema 1.0 JSON contract a frontend
+consumes to render a whole CRUD screen without hardcoding conventions client-side. See
+[Schema 1.0 contract](../api/schema-contract.md).
 
-## Próximos passos
+## Where to go next
 
-- Novo no framework: [Instalação](../getting-started/installation.md) depois
-  [Início rápido](../getting-started/quick-start.md).
-- Acrescentar um recurso a um projeto existente: [Criar um novo recurso](../development/creating-resource.md).
-- Perceber o isolamento por tenant em profundidade: [Multi-tenancy](multi-tenancy.md) e
-  [Ciclo de uma requisição](request-lifecycle.md).
+- New to the framework: [Installation](../getting-started/installation.md) then
+  [Quick start](../getting-started/quick-start.md).
+- Adding a resource to an existing project: [Creating a new resource](../development/creating-resource.md).
+- Understanding tenant isolation in depth: [Multi-tenancy](multi-tenancy.md) and
+  [Request lifecycle](request-lifecycle.md).

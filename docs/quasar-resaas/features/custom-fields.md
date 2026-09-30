@@ -37,7 +37,7 @@ a validation rule) is a normal array `find`/mutate before handing the
 result to [`AutoForm`](../components/form.md):
 
 ```js
-const result = await buildFormFromSchema({ app: 'hr', model: 'Employee' })
+const result = await buildFormFromSchema({ app: 'your_app', model: 'Product' })
 
 const status = result.fields.find(f => f.name === 'status')
 if (status) {

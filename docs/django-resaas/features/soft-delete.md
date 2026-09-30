@@ -1,28 +1,28 @@
-# Soft Delete, Restore e Hard Delete
+# Soft Delete, Restore and Hard Delete
 
-Qualquer model construído sobre `SoftBaseModel` (que tanto `BaseModel` como `TimeModel` estendem)
-ganha soft delete de graça, suportado por três managers: `objects` (só linhas vivas — o padrão),
-`all_objects` (tudo), `deleted_objects` (só soft-deleted).
+Any model built on `SoftBaseModel` (which `BaseModel`/`TimeModel` both extend) gets soft delete
+for free, backed by three managers: `objects` (alive rows only — the default), `all_objects`
+(everything), `deleted_objects` (soft-deleted only).
 
-## Apagar através da API
+## Deleting through the API
 
-`DELETE .../<id>/` é um **soft** delete: `perform_destroy()` define `deleted_at` (e regista
-`updated_by`) em vez de remover a linha. Um `GET .../<id>/` simples numa linha soft-deleted passa
-então a dar 404 — já não está no manager `objects` por omissão — mas a linha continua a existir.
+`DELETE .../<id>/` is a **soft** delete: `perform_destroy()` sets `deleted_at` (and stamps
+`updated_by`) rather than removing the row. A soft-deleted row's plain `GET .../<id>/` then 404s —
+it's no longer in the default `objects` manager — but the row still exists.
 
-## Listar além do manager por omissão
+## Listing past the default manager
 
-O parâmetro de query `?objects=` troca de que manager um endpoint de listagem/detalhe lê, sempre
-ainda delimitado pelo tenant atual:
+The `?objects=` query param switches which manager a list/retrieve endpoint reads from, always
+still scoped to the current tenant:
 
 ```text
-GET .../?objects=all       # ativas + soft-deleted
-GET .../?objects=deleted   # só soft-deleted
+GET .../?objects=all       # active + soft-deleted
+GET .../?objects=deleted   # soft-deleted only
 ```
 
-Trocar de manager reinicia qualquer filtragem de tenant já aplicada, e é por isso que
-`get_queryset()` reaplica os filtros `entity_id`/`branch_id` logo a seguir à troca — ver
-[Ciclo de uma requisição](../architecture/request-lifecycle.md).
+Switching managers resets any tenant filtering already applied, which is why `get_queryset()`
+re-applies the `entity_id`/`branch_id` filters immediately after the switch — see
+[Request lifecycle](../architecture/request-lifecycle.md).
 
 ## Restore
 
@@ -30,9 +30,9 @@ Trocar de manager reinicia qualquer filtragem de tenant já aplicada, e é por i
 POST .../<id>/restore/
 ```
 
-Localizada através de `Model.all_objects`, filtrada por `entity_id`/`branch_id` — restaurar a
-linha de outro tenant dá 404 tal como obtê-la dá. Limpa `deleted_at` e regista `updated_by`.
-Exige a permissão `restore_<model>`.
+Looked up through `Model.all_objects`, filtered by `entity_id`/`branch_id` — restoring another
+tenant's row 404s exactly like retrieving one does. Clears `deleted_at` and stamps `updated_by`.
+Requires the `restore_<model>` permission.
 
 ## Hard delete
 
@@ -41,17 +41,35 @@ DELETE .../<id>/hard_delete/
 ```
 
 > [!WARNING]
-> Remove a linha permanentemente (ignora `deleted_at` por completo) — não há `restore` que
-> traga isto de volta. A mesma localização delimitada por tenant que o restore. Exige a
-> permissão separada `hard_delete_<model>` — um grupo que só tenha `delete_<model>` (soft
-> delete) não consegue fazer hard delete.
+> Permanently removes the row (bypasses `deleted_at` entirely) - there is no `restore` back
+> from this. Same tenant-scoped lookup as restore. Requires the separate
+> `hard_delete_<model>` permission — a group with only `delete_<model>` (soft delete) cannot
+> hard-delete.
 
-## Utilização direta no model
+## Direct model usage
 
-Fora da API, as mesmas operações estão disponíveis como métodos de instância:
+Outside the API, the same operations are available as instance methods:
 
 ```python
-instance.delete(user=request.user)   # soft delete, regista updated_by se o model o tiver
-instance.restore(user=request.user)  # limpa deleted_at, regista updated_by
-instance.hard_delete()               # remoção real
+instance.delete(user=request.user)   # soft delete, stamps updated_by if the model has it
+instance.restore(user=request.user)  # clears deleted_at, stamps updated_by
+instance.hard_delete()               # real deletion
 ```
+
+## Django admin bulk actions
+
+`BaseAdmin` (`saas/core/base/admin.py`) offers four bulk actions, each labelled with the model name
+last (Django's `%(verbose_name_plural)s`), e.g. "Activate selected departments":
+
+| Action | Effect | Offered when the model has |
+|---|---|---|
+| Activate selected … | `state = "Active"` | `state` |
+| Deactivate selected … | `state = "Inactive"` | `state` |
+| Restore selected … | clears `deleted_at` | `deleted_at` |
+| Soft delete selected … | sets `deleted_at` | `deleted_at` |
+
+Activate/Deactivate also stamp `updated_at`/`updated_by` (a queryset `update()` bypasses `save()`).
+The labels are translated per request through `Translate.tdc` (pt-pt, en-us, es-es, fr-fr, keys in
+`saas/lang/*.py`); an admin browser sends no `L` header, so it uses `LANGUAGE_CODE`.
+**Backward compatible**: the old plain labels ("Restore selected") were replaced; nothing read them.
+Tests: `saas/tests/test_admin_state_actions.py`.

@@ -1,44 +1,43 @@
 # Middleware
 
-O `django_resaas` distribui três classes de middleware em `django_resaas.core.middleware`. Só
-duas estão ativas por omissão na configuração `MIDDLEWARE` do projeto `src/dev`.
+`django_resaas` ships three middleware classes under `django_resaas.saas.core.middleware`. Only two are
+enabled by default in the `src/dev` project's `MIDDLEWARE` setting.
 
-## `TenantContextMiddleware` (`core/middleware/tenant.py`) — ativo por omissão
+## `TenantContextMiddleware` (`core/middleware/tenant.py`) - enabled by default
 
-Corre em cada pedido. Inicializa `request.tenant_context`, `request.tenant_context_error`,
-`request.entity_type_id`, `request.entity_id`, `request.branch_id`, `request.group_id` a `None`, e
-`request.lang_id` a partir do cabeçalho `L`. Se o cabeçalho `X-RESAAS-Context` estiver presente,
-descodifica-o via `ResaasContextService.decode(token)` e preenche `entity_type_id`/`entity_id`/
-`branch_id`/`group_id` a partir do payload descodificado; uma falha na descodificação é capturada
-em `request.tenant_context_error` em vez de ser levantada, para que o código a jusante
-(verificações de permissão, filtragem de queryset — ver
-[Multi-tenancy](multi-tenancy.md)) veja sempre um contexto de tenant consistente (ainda que
-vazio).
+Runs on every request. Initializes `request.tenant_context`, `request.tenant_context_error`,
+`request.entity_type_id`, `request.entity_id`, `request.branch_id`, `request.group_id` to `None`,
+and `request.lang_id` from the `L` header. If an `X-RESAAS-Context` header is present, it decodes
+it via `ResaasContextService.decode(token)` and populates `entity_type_id`/`entity_id`/
+`branch_id`/`group_id` from the decoded payload; a decode failure is captured into
+`request.tenant_context_error` rather than raising, so downstream code (permission checks,
+queryset filtering - see [`docs/architecture/multi-tenancy.md`](multi-tenancy.md)) sees a
+consistent (if empty) tenant context either way.
 
-## `FileAccessMiddleware` (`core/middleware/file_access.py`) — ativo por omissão
+## `FileAccessMiddleware` (`core/middleware/file_access.py`) - enabled by default
 
-Só atua em pedidos cujo caminho começa por `settings.MEDIA_URL`. Exige um parâmetro de query
-`?token=` validado por `FullPath.validate_token(token)`; sem um token válido devolve uma resposta
-JSON `401` (`{"alert_error": "..."}`). É isto que protege o acesso direto a ficheiros de media
-enviados (ver [Ficheiros e PDF](../features/files-pdf.md)).
+Only acts on requests whose path starts with `settings.MEDIA_URL`. Requires a `?token=` query
+parameter validated by `FullPath.validate_token(token)`; without a valid token it returns a `401`
+JSON response (`{"alert_error": "..."}`). This is what protects direct access to uploaded media
+files (see [`docs/features/files-pdf.md`](../features/files-pdf.md)).
 
-## `FrontEndMiddleware` (`core/middleware/front_end.py`) — **não ativo por omissão**
+## `FrontEndMiddleware` (`core/middleware/front_end.py`) - **not enabled by default**
 
-Disponível mas comentado em `src/dev/settings.py`. Quando ativado, restringe qual "frontend"
-registado (model `FrontEnd`, identificado por credenciais nos cabeçalhos `FEK`/`FEP`) pode chamar
-qual âmbito de URL (`/api/<scope>/...`) e com que métodos HTTP, com base nas definições
-`DJANGO_REST_AUTH.FRONT_END` (`REQUIRE_CREDENTIALS`, `PUBLIC_URL`, `URL_RULES`):
+Available but commented out in `src/dev/settings.py`'s `MIDDLEWARE` list. When enabled, it
+restricts which registered "frontend" (`FrontEnd` model, identified by `FEK`/`FEP` header
+credentials) may call which URL scope (`/api/<scope>/...`) and with which HTTP methods, based on
+`DJANGO_REST_AUTH.FRONT_END` settings (`REQUIRE_CREDENTIALS`, `PUBLIC_URL`, `URL_RULES`):
 
-- Se `REQUIRE_CREDENTIALS` for falso, o middleware só aplica as regras de âmbito público/scope
-  abaixo e nunca exige `FEK`/`FEP`.
-- Caso contrário, todo o pedido precisa de cabeçalhos `FEK`/`FEP` válidos correspondentes a uma
-  linha `FrontEnd`, a menos que o seu âmbito de URL esteja listado em `FRONT_END.PUBLIC_URL`.
-- `frontend.access` (`super`, `read`, `readwrite`, `write`) delimita tanto o âmbito de URL (contra
-  `FRONT_END.URL_RULES`) como o método HTTP permitido para esse nível de acesso.
+- If `REQUIRE_CREDENTIALS` is falsy, the middleware only enforces the public/scope rules below and
+  never requires `FEK`/`FEP`.
+- Otherwise, every request needs valid `FEK`/`FEP` headers matching a `FrontEnd` row, unless its
+  URL scope is listed in `FRONT_END.PUBLIC_URL`.
+- `frontend.access` (`super`, `read`, `readwrite`, `write`) gates both the URL scope (against
+  `FRONT_END.URL_RULES`) and the HTTP method allowed for that access level.
 
 > [!WARNING]
-> Problema conhecido: a linha comentada em `src/dev/settings.py` referencia
-> `django_resaas.core.middleware.frontend.FrontEndMiddleware` (sem underscore), mas o módulo
-> real é `django_resaas.core.middleware.front_end` (com underscore). Descomentar essa linha
-> tal como está levantaria `ModuleNotFoundError` — o caminho precisa do underscore
-> acrescentado antes de este middleware poder ser ativado de facto.
+> Known issue: the commented-out entry in `src/dev/settings.py` references
+> `django_resaas.saas.core.middleware.front_end.FrontEndMiddleware` (no underscore), but the real
+> module is `django_resaas.saas.core.middleware.front_end` (with an underscore). Uncommenting
+> that line as written would raise `ModuleNotFoundError` - the dotted path needs the
+> underscore added before this middleware can actually be enabled.

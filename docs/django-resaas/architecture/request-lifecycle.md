@@ -1,31 +1,31 @@
-# Ciclo de uma Requisição
+# Request Lifecycle
 
-O que corre de facto, por ordem, num pedido tratado por uma subclasse de `BaseAPIView` — baseado
-em `core/base/views.py`.
+What actually runs, in order, for a request handled by a `BaseAPIView` subclass — grounded in
+`core/base/views.py`.
 
 ```text
-Pedido HTTP
+HTTP Request
    |
    v
-TenantContextMiddleware        descodifica X-RESAAS-Context / L (architecture/middleware.md)
+TenantContextMiddleware        decodes X-RESAAS-Context / L (architecture/middleware.md)
    |
    v
-initial()                      primeiro o initial() do DRF, depois as verificações do RESAAS:
+initial()                      DRF's own initial() first, then RESAAS's checks:
    |
-   +-- tenant_context_error definido?      -> 403 PermissionDenied
-   +-- tenant_context em falta?            -> 403 PermissionDenied
+   +-- tenant_context_error set?        -> 403 PermissionDenied
+   +-- tenant_context missing entirely? -> 403 PermissionDenied
    +-- ResaasContextService.validate_for_user(...)
-   +-- request.entity_id em falta?         -> 403 "não associado a nenhuma entidade"
-   +-- module_name ativo para a entidade?  -> 403 "Módulo '<nome>' não está ativo"
-   +-- codename de permissão concedido?    -> 403 "Não autorizado" (cache por pedido)
+   +-- request.entity_id missing?       -> 403 "not associated with any entity"
+   +-- module_name active for entity?   -> 403 "Module '<name>' is not active"
+   +-- permission codename granted?     -> 403 "Unauthorized" (cached per-request)
    |
    v
 get_queryset()
    |
-   +-- filtrar por entity_id / branch_id (se o model os tiver)
-   +-- trocar manager para ?objects=all / ?objects=deleted (se o model suportar)
-   +-- reaplicar entity_id / branch_id (trocar de manager reinicia o filtro anterior)
-   +-- apply_dynamic_search()  ->  build_search_query() a partir de ?search=
+   +-- filter by entity_id / branch_id (if the model has them)
+   +-- switch manager for ?objects=all / ?objects=deleted (if the model supports it)
+   +-- re-apply entity_id / branch_id (switching manager resets any prior filtering)
+   +-- apply_dynamic_search()  ->  build_search_query() from ?search=
    |
    v
 DynamicFilterBackend + OrderingFilter    (api/filters-pagination.md)
@@ -34,20 +34,20 @@ DynamicFilterBackend + OrderingFilter    (api/filters-pagination.md)
 Serializer  (BaseSerializer)
    |
    v
-Model / Base de dados
+Model / Database
    |
    v
-Resposta HTTP
+HTTP Response
 ```
 
-## Criação
+## Create
 
-`perform_create()` preenche `created_by`/`updated_by` a partir de `request.user`, e — só para
-models que realmente têm essas colunas — `entity_id`/`branch_id` a partir de
-`request.entity_id`/`request.branch_id`. Este é o único ponto onde uma instância de `BaseModel`
-criada pela API recebe o seu tenant; fora da API (shell, management commands, sinais,
-migrações), quem chama tem de definir `entity`/`branch` manualmente ou `BaseModel.save()` levanta
-`ValidationError` — ver [Multi-tenancy](multi-tenancy.md#regra-de-ouro-o-tenant-nunca-e-adivinhado).
+`perform_create()` stamps `created_by`/`updated_by` from `request.user`, and — only for models
+that actually have those columns — `entity_id`/`branch_id` from `request.entity_id`/
+`request.branch_id`. This is the one and only place a `BaseModel` instance created through the API
+gets its tenant set; outside the API (shell, management commands, signals, migrations), callers
+must set `entity`/`branch` themselves or `BaseModel.save()` raises `ValidationError` — see
+[Multi-tenancy](multi-tenancy.md#golden-rule-the-tenant-is-never-guessed).
 
 ```python
 def perform_create(self, serializer):
@@ -59,16 +59,16 @@ def perform_create(self, serializer):
     serializer.save(**data)
 ```
 
-## Atualização
+## Update
 
-`perform_update()` só preenche `updated_by` — `entity`/`branch` não são tocados na atualização (o
-tenant de uma linha não muda ao ser editada).
+`perform_update()` only stamps `updated_by` — `entity`/`branch` are left untouched on update (a
+row's tenant doesn't move when it's edited).
 
-## Remoção, restore e hard delete
+## Delete, restore, hard delete
 
-`DELETE .../<id>/` chama `perform_destroy()`, que é um **soft** delete: define `deleted_at` (e,
-via `instance.delete(user=...)`, também `updated_by`) em vez de remover a linha. Duas actions
-dedicadas, com permissões próprias, tratam do resto — `POST .../<id>/restore/` e
-`DELETE .../<id>/hard_delete/` — ambas localizadas através de `Model.all_objects` e ainda
-filtradas por `entity_id`/`branch_id`, pelo que agir sobre a linha de outro tenant dá 404 tal como
-ao tentar obtê-la. Detalhe completo em [Soft delete](../features/soft-delete.md).
+`DELETE .../<id>/` calls `perform_destroy()`, which is a **soft** delete: it sets `deleted_at`
+(and, via `instance.delete(user=...)`, `updated_by` too) rather than removing the row. Two
+dedicated, separately-permissioned actions handle the rest — `POST .../<id>/restore/` and
+`DELETE .../<id>/hard_delete/` — both looked up through `Model.all_objects` and still filtered by
+`entity_id`/`branch_id`, so acting on another tenant's row 404s exactly like retrieving one does.
+Full detail in [Soft delete](../features/soft-delete.md).

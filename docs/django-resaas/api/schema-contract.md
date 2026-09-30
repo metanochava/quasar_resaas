@@ -1,48 +1,50 @@
-# O Contrato de Schema RESAAS (v1.0)
+# The RESAAS Schema Contract (v1.0)
 
-O `ResaasSchemaBuilder` (`django_resaas.core.schema.ResaasSchemaBuilder`) transforma um model
-Django num contrato JSON declarativo que um frontend (`quasar_resaas`, em particular) consome
-para renderizar um ecrã CRUD completo — tabela, formulário, filtros, paginação, permissões,
-actions, exportação em PDF — sem fixar nenhuma dessas convenções do lado do cliente.
+`ResaasSchemaBuilder` (`django_resaas.saas.core.schema.ResaasSchemaBuilder`) turns a Django model into
+a declarative JSON contract that a frontend (`quasar_resaas` in particular) consumes to render a
+full CRUD screen — table, form, filters, pagination, permissions, actions, PDF export — without
+hardcoding any of those conventions on the client.
 
-É servido pelo `AppSchemaAPIView` (`management/apicommands/view/app_schema.py`) no endpoint
-`.../<app>/<model>/schema/` de cada app, e é exercitado de ponta a ponta pela app de demonstração
-em `src/dev/demo`.
+It is served by `AppSchemaAPIView` (`management/apicommands/view/app_schema.py`) at the app's
+`.../<app>/<model>/schema/` endpoint, and is exercised end-to-end by the demo app in
+[`src/dev/demo`](../../src/dev/README.md).
 
-Este documento é a referência oficial para essa forma.
+This document is the authoritative reference for that shape.
 
 > [!NOTE]
-> É protegido por `src/django_resaas/core/schema/tests/test_builder.py` — qualquer alteração
-> ao JSON abaixo tem de vir acompanhada de uma alteração correspondente no teste, para que a
-> divergência entre este documento e o output real seja apanhada em CI.
+> It is protected by `src/django_resaas/core/schema/tests/test_builder.py` — any change to
+> the JSON below must come with a matching test change, so drift between this doc and the
+> real output is caught in CI.
 
-## Utilização
+## Usage
 
 ```python
-from django_resaas.core.schema import ResaasSchemaBuilder
+from django_resaas.saas.core.schema import ResaasSchemaBuilder
 
 schema = ResaasSchemaBuilder(Model=SomeModel, fields=serialized_field_list).build()
 ```
 
-`fields` é a lista de descritores de campo já derivada pelo chamador a partir do serializer do
-model (cada um, no mínimo, `{"name": "<field_name>"}`); o builder não introspeta serializers por
-si próprio.
+`fields` is the list of field descriptors the caller already derived from the model's serializer
+(each at minimum `{"name": "<field_name>"}`); the builder does not introspect serializers itself.
 
-## Política de versionamento
+A field restricted by [field-level permissions](../security/field-permissions.md) additionally
+carries `"permissions": {"view": "<codename>", "change": "<codename>"}` in its descriptor. This is
+an additive key, and the schema stays identical for every user.
 
-- `schema_version` está atualmente congelado em `"1.0"`.
-- **Alterações aditivas, compatíveis com versões anteriores** (uma chave nova, um campo opcional
-  novo num objeto já existente) não exigem subir a versão.
-- **Alterações que quebram compatibilidade** (remover/renomear uma chave, mudar o tipo ou
-  significado de um campo) exigem subir `ResaasSchemaBuilder.SCHEMA_VERSION` para `"2.0"`.
-  Consumidores devem verificar `schema_version` antes de confiar em comportamento exclusivo da
-  2.0.
+## Versioning policy
+
+- `schema_version` is currently frozen at `"1.0"`.
+- **Additive, backward-compatible changes** (a new key, a new optional field on an existing
+  object) do not require a version bump.
+- **Breaking changes** (removing/renaming a key, changing a field's type or meaning) require
+  bumping `ResaasSchemaBuilder.SCHEMA_VERSION` to `"2.0"`. Consumers should check `schema_version`
+  before relying on 2.0-only behavior.
 > [!NOTE]
-> `module` e `config` (ver abaixo) são **aliases obsoletos**, mantidos apenas por
-> compatibilidade com consumidores mais antigos. Código novo deve ler `model.app` e
-> `routes`/`ui.crud` diretamente.
+> `module` and `config` (see below) are **deprecated aliases** kept only for backward
+> compatibility with older consumers. New code should read `model.app` and `routes`/`ui.crud`
+> directly instead.
 
-## Forma
+## Shape
 
 ```jsonc
 {
@@ -52,13 +54,13 @@ si próprio.
     "app": "django_resaas",         // Model._meta.app_label
     "name": "group",                // Model._meta.model_name
     "class_name": "Group",          // Model.__name__
-    "label": "Group",               // Model._meta.verbose_name, em title case
-    "label_plural": "Groups",       // Model._meta.verbose_name_plural, em title case
+    "label": "Group",               // Model._meta.verbose_name, titlecased
+    "label_plural": "Groups",       // Model._meta.verbose_name_plural, titlecased
     "pk": "id",                     // Model._meta.pk.name
-    "endpoint": "django_resaas/groups/"  // convenção "{app}/{model}s/"
+    "endpoint": "django_resaas/groups/"  // "{app}/{model}s/" convention
   },
 
-  "fields": [ /* a lista `fields` recebida, sem alterações */ ],
+  "fields": [ /* the `fields` list passed in, unmodified */ ],
 
   "actions": [
     {
@@ -71,17 +73,17 @@ si próprio.
       "position": null,
       "order": 0,
       "visible": true,
-      "method": "POST",               // o único método com que a UI deve submeter esta action - sempre um valor, nunca vários juntos
-      "methods": ["POST"],            // todos os métodos HTTP que o DRF de facto encaminha para o handler (de `@resaas_action(methods=[...])`); "method" acima é sempre methods[0]
-      "detail": true,                // nome conceptual/de API (corresponde ao próprio `detail=` do DRF) - sempre igual a "details"
-      "details": true,               // mantido por compatibilidade com código de frontend já existente; action de detalhe -> ".../{id}/archive/"
+      "method": "POST",               // the single method the UI should submit this action with - always one value, never comma-joined
+      "methods": ["POST"],            // every HTTP method DRF actually routes to the handler (from `@resaas_action(methods=[...])`); "method" above is always methods[0]
+      "detail": true,                // conceptual/API name (matches DRF's own `detail=`) - always equal to "details"
+      "details": true,               // kept for backward compatibility with existing frontend code; detail action -> ".../{id}/archive/"
       "url": null,
       "autorequest": false,
       "endpoint": "django_resaas/groups/{id}/archive/",
       "permission": "archive_group"
     }
-    // uma entrada por linha ModelExtraAction desta app+model,
-    // ordenadas por (order, action)
+    // one entry per ModelExtraAction row for this app+model,
+    // ordered by (order, action)
   ],
 
   "permissions": {
@@ -89,40 +91,40 @@ si próprio.
     "change": "change_group", "delete": "delete_group",
     "restore": "restore_group", "hard_delete": "hard_delete_group",
     "pdf": "pdf_group", "pdf_list": "pdf_list_group",
-    "custom": { "archive": "archive_group" }   // uma entrada por ModelExtraAction
+    "custom": { "archive": "archive_group" }   // one entry per ModelExtraAction
   },
 
   "routes": {
-    // valores por omissão de convenção ("{verbo}_{model}"), sobreponíveis por chave via
-    // `RESAAS.routes` (um merge de dicionário, não uma substituição total)
+    // convention defaults ("{verb}_{model}"), overridable per-key via
+    // `RESAAS.routes` (a dict merge, not a wholesale replacement)
     "list": "list_group", "add": "add_group",
     "change": "change_group", "view": "view_group"
   },
 
   "ui": {
-    "title": "Groups",              // verbose_name_plural, em title case
+    "title": "Groups",              // verbose_name_plural, titlecased
     "icon": null,                   // RESAAS.icon
-    "crud": true,                   // RESAAS.crud, por omissão true
+    "crud": true,                   // RESAAS.crud, default true
     "dense": true, "striped": true,
     "show_search": true, "show_filters": true, "show_columns": true,
     "show_refresh": true, "show_pdf": true, "show_pdf_list": true
-    // qualquer chave acima sobreponível via `RESAAS.ui = {...}` (fundida sobre os valores por omissão)
+    // any key above overridable via `RESAAS.ui = {...}` (merged over defaults)
   },
 
   "filters": {
     "enabled": true,
     "search": true,
     "search_fields": [],            // RESAAS.search_fields
-    "fields": ["name", "editable"]  // nomes retirados do argumento `fields`
-    // sobreponível via `RESAAS.filters = {...}` (fundida sobre os valores por omissão)
+    "fields": ["name", "editable"]  // names pulled from the `fields` argument
+    // overridable via `RESAAS.filters = {...}` (merged over defaults)
   },
 
   "pagination": {
     "enabled": true,
-    "page_size": 10,                // de REST_FRAMEWORK["PAGE_SIZE"], por omissão 10
+    "page_size": 10,                // from REST_FRAMEWORK["PAGE_SIZE"], default 10
     "page_size_options": [5, 10, 20, 50, 100, 200, 500, 1000, 0],
     "default_ordering": "-id"
-    // sobreponível via `RESAAS.pagination = {...}` (fundida sobre os valores por omissão)
+    // overridable via `RESAAS.pagination = {...}` (merged over defaults)
   },
 
   "pdf": {
@@ -130,32 +132,32 @@ si próprio.
     "detail_permission": "pdf_group", "list_permission": "pdf_list_group",
     "detail_endpoint": "django_resaas/groups/{id}/pdf/",
     "list_endpoint": "django_resaas/groups/pdflist/"
-    // sobreponível via `RESAAS.pdf = {...}` (fundida sobre os valores por omissão)
+    // overridable via `RESAAS.pdf = {...}` (merged over defaults)
   },
 
-  // --- aliases obsoletos, mantidos por compatibilidade, ver Versionamento acima ---
-  "module": "django_resaas",        // duplicado de model.app
+  // --- deprecated backward-compatibility aliases, see Versioning above ---
+  "module": "django_resaas",        // duplicate of model.app
   "config": {
-    "crud": true,                   // duplicado de ui.crud
-    "routes": { /* duplicado de routes */ }
+    "crud": true,                   // duplicate of ui.crud
+    "routes": { /* duplicate of routes */ }
   }
 }
 ```
 
-## Semântica de merge
+## Merge semantics
 
-Toda a secção sobreponível (`ui`, `filters`, `pagination`, `pdf`, `routes`) é um **merge raso de
-dicionário**: `{**default, **(configured or {})}`. Definir `RESAAS.ui = {"dense": False}` só
-sobrepõe `dense` — todas as outras chaves de `ui` mantêm o seu valor por omissão.
+Every overridable section (`ui`, `filters`, `pagination`, `pdf`, `routes`) is a **shallow dict
+merge**: `{**default, **(configured or {})}`. Supplying `RESAAS.ui = {"dense": False}` only
+overrides `dense` — every other `ui` key keeps its default.
 
 > [!TIP]
-> Um consumidor nunca deve redeclarar estes valores por omissão localmente (ver
-> [Referência pública da API](public-api-reference.md) e o `utils/schema.js` do
-> `quasar_resaas`, que agora importa estas constantes em vez de as redeclarar) — o backend é
-> a única fonte de verdade sobre o que "não definido" significa.
+> A consumer should never re-declare these defaults locally (see
+> [`docs/api/public-api-reference.md`](public-api-reference.md) and the frontend's
+> `quasar_resaas` `utils/schema.js`, which now imports these constants instead of re-declaring
+> them) — the backend is the single source of truth for what "unset" means.
 
-## Relacionados
+## Related
 
-- [Models & RESAAS](../models/resaas-config.md) — a convenção `class RESAAS` do lado do model
-  (`label_field`, `search_fields`, `crud`, e as secções documentadas acima).
-- `src/django_resaas/core/schema/tests/test_builder.py` — a versão executável deste contrato.
+- [`docs/models/resaas-config.md`](../models/resaas-config.md) — the `class RESAAS` convention on
+  the model side (`label_field`, `search_fields`, `crud`, and the sections documented above).
+- `src/django_resaas/core/schema/tests/test_builder.py` — the executable version of this contract.

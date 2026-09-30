@@ -14,8 +14,9 @@ If you're consuming a [`django_resaas`](https://github.com/metanochava/django_re
 
 **quasar_resaas** solves that part. It's a Vue 3 + Quasar component/store/service library that reads the schema `django_resaas` already exposes for every model and renders the form, table, filters and CRUD flow from it — so your team writes business screens, not plumbing.
 
-```bash
-npm install quasar_resaas
+```json
+// package.json — installed from GitHub (the npm registry holds an obsolete 0.0.4)
+"dependencies": { "quasar_resaas": "github:metanochava/quasar_resaas" }
 ```
 
 ---
@@ -70,9 +71,19 @@ npm install quasar_resaas
 
 ## ⚙️ Installation & setup
 
-```bash
-npm install quasar_resaas
+`quasar_resaas` is consumed from GitHub, not from the npm registry (whose
+`quasar_resaas` is an obsolete 0.0.4):
+
+```json
+// package.json
+"dependencies": { "quasar_resaas": "github:metanochava/quasar_resaas" }
 ```
+
+```bash
+npm install
+```
+
+See [Installation](docs/quasar-resaas/getting-started/installation.md).
 
 Register components in your Quasar app's boot files:
 
@@ -229,7 +240,7 @@ Internal links between docs (e.g. `docs/quasar-resaas/README.md` linking to `arc
 | `ActionForm` | Form for custom backend actions (`@action`-decorated endpoints) |
 | `FormModal` | Modal wrapper around `AutoForm`/`Form` for create/edit dialogs |
 | `ConfirmDeleteDialog` | Confirmation dialog wired to a store's `delete`/`restore` |
-| `PdfRender` / `PdfRenderPro` | Preview backend-generated PDFs (pdfjs-dist) |
+| `PdfRender` / `PdfRenderPro` | Preview backend-generated PDFs (pdfjs-dist; `s-pdf-render-pro` is loaded on first use) |
 
 The `components/engine/*` set (`InputComponent`, `SelectComponent`, `DateComponent`, `UploadComponent`, …) are the field-level primitives `AutoForm` composes from a schema's field `type`.
 
@@ -261,7 +272,7 @@ Gives the resource list/pagination/filters, current item, and create/update/dele
 | PDF | `pdfjs-dist` |
 | Docs rendering | `marked` |
 | Storage security | `crypto-js` |
-| Misc | `figlet` (CLI banners) |
+| Misc | `figlet` (only `ascii()`, deprecated) |
 
 ---
 

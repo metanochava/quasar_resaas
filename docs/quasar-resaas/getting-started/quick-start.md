@@ -7,8 +7,8 @@ already exists and is registered — see the backend's
 [Quick start](../../django-resaas/getting-started/quick-start.md) for that
 half first if it doesn't yet.
 
-The example uses `app: 'hr'`, `model: 'Employee'` throughout — substitute
-your own.
+The example uses `app: 'your_app'`, `model: 'Product'` throughout — the same
+resource the backend's Quick start creates. Substitute your own.
 
 ## 0. The fastest possible path: zero files
 
@@ -36,32 +36,32 @@ For a real resource, the fastest path to a permission-gated list screen is
 [`AutoCrud`](../components/auto-crud.md) behind its own route:
 
 ```vue
-<!-- pages/hr/employee/EmployeeLPage.vue -->
+<!-- pages/your_app/product/ProductLPage.vue -->
 <template>
-  <s-auto-crud app="hr" model="Employee" route="view_employee" />
+  <s-auto-crud app="your_app" model="Product" route="view_product" />
 </template>
 ```
 
 ```js
-// pages/hr/employee/employeeRoutes.js
+// pages/your_app/product/productRoutes.js
 import { tdc } from 'quasar_resaas'
 
-export const employeeRoutes = [
+export const productRoutes = [
   {
-    path: '/list_employee',
-    name: 'list_employee',
-    component: () => import('./EmployeeLPage.vue'),
+    path: '/list_product',
+    name: 'list_product',
+    component: () => import('./ProductLPage.vue'),
     meta: {
-      title: tdc('View of') + ' ' + tdc('employee'),
+      title: tdc('View of') + ' ' + tdc('product'),
       requiresAuth: true,
       icon: 'list',
-      requiredRole: 'list_employee'
+      requiredRole: 'list_product'
     }
   }
 ]
 ```
 
-Spread `employeeRoutes` into the host's own route table (see
+Spread `productRoutes` into the host's own route table (see
 [Router](../routing/routes.md)) and the page is done — table, search,
 filters, create/edit dialog, delete/restore, custom actions and PDF (if the
 backend schema exposes them) all work with no further code. Full walkthrough,
@@ -74,22 +74,22 @@ something `AutoCrud` doesn't offer as-is — a dashboard widget, a
 multi-step wizard, cross-store logic, a detail page that isn't a list:
 
 ```js
-// stores/EmployeeStore.js
+// stores/ProductStore.js
 import { createBaseStore } from 'quasar_resaas'
 
-export const useEmployeeStore = createBaseStore('employee', {
-  app: 'hr',
-  model: 'Employee'
+export const useProductStore = createBaseStore('product', {
+  app: 'your_app',
+  model: 'Product'
 })
 ```
 
 ```js
-const Employee = useEmployeeStore()
+const Product = useProductStore()
 
-await Employee.init()            // loadSchema() + loadData()
-await Employee.getById(id)       // cached; { force: true } to bypass
-Employee.form = { ...Employee.form, first_name: 'Ana' }
-await Employee.save()            // create() or update(), based on form.id
+await Product.init()            // loadSchema() + loadData()
+await Product.getById(id)       // cached; { force: true } to bypass
+Product.form = { ...Product.form, name: 'Chair' }
+await Product.save()            // create() or update(), based on form.id
 ```
 
 ## 3. A page-level form: `s-form-two`
@@ -99,7 +99,7 @@ step 2:
 
 ```vue
 <s-form-two
-  :store="Employee"
+  :store="Product"
   :ignore-fields="['created_at', 'updated_at', 'created_by', 'updated_by']"
   @saved="onSaved"
 />

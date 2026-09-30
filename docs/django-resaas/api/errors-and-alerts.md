@@ -3,7 +3,7 @@
 Every API exposed by `django_resaas` and by business modules built on `BaseAPIView` answers
 failures and extra messages through the same two mechanisms: the **error** body and **alerts**.
 This page documents the backend side of the contract; see
-[quasar_resaas: Errors and alerts](../../quasar-resaas/features/errors-and-alerts.md) for how the
+[quasar_resaas: Errors and alerts](https://github.com/metanochava/quasar_resaas/blob/main/docs/quasar-resaas/features/errors-and-alerts.md) for how the
 frontend consumes it.
 
 ## The error body
@@ -16,7 +16,7 @@ top-level key:
 ```
 
 - `message` — always present; human text, translated with the request's language
-  (`Translate.tdc`, see [translation architecture](../../quasar-resaas/features/translation.md)).
+  (`Translate.tdc`, see [translation architecture](https://github.com/metanochava/quasar_resaas/blob/main/docs/quasar-resaas/features/translation.md)).
 - `code` — only when a caller must branch on this condition programmatically. Stable, technical,
   **never translated**. DRF's own generic codes (`"error"`, `"invalid"`) are never published as-is
   — see `GENERIC_CODES` in `saas/core/exceptions/handler.py`.
@@ -53,6 +53,12 @@ raise ConflictError("This profile is already assigned.", code="group_already_ass
   validation: `message` becomes the generic `"Please correct the highlighted fields."`, and
   `details` carries the real per-field messages, translated in place (shape preserved, including
   nested dicts/lists).
+- The `details=` of a `ResaasAPIException` is translated the same way (its text values are
+  treated as messages). Numbers, booleans and `null` are data and are never translated or turned
+  into strings. An exception whose `details` holds **machine values** (names, codes) sets the class
+  attribute `translate_details = False`, so they reach the client unchanged. The entitlement
+  errors do this (`{"capacity": "branches", "limit": 3, "current": 3}`, see
+  [Entitlements](../security/entitlements.md)).
 - An exception raised with `{"code": ..., "detail": ...}` (a pattern some views already use, e.g.
   a stable `temporary_password_expired`) is treated as one error with that stable code, not as a
   field map.
@@ -86,7 +92,7 @@ Alerts are **extra** messages a request wants the user to see next to its normal
 not the failure, and a failed request must not repeat its own error as an alert:
 
 ```json
-{"id": 1, "alerts": [{"level": "warning", "message": "...", "code": "employee_without_profile", "details": null}]}
+{"id": 1, "alerts": [{"level": "warning", "message": "...", "code": "member_without_category", "details": null}]}
 ```
 
 - `level` is one of `success | info | warning | error` (never Quasar's own `positive`/`negative`

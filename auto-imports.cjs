@@ -13,11 +13,11 @@ const RESAAS_STORE_IMPORTS = [
 
   'useActionStore',
   'useAlertStore',
-  'useEmployeeStore',
   'useGroupStore',
   'useLanguageStore',
   'useLoadStore',
   'usePermissionStore',
+  'useEntitlementStore',
 
 ]
 

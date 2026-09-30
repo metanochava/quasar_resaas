@@ -1,81 +1,97 @@
-# Referência Pública da API
+# Public API Reference
 
-O `django_resaas` é uma app Django reutilizável, não uma biblioteca autónoma com uma lista de
-exports curada no `__init__.py` de topo. Os seus ficheiros `__init__.py` estão intencionalmente
-vazios (importar models ou views ali de forma antecipada arriscaria erros
-`AppRegistryNotReady`, antes de o Django terminar de carregar as apps instaladas). A convenção
-suportada e funcional é o **import profundo** — importar cada classe diretamente do módulo que a
-define. Esta página documenta essa superfície já existente; não introduz nenhuma nova.
+`django_resaas` is a reusable Django app, not a standalone library with a curated top-level
+`__init__.py` export list. Its `__init__.py` files are intentionally empty (eagerly importing
+models or views there would risk `AppRegistryNotReady` errors before Django finishes loading
+installed apps). The supported, working convention is **deep import** - importing each class
+directly from the module that defines it. This page documents that existing surface; it does not
+introduce a new one.
 
-## Classes base (`django_resaas.core.base`)
+## Base classes (`django_resaas.saas.core.base`)
 
-### `BaseModel` — `django_resaas.core.base.models.BaseModel`
+### `BaseModel` - `django_resaas.saas.core.base.models.BaseModel`
 
-A classe base de model que a maioria dos models de aplicação deve herdar. Construída em camadas:
+The model base class most application models should inherit from. Built in layers:
 
-- `SoftBaseModel` — acrescenta uma chave primária UUID, `created_at`/`updated_at`/`deleted_at`, e
-  três managers: `objects` (só linhas vivas), `all_objects` (tudo), `deleted_objects` (só linhas
-  soft-deleted). `delete()` define `deleted_at` em vez de remover a linha; `hard_delete()` faz a
-  remoção real; `restore()` limpa `deleted_at`.
-- `TimeModel` — acrescenta `created_by`/`updated_by` (FK para `AUTH_USER_MODEL`) e um campo
-  `state` (`Active`/`Inactive`).
-- `BaseModel` — acrescenta as foreign keys de tenant `entity`/`branch` e `ensure_tenant()`, que o
-  `save()` chama automaticamente. Nunca preenche um tenant sozinho: se `entity`/`branch` não
-  estiverem já definidos explicitamente, levanta `ValidationError` em vez de adivinhar — ver
-  [Multi-tenancy](../architecture/multi-tenancy.md#regra-de-ouro-o-tenant-nunca-e-adivinhado).
+-   `SoftBaseModel` - adds a UUID primary key, `created_at`/`updated_at`/`deleted_at`, and three
+    managers: `objects` (alive rows only), `all_objects` (everything), `deleted_objects`
+    (soft-deleted rows only). `delete()` sets `deleted_at` instead of removing the row;
+    `hard_delete()` performs the real deletion; `restore()` clears `deleted_at`.
+-   `TimeModel` - adds `created_by`/`updated_by` (FK to `AUTH_USER_MODEL`) and a `state`
+    (`Active`/`Inactive`) field.
+-   `BaseModel` - adds the tenant `entity`/`branch` foreign keys and `ensure_tenant()`, which
+    `save()` calls automatically. It never backfills a tenant: if `entity`/`branch` aren't already
+    set explicitly, it raises `ValidationError` instead of guessing - see
+    [`docs/architecture/multi-tenancy.md`](../architecture/multi-tenancy.md#golden-rule-the-tenant-is-never-guessed).
 
-Também exportados do mesmo módulo: `SoftDeleteQuerySet`, `SoftDeleteManager`, `DeletedManager`,
-`AllObjectsManager`, e a função auxiliar de caminho de upload `file_path(instance, file_name,
-pasta="")` (constrói `{entity_type_id}/{entity_id}/{instance_id}/{pasta}/{filename}`).
+Also exported from the same module: `SoftDeleteQuerySet`, `SoftDeleteManager`, `DeletedManager`,
+`AllObjectsManager`, and the `file_path(instance, file_name, pasta="")` upload-path helper (builds
+`{entity_type_id}/{entity_id}/{instance_id}/{pasta}/{filename}`).
 
-### `BaseSerializer` — `django_resaas.core.base.serializers.BaseSerializer`
+### `BaseSerializer` - `django_resaas.saas.core.base.serializers.BaseSerializer`
 
-A classe base de `ModelSerializer`, composta por quatro mixins (`DynamicFieldsMixin`,
-`SerializerUtilsMixin`, `FileFieldsMixin`, `RepresentationMixin`). Marca automaticamente
+The `ModelSerializer` base class, composed from four mixins (`DynamicFieldsMixin`,
+`SerializerUtilsMixin`, `FileFieldsMixin`, `RepresentationMixin`). Automatically marks
 `DEFAULT_READ_ONLY_FIELDS` (`id`, `entity`, `branch`, `created_by`, `updated_by`, `created_at`,
-`updated_at`, `deleted_at`) como só de leitura em cada subclasse, para que quem a use não precise
-de repetir essa lista por serializer. `label_field` e `value_field` (por omissão `"id"`) suportam
-a representação genérica label/value do framework.
+`updated_at`, `deleted_at`) as read-only on every subclass, so callers don't need to repeat that
+list per serializer. `label_field` and `value_field` (default `"id"`) support the framework's
+generic label/value representation.
 
-### `BaseAPIView` — `django_resaas.core.base.views.BaseAPIView`
+### `BaseAPIView` - `django_resaas.saas.core.base.views.BaseAPIView`
 
-A classe base de `ModelViewSet` — ver [BaseAPIView](base-api-view.md) para as suas
-responsabilidades (CRUD, filtros, ordenação, pesquisa, permissões, multi-tenancy, soft
-delete/restore/hard delete). Também neste módulo:
+The `ModelViewSet` base class - see [`docs/api/base-api-view.md`](base-api-view.md) for its
+responsibilities (CRUD, filters, ordering, search, permissions, multi-tenancy, soft
+delete/restore/hard delete). Also in this module:
 
-- `registerView(name=None, module=None)` — decorator de classe que regista uma classe de view no
-  `VIEW_REGISTRY` global (`django_resaas.core.base.registry.VIEW_REGISTRY`), indexado por
-  `module` (por omissão: o pacote de topo da classe) e `name` (por omissão: o nome da classe, em
-  minúsculas, com o sufixo `APIView` removido, pluralizado com um `s` no fim). Este registo é o
-  que `core.utils.autoload_urls.build_saas_urls()` percorre para construir o router
-  automaticamente — ver [Criar um novo recurso](../development/creating-resource.md) para um
-  exemplo de utilização completo.
+-   `register_view(name=None, module=None)` - class decorator that registers a view class into the
+    global `VIEW_REGISTRY` (`django_resaas.saas.core.base.registry.VIEW_REGISTRY`), keyed by
+    `module` (default: the class's top-level package) and `name` (default: the class name,
+    lowercased, `APIView` suffix stripped, pluralized with a trailing `s`). This registry is what
+    `core.utils.autoload_urls.build_saas_urls()` walks to build the router automatically - see
+    [`docs/development/creating-resource.md`](../development/creating-resource.md) for a full
+    usage example.
 
-### `HasAppPermission` e afins — `core/base/permissions.py`
+    `registerView` is the same decorator under its original (camelCase) name. It is a
+    supported alias (`registerView is register_view`), kept because applications decorate
+    their views with it; new code and the scaffold use `register_view`.
 
-- `HasAppPermission` — uma `BasePermission` do DRF. Lê `permission_codename` da view e delega em
-  `check_permission()`.
-- `check_permission(request, role)` — a verificação de autorização em si: exige um utilizador
-  autenticado mais um contexto de tenant completo no pedido (`entity_type_id`, `entity_id`,
-  `branch_id`, `group_id`, `lang_id`), depois verifica numa única query se o `BranchUserGroup` do
-  utilizador concede uma permissão com esse codename para a branch/entity/entity_type atuais.
-- `hasApp(codigo)` — decorator de método; devolve 403 a menos que a app `codigo` dada esteja ativa
-  (`EntityApp`, `state='Active'`) para a entidade do pedido.
+### `HasAppPermission` and friends - `django_resaas.saas.core.base.permissions.py`
 
-  > [!WARNING]
-  > Problema conhecido: filtra por `app__codigo`, mas `django_resaas.models.app.App` não tem
-  > nenhum campo `codigo` — chamar este decorator levantaria `FieldError`. Não tem nenhum
-  > ponto de chamada no código atual, pelo que isto nunca surgiu na prática; fica sinalizado
-  > aqui em vez de corrigido, já que corrigir implicaria adivinhar o nome/semântica do campo
-  > pretendido (fora do âmbito de uma passagem só de documentação). Usa a verificação real de
-  > ativação de módulo (`EntityApp.objects.filter(entity__id=..., app__name=module,
-  > state="Active")`, ver [BaseAPIView#module-activation](base-api-view.md#module-activation))
-  > em vez disto.
-- `hasPermission(role=None)` — decorator de método que envolve `check_permission()`, devolvendo
-  uma resposta 403 `fail()` em vez de levantar.
-- `isPermited(request=None, role=None)` — um alias fino para `check_permission()`.
+-   `HasAppPermission` - a DRF `BasePermission`. Reads `permission_codename` off the view and
+    delegates to `check_permission()`.
+-   `check_permission(request, role)` - the actual authorization check: requires an authenticated
+    user plus a full tenant context on the request (`entity_type_id`, `entity_id`, `branch_id`,
+    `group_id`, `lang_id`), then checks in one query whether the user's `BranchUserGroup` grants a
+    permission with that `codename` for the current branch/entity/entity_type.
+-   `hasApp(codigo)` - method decorator; 403s unless the given app `codigo` is active
+    (`EntityApp`, `state='Active'`) for the request's entity.
 
-## `resaas_action` — `django_resaas.core.decorators.action.resaas_action`
+    > [!WARNING]
+    > Known issue: it filters on `app__codigo`, but `django_resaas.saas.models.app.App` has no
+    > `codigo` field - calling this decorator would raise `FieldError`. It has zero call
+    > sites in the current codebase, so this hasn't surfaced; flagging it here rather than
+    > fixing it, since fixing would mean guessing at the intended field name/semantics (out
+    > of scope for a docs-only pass). Use the real module-activation check
+    > (`EntityApp.objects.filter(entity__id=..., app__name=module, state="Active")`, see
+    > [BaseAPIView#module-activation](base-api-view.md#module-activation)) instead.
+-   `hasPermission(role=None)` - method decorator wrapping `check_permission()`, returning a 403
+    `fail()` response instead of raising.
+-   `isPermited(request=None, role=None)` - a thin alias for `check_permission()`.
+
+## Entitlements - `django_resaas.saas.core.entitlements`
+
+-   `has_feature(request_or_context, feature)` / `require_feature(...)`: 403 `feature_not_available`.
+-   `get_capacity(request_or_context, capacity)`: returns an `int`, or `None` for no limit.
+-   `require_capacity(request_or_context, capacity, current=None, adding=1)`: 403 `capacity_exceeded`.
+-   `has_module(request_or_context, module)`, `get_usage(...)`, `snapshot(...)`.
+-   `EntitlementProvider` (the interface), `SettingsEntitlementProvider` (the default) and
+    `EntitlementContext(entity_type_id, entity_id, branch_id)`.
+-   The exceptions `FeatureNotAvailable` and `CapacityExceeded` (`ResaasAPIException`, 403).
+
+Settings: `RESAAS_ENTITLEMENTS`, `RESAAS_ENTITLEMENT_PROVIDER`. See
+[Entitlements](../security/entitlements.md).
+
+## `resaas_action` - `django_resaas.saas.core.decorators.action.resaas_action`
 
 ```python
 @resaas_action(*, methods=None, detail=False, label=None, icon=None, tooltip=None,
@@ -83,45 +99,44 @@ delete/restore/hard delete). Também neste módulo:
                 url_path=None, url_name=None)
 ```
 
-Declara uma action personalizada numa `ViewSet`/`BaseAPIView`, sobrepondo metadados RESAAS
-(label, ícone, tooltip, posição, ordem, visibilidade, se o frontend deve pedi-la automaticamente)
-sobre o próprio decorator `@action` do DRF. O nome do método decorado torna-se o nome da action e
-(salvo sobreposição) o caminho/nome de URL e a base do codename de permissão. O decorator em si
-não escreve na base de dados — os metadados ficam guardados na função como `_resaas_action` e são
-persistidos pelo `ActionSyncService` (ver
-[Comandos de gestão](../development/management-commands.md#sync_actions)), que é o que faz a
-action aparecer no output `actions`/`permissions.custom` do `ResaasSchemaBuilder` (ver
-[O contrato Schema 1.0](schema-contract.md)).
+Declares a custom action on a `ViewSet`/`BaseAPIView`, layering RESAAS metadata (label, icon,
+tooltip, position, order, visibility, whether the frontend should auto-request it) on top of DRF's
+own `@action` decorator. The decorated method's name becomes the action name and (unless
+overridden) the URL path/name and the permission codename base. The decorator itself does not
+write to the database - metadata is stashed on the function as `_resaas_action` and persisted by
+`ActionSyncService` (see [`docs/development/management-commands.md`](../development/management-commands.md#sync_actions)),
+which is what makes the action show up in `ResaasSchemaBuilder`'s `actions`/`permissions.custom`
+output (see [`docs/api/schema-contract.md`](schema-contract.md)).
 
-## `ResaasSchemaBuilder` — `django_resaas.core.schema.ResaasSchemaBuilder`
+## `ResaasSchemaBuilder` - `django_resaas.saas.core.schema.ResaasSchemaBuilder`
 
 ```python
-from django_resaas.core.schema import ResaasSchemaBuilder
+from django_resaas.saas.core.schema import ResaasSchemaBuilder
 ```
 
-Transforma um model no JSON versionado "Schema 1.0" consumido por frontends. A sua forma exata de
-output, política de versionamento e semântica de merge estão documentadas separadamente em
-[O contrato Schema 1.0](schema-contract.md) — esta entrada existe só para apontar para o caminho
-de import correto.
+Turns a model into the versioned "Schema 1.0" JSON contract consumed by frontends. Its exact
+output shape, versioning policy, and merge semantics are documented separately in
+[`docs/api/schema-contract.md`](schema-contract.md) - this entry exists only to point at the
+correct import path.
 
 ## `django_resaas.models`
 
-`src/django_resaas/models/__init__.py` reexporta um subconjunto pequeno e específico dos ~25
-models nesse pacote:
+`src/django_resaas/models/__init__.py` re-exports a small, specific subset of the ~25 models in
+that package:
 
 ```python
 from django_resaas.models import Document, Person, EntityTypeGroup, CorsAllowedOrigin, ModelExtraAction
 ```
 
-Todos os outros models são importados do seu próprio módulo — ex.:
+Every other model is imported from its own module - e.g.:
 
 ```python
-from django_resaas.models.user import User
-from django_resaas.models.group import Group
-from django_resaas.models.entity import Entity
-from django_resaas.models.branch import Branch
+from django_resaas.saas.models.user import User
+from django_resaas.saas.models.group import Group
+from django_resaas.saas.models.entity import Entity
+from django_resaas.saas.models.branch import Branch
 ```
 
-Não há nenhuma regra documentada para o motivo de estes cinco serem reexportados e os restantes
-não; tratar isto como comportamento já existente a preservar — não confiar que mais models sejam
-acrescentados a essa lista sem antes verificar `models/__init__.py`.
+There is no documented rule for why those five are re-exported and the rest aren't; treat it as
+existing behavior to preserve; don't rely on more models being added to that list without
+checking `models/__init__.py` first.

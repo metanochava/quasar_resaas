@@ -12,6 +12,10 @@ export const JSONSafeParse = function (value) {
 
 
 
+/**
+ * @deprecated No caller in quasar_resaas or its applications; it is the only
+ * user of `figlet`. Kept for compatibility, to be removed in a later release.
+ */
 export function ascii(text, font = 'Standard') {
   return figlet.textSync(text, { font })
 }

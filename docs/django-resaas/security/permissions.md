@@ -1,18 +1,18 @@
-# Permissões
+# Permissions
 
-O backend é a autoridade final para autorização.
+The backend is the final authority for authorization.
 
-## Processo
+## Process
 
-1. Identificar a action da view.
-2. Converter a action num prefixo de permissão.
-3. Obter o nome técnico do model.
-4. Construir o codename.
-5. Verificar com `isPermited()`.
+1.  Identify the view's action.
+2.  Convert the action into a permission prefix.
+3.  Get the model's technical name.
+4.  Build the codename.
+5.  Check it with `isPermited()`.
 
-Exemplo:
+Example:
 
-```text
+``` text
 create + patient -> add_patient
 update + patient -> change_patient
 destroy + patient -> delete_patient
@@ -20,199 +20,227 @@ destroy + patient -> delete_patient
 
 ## Cache
 
-Uma cache por pedido evita verificações repetidas do mesmo codename durante o mesmo pedido.
+A per-request cache can avoid repeated checks of the same codename
+during the same request.
 
-## Perfis-modelo (`group_creator`)
+## Profile templates (`group_creator`)
 
-Os módulos trazem perfis por omissão (Groups com um conjunto de permissões) através de
-`saas/core/utils/group_creator.py`, chamado no seu `post_migrate` (ex.: `saude/apps.py` com
-`saude/profiles.py`):
+Modules ship default profiles (Groups with a default permission set) through
+`saas/core/utils/group_creator.py`, called from their `post_migrate` (e.g.
+`saude/apps.py` with `saude/profiles.py`):
 
 ```python
 report = group_creator([{"name": "Registered Nurse", "permissions": ["view_paciente", "add_dadovital"]}],
                        rename_from={"Registered Nurse": "Enfermeiro"})
 ```
 
-- **Idempotente e aditivo.** Um Group que já existe (pelo nome) é reutilizado, nunca duplicado; `rename_from`
-  renomeia um nome antigo no lugar (mesmo `id`, relações mantidas). Aceita um nome antigo ou uma **lista**
-  (ex.: `{"Doctor": ["General Practitioner", "Médico Geral"]}`): o primeiro que existir é renomeado. As permissões por omissão são
-  **acrescentadas**; as que um administrador juntou nunca são retiradas.
-- **Só codenames reais.** Um codename que não existe **não é criado nem atribuído**. Fica registado num aviso
-  e listado no relatório devolvido (`permissions_missing`). O relatório tem também `groups_created`,
-  `groups_reused`, `groups_renamed`, `permissions_assigned` e `permissions_already_assigned` por perfil.
-- **Ordem.** As permissões que o próprio módulo cria (ex.: de dashboards) têm de existir antes do seed dos
-  perfis: ligar esse receiver de `post_migrate` primeiro.
-- Os perfis são **Groups globais** ligados ao EntityType como modelos (ver *Gestão das permissões de grupo*):
-  alterar as suas permissões é uma operação de nível plataforma.
+- **Idempotent and additive.** An existing Group (by name) is reused, never duplicated; `rename_from`
+  renames an old name in place (same `id`, relations kept). It accepts one old name or a **list**
+  (e.g. `{"Doctor": ["General Practitioner", "Médico Geral"]}`): the first that exists is renamed. Default permissions are **added**; permissions
+  an administrator added are never removed.
+- **Real codenames only.** A codename that doesn't exist is **not created and not assigned**. It is logged as
+  a warning and listed in the returned report (`permissions_missing`). The report also has `groups_created`,
+  `groups_reused`, `groups_renamed`, `permissions_assigned` and `permissions_already_assigned` per profile.
+- **Ordering.** Permissions a module creates itself (e.g. dashboard permissions) must exist before its
+  profiles are seeded: connect that `post_migrate` receiver first.
+- Profiles are **global Groups** linked to the EntityType as templates (see *Managing group permissions*):
+  changing their permissions is a platform-level operation.
 
-## Gestão das permissões de grupo
+## Managing group permissions
 
-Os registos `Group` são **globais**: o mesmo grupo (ex.: o `Admin` do bootstrap) pode estar ligado a
-várias Entities (`EntityGroup`) e ser modelo de um EntityType (`EntityTypeGroup`). Alterar as
-permissões de um grupo altera-as em todos os sítios onde está ligado. Por isso
-`POST auth/permissions/setGroupPermissions/` (`PermissionAPIView`, corpo
-`{"group": <id>, "permissions": [<id>, ...]}`, substitui a lista inteira) é **PROTEGIDO** e verifica,
-por esta ordem:
+`Group` rows are **global**: the same group (e.g. the bootstrap `Admin`) can be linked to several
+Entities (`EntityGroup`) and used as an EntityType template (`EntityTypeGroup`). Changing a group's
+permissions changes them everywhere it is linked. For that reason `POST auth/permissions/setGroupPermissions/`
+(`PermissionAPIView`, body `{"group": <id>, "permissions": [<id>, ...]}`, replaces the whole list)
+is **PROTECTED** and checks, in order:
 
-1. `change_group` no contexto assinado actual, senão `403 permission_denied`.
-2. Sem `change_entitytype` (nível plataforma, que por omissão só o **Root** tem), o grupo tem de:
-   - pertencer à Entity actual (`EntityGroup`), senão `404 group_not_in_entity`. Um grupo de outra
-     Entity não é revelado.
-   - ser `editable`, senão `403 group_not_editable`. Só um grupo que uma Entity cria para si
-     (`EntityAPIView.createGroup`) tem `editable=True`. Os grupos do bootstrap e os grupos-modelo
-     não têm, e o cliente não pode mudar a marca (só de leitura no `GroupSerializer`).
-     Os grupos que já existiam podem ser marcados com `manage.py mark_editable_groups`
-     (simulação por omissão).
-   - não ser partilhado com outra Entity nem ser grupo-modelo de um EntityType, senão
-     `403 group_shared`.
-3. **Sem escalada por delegação.** Todas as permissões que o pedido acrescenta **ou retira** têm de
-   estar no grupo activo de quem faz o pedido, senão `403 permission_not_held` com
-   `error.details.permissions` (ids). As permissões que a lista mantém sem alteração não são
-   verificadas, porque o ecrã reenvia a lista inteira.
+1. `change_group` in the current signed context, otherwise `403 permission_denied`.
+2. Without `change_entitytype` (platform level, which only **Root** holds by default), the group must:
+   - belong to the current Entity (`EntityGroup`), otherwise `404 group_not_in_entity`. A group of
+     another Entity is not revealed.
+   - be `editable`, otherwise `403 group_not_editable`. Only a group an Entity creates for itself
+     (`EntityAPIView.createGroup`) is `editable=True`. Bootstrap and template groups are not, and
+     clients cannot set the flag (read-only in `GroupSerializer`). Groups that
+     existed before this rule can be marked with `manage.py mark_editable_groups`
+     (dry run by default).
+   - not be shared with another Entity nor be an EntityType template, otherwise `403 group_shared`.
+3. **No escalation by delegation.** Without `change_entitytype`, every permission the request adds
+   **or removes** must be held by the caller's active group, otherwise `403 permission_not_held`
+   with `error.details.permissions` (ids). Permissions the list keeps unchanged are not checked,
+   because the screen sends the whole list back. Platform level (`change_entitytype`, Root by
+   default) may grant or revoke **any** permission on any group, including permissions its own
+   group lacks (e.g. ones a module created after Root was set up). The same applies to
+   `addPermission` / `removePermission` and to the profile import/export of an EntityType, which
+   still refuses to create or grant `change_entitytype` / Root itself.
 
-A alteração corre numa transacção com a linha do grupo bloqueada. A excepção do Root vem da
-**permissão** `change_entitytype`, nunca do nome do grupo.
+The change runs in a transaction with the group row locked. The Root exception is carried by the
+`change_entitytype` **permission**, never by the group's name.
 
-O catálogo de permissões (`auth/permissions/`) pode ser listado por qualquer utilizador autenticado.
-Criar, alterar ou apagar um `Permission` exige `add_permission` / `change_permission` /
+The permission catalogue itself (`auth/permissions/`) can be listed by any authenticated user.
+Creating, changing or deleting a `Permission` row needs `add_permission` / `change_permission` /
 `delete_permission`.
 
-Os perfis de um utilizador na Branch actual gerem-se em `users/{id}/addGroup/` e `removeGroup/`
-(`UserAPIView`, com verificação de permissão e de tenant).
+A user's profiles in the current Branch are managed by `users/{id}/addGroup/` and `removeGroup/`
+(`UserAPIView`, permission- and tenant-checked).
 
-### Os próprios grupos (`auth/groups/`)
+### Groups themselves (`auth/groups/`)
 
-O `GroupAPIView` aplica as mesmas regras (`saas/core/services/group_access_service.py`). Cada acção
-exige a sua permissão no contexto actual. Uma acção sem permissão mapeada é recusada.
+`GroupAPIView` applies the same rules (`saas/core/services/group_access_service.py`). Every action
+needs its permission in the current context. An action without a mapped permission is denied.
 
-| Acção | Permissão | Âmbito |
+| Action | Permission | Scope |
 |---|---|---|
-| `GET auth/groups/` | `list_group` | os grupos da Entity actual (todos, ao nível plataforma) |
-| `GET auth/groups/{id}/`, `{id}/permissions/` | `view_group` | idem; grupo de outra Entity → `404` |
-| `POST auth/groups/` | `add_group` | sem nível plataforma, o grupo novo fica ligado à Entity actual e às suas Branches e com `editable=True` |
-| `PUT/PATCH auth/groups/{id}/` | `change_group` | grupo alterável (regra 2 acima) |
-| `DELETE auth/groups/{id}/` | `delete_group` | grupo alterável; nunca o grupo activo de quem pede (`400 cannot_delete_active_group`) |
-| `POST {id}/addPermission/` | `change_group` | grupo alterável. Um codename que já existe fora do content type `custom` → `409 permission_codename_exists` (a autorização compara codenames, por isso daria a capacidade real). Criar uma permissão custom nova exige `add_permission`; juntar uma custom já existente é uma atribuição (regra 3). |
-| `POST {id}/removePermission/` | `change_group` | grupo alterável; retirar exige ter a permissão (regra 3) |
-| `GET {id}/permissions_csv/` | `view_group` | grupo visível; CSV `app, model, codename, name` (UTF-8 com BOM); células que começam por `= + - @` levam `'` à frente (sem fórmulas na folha de cálculo) |
-| `GET {id}/permissions_pdf/` | `view_group` | grupo visível; o PDF de lista genérico (`django_resaas/pdf/list.html`) com o branding da Entity |
-| `POST {id}/import_permissions/` (multipart `file`, `mode=add\|replace`) | `change_group` | grupo alterável (regra 2) + sem escalada (regra 3) em cada permissão acrescentada **ou retirada** |
+| `GET auth/groups/` | `list_group` | the current Entity's groups (all groups at platform level) |
+| `GET auth/groups/{id}/`, `{id}/permissions/` | `view_group` | same; another Entity's group → `404` |
+| `POST auth/groups/` | `add_group` | without platform level, the new group is linked to the current Entity and its Branches and is `editable=True` |
+| `PUT/PATCH auth/groups/{id}/` | `change_group` | changeable group (rule 2 above) |
+| `DELETE auth/groups/{id}/` | `delete_group` | changeable group; never the caller's active group (`400 cannot_delete_active_group`) |
+| `POST {id}/addPermission/` | `change_group` | changeable group. A codename that already exists outside the `custom` content type → `409 permission_codename_exists` (authorization matches codenames, so it would grant the real capability). Creating a new custom permission needs `add_permission`; adding an existing custom one is a grant (rule 3). |
+| `POST {id}/removePermission/` | `change_group` | changeable group; revoking needs the permission to be held (rule 3) |
+| `GET {id}/permissions_csv/` | `view_group` | visible group; CSV `app, model, codename, name` (UTF-8 with BOM); cells starting with `= + - @` are prefixed with `'` (no spreadsheet formulas) |
+| `GET {id}/permissions_pdf/` | `view_group` | visible group; the generic list PDF (`django_resaas/pdf/list.html`) with the Entity's branding |
+| `POST {id}/import_permissions/` (multipart `file`, `mode=add\|replace`) | `change_group` | changeable group (rule 2) + no escalation (rule 3) on every permission added **or removed** |
 
-**Import CSV** (`saas/core/services/group_permissions_io_service.py`): a coluna
-`codename` é obrigatória; `app` desfaz a ambiguidade de um codename que existe em várias
-apps (ex.: `view_group` em `django_resaas` e `auth`). O ficheiro é validado **antes** de
-qualquer alteração. Uma linha desconhecida ou ambígua devolve `400 invalid_rows` com
-`error.details.rows` (`{linha: [mensagem]}`), e nada é aplicado. `mode=add` (por omissão)
-só acrescenta; `replace` deixa o grupo exactamente com as permissões do ficheiro. Os
-limites são 1 MB e 5000 linhas, em UTF-8. A resposta é
-`{mode, added, removed, unchanged, total}`. A alteração fica auditada
-(`GROUP_PERMISSIONS_IMPORTED`). Um ficheiro descarregado com `permissions_csv` pode ser
-editado e importado de volta.
+**CSV import** (`saas/core/services/group_permissions_io_service.py`): a `codename`
+column is required; `app` disambiguates a codename that exists in several apps
+(e.g. `view_group` in `django_resaas` and `auth`). The file is validated **before**
+anything changes. Any unknown or ambiguous row returns `400 invalid_rows` with
+`error.details.rows` (`{line: [message]}`), and nothing is applied. `mode=add`
+(default) only adds; `replace` makes the group's permissions exactly the file's.
+The limits are 1 MB and 5,000 rows, in UTF-8. The answer is
+`{mode, added, removed, unchanged, total}`. The change is audited
+(`GROUP_PERMISSIONS_IMPORTED`). A file downloaded with `permissions_csv` can be
+edited and imported back.
 
-### Viewsets antigas: permissões por acção (`ActionPermissionMixin`)
+### Legacy viewsets: per-action permissions (`ActionPermissionMixin`)
 
-O `ExplicitAccessMixin` só decide quem **chega** a um `ModelViewSet` simples
-(autenticado, ou público para acções seguras listadas). O `ActionPermissionMixin`
-(`saas/core/base/access.py`) acrescenta o que o `BaseAPIView` faz: cada acção exige a
-sua permissão no contexto assinado, e uma acção não declarada é recusada (`403
-permission_denied`). As acções em `membership_actions` não exigem permissão, e o
-`get_queryset` da view tem de as limitar aos objectos do próprio utilizador.
-`is_membership_request()` pode decidir isto por pedido.
+`ExplicitAccessMixin` only decides who may **reach** a plain `ModelViewSet`
+(authenticated, or public for listed safe actions). `ActionPermissionMixin`
+(`saas/core/base/access.py`) adds what `BaseAPIView` does: every action needs its
+permission in the signed context, and an undeclared action is refused (`403
+permission_denied`). Actions listed in `membership_actions` need no permission,
+and the view's `get_queryset` must scope them to the caller's own objects.
+`is_membership_request()` can decide this per request.
 
-| View | Sem permissão (pertença) | Tudo o resto |
+```python
+class EntityAPIView(ActionPermissionMixin, ExplicitAccessMixin, viewsets.ModelViewSet):
+    membership_actions = ("list", "retrieve", "branchs", "apps", "models", "themeGet", ...)
+    action_permissions = {"update": "change_entity", "addUser": "add_entityuser", ...}
+```
+
+| View | No permission (membership) | Everything else |
 |---|---|---|
-| `EntityAPIView` (`django_resaas/entitys/`) | as Entities do próprio utilizador: lista, detalhe, branches, apps/modelos activos, leituras de branding; `create` (registo self-service de uma Entity **nova**) | a sua permissão (`change_entity`, `add_entityuser`, `add_entitygroup`, ...) **e** só na Entity do contexto assinado (outra dá `404`), excepto ao nível plataforma (`change_entitytype`) |
-| `EntityTypeAPIView` (`django_resaas/entitytypes/`) | **a lista do catálogo (`GET entitytypes/`) é PÚBLICA**, só leitura: tipos activos com `id`, `name`, `label`, `icon`, `ordem` (`EntityTypePublicSerializer`; menu de serviços do cabeçalho, ecrã de login) - todos os campos e os tipos apagados exigem `list_entitytype`; leituras de branding (públicas); o **próprio** EntityType: detalhe, apps, modelos, grupos, permissões; `user_entitys` (só as Entities próprias) | leituras de outros tipos e listas que atravessam tenants (`entitys`, `branches_map`) exigem `view_entitytype`; todas as escritas são de nível plataforma |
+| `EntityAPIView` (`django_resaas/entitys/`) | the caller's own Entities: list, detail, branches, active apps/models, branding reads; `create` (self-service registration of a **new** Entity) | its permission (`change_entity`, `add_entityuser`, `add_entitygroup`, ...) **and** only on the Entity of the signed context (another one is `404`), unless platform level (`change_entitytype`) |
+| `EntityTypeAPIView` (`django_resaas/entitytypes/`) | **the catalogue list (`GET entitytypes/`) is PUBLIC**, read only: live types with `id`, `name`, `label`, `icon`, `ordem` (`EntityTypePublicSerializer`; header services menu, login screen) - every field and deleted types need `list_entitytype`; branding reads (public); the caller's **own** EntityType: detail, apps, models, groups, permissions; `user_entitys` (own Entities only) | reads of other types and cross-tenant lists (`entitys`, `branches_map`) need `view_entitytype`; every write is platform level (`change_entitytype`, `add_/delete_entitytype`) |
 
-**Exportar / importar perfis de um EntityType** (EntityType -> perfis-modelo -> permissões, em
-JSON por causa do aninhamento; `saas/core/services/entity_type_profiles_io_service.py`, construído
-sobre as funções de grupo de `group_permissions_io_service`):
+**EntityType profiles export / import** (EntityType -> template profiles -> permissions, JSON
+because of the nesting; `saas/core/services/entity_type_profiles_io_service.py`, built on the
+group functions of `group_permissions_io_service`):
 
-| Acção | Permissão | Notas |
+| Action | Permission | Notes |
 |---|---|---|
-| `GET entitytypes/{id}/profiles_json/` | `view_entitytype` (ou o próprio tipo) | `{"format": "resaas.entity_type_profiles", "version": 1, "entity_type", "profiles": [{"name", "permissions": [{app, model, codename, name}]}]}` |
-| `GET entitytypes/{id}/profiles_pdf/` | `view_entitytype` (ou o próprio tipo) | PDF de lista genérico: perfil, app, modelo, codename, nome |
-| `POST entitytypes/{id}/import_profiles/` (multipart `file`, `mode=add\|replace`) | `change_entitytype` | ver abaixo |
+| `GET entitytypes/{id}/profiles_json/` | `view_entitytype` (or the caller's own type) | `{"format": "resaas.entity_type_profiles", "version": 1, "entity_type", "profiles": [{"name", "permissions": [{app, model, codename, name}]}]}` |
+| `GET entitytypes/{id}/profiles_pdf/` | `view_entitytype` (or own type) | generic list PDF: profile, app, model, codename, name |
+| `POST entitytypes/{id}/import_profiles/` (multipart `file`, `mode=add\|replace`) | `change_entitytype` | see below |
 
-Import: o ficheiro inteiro é validado primeiro (`400 invalid_profiles`,
-`error.details.profiles` com chave `profiles[i] <nome>`), e nada muda se algum perfil estiver
-errado. Um perfil que não existe é criado e ligado como modelo do tipo. O `mode` aplica-se a
-cada perfil **listado** (`add` / `replace` das suas permissões); os perfis fora do ficheiro nunca
-são tocados. As permissões podem ser `{"app", "codename"}` ou só o codename (`app` é necessário
-quando o codename existe em várias apps). **Recusado**: um perfil de plataforma (que tem
-`change_entitytype`, ex.: Root) e a própria permissão `change_entitytype`, porque um modelo é
-herdado por todas as Entities do tipo. As regras de grupo aplicam-se também a cada perfil: nenhuma
-permissão acrescentada ou retirada que quem importa não tenha. Limites: 2 MB, 200 perfis.
-Auditado (`ENTITY_TYPE_PROFILES_IMPORTED`). Um ficheiro exportado importa-se de volta sem
-alterações.
+Import: the whole file is validated first (`400 invalid_profiles`, `error.details.profiles`
+keyed `profiles[i] <name>`), and nothing changes if any profile is wrong. A profile that
+doesn't exist is created and linked as a template of the type. `mode` applies to each
+**listed** profile (`add` / `replace` its permissions); profiles not in the file are never
+touched. Permissions may be `{"app", "codename"}` or a bare codename (`app` is needed when
+the codename exists in several apps). **Refused**: a platform profile (one holding
+`change_entitytype`, e.g. Root) and the `change_entitytype` permission itself, because a
+template is inherited by every Entity of the type. The group rules also apply to every
+profile: no permission added or removed that the caller doesn't hold. Limits: 2 MB, 200
+profiles. Audited (`ENTITY_TYPE_PROFILES_IMPORTED`). The answer is
+`{mode, created, profiles: [{name, created, added, removed, total}]}`. An exported file
+imports back unchanged.
 
-O `EntityAPIView.addGroup` só liga um grupo que seja modelo do EntityType da própria
-Entity (senão `403 group_not_in_entity_type`, excepto ao nível plataforma). Ligar
-qualquer grupo, por exemplo o Root, permitiria aos administradores da Entity
-atribuí-lo através de `users/{id}/addGroup/`.
+`EntityAPIView.addGroup` only links a group that is a template of the Entity's own
+EntityType (`403 group_not_in_entity_type` otherwise, unless platform level).
+Linking any group, e.g. Root, would let the Entity's admins assign it through
+`users/{id}/addGroup/`.
 
-### Endpoints de deploy (`deploy/*`)
+### Deploy endpoints (`deploy/*`)
 
-**PÚBLICOS por desenho** (webhook do GitHub / operações), autenticados por um token
-partilhado: cabeçalho `X-Deploy-Token` (preferido) ou `?token=` (mantido para os
-webhooks existentes), comparado em tempo constante. **Não há token por omissão**: sem
-`settings.DEPLOY_TOKEN` todas as chamadas são recusadas. `deploy/github/` e
-`deploy/rollback/` alteram o servidor e são **só POST** (`405` em GET).
+**PUBLIC by design** (GitHub webhook / operations), authenticated by a shared
+token: header `X-Deploy-Token` (preferred) or `?token=` (kept for existing
+webhooks), compared in constant time. There is **no default token**: without
+`settings.DEPLOY_TOKEN` every call is refused. `deploy/github/` and
+`deploy/rollback/` change the server and are **POST only** (`405` on GET).
+`status`, `releases` and `logs` are read-only GETs.
 
-### Endpoints removidos
+> [!WARNING]
+> **Known issue (open):** `django_resaas/view.py` defines `deploy_status` and
+> `deploy_logs` twice, and the second, older definitions are the ones routed.
+> They compare `?token=` with `!=` (not in constant time, header ignored).
+> **Without `DEPLOY_TOKEN` they answer 200 to anonymous callers**, because
+> `None != None` is false: `deploy/status/` returns the deploy status and
+> `deploy/logs/` returns the deploy log. `deploy/github/`, `deploy/rollback/`
+> and `deploy/releases/` are not affected.
+>
+> Until this is fixed, set `DEPLOY_TOKEN` in every installation that includes
+> `django_resaas.urls`.
 
-Estes endpoints foram removidos porque actuavam sobre qualquer tenant sem verificar permissões, e
-nenhum consumidor os usava:
+### Removed endpoints
 
-| Removido | Usar em vez disso |
+These endpoints were removed because they acted on any tenant with no permission check, and no
+consumer used them:
+
+| Removed | Use instead |
 |---|---|
 | `POST auth/permissions/{id}/addToGroup/`, `removeFromGroup/` | `setGroupPermissions/` |
 | `POST auth/permissions/{id}/addToUser/`, `removeFromUser/` | `POST django_resaas/users/{id}/addGroup/`, `removeGroup/` |
-| `GET django_resaas/resaasapps/{app}/{model}/data/` | o `BaseAPIView` do próprio model (âmbito de tenant, permissões de acção e de campo) |
+| `GET django_resaas/resaasapps/{app}/{model}/data/` | the model's own `BaseAPIView` (tenant scope, action and field permissions) |
 
-Testes: `src/django_resaas/saas/tests/test_permission_api_security.py`, `test_group_api_security.py`.
+Tests: `src/django_resaas/saas/tests/test_permission_api_security.py`, `test_group_api_security.py`.
 
-## Permissões por campo
+## Field-level permissions
 
-Um model pode também proteger campos individuais (ex.: `Contract.salary`) com permissões próprias
-de `view`/`change`, por cima da permissão da action - ver
+A model can also gate individual fields (e.g. `Contract.salary`) with their own
+`view`/`change` permissions, layered on top of the action permission - see
 [Field-level permissions](field-permissions.md).
 
-## Módulo
+## Module
 
-Além da própria permissão, a aplicação verifica se o módulo correspondente está ativo para a
-entidade (ver [`../api/base-api-view.md`](../api/base-api-view.md)).
+Besides the permission itself, the application can check whether the
+corresponding module is active for the entity (see
+[`../api/base-api-view.md`](../api/base-api-view.md)).
 
-## Permissões de actions personalizadas e ownership
+## Custom action permissions and ownership
 
-Métodos `@resaas_action` ganham a sua própria `Permission`, sincronizada pelo `ActionSyncService`
-para dentro de `ModelExtraAction`. Dois campos decidem o que o mecanismo de sincronização pode e
-não pode tocar:
+`@resaas_action` methods get their own `Permission`, synced by
+`ActionSyncService` into `ModelExtraAction`. Two fields decide what the
+sync mechanism is and isn't allowed to touch:
 
-- **`managed_by`** (`"decorator"` ou `"manual"`, por omissão `"manual"`) — identifica *quem* é
-  dono de uma linha `ModelExtraAction`. O `ActionSyncService` escreve sempre `managed_by="decorator"`
-  para linhas que cria/atualiza a partir de um `@resaas_action`. Uma linha criada de qualquer outra
-  forma (admin, migração de dados, diretamente na shell) fica por omissão `"manual"` e passa então
-  a estar **fora do alcance do decorator**: se um `@resaas_action` for declarado com a mesma
-  identidade `app`/`model`/`action` de uma linha `managed_by="manual"` já existente, sincronizar
-  levanta `ImproperlyConfigured` em vez de a tomar silenciosamente. Para entregar uma action manual
-  ao decorator de propósito, definir `managed_by="decorator"` nessa linha primeiro.
-- **`permission_managed`** (booleano, por omissão `False`) — se a *própria Permission* (não só a
-  linha `ModelExtraAction`) foi criada pelo RESAAS e é por isso segura para apagar automaticamente
-  assim que a sua action ficar órfã (removida do código). Uma `Permission` já existente (criada
-  por um humano, ex. via admin) é detetada no momento da sincronização e marcada
-  `permission_managed=False`, pelo que a limpeza de órfãos remove a linha `ModelExtraAction` mas
-  **nunca** a `Permission`. Uma `Permission` criada via um `@resaas_action(permission=...)`
-  explícito (pensada para ser partilhada/reutilizada entre actions) também nunca é apagada na
-  limpeza, e o seu `.name` nunca é renomeado automaticamente — só uma permissão que segue a
-  convenção por omissão `{action}_{model}` tem o `.name` mantido em sincronia com o label/model da
-  action automaticamente.
+- **`managed_by`** (`"decorator"` or `"manual"`, default `"manual"`) -
+  identifies *who* owns a `ModelExtraAction` row. `ActionSyncService`
+  always writes `managed_by="decorator"` for rows it creates/updates from
+  a `@resaas_action`. A row created any other way (the admin, a data
+  migration, directly in the shell) defaults to `"manual"` and is then
+  **off-limits to the decorator**: if a `@resaas_action` is declared with
+  the same `app`/`model`/`action` identity as an existing `managed_by="manual"`
+  row, syncing raises `ImproperlyConfigured` instead of silently taking
+  it over. To hand a manual action to the decorator on purpose, set
+  `managed_by="decorator"` on that row yourself first.
+- **`permission_managed`** (boolean, default `False`) - whether the
+  *Permission itself* (not just the `ModelExtraAction` row) was created
+  by RESAAS and is therefore safe to delete automatically once its
+  action becomes an orphan (removed from code). A pre-existing
+  `Permission` (created by a human, e.g. via the admin) is detected at
+  sync time and marked `permission_managed=False`, so orphan cleanup
+  removes the `ModelExtraAction` row but **never** the `Permission`.
+  A `Permission` created via an explicit `@resaas_action(permission=...)`
+  (meant to be shared/reused across actions) is likewise never deleted
+  on cleanup, and its `.name` is never auto-renamed - only a permission
+  following the default `{action}_{model}` naming convention has its
+  `.name` kept in sync with the action's label/model automatically.
 
 > [!NOTE]
-> A remoção de órfãos só acontece em `ActionSyncService.sync_registry()` (o ponto de entrada
-> do sinal `post_migrate` / `manage.py sync_actions`), que agrega as actions declaradas por
-> todas as views registadas *antes* de decidir o que já não existe em lado nenhum do código.
-> Chamar `sync_view()` diretamente numa única view só faz upsert — nunca apaga, já que uma
-> view não tem forma de saber se uma view irmã do mesmo model ainda declara uma action que
-> ela própria não vê. Ver `src/django_resaas/tests/test_permissions.py` e
-> `test_action_sync.py` para o comportamento exato e testado.
+> Orphan removal itself only ever happens in `ActionSyncService.sync_registry()` (the
+> `post_migrate` signal / `manage.py sync_actions` entry point), which aggregates every
+> registered view's declared actions *before* deciding what no longer exists anywhere in
+> code. Calling `sync_view()` directly on a single view only upserts - it never deletes,
+> since one view has no way of knowing whether a sibling view of the same model still
+> declares an action it doesn't see. See `src/django_resaas/tests/test_permissions.py` and
+> `test_action_sync.py` for the exact, tested behavior.

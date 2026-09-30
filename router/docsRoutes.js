@@ -50,6 +50,7 @@ export const docsNav = {
     { section: 'Features', slug: 'features/errors-and-alerts', title: 'Errors and alerts' },
     { section: 'Features', slug: 'features/translation', title: 'Translation' },
     { section: 'Features', slug: 'features/custom-fields', title: 'Customizing fields' },
+    { section: 'Features', slug: 'features/entitlements', title: 'Entitlements' },
 
     { section: 'Routing', slug: 'routing/routes', title: 'Router' },
     { section: 'Layout', slug: 'layout/layout', title: 'Layout' },
@@ -82,17 +83,18 @@ export const docsNav = {
 
     { section: 'Security', slug: 'security/permissions', title: 'Permissions' },
     { section: 'Security', slug: 'security/field-permissions', title: 'Field-level permissions' },
+    { section: 'Security', slug: 'security/entitlements', title: 'Entitlements' },
 
     { section: 'Features', slug: 'features/soft-delete', title: 'Soft delete' },
     { section: 'Features', slug: 'features/files-pdf', title: 'Files & PDF' },
     { section: 'Features', slug: 'features/notifications', title: 'Notifications' },
 
     { section: 'Development', slug: 'development/creating-resource', title: 'Creating a resource' },
+    { section: 'Development', slug: 'development/building-a-module', title: 'Building a module' },
     { section: 'Development', slug: 'development/management-commands', title: 'Management commands' },
 
-    { section: 'Modules', slug: 'hr/overview', title: 'HR module' },
-
     { section: 'Deployment', slug: 'deployment/releases', title: 'Git flow & releases' },
+    { section: 'Deployment', slug: 'deployment/upgrading', title: 'Upgrading' },
     { section: 'Troubleshooting', slug: 'troubleshooting/common-errors', title: 'Common errors' }
   ]
 }

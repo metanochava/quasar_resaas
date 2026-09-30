@@ -45,6 +45,7 @@ export * from './stores/LanguageStore.js'
 export * from './stores/LoadStore.js'
 export * from './stores/PermissionStore.js'
 export * from './stores/DashboardStore.js'
+export * from './stores/EntitlementStore.js'
 
 
 // =========================================================

@@ -11,6 +11,23 @@
 
 Practical consequence: there's no semver. `npm install` pins the default branch's commit (usually `main`) at install time; to pick up new commits from the library you need `npm update quasar_resaas` (or remove `node_modules/quasar_resaas` and reinstall) — running `npm install` again isn't enough.
 
+### Releasing (Makefile)
+
+```bash
+make release-check   # clean tree -> npm test -> npm pack --dry-run (checks what would ship)
+make publish         # release-check -> version commit + tag (local) -> npm publish -> push
+```
+
+- **What ships.** `package.json` `files` lists the source directories the application compiles,
+  plus `docs/` (rendered by `DocsPage`). Specs, `tests/`, the `Makefile` and `vitest.config.js`
+  are left out. `release-check` fails if one of them would be packed, or if `index.js`,
+  `auto-imports.cjs` or `package.json` would be missing.
+- **Failure behaviour.** `make publish` pushes only after `npm publish` succeeds. If the publish
+  fails, it deletes the local tag, undoes the local version commit and stops. Nothing reached
+  GitHub or the registry.
+- `make push` / `make pushtag` (GitHub-only releases, the way applications consume the library
+  today) are unchanged.
+
 ## ES modules throughout
 
 The library's `package.json` declares:
