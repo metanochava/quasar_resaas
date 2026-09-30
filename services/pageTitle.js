@@ -19,7 +19,7 @@ import { tdc } from './translation'
 
 // ---------------- pure pieces (unit-tested) ----------------
 
-// Route titles are often built as tdc('View of') + ' ' + tdc('employee') at
+// Route titles are often built as tdc('View of') + ' ' + tdc(<model name>) at
 // module load - i.e. BEFORE the dictionary is loaded, so they arrive in
 // English. Re-translate at display time: the whole phrase when it is a
 // known key, otherwise the longest known word-sequences from the left.

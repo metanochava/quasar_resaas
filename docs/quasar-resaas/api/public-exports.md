@@ -17,7 +17,7 @@ consumer needs — previously there was no single list, only `index.js` itself.
 ## Stores (Pinia)
 
 `UserStore`, `EntityStore`, `EntityTypeStore`, `BranchStore`, `MenuStore`, `PersonStore`,
-`ActionStore`, `AlertStore`, `EmployeeStore`, `GroupStore`, `LanguageStore`, `LoadStore`,
+`ActionStore`, `AlertStore`, `GroupStore`, `LanguageStore`, `LoadStore`,
 `PermissionStore` — see [stores/base-store.md](../stores/base-store.md) for how they're built
 (`createBaseStore`) and [stores/user-context.md](../stores/user-context.md) for tenant context.
 
@@ -54,6 +54,8 @@ consumer needs — previously there was no single list, only `index.js` itself.
 ## Components / layouts
 
 - `Components` — the default export of `boot/components.js`, the full `s-*` component registry.
+- `FormTwo`, `AutoCrud`, `PersonProfilePanel` — also by name, for an application's own pages
+  (they are registered globally too, as `s-form-two` / `s-auto-crud`).
 - `MainLayout`, `AuthLayout` — page layouts.
 - `CrudPage` — the ready-made CRUD screen (wraps `AutoCrud`/`AutoTable`/`AutoFilter`/`FormModal`
   described in [development/creating-resource.md](../development/creating-resource.md)).
@@ -69,3 +71,15 @@ A few things are used internally or only reachable by relative import, not `impo
 - `./auto-imports` — a separate `exports` subpath (`quasar_resaas/auto-imports`), not part of the
   default import; see [deployment/build.md](../deployment/build.md).
 - `./core/*` — a separate `exports` subpath for direct file access under `core/`.
+
+## Removed: HR
+
+HR is no longer part of `quasar_resaas` (nor of `django_resaas`): it is an application's own
+module now (see [Building a module](../development/building-a-module.md)).
+
+- `useEmployeeStore` (and the other HR stores) are no longer exported: an application that
+  has the HR module imports them from its own folder.
+- `restRoutes` no longer contains the HR routes (`list_employee`, `view_hr_dashboard`, ...):
+  the application spreads its HR module's routes next to `restRoutes`.
+- New: `FormTwo`, `AutoCrud`, `PersonProfilePanel` named exports, so a module's pages import
+  everything from `'quasar_resaas'`.

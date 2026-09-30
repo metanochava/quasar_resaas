@@ -40,7 +40,6 @@ export * from './stores/LayoutSettingStore.js'
 
 export * from './stores/ActionStore.js'
 export * from './stores/AlertStore.js'
-export * from './stores/EmployeeStore.js'
 export * from './stores/GroupStore.js'
 export * from './stores/LanguageStore.js'
 export * from './stores/LoadStore.js'
@@ -142,6 +141,12 @@ export * from './boot/alerts.js'
 // =========================================================
 
 export { default as Components } from './boot/components.js'
+
+// Components also usable by name in an application's own pages (they are
+// registered globally too, as s-form-two / s-auto-crud)
+export { default as FormTwo } from './components/auto/FormTwo.vue'
+export { default as AutoCrud } from './components/auto/AutoCrud.vue'
+export { default as PersonProfilePanel } from './components/person/PersonProfilePanel.vue'
 
 
 export {

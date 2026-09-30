@@ -13,7 +13,7 @@ library, companion to the `django_resaas` backend.
 -   **Routing** — [Router](routing/routes.md)
 -   **Layout** — [Layout](layout/layout.md)
 -   **API** — [API & headers](api/backend-integration.md), [Public exports](api/public-exports.md)
--   **Development** — [Creating a new resource](development/creating-resource.md)
+-   **Development** — [Creating a new resource](development/creating-resource.md), [Building a module](development/building-a-module.md)
 -   **Deployment** — [Build](deployment/build.md)
 -   **Troubleshooting** — [Common errors](troubleshooting/common-errors.md)
 
