@@ -106,7 +106,7 @@ backend doesn't silently stay at the local default of 10.
     *before* reloading - the default DRF paginator 404s ("Invalid page")
     on a page number past the new last page, so reloading the same,
     now-empty page would turn a successful delete into a thrown error.
--   `getPdf(id)` / `getPdfList()` — request a PDF via `HTTPAuthBlob`, preferring
+-   `getPdf(id)` / `getpdf_list()` (old name `getPdfList()`, deprecated alias) — request a PDF via `HTTPAuthBlob`, preferring
     the schema-provided `pdfConfig.detail_endpoint`/`list_endpoint` when
     available (falling back to a computed `safeUrl`-based path otherwise), and
     store a `Blob` URL in `pdf` (used by `s-pdf-render*`).

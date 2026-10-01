@@ -125,7 +125,7 @@
     "detail_permission": "pdf_order",
     "list_permission": "pdf_list_order",
     "detail_endpoint": "custom/orders/{id}/pdf/",
-    "list_endpoint": "custom/orders/pdflist/"
+    "list_endpoint": "custom/orders/pdf_list/"
   },
   "module": "sales",
   "config": {

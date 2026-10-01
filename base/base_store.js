@@ -677,8 +677,8 @@ export function createBaseStore(name, config, extend = {}) {
         if (!id) return blob
       },
 
-      async getPdfList() {
-        const endpoint = this.pdfConfig?.list_endpoint || `${this.safeUrl}/pdflist`
+      async getpdf_list() {
+        const endpoint = this.pdfConfig?.list_endpoint || `${this.safeUrl}/pdf_list`
 
         const res = await HTTPAuthBlob.get(url({ type: 'u',
           url: endpoint, params: {
@@ -693,6 +693,11 @@ export function createBaseStore(name, config, extend = {}) {
         this.pdf = blob
         this.showPdf = true
 
+      },
+
+      // Deprecated: the name before the list-PDF action became `pdf_list`.
+      getPdfList(...args) {
+        return this.getpdf_list(...args)
       },
       
       // =========================

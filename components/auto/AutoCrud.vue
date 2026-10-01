@@ -21,7 +21,7 @@
     @request="onRequest"
     @create="openCreate"
     @pdf="openPdf"
-    @pdfList="openPdfList"
+    @pdf_list="openpdf_list"
     @edit="openEdit"
     @delete="onDelete"
     @filter="showFilter = true"
@@ -294,7 +294,7 @@ async function openPdf(row) {
   showPdfBlob(data)
 }
 
-async function openPdfList() {
+async function openpdf_list() {
   const pdf = schema.value?.pdf
 
   if (

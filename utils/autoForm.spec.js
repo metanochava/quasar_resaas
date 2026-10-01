@@ -115,7 +115,7 @@ const REALISTIC_DJANGO_SCHEMA = {
     detail_permission: 'pdf_product',
     list_permission: 'pdf_list_product',
     detail_endpoint: 'demo/products/{id}/pdf/',
-    list_endpoint: 'demo/products/pdflist/',
+    list_endpoint: 'demo/products/pdf_list/',
   },
   module: 'demo',
   config: {

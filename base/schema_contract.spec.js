@@ -158,7 +158,7 @@ describe('Schema 1.0 contract: fixture -> buildFormFromSchema -> BaseStore', () 
     expect(store.pagination.rowsPerPage).toBe(25)
   })
 
-  it('PDF config from the backend is respected by getPdf/getPdfList', async () => {
+  it('PDF config from the backend is respected by getPdf/getpdf_list', async () => {
     httpAuthBlobGet.mockResolvedValue({
       data: new Blob(['%PDF-1.4'], { type: 'application/pdf' }),
     })

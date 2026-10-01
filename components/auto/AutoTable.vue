@@ -125,7 +125,7 @@ const emit = defineEmits([
   'request',
   'create',
   'pdf',
-  'pdfList',
+  'pdf_list',
   'edit',
   'delete',
   'filter',
@@ -708,7 +708,7 @@ function filteredItems(row, field) {
               
               flat
               icon="download"
-              @click="emit('pdfList')"
+              @click="emit('pdf_list')"
               v-show="
                 schemaPdf.enabled &&
                 schemaPdf.list &&

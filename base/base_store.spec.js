@@ -448,7 +448,7 @@ describe('createBaseStore - schema-derived permissions/pdf config', () => {
       permissions: { change: 'change_product', add: 'add_product' },
       pdf: {
         detail_endpoint: 'demo/products/{id}/pdf/',
-        list_endpoint: 'demo/products/pdflist/',
+        list_endpoint: 'demo/products/pdf_list/',
       },
     })
 
@@ -485,7 +485,7 @@ describe('createBaseStore - schema-derived permissions/pdf config', () => {
   })
 })
 
-describe('createBaseStore - getPdf/getPdfList prefer the schema endpoint', () => {
+describe('createBaseStore - getPdf/getpdf_list prefer the schema endpoint', () => {
   it('getPdf uses schema.pdf.detail_endpoint (with {id} resolved) when available', async () => {
     httpAuthBlobGet.mockResolvedValue(makeBlobResponse())
 
@@ -516,7 +516,15 @@ describe('createBaseStore - getPdf/getPdfList prefer the schema endpoint', () =>
     expect(httpAuthBlobGet).toHaveBeenCalledWith('demo/products/42/pdf')
   })
 
-  it('getPdfList uses schema.pdf.list_endpoint when available', async () => {
+  it('getPdfList (the old name) still calls getpdf_list', async () => {
+    const useProductStore = createBaseStore('product-compat', { app: 'demo', model: 'Product' })
+    const store = useProductStore()
+    store.getpdf_list = vi.fn()
+    await store.getPdfList()
+    expect(store.getpdf_list).toHaveBeenCalled()
+  })
+
+  it('getpdf_list uses schema.pdf.list_endpoint when available', async () => {
     httpAuthBlobGet.mockResolvedValue(makeBlobResponse())
 
     const useProductStore = createBaseStore('product-e', {
@@ -524,14 +532,14 @@ describe('createBaseStore - getPdf/getPdfList prefer the schema endpoint', () =>
       model: 'Product',
     })
     const store = useProductStore()
-    store.pdfConfig = { list_endpoint: 'demo/products/pdflist/' }
+    store.pdfConfig = { list_endpoint: 'demo/products/pdf_list/' }
 
-    await store.getPdfList()
+    await store.getpdf_list()
 
-    // getPdfList() passes the current page/search/filters along too -
+    // getpdf_list() passes the current page/search/filters along too -
     // the mocked url() now mirrors the real one closely enough to show it
     expect(httpAuthBlobGet).toHaveBeenCalledWith(
-      'demo/products/pdflist/?page=1&page_size=10&search='
+      'demo/products/pdf_list/?page=1&page_size=10&search='
     )
     expect(store.showPdf).toBe(true)
   })
