@@ -31,8 +31,7 @@ consumer needs — previously there was no single list, only `index.js` itself.
   resource's RESAAS schema into form-ready fields (see
   [../../django-resaas/api/schema-contract.md](../../django-resaas/api/schema-contract.md)
   for the underlying contract).
-- `json` — `safeParse`, `JSONSafeParse`, `ascii` (**deprecated**: no caller; it is the only user of
-  `figlet` and will be removed in a later release).
+- `json` — `safeParse`, `JSONSafeParse`.
 - `text` — string helpers.
 - `profile` — user-profile helpers.
 - `schema` — `normalizeSchema`, `schemaPermission`, `canSchema`, `resolveActionEndpoint`,
@@ -73,6 +72,11 @@ A few things are used internally or only reachable by relative import, not `impo
 - `./auto-imports` — a separate `exports` subpath (`quasar_resaas/auto-imports`), not part of the
   default import; see [deployment/build.md](../deployment/build.md).
 - `./core/*` — a separate `exports` subpath for direct file access under `core/`.
+
+## Removed: `ascii()`
+
+`ascii()` (FIGlet text banners) was removed together with the `figlet` dependency: it was
+deprecated in 0.0.1422 and had no caller in the library or its applications.
 
 ## Removed: HR
 

@@ -272,7 +272,6 @@ Gives the resource list/pagination/filters, current item, and create/update/dele
 | PDF | `pdfjs-dist` |
 | Docs rendering | `marked` |
 | Storage security | `crypto-js` |
-| Misc | `figlet` (only `ascii()`, deprecated) |
 
 ---
 

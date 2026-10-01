@@ -76,7 +76,6 @@ const RESAAS_UTIL_IMPORTS = [
   'autoLabel',
 
   // Text
-  'ascii',
   'toPlural',
 
   // Routes
