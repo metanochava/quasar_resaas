@@ -70,8 +70,10 @@ the current `Group`:
 | Click | opens the list of the user's profiles (`User.Groups`); choosing one calls `GroupStore.select(group)` |
 | Double click | **reloads the current profile**: the same `GroupStore.select(User.Group)` — new signed context, permissions (`getUserPermissions()`) and menus (`getMenus()`) — e.g. after an administrator changed this profile's permissions |
 
-The click waits 250 ms before opening the list, so a double click does not also
-open it. While reloading the button shows its loading state. Tests:
+Both end on the **home page** (`router.push({ name: 'home' })`), after the
+permissions are reloaded: the page that was open may not be allowed with the
+new permissions. The click waits 250 ms before opening the list, so a double
+click does not also open it. While reloading the button shows its loading state. Tests:
 `components/GroupSelector.spec.js`.
 
 ## Resolving the tenant from a public domain (`EntityStore.getSettings()`)

@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { Quasar, QMenu } from 'quasar'
+import { Quasar, QMenu, QItem } from 'quasar'
 import { createPinia, setActivePinia } from 'pinia'
+
+const push = vi.fn().mockResolvedValue()
+vi.mock('vue-router', () => ({ useRouter: () => ({ push }) }))
 
 import GroupSelector from './GroupSelector.vue'
 import { useUserStore } from '../stores/UserStore'
@@ -31,6 +34,7 @@ beforeEach(() => {
   User.Groups = [{ id: 'g1', name: 'Doctor' }, { id: 'g2', name: 'Nurse' }]
   Group = useGroupStore()
   Group.select = vi.fn().mockResolvedValue()
+  push.mockClear()
 })
 
 afterEach(() => vi.useRealTimers())
@@ -63,5 +67,19 @@ describe('GroupSelector - click / double click', () => {
     expect(Group.select).toHaveBeenCalledTimes(1)
     expect(Group.select).toHaveBeenCalledWith(User.Group)
     expect(menuOpen(w)).toBe(false)
+    await vi.waitFor(() => expect(push).toHaveBeenCalledWith({ name: 'home' }))
+  })
+
+  it('choosing a profile in the list also ends on the home page', async () => {
+    const w = mountSelector()
+    await w.find('[data-test="group-selector"]').trigger('click')
+    vi.advanceTimersByTime(300)
+    await w.vm.$nextTick()
+
+    const items = w.findAllComponents(QItem)
+    expect(items.length).toBe(2)
+    await items[1].trigger('click')
+    await vi.waitFor(() => expect(Group.select).toHaveBeenCalledWith(User.Groups[1]))
+    await vi.waitFor(() => expect(push).toHaveBeenCalledWith({ name: 'home' }))
   })
 })

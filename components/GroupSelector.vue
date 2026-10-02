@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import { tdc } from '../services/translation'
 import { groupLabel } from '../utils/groupLabel'
 
@@ -20,7 +21,14 @@ const label = computed(() => groupLabel(User.Group))
 
 const groups = computed(() => User.Groups || [])
 
-const select = group => Group.select(group)
+const router = useRouter()
+
+// Choosing a profile (or reloading the current one) ends on the home page:
+// the page that was open may not be allowed with the new permissions.
+async function select (group) {
+  await Group.select(group)
+  await router.push({ name: 'home' })
+}
 
 // One click opens the list of profiles; a double click reloads the current
 // profile's permissions and menus - the same Group.select() as choosing it in
@@ -42,7 +50,7 @@ async function onDoubleClick () {
   if (!User.Group || reloading.value) return
   reloading.value = true
   try {
-    await Group.select(User.Group)
+    await select(User.Group)
   } finally {
     reloading.value = false
   }
