@@ -12,7 +12,9 @@ const props = defineProps({
 const router = useRouter()
 
 function onEventClick(event) {
-  if (props.widget.item_action) resolveDashboardAction(props.widget.item_action, { router, context: event })
+  if (!props.widget.item_action) return
+  dayOpen.value = false
+  resolveDashboardAction(props.widget.item_action, { router, context: event })
 }
 
 // Nenhuma biblioteca de calendário instalada no projecto - reutiliza
@@ -48,39 +50,70 @@ function eventColor(date) {
 }
 
 const selectedEvents = computed(() => eventsByDate.value[selectedDate.value] || [])
+
+// clicking a day selects it and, when it has events, opens their list
+const dayOpen = ref(false)
+function selectDay (date) {
+  if (!date) return
+  selectedDate.value = date
+  dayOpen.value = (eventsByDate.value[date] || []).length > 0
+}
+
+// "Appointments: 3" for the selected day ("label: n" reads right in every
+// language). The widget may name what it counts (widget.count_label, e.g.
+// "Appointments"); default "Events".
+const countLabel = computed(() => tdc(props.widget.count_label || 'Events'))
+const selectedDateLabel = computed(() => selectedDate.value.split('/').reverse().join('/'))
 </script>
 
 <template>
-  <div class="row q-gutter-md items-start">
+  <div class="column items-center">
     <q-date
-      v-model="selectedDate"
+      :model-value="selectedDate"
       :events="eventDates"
       :event-color="eventColor"
       minimal flat dense
-      class="col-auto"
+      @update:model-value="selectDay"
     />
 
-    <div class="col column q-gutter-xs">
+    <!-- the selected day: how many, and a way back to its list -->
+    <s-btn
+      flat dense no-caps class="q-mt-xs"
+      :color="selectedEvents.length ? 'primary' : 'grey'"
+      :disable="!selectedEvents.length"
+      data-test="calendar-day-header"
+      @click="dayOpen = true"
+    >
+      {{ selectedDateLabel }} ·
+      <span class="q-ml-xs" data-test="calendar-day-count">{{ countLabel }}: {{ selectedEvents.length }}</span>
+    </s-btn>
+  </div>
+
+  <!-- the day's list in a modal (the RESAAS modal pattern: static q-bar, the body scrolls) -->
+  <q-dialog v-model="dayOpen">
+    <s-modal-card :title="`${selectedDateLabel} · ${countLabel}: ${selectedEvents.length}`" icon="event" width="520px" @close="dayOpen = false">
       <div v-if="!selectedEvents.length" class="text-caption text-grey-6">
         {{ tdc('No events') }}
       </div>
+      <q-list v-else separator data-test="calendar-day-list">
+        <q-item
+          v-for="event in selectedEvents" :key="event.id"
+          :clickable="!!widget.item_action" v-ripple="!!widget.item_action"
+          @click="onEventClick(event)"
+        >
+          <q-item-section>
+            <q-item-label>{{ tdc(event.title) }}</q-item-label>
+            <q-item-label caption>
+              {{ (event.start || '').slice(11, 16) }}<span v-if="event.end"> - {{ (event.end || '').slice(11, 16) }}</span>
+            </q-item-label>
+          </q-item-section>
 
-      <q-item
-        v-for="event in selectedEvents" :key="event.id" dense class="q-px-none"
-        :clickable="!!widget.item_action" v-ripple="!!widget.item_action"
-        @click="onEventClick(event)"
-      >
-        <q-item-section>
-          <q-item-label>{{ tdc(event.title) }}</q-item-label>
-          <q-item-label caption>
-            {{ (event.start || '').slice(11, 16) }}<span v-if="event.end"> - {{ (event.end || '').slice(11, 16) }}</span>
-          </q-item-label>
-        </q-item-section>
-
-        <q-item-section v-if="event.status" side>
-          <q-badge :color="event.status_color || 'grey'">{{ tdc(event.status) }}</q-badge>
-        </q-item-section>
-      </q-item>
-    </div>
-  </div>
+          <q-item-section v-if="event.status" side>
+            <q-badge :color="event.status_color || 'grey'">{{ tdc(event.status) }}</q-badge>
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </s-modal-card>
+  </q-dialog>
 </template>
+
