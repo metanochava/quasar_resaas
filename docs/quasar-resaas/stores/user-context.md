@@ -60,6 +60,20 @@ Entity and makes no request, so a refused selection is never retried in a
 loop. This covers an Entity kept by a previous user's
 `logout(entityId)`. A network error or a `5xx` keeps the selection.
 
+### Switching profile (`GroupSelector`)
+
+The header's profile button (`components/GroupSelector.vue`, in `TopMenu`) shows
+the current `Group`:
+
+| Gesture | Effect |
+|---|---|
+| Click | opens the list of the user's profiles (`User.Groups`); choosing one calls `GroupStore.select(group)` |
+| Double click | **reloads the current profile**: the same `GroupStore.select(User.Group)` — new signed context, permissions (`getUserPermissions()`) and menus (`getMenus()`) — e.g. after an administrator changed this profile's permissions |
+
+The click waits 250 ms before opening the list, so a double click does not also
+open it. While reloading the button shows its loading state. Tests:
+`components/GroupSelector.spec.js`.
+
 ## Resolving the tenant from a public domain (`EntityStore.getSettings()`)
 
 `Entity.getSettings()` (`stores/EntityStore.js`) is a **different, earlier** tenant-resolution

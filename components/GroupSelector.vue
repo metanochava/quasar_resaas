@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onBeforeUnmount } from 'vue'
 import { tdc } from '../services/translation'
 import { groupLabel } from '../utils/groupLabel'
 
@@ -21,6 +21,34 @@ const label = computed(() => groupLabel(User.Group))
 const groups = computed(() => User.Groups || [])
 
 const select = group => Group.select(group)
+
+// One click opens the list of profiles; a double click reloads the current
+// profile's permissions and menus - the same Group.select() as choosing it in
+// the list. The first click waits a moment so a double click does not also
+// open the list.
+const DOUBLE_CLICK_MS = 250
+const menuOpen = ref(false)
+const reloading = ref(false)
+let clickTimer = null
+
+function onClick () {
+  clearTimeout(clickTimer)
+  clickTimer = setTimeout(() => { menuOpen.value = !menuOpen.value }, DOUBLE_CLICK_MS)
+}
+
+async function onDoubleClick () {
+  clearTimeout(clickTimer)
+  menuOpen.value = false
+  if (!User.Group || reloading.value) return
+  reloading.value = true
+  try {
+    await Group.select(User.Group)
+  } finally {
+    reloading.value = false
+  }
+}
+
+onBeforeUnmount(() => clearTimeout(clickTimer))
 </script>
 
 <template>
@@ -29,9 +57,14 @@ const select = group => Group.select(group)
     dense
 
     :label="minimenu ? label.charAt(0) : label"
+    :loading="reloading"
     class="full-width"
+    data-test="group-selector"
+    @click="onClick"
+    @dblclick="onDoubleClick"
   >
-    <q-menu fit>
+    <s-tooltip :delay="800">{{ tdc('Click: profiles · Double-click: reload permissions') }}</s-tooltip>
+    <q-menu v-model="menuOpen" fit no-parent-event>
       <q-list
         dense
         class="group-list rounded-borders"
