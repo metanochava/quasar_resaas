@@ -142,6 +142,27 @@ const routes = [
 See [Router](../routing/routes.md) for the full convention (`meta.title`,
 `requiresAuth`, `requiredRole`).
 
+## 6. Right menus (optional)
+
+`MainLayout`'s right drawer shows, next to a page, the component registered for that page's
+route name. The
+library only keeps that registry; the application fills it from one of its boot files:
+
+```js
+// src/boot/right_menus.js  (add 'right_menus' to quasar.config.js boot)
+import { useMenuStore } from 'quasar_resaas'
+import OrderRightMenu from 'src/pages/orders/RightMenu.vue'
+
+export default ({ store }) => {
+  const Menu = useMenuStore(store)
+  Menu.registerRightMenu('view_order', OrderRightMenu)
+}
+```
+
+An application without right menus does nothing here. (Before quasar_resaas 0.0.1424 the library
+imported `src/core/rightMenus` itself, so an application without that file failed to build with
+`Could not load src/core/rightMenus`.)
+
 ## Next
 
 Continue with [Quick start](quick-start.md) to define your first store and

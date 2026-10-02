@@ -13,15 +13,12 @@ export const useMenuStore = defineStore('menu', {
       this.rightMenus[name] = component
     },
 
+    // The application registers its own right menus (registerRightMenu)
+    // from one of its boot files. The library never imports application
+    // files: it used to import src/core/rightMenus here, which made every
+    // app without that file fail to build.
     init() {
-      if (this.initialized) return
-
       this.initialized = true
-
-      // 🔥 load menus here
-      import('src/core/rightMenus').then(({ setupRightMenus }) => {
-        setupRightMenus(this)
-      })
     }
   }
 })

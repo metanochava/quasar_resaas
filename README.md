@@ -88,18 +88,23 @@ See [Installation](docs/quasar-resaas/getting-started/installation.md).
 Register components in your Quasar app's boot files:
 
 ```js
-// boot/resaas.js
+// src/boot/resaas.js
 import { Components } from 'quasar_resaas'
+import { setPinia } from 'quasar_resaas/core/context'
 
-export default ({ app }) => {
-  app.use(Components)
+export default ({ app, store }) => {
+  Components({ app })   // a Quasar boot function: call it, do not app.use() it
+  setPinia(store)
 }
 ```
 
 ```js
 // quasar.config.js
-boot: ['resaas', 'login_boot', 'alerts', 'cripto']
+boot: ['resaas']
 ```
+
+The full sequence (environment, routes, right menus) is in
+[Installation](docs/quasar-resaas/getting-started/installation.md).
 
 `quasar_resaas` expects to run inside a Quasar CLI (Vite) app that already provides **Vue 3**, **Quasar**, **Pinia** and **Vue Router** — it doesn't bundle them.
 

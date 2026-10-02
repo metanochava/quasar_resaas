@@ -73,6 +73,12 @@ A few things are used internally or only reachable by relative import, not `impo
   default import; see [deployment/build.md](../deployment/build.md).
 - `./core/*` — a separate `exports` subpath for direct file access under `core/`.
 
+## Changed: right menus are registered by the application
+
+`useMenuStore().init()` no longer imports the application's `src/core/rightMenus`. An application
+with right menus registers them from a boot file with `useMenuStore().registerRightMenu(name,
+component)` — see [Installation](../getting-started/installation.md#6-right-menus-optional).
+
 ## Removed: `ascii()`
 
 `ascii()` (FIGlet text banners) was removed together with the `figlet` dependency: it was
