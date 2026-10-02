@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.1424",
+  "version": "0.0.1425",
   "description": "Quasar rest SaaS",
   "keywords": [
     "quasar",
@@ -83,6 +83,7 @@
     "happy-dom": "^20.11.10",
     "pinia": "^4.0.3",
     "vitest": "^4.1.11",
-    "vue": "^3.5.0"
+    "vue": "^3.5.0",
+    "vue-router": "^4.6.4"
   }
 }

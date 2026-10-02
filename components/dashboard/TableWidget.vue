@@ -23,6 +23,7 @@ const columns = computed(() => {
     field: c.name,
     align: c.align || 'left',
     sortable: !!c.sortable,
+    badge: c.badge || null,
   }))
 
   if (rowActions.value.length) {
@@ -31,6 +32,16 @@ const columns = computed(() => {
 
   return cols
 })
+
+// Columns the backend marks with `badge: {value: color}` render each value as
+// a coloured, translated label. Colors are Quasar brand names (positive,
+// warning, negative, info, ...), so they follow the backend Theme; a value
+// with no color of its own is grey.
+const badgeColumns = computed(() => columns.value.filter((c) => c.badge))
+
+const hasValue = (value) => value !== null && value !== undefined && value !== '' && value !== '-'
+
+const badgeColor = (column, value) => column.badge[value] || 'grey'
 
 function runRowAction(action, row) {
   resolveDashboardAction(action, {
@@ -76,6 +87,18 @@ function onRequest(evt) {
       <div class="full-width text-center text-grey-6 q-pa-md">
         {{ tdc('No data') }}
       </div>
+    </template>
+
+    <template v-for="col in badgeColumns" :key="col.name" #[`body-cell-${col.name}`]="cellProps">
+      <q-td :props="cellProps">
+        <q-badge
+          v-if="hasValue(cellProps.value)"
+          :color="badgeColor(col, cellProps.value)"
+          :label="tdc(String(cellProps.value))"
+          :data-test="`badge-${col.name}`"
+        />
+        <span v-else>-</span>
+      </q-td>
     </template>
 
     <template v-if="rowActions.length" #body-cell-__actions="cellProps">
