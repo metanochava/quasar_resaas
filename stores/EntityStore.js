@@ -65,7 +65,7 @@ export const useEntityStore = createBaseStore(
           const { data } = await HTTPClient.get(
             url({
               type: 'u',
-              url: 'site'
+              url: 'site/'
             })
           )
 
