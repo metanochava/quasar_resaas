@@ -162,11 +162,11 @@ export const usePermissionStore = createBaseStore(
         this.loadingPermission = true
 
         try {
-          const permissions = [
-            ...new Set(
-              this.groupPermissions.map((permission) => permission.id)
-            )
-          ]
+          // only what the user ticked / unticked ({add, remove}): the
+          // backend never removes a permission that is not listed, so an
+          // editor that loaded nothing (or a stale one) cannot wipe a group
+          const current = new Set(this.groupPermissions.map((permission) => permission.id))
+          const original = new Set(this.originalGroupPermissions.map((permission) => permission.id))
 
           await HTTPAuth.post(
             url({
@@ -175,7 +175,8 @@ export const usePermissionStore = createBaseStore(
             }),
             {
               group: this.group.id,
-              permissions
+              add: [...current].filter((id) => !original.has(id)),
+              remove: [...original].filter((id) => !current.has(id))
             }
           )
 

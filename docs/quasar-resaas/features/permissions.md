@@ -91,9 +91,18 @@ The real admin screen is `pages/permission/PermissionManager.vue`, bound to
     (checked/indeterminate) for the per-app and per-model checkboxes.
 -   `toggle(permission)` / `toggleModel()` / `toggleApp()` — change the
     selection **locally** only and mark the store `dirty`.
--   `saveGroupPermissions()` — sends the whole selection in one request,
-    `POST auth/permissions/setGroupPermissions/` (`{group, permissions}`);
-    `resetChanges()` discards it.
+-   `saveGroupPermissions()` — sends only the changes against what was
+    loaded, in one request: `POST auth/permissions/setGroupPermissions/`
+    (`{group, add, remove}`, the backend's delta mode). A permission the user
+    did not touch is never sent, so an editor that opened without the group's
+    current permissions can only add, never wipe. `resetChanges()` discards
+    the local changes.
+
+The group managers (`GroupManagerEntity.vue`, `GroupManagerEntityType.vue`)
+and `GroupSEPage.vue` load the group's current permissions from
+`GET auth/groups/{id}/permissions/` (`view_group`) - the group detail
+(`GroupSerializer`) does not carry them. If that load fails, the managers close
+the editor instead of showing an empty selection.
 
 On screen (`PermissionManager.vue`):
 

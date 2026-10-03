@@ -92,6 +92,39 @@ describe('a successful response', () => {
   })
 })
 
+describe('the status of a successful POST (201 / 202 / 204, never 200)', () => {
+  it('202: an operation with a result says "Processed successfully!"', () => {
+    Alert(response(202, { checked_in: true }, { method: 'post', url: '/api/saude/agendas/1/check_in/' }))
+
+    expect(toasts()[0].message).toBe('Processed successfully!')
+  })
+
+  it('204 says what the method did: POST processed, DELETE deleted, PATCH modified', () => {
+    Alert(response(204, '', { method: 'post', url: '/api/a/' }))
+    Alert(response(204, '', { method: 'delete', url: '/api/b/1/' }))
+    Alert(response(204, '', { method: 'patch', url: '/api/c/1/' }))
+
+    expect(toasts().map(t => t.message)).toEqual(['Processed successfully!', 'Deleted successfully!', 'Modified successfully!'])
+  })
+
+  it('signing in, refreshing the token, switching context, 2FA and OTP stay silent', () => {
+    for (const url of ['/api/login/', '/api/login/two_factor/', '/api/logout/', '/api/refresh_token/',
+      '/api/resaas/context/', '/api/two_factor/confirm/', '/api/register/otp/request/']) {
+      Alert(response(202, { ok: 1 }, { method: 'post', url }))
+    }
+
+    expect(toasts()).toEqual([])
+  })
+
+  it('a request can ask for no generic toast ({ silent: true }), but its alerts still show', () => {
+    Alert(response(202, { valid: true }, { method: 'post', url: '/api/x/validate/', silent: true }))
+    expect(toasts()).toEqual([])
+
+    Alert(response(202, { alerts: [{ level: 'warning', message: 'Careful.' }] }, { method: 'post', url: '/api/login/' }))
+    expect(toasts()[0].message).toBe('Careful.')
+  })
+})
+
 describe('a failed response', () => {
   const failure = (status, data, config) => ({ response: response(status, data, config) })
 

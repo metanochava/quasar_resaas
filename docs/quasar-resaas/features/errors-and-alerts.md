@@ -72,6 +72,31 @@ That history is shown by the **existing** header notification component
 (`HeaderNotifications`, "Alerts" tab: unread badge, filters, mark as read, remove, clear) — never
 add a second button, store or toast layer for this.
 
+## Generic success messages
+
+A successful write that carries no message of its own gets a short generic toast (toast only, not
+kept in the history), chosen from the status the backend answers (see the backend's
+*Errors and alerts*, "Success status codes"):
+
+| Status | Method | Toast |
+|---|---|---|
+| `201` | `POST` | Created successfully! |
+| `202` | `POST` | Processed successfully! |
+| `204` | `POST` / `DELETE` / `PATCH`·`PUT` | Processed / Deleted / Modified successfully! |
+| `200` | any | none (reads stay silent) |
+
+No generic toast for the sign-in and session plumbing — `login/` (and `login/two_factor/...`),
+`logout/`, `refresh_token/`, `resaas/context/`, `two_factor/...` and any `.../otp/...` path
+(`SILENT_PATHS` in `boot/alerts.js`); those screens give their own feedback. A request that is a
+check rather than an operation can opt out per call:
+
+```js
+await HTTPAuth.post(url({ type: 'u', url: 'django_resaas/ide/validate/' }), payload, { silent: true })
+```
+
+`silent` only suppresses the generic message: `alerts` in the body and `alert_success`-style keys
+are still shown. Covered by `boot/alertPipeline.spec.js`.
+
 ## Levels
 
 Backend levels (`success | info | warning | error`) are mapped to Quasar's own `Notify` types

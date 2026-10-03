@@ -125,6 +125,24 @@ const pushContractAlerts = (body, request) => {
   }
 }
 
+// Requests whose success needs no generic toast: signing in / out, refreshing the
+// token, switching the tenant context, 2FA and OTP steps. Their screens give their
+// own feedback. Matched on the path, so the API prefix does not matter.
+const SILENT_PATHS = [
+  /\/login\//,
+  /\/logout\/$/,
+  /\/refresh_token\/$/,
+  /\/resaas\/context\/$/,
+  /\/two_factor\//,
+  /\/otp\//,
+]
+
+const isSilent = (response) => {
+  if (response?.config?.silent) return true
+  const path = requestMeta(response)?.path || ''
+  return SILENT_PATHS.some(pattern => pattern.test(path))
+}
+
 /* =========================
    SUCCESS
 ========================= */
@@ -149,20 +167,30 @@ const AlertSuccess = (data) => {
   let go = false
   let generic = false
 
+  // The backend answers a successful POST with 201 (created), 202 (an operation
+  // with a result) or 204 (an operation with nothing to return) - never 200.
+  const method = String(data?.config?.method || '').toLowerCase()
+
   if (data?.status === 201) { sms = 'Created successfully!'; go = true; generic = true }
   if (data?.status === 202) { sms = 'Processed successfully!'; go = true; generic = true }
   if (data?.status === 203) { sms = 'Modified successfully!'; go = true; generic = true }
-  if (data?.status === 204) { sms = 'Deleted successfully!'; go = true; generic = true }
+  if (data?.status === 204) {
+    sms = method === 'post' ? 'Processed successfully!' : (method === 'delete' ? 'Deleted successfully!' : 'Modified successfully!')
+    go = true
+    generic = true
+  }
 
   // A write request (POST/PUT/PATCH/DELETE) answered with a plain 200 OK - DRF's
   // default for update/destroy - is covered by none of the codes above.
   if (!go && data?.status === 200) {
-    const method = String(data?.config?.method || '').toLowerCase()
-
     if (method === 'post')  { sms = 'Processed successfully!'; go = true; generic = true }
     if (method === 'put' || method === 'patch') { sms = 'Modified successfully!'; go = true; generic = true }
     if (method === 'delete') { sms = 'Deleted successfully!'; go = true; generic = true }
   }
+
+  // the generic message is feedback for a click: not for the sign-in / session
+  // plumbing, nor for a request that asked to stay quiet ({ silent: true })
+  if (generic && isSilent(data)) go = false
 
   // backend messages
   if (data?.data?.alert_success) { sms = data.data.alert_success; go = true; generic = false }

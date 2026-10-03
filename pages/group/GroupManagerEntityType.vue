@@ -212,14 +212,24 @@ async function openPermissions(group) {
     await Group.init()
     await Group.getById(group.id)
 
-    const { data } = await HTTPAuth.get(
-      url({
+    // the group detail (GroupSerializer) does not carry its permissions: they
+    // come from auth/groups/{id}/permissions/ - without them the editor opened
+    // with nothing checked and saving wiped what the profile had
+    const [available, own] = await Promise.all([
+      HTTPAuth.get(url({
         type: 'u',
         url: `django_resaas/entitytypes/${EntityType.form.id}/permissions`
-      })
-    )
+      })),
+      HTTPAuth.get(url({ type: 'u', url: `auth/groups/${group.id}/permissions/` }))
+    ])
 
-    permissions.value = data || []
+    permissions.value = available.data || []
+    Group.row.permissions = own.data || []
+  } catch {
+    // never leave an editor open on a partial load: saving would replace the
+    // profile's permissions with whatever was (not) loaded (the API funnel
+    // already showed the error)
+    permissionsModal.value = false
   } finally {
     ready.value = true
   }

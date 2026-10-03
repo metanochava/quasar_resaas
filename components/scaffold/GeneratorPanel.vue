@@ -459,7 +459,7 @@ export default {
         fields: this.normalizeFields(this.form.fields),
         actions: this.form.actions,
       }
-      const { data } = await HTTPAuth.post('django_resaas/scaffolds/preview/', payload)
+      const { data } = await HTTPAuth.post('django_resaas/scaffolds/preview/', payload, { silent: true })
       this.preview = data.data || data || { model: '', serializer: '', view: '' }
       this.tab = 'model'
 

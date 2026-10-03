@@ -170,7 +170,8 @@ export const useScaffoldIDEStore = defineStore('scaffoldIDE', {
 
       const { data } = await HTTPAuth.post(
         url({ type: 'u', url: 'django_resaas/ide/validate/', params: {} }),
-        { path: file.path, content: file.currentContent }
+        { path: file.path, content: file.currentContent },
+        { silent: true } // a check, not an operation: no generic toast
       )
 
       file.validation = data
