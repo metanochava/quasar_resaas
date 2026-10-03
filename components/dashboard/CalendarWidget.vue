@@ -124,9 +124,7 @@ const selectedDateLabel = computed(() => selectedDate.value.split('/').reverse()
           type="search"
           :placeholder="tdc('Search')"
           data-test="calendar-day-search"
-        >
-          <template #prepend><q-icon name="search" /></template>
-        </s-input>
+        />
       </template>
 
       <div class="col scroll" data-test="calendar-day-scroll">

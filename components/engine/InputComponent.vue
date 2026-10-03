@@ -16,7 +16,13 @@
     :standout="attrs.standout"
     :class="['s-input', attrs.class]"
   >
-    <template v-if="isPassword" #append>
+    <!-- the caller's own slots (append, prepend, before, after, hint, ...) reach
+         q-input; the built-in ones below only apply when the caller gives none -->
+    <template v-for="name in namedSlots($slots)" :key="name" #[name]="scope">
+      <slot :name="name" v-bind="scope || {}" />
+    </template>
+
+    <template v-if="isPassword && !$slots.append" #append>
       <q-icon
         :name="showPassword ? 'visibility_off' : 'visibility'"
         class="cursor-pointer"
@@ -24,7 +30,7 @@
       />
     </template>
 
-    <template v-if="attrs.type === 'search'" #prepend>
+    <template v-if="type === 'search' && !$slots.prepend" #prepend>
       <q-icon name="search" />
     </template>
 
@@ -103,6 +109,10 @@ export default defineComponent({
     // --------------------------
 
     const isPassword = computed(() => props.type === "password")
+
+    // every named slot the caller gives is passed on to q-input (default stays
+    // the plain <slot /> below); read on each render, so it follows the caller
+    const namedSlots = (all) => Object.keys(all).filter(name => name !== "default")
 
     const computedType = computed(() => {
       if (props.type === "password") {
@@ -204,6 +214,7 @@ export default defineComponent({
       localValue,
       showPassword,
       isPassword,
+      namedSlots,
       computedType,
       computedMask,
       computedRules,

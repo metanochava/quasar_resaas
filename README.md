@@ -324,7 +324,7 @@ Full technical documentation lives in [`docs/`](docs/quasar-resaas/README.md), s
 - [**Installation**](docs/quasar-resaas/getting-started/installation.md) · [Quick start](docs/quasar-resaas/getting-started/quick-start.md)
 - [Architecture](docs/quasar-resaas/architecture/overview.md) · [Data flow](docs/quasar-resaas/architecture/data-flow.md)
 - [BaseStore](docs/quasar-resaas/stores/base-store.md) · [UserStore & context](docs/quasar-resaas/stores/user-context.md)
-- [Form](docs/quasar-resaas/components/form.md) · [ActionForm](docs/quasar-resaas/components/action-form.md) · [AutoCrud](docs/quasar-resaas/components/auto-crud.md) · [s-btn](docs/quasar-resaas/components/button.md)
+- [Form](docs/quasar-resaas/components/form.md) · [ActionForm](docs/quasar-resaas/components/action-form.md) · [AutoCrud](docs/quasar-resaas/components/auto-crud.md) · [s-btn](docs/quasar-resaas/components/button.md) · [s-input](docs/quasar-resaas/components/input.md)
 - [Router](docs/quasar-resaas/routing/routes.md) · [Layout](docs/quasar-resaas/layout/layout.md)
 - [Permissions](docs/quasar-resaas/features/permissions.md) · [Translation](docs/quasar-resaas/features/translation.md) · [Customizing fields](docs/quasar-resaas/features/custom-fields.md)
 - [API & headers](docs/quasar-resaas/api/backend-integration.md) · [Public exports](docs/quasar-resaas/api/public-exports.md)
