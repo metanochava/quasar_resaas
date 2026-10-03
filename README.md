@@ -5,7 +5,7 @@
 [![npm](https://img.shields.io/npm/v/quasar_resaas?logo=npm&logoColor=white)](https://www.npmjs.com/package/quasar_resaas)
 [![Vue](https://img.shields.io/badge/vue-3-42b883?logo=vue.js&logoColor=white)](package.json)
 [![Quasar](https://img.shields.io/badge/quasar-2-1976D2?logo=quasar&logoColor=white)](package.json)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License: Commercial](https://img.shields.io/badge/license-commercial-blue.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-active%20development-orange)](https://github.com/metanochava/quasar_resaas)
 
 ---
@@ -29,6 +29,7 @@ If you're consuming a [`django_resaas`](https://github.com/metanochava/django_re
 - [Architecture](#-architecture)
 - [Quick example](#-quick-example)
 - [Tenant context & headers](#-tenant-context--headers)
+- [Entitlements](#-entitlements)
 - [Documentation site (docsRoutes)](#-documentation-site-docsroutes)
 - [Auto components](#-auto-components)
 - [Base stores](#-base-stores)
@@ -58,13 +59,14 @@ If you're consuming a [`django_resaas`](https://github.com/metanochava/django_re
 
 * 🧬 **Schema-driven forms** — `buildFormFromSchema(app, model)` fetches `django_resaas`'s `/schema/` endpoint and turns fields, validation rules, choices and relations into ready-to-render field configs
 * 🧱 **Auto CRUD kit** — `AutoCrud`, `AutoTable`, `AutoFilter`, `ActionForm`, `FormModal`, `ConfirmDeleteDialog` cover list/create/edit/delete with no custom pages
-* 🗃️ **Base Pinia stores** — `createBaseStore()` gives any resource full CRUD state; ready-made stores ship for `User`, `Entity`, `EntityType`, `Branch`, `Group`, `Permission`, `Person`, `Employee`, `Language`, `Menu`, `Action`
+* 🗃️ **Base Pinia stores** — `createBaseStore()` gives any resource full CRUD state; ready-made stores ship for `User`, `Entity`, `EntityType`, `Branch`, `Group`, `Permission`, `Person`, `Language`, `Menu`, `Action`, `Entitlement`
 * 🔐 **Tenant-aware HTTP client** — `HTTPAuth` / `HTTPClient` (axios) attach `Authorization`, `X-RESAAS-Context` and `L` on every request automatically
 * 🌍 **Built-in i18n** — `tdc()` translation helper, backed by the same cascade as `django_resaas`
 * 📄 **PDF preview** — `PdfRender` / `PdfRenderPro` for backend-generated documents (invoices, reports, lists)
-* 🧩 **Ready layouts & pages** — `MainLayout`, `AuthLayout`, `CrudPage`, plus scaffolded list/edit/view pages for entity, branch, user, group, permission, employee
+* 🧩 **Ready layouts & pages** — `MainLayout`, `AuthLayout`, `CrudPage`, plus scaffolded list/edit/view pages for entity, branch, user, group, permission
 * 📖 **Self-hosted documentation site** — `docsRoutes` renders the `docs/` folder itself (this README's linked pages) as navigable screens inside the host app, under its own `MainLayout`
 * 🔑 **Auth boot** — JWT login flow, token storage/refresh, encrypted local storage (`crypto-js`)
+* 🎫 **Entitlements (UX)** — `useEntitlementStore()` reads what the current tenant is entitled to (features, capacities) to hide, disable or show usage — the backend enforces it
 * 🎨 **Theme engine** — CSS variables + `services/theme.js` for per-entity branding
 
 ---
@@ -142,7 +144,7 @@ const editingRow = ref(null)   // null = create, an object = edit that record
 async function loadSchema() {
   // buildFormFromSchema() returns the full result object - fields,
   // actions, permissions, routes, ui, filters, pagination, pdf, schema
-  const result = await buildFormFromSchema({ app: 'hr', model: 'Employee' })
+  const result = await buildFormFromSchema({ app: 'your_app', model: 'Product' })
   schemaFields.value = result.fields
 }
 ```
@@ -155,8 +157,8 @@ async function loadSchema() {
 <AutoForm
   v-model="showForm"
   :schema="schemaFields"
-  app="hr"
-  model="Employee"
+  app="your_app"
+  model="Product"
   :data="editingRow"
   @saved="showForm = false"
 />
@@ -195,6 +197,29 @@ await createResaasContext({ entity, branch, group })
 | `fek` / `fep` | interceptor (env-configured) | frontend key/secret checked by `FrontEndMiddleware` |
 
 You never set these by hand — call `createResaasContext()` once per entity/branch/group switch and the interceptor in `services/api.js` takes care of the rest for every subsequent request.
+
+---
+
+## 🎫 Entitlements
+
+`django_resaas` can restrict what an installation or tenant may use: **features**
+(available or not), **capacities** (quantitative limits) and **modules**. The
+frontend reads them through `useEntitlementStore()` to hide, disable, or show
+usage and limits — that is **UX only**: the backend enforces entitlements and
+permissions on every request, whatever the screen shows.
+
+```js
+import { useEntitlementStore } from 'quasar_resaas'
+
+const Entitlements = useEntitlementStore()
+await Entitlements.load()                       // GET resaas/entitlements/ (needs the RESAAS context)
+Entitlements.hasFeature('advanced_audit')       // true / false
+Entitlements.canAdd('branches')                 // false when the tenant used its limit
+```
+
+Entitlements are not permissions (a button usually checks `User.can(...)` **and**
+`canAdd(...)`) and not billing. See
+[Entitlements](docs/quasar-resaas/features/entitlements.md).
 
 ---
 
@@ -256,9 +281,9 @@ The `components/engine/*` set (`InputComponent`, `SelectComponent`, `DateCompone
 ```js
 import { createBaseStore } from 'quasar_resaas'
 
-export const useEmployeeStore = createBaseStore('employee', {
-  app: 'hr',
-  model: 'Employee'
+export const useProductStore = createBaseStore('product', {
+  app: 'your_app',
+  model: 'Product'
 })
 ```
 
@@ -342,7 +367,10 @@ npm install
 
 ## 📄 License
 
-Distributed under the [MIT](LICENSE) license.
+Distributed under the [RESAAS Commercial License](LICENSE). The package can be installed
+and used within the terms of that license and the entitlements enabled for your
+installation; anything beyond that needs a written license. Versions published
+before this license keep the license they were published with.
 
 ---
 

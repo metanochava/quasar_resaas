@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.1429",
+  "version": "0.0.1430",
   "description": "Quasar rest SaaS",
   "keywords": [
     "quasar",
@@ -19,7 +19,7 @@
     "type": "git",
     "url": "https://github.com/metanochava/quasar_resaas.git"
   },
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "author": "Dias Metano Salvador Chavana",
   "type": "module",
   "main": "index.js",

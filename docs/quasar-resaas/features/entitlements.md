@@ -13,6 +13,11 @@ limit 3, used 3). It reads the backend's `GET resaas/entitlements/`
 > - 403 `capacity_exceeded`, with `error.details` = `{capacity, limit, current}`;
 > - 403 `module_not_available`.
 
+The frontend may **hide**, **disable**, **display usage** and **display limits**.
+It never decides: `useEntitlementStore` is not a security mechanism, and
+entitlements are not billing (RESAAS has no payments or subscriptions). The
+limits in the examples below (3 branches) are illustrative, not official values.
+
 Entitlements are not permissions: `User.can('add_branch')` says whether the
 **user** may create a branch; `canAdd('branches')` says whether the **tenant**
 still has room for one. A button that creates a branch should check both.
