@@ -196,6 +196,26 @@
                       dense outlined
                     />
                   </div>
+
+                  <!-- filiation, as on identity documents -->
+                  <div class="col-12 col-sm-6">
+                    <s-field
+                      v-model="Person.form.father_name"
+                      :field="fieldOf(Person, 'father_name')"
+                      :label="tdc('Father\'s name')"
+                      :filled="false"
+                      dense outlined
+                    />
+                  </div>
+                  <div class="col-12 col-sm-6">
+                    <s-field
+                      v-model="Person.form.mother_name"
+                      :field="fieldOf(Person, 'mother_name')"
+                      :label="tdc('Mother\'s name')"
+                      :filled="false"
+                      dense outlined
+                    />
+                  </div>
                 </div>
               </div>
 

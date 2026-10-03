@@ -121,6 +121,19 @@ describe('PersonProfilePanel', () => {
     expect(w.find('.identity-initials').text()).toBe('MC')
   })
 
+  it('shows the filiation: father\'s and mother\'s names', async () => {
+    const w = mount(PersonProfilePanel, {
+      props: { person: { ...person, father_name: 'Alberto Chavana', mother_name: 'Maria Cossa' } },
+      global: globalOptions
+    })
+    await flushPromises()
+    const text = w.text()
+    expect(text).toContain("Father's name")
+    expect(text).toContain('Alberto Chavana')
+    expect(text).toContain("Mother's name")
+    expect(text).toContain('Maria Cossa')
+  })
+
   it('never prints a raw object: {id,value,label} choices show the label, all-null shows nothing', async () => {
     const w = mount(PersonProfilePanel, { props: { person }, global: globalOptions })
     await flushPromises()

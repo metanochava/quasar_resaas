@@ -397,6 +397,8 @@ const identityFields = computed(() => {
     { label: tdc('Nationality'), value: displayValue(p.nationality) },
     { label: tdc('Country of birth'), value: displayValue(p.country_of_birth) },
     { label: tdc('Place of birth'), value: displayValue(p.place_of_birth) },
+    { label: tdc('Father\'s name'), value: displayValue(p.father_name) },
+    { label: tdc('Mother\'s name'), value: displayValue(p.mother_name) },
     { label: tdc('Occupation'), value: displayValue(p.occupation) },
     { label: tdc('Blood type'), value: bloodTypeLabel.value }
   ]
