@@ -1,9 +1,10 @@
 <template>
-  <q-dialog v-model="permissionsModal" @hide="Permission.resetChanges">
+  <!-- full width: a profile's permissions span many apps/models -->
+  <q-dialog v-model="permissionsModal" full-width @hide="Permission.resetChanges">
     <s-modal-card
       :title="`${tdc('Permissions')} - ${groupLabel(Group.row)}`"
       icon="security"
-      width="min(1100px, 90vw)"
+      width="100%"
       class="permissions-card"
       flush
     >

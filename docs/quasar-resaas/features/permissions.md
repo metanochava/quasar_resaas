@@ -110,7 +110,7 @@ On screen (`PermissionManager.vue`):
     permissions) are static; only the list scrolls. The component fills the
     height it is given, so a modal hosting it is a `flush`
     [`s-modal-card`](../components/modal-card.md) with a height (the group
-    managers use 80vh).
+    managers use a full-width dialog, 80vh high).
 -   While searching, every app section left by the filter opens, and the
     matching text (app, model, permission) is highlighted
     (`HighlightText`). A permission found by its own codename gets the
