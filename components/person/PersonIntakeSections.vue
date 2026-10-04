@@ -362,7 +362,8 @@
                 <s-field v-model="doc.data_validade" :field="fieldOf(Document, 'data_validade')" :label="tdc('Expiry date')" :filled="false" dense outlined />
               </div>
               <div class="col-12 col-sm-8 col-md-1">
-                <s-field v-model="doc.arquivo" :field="fieldOf(Document, 'arquivo')" :label="tdc('File')" />
+                <!-- camera: a document may be a photo of it, taken right here -->
+                <s-field v-model="doc.arquivo" :field="fieldOf(Document, 'arquivo')" :label="tdc('File')" camera />
               </div>
               <div class="col-12 col-sm-4 col-md-1 flex flex-center justify-end">
                 <s-btn

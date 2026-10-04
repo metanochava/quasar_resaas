@@ -72,6 +72,13 @@ That history is shown by the **existing** header notification component
 (`HeaderNotifications`, "Alerts" tab: unread badge, filters, mark as read, remove, clear) — never
 add a second button, store or toast layer for this.
 
+Each history entry keeps the request that produced it (client-side metadata,
+never sent anywhere): method, path and **query** - the filters, search and page
+the user was on (`GET /api/saude/pacientes/?search=maria&page=2`). The
+`format=json` every request carries is left out, and the value of any parameter
+that may be a secret (`token`, `password`, `code`, `key`, `refresh`, `access`,
+`otp`, `session`, ...) is shown as `***`. Long URLs wrap in the panel.
+
 ## Generic success messages
 
 A successful write that carries no message of its own gets a short generic toast (toast only, not

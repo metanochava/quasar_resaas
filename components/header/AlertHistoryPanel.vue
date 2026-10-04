@@ -107,8 +107,8 @@ function open(alert) {
             <q-item-label caption class="row items-center q-gutter-x-sm">
               <span>{{ time(alert.createdAt) }}</span>
               <q-badge v-if="alert.code" outline color="grey-7" :label="alert.code" data-test="alert-code" />
-              <span v-if="alert.request" class="text-grey-6" data-test="alert-request">
-                {{ alert.request.method }} {{ alert.request.path }}
+              <span v-if="alert.request" class="text-grey-6 alert-request" data-test="alert-request">
+                {{ alert.request.method }} {{ alert.request.path }}<template v-if="alert.request.query">?{{ alert.request.query }}</template>
               </span>
             </q-item-label>
           </q-item-section>
@@ -144,4 +144,9 @@ function open(alert) {
 .alert-history { height: 100%; min-height: 0; }
 .alert-scroll { flex: 1 1 auto; min-height: 0; }
 .alert-unread { background: rgba(25, 118, 210, 0.08); }
+
+/* a long query string wraps instead of widening the panel */
+.alert-request {
+  word-break: break-all;
+}
 </style>

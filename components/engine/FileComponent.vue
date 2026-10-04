@@ -90,7 +90,7 @@
           </div>
 
           <s-btn
-            v-if="isImageField"
+            v-if="showCamera"
             flat
             round
             color="primary"
@@ -108,7 +108,7 @@
     </div>
 
     <CameraCaptureDialog
-      v-if="isImageField"
+      v-if="showCamera"
       v-model="cameraOpen"
       @captured="onCameraCaptured"
     />
@@ -138,7 +138,11 @@ export default defineComponent({
     multiple:{type:Boolean,default:false},
     maxSize:{type:Number,default:null},
     error:{type:[Boolean,String],default:false},
-    errorMessage:{type:String,default:""}
+    errorMessage:{type:String,default:""},
+    // the "Use camera" button: null (default) shows it only when `accept` is
+    // an image type; true also on any other file field (e.g. a document that
+    // can be a PDF or a photo of it); false never
+    camera:{type:Boolean,default:null}
   },
   emits:["update:modelValue"],
   setup(props,{emit}){
@@ -158,6 +162,7 @@ export default defineComponent({
     })
 
     const isImageField=computed(()=>looksLikeImageAccept(accept.value))
+    const showCamera=computed(()=>props.camera===null?isImageField.value:props.camera)
     const hasError=computed(()=>!!props.error)
     const firstError=computed(()=>(typeof props.error==="string"&&props.error)||props.errorMessage||"")
     const radiusStyle=computed(()=>({borderRadius:layout.value.rounded?"16px":"6px"}))
@@ -235,7 +240,7 @@ export default defineComponent({
 
     return{
       inputId,nativeInput,cameraOpen,accept,translatedLabel,translatedHint,
-      required:props.required,isImageField,hasError,firstError,radiusStyle,
+      required:props.required,isImageField,showCamera,hasError,firstError,radiusStyle,
       previewItems,onFileChange,onCameraCaptured,removeAt,tdc
     }
   }

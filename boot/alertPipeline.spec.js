@@ -71,10 +71,25 @@ describe('a successful response', () => {
     expect(Alerts.data[0].code).toBeNull()
   })
 
-  it('records which request produced it - method and path only, no query string', () => {
+  it('records which request produced it - method, path and its query (without format=json)', () => {
     Alert(response(201, { alerts: [{ level: 'info', message: 'Hello.' }] }))
 
-    expect(Alerts.data[0].request).toEqual({ method: 'POST', path: '/api/hr/employees/' })
+    expect(Alerts.data[0].request).toEqual({ method: 'POST', path: '/api/hr/employees/', query: 'page=2' })
+  })
+
+  it('a request without a query has no query; axios params count too', () => {
+    Alert(response(201, { alerts: [{ level: 'info', message: 'A.' }] }, { method: 'get', url: '/api/x/?format=json' }))
+    Alert(response(201, { alerts: [{ level: 'info', message: 'B.' }] }, { method: 'get', url: '/api/y/', params: { search: 'ana', page: 3 } }))
+
+    expect(Alerts.data.find(a => a.message === 'A.').request).toEqual({ method: 'GET', path: '/api/x/' })
+    expect(Alerts.data.find(a => a.message === 'B.').request.query).toBe('search=ana&page=3')
+  })
+
+  it('never shows a secret in the history: token / password / code values are masked', () => {
+    Alert(response(201, { alerts: [{ level: 'info', message: 'C.' }] },
+      { method: 'get', url: '/api/z/?token=abc123&search=maria&refresh=xyz&otp_code=999' }))
+
+    expect(Alerts.data[0].request.query).toBe('token=***&search=maria&refresh=***&otp_code=***')
   })
 
   it('a generic "Created successfully!" is a toast only - not history', () => {

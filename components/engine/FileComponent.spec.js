@@ -150,4 +150,15 @@ describe('FileComponent (s-file) - image field affordances', () => {
     const withPlainFile = mountFile({ modelValue: null, accept: '*' })
     expect(withPlainFile.findComponent({ name: 'CameraCaptureDialog' }).exists()).toBe(false)
   })
+
+  it('camera forces the camera on any file field (a document: PDF or a photo of it); false hides it', () => {
+    const forced = mountFile({ modelValue: null, accept: '.pdf,image/*,*', camera: true })
+    expect(forced.findComponent({ name: 'CameraCaptureDialog' }).exists()).toBe(true)
+
+    const plainForced = mountFile({ modelValue: null, camera: true })
+    expect(plainForced.findComponent({ name: 'CameraCaptureDialog' }).exists()).toBe(true)
+
+    const hidden = mountFile({ modelValue: null, accept: 'image/*', camera: false })
+    expect(hidden.findComponent({ name: 'CameraCaptureDialog' }).exists()).toBe(false)
+  })
 })

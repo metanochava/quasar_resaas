@@ -100,22 +100,56 @@ const pushAlert = (sms, type = 'info', options = {}) => {
   })
 }
 
-// {method, path} of the request that produced a response - client-side metadata
-// for the history, never sent anywhere. Query strings are dropped (they can carry
-// filters or tokens).
+// {method, path, query} of the request that produced a response - client-side
+// metadata for the history, never sent anywhere. `query` keeps the filters,
+// search and page the user was on (format=json, present on every request, is
+// dropped); the value of anything that can be a secret (token, password, code,
+// key, ...) is masked, so a history never shows one.
+const HIDDEN_QUERY_KEYS = new Set(['format'])
+const SENSITIVE_QUERY_KEY = /token|password|passwd|secret|otp|code|key|refresh|access|signature|session|auth/i
+
+export const describeQuery = (search) => {
+  const params = new URLSearchParams(search || '')
+  const parts = []
+  for (const [key, value] of params) {
+    if (HIDDEN_QUERY_KEYS.has(key)) continue
+    parts.push(`${key}=${SENSITIVE_QUERY_KEY.test(key) ? '***' : value}`)
+  }
+  return parts.join('&')
+}
+
 const requestMeta = (response) => {
   const config = response?.config
   if (!config?.url) return null
 
   let path = String(config.url)
+  let search = ''
 
   try {
-    path = new URL(path, 'http://resaas.local').pathname
+    const parsed = new URL(path, 'http://resaas.local')
+    path = parsed.pathname
+    search = parsed.search
   } catch {
-    path = path.split('?')[0]
+    const [base, rest] = path.split('?')
+    path = base
+    search = rest || ''
   }
 
-  return { method: String(config.method || 'get').toUpperCase(), path }
+  // axios `params` (not in the URL string) are part of the request too
+  if (config.params && typeof config.params === 'object') {
+    const extra = new URLSearchParams()
+    for (const [key, value] of Object.entries(config.params)) {
+      if (value === undefined || value === null) continue
+      ;[].concat(value).forEach(item => extra.append(key, item))
+    }
+    const joined = extra.toString()
+    if (joined) search = search ? `${search}&${joined}` : joined
+  }
+
+  const query = describeQuery(search)
+  return query
+    ? { method: String(config.method || 'get').toUpperCase(), path, query }
+    : { method: String(config.method || 'get').toUpperCase(), path }
 }
 
 // The `alerts` of a response body (contract), whatever its status.

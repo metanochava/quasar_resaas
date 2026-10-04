@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
 import { useDashboardStore } from '../../stores/DashboardStore'
@@ -60,6 +60,27 @@ function runAction(action) {
   })
 }
 
+// A header button with a `dblclick_action`: one click runs the action, a
+// double click runs the dblclick_action instead. The single click waits
+// DBLCLICK_MS first, or a double click would also run it (twice).
+const DBLCLICK_MS = 250
+let clickTimer = null
+
+function clickAction(action) {
+  if (!action.dblclick_action) return runAction(action)
+  clearTimeout(clickTimer)
+  clickTimer = setTimeout(() => { clickTimer = null; runAction(action) }, DBLCLICK_MS)
+}
+
+function dblclickAction(action) {
+  if (!action.dblclick_action) return
+  clearTimeout(clickTimer)
+  clickTimer = null
+  runAction(action.dblclick_action)
+}
+
+onBeforeUnmount(() => clearTimeout(clickTimer))
+
 const hasPrimaryAction = computed(() => !!props.widget.primary_action)
 
 function onPrimaryAction() {
@@ -91,7 +112,9 @@ function onPrimaryAction() {
             flat round size="md"
             :color="action.color || 'primary'"
             :icon="action.icon || 'more_horiz'"
-            @click="runAction(action)"
+            :data-test="`widget-action-${action.name}`"
+            @click="clickAction(action)"
+            @dblclick="dblclickAction(action)"
           >
             <s-tooltip v-if="action.tooltip">{{ tdc(action.tooltip) }}</s-tooltip>
           </s-btn>
