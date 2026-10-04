@@ -11,6 +11,7 @@ import CardComponent from './../components/engine/CardComponent.vue'
 import ModalCard from './../components/engine/ModalCard.vue'
 import ChartComponent from './../components/engine/ChartComponent.vue'
 import TooltipComponent from './../components/engine/TooltipComponent.vue'
+import HighlightText from './../components/engine/HighlightText.vue'
 import InputComponent from './../components/engine/InputComponent.vue'
 import DateComponent from './../components/engine/DateComponent.vue'
 import TimeComponent from './../components/engine/TimeComponent.vue'
@@ -121,6 +122,9 @@ export default boot(({ app }) => {
   app.component('s-card', CardComponent)
 
   app.component('s-tooltip', TooltipComponent)
+  // text with the part matching `search` highlighted (case- and accent-insensitive),
+  // the same as the left menu's search
+  app.component('s-highlight', HighlightText)
 
   app.component('s-input', InputComponent)
 

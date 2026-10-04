@@ -79,6 +79,12 @@ the user was on (`GET /api/saude/pacientes/?search=maria&page=2`). The
 that may be a secret (`token`, `password`, `code`, `key`, `refresh`, `access`,
 `otp`, `session`, ...) is shown as `***`. Long URLs wrap in the panel.
 
+It also keeps the **profile** the user was acting with when the alert was
+raised (the active Group's raw name, `User.Group.name`, read at that moment).
+The history shows it in front of the message, translated with `groupLabel()`:
+`<Medical Laboratory Scientist> Unauthorized`. Switching profile later does not
+change the profile of earlier alerts.
+
 ## Generic success messages
 
 A successful write that carries no message of its own gets a short generic toast (toast only, not

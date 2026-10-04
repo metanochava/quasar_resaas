@@ -46,6 +46,8 @@ export const useAlertStore = defineStore('alert', {
         read: alert.read ?? false,
         createdAt: alert.createdAt ?? new Date().toISOString(),
         request: alert.request ?? null,
+        // the profile active when it was raised (raw Group name)
+        profile: alert.profile ?? null,
         // legacy field names
         sms: message,
         type: level

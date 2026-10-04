@@ -140,6 +140,26 @@ describe('the status of a successful POST (201 / 202 / 204, never 200)', () => {
   })
 })
 
+describe('the profile that raised an alert', () => {
+  it('is kept with the alert (raw name), from the active Group', async () => {
+    const { useUserStore } = await import('../stores/UserStore')
+    useUserStore().Group = { id: 'g1', name: 'Medical Laboratory Scientist' }
+
+    Alert(response(201, { alerts: [{ level: 'warning', message: 'Careful.' }] }))
+
+    expect(Alerts.data[0].profile).toBe('Medical Laboratory Scientist')
+  })
+
+  it('is null when no profile is active', async () => {
+    const { useUserStore } = await import('../stores/UserStore')
+    useUserStore().Group = null
+
+    Alert(response(201, { alerts: [{ level: 'info', message: 'Hello.' }] }))
+
+    expect(Alerts.data[0].profile).toBeNull()
+  })
+})
+
 describe('a failed response', () => {
   const failure = (status, data, config) => ({ response: response(status, data, config) })
 

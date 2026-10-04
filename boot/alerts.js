@@ -1,5 +1,6 @@
 import { Notify } from 'quasar'
 import { useAlertStore } from '../stores/AlertStore'
+import { useUserStore } from '../stores/UserStore'
 import { tdc } from '../services/translation'
 import {
   levelToQuasar,
@@ -66,6 +67,15 @@ export const resetAlertDedupe = () => recent.clear()
 // `options`: { code, details, request: {method, path}, toast, history } - `toast` /
 // `history` false override the level's policy for this message (e.g. a generic
 // "Created successfully!" is feedback, not something worth keeping).
+// the active profile (Group) name, or null before login / outside Pinia
+const currentProfile = () => {
+  try {
+    return useUserStore()?.Group?.name || null
+  } catch {
+    return null
+  }
+}
+
 const pushAlert = (sms, type = 'info', options = {}) => {
   const level = ['success', 'info', 'warning', 'error'].includes(type) ? type : 'info'
   const message = tdc(String(sms))
@@ -80,7 +90,10 @@ const pushAlert = (sms, type = 'info', options = {}) => {
       message,
       code: options.code || null,
       details: options.details ?? null,
-      request: options.request || null
+      request: options.request || null,
+      // the profile the user was acting with when it happened (raw name;
+      // translated where it is shown - groupLabel)
+      profile: currentProfile()
     })
   }
 

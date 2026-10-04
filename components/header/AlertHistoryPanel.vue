@@ -4,6 +4,7 @@ import { ref, computed } from 'vue'
 import { useAlertStore } from '../../stores/AlertStore'
 import { tdc } from '../../services/translation'
 import { levelToQuasar } from '../../utils/apiContract'
+import { groupLabel } from '../../utils/groupLabel'
 
 // The history of what requests told the user (errors and alerts), shown inside the
 // header Notification. The data is the AlertStore; nothing is requested here.
@@ -103,7 +104,11 @@ function open(alert) {
           </q-item-section>
 
           <q-item-section>
-            <q-item-label :class="{ 'text-weight-bold': !alert.read }" data-test="alert-message">{{ plain(alert.message) }}</q-item-label>
+            <q-item-label :class="{ 'text-weight-bold': !alert.read }" data-test="alert-message">
+              <!-- the profile that raised it: "<Doctor> Unauthorized" -->
+              <span v-if="alert.profile" class="alert-profile" data-test="alert-profile">&lt;{{ groupLabel(alert.profile) }}&gt;</span>
+              {{ plain(alert.message) }}
+            </q-item-label>
             <q-item-label caption class="row items-center q-gutter-x-sm">
               <span>{{ time(alert.createdAt) }}</span>
               <q-badge v-if="alert.code" outline color="grey-7" :label="alert.code" data-test="alert-code" />
@@ -148,5 +153,11 @@ function open(alert) {
 /* a long query string wraps instead of widening the panel */
 .alert-request {
   word-break: break-all;
+}
+
+.alert-profile {
+  color: var(--q-primary);
+  font-weight: 600;
+  margin-right: 4px;
 }
 </style>
