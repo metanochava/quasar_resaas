@@ -111,7 +111,20 @@ in the module's `dashboard.py`:
 | `line_chart` | `area` (fill under the lines), `height` |
 | `pie_chart` | `donut` (default `true`; `false` draws a pie), `height`; `series[0].colors` for per-slice semantic colours |
 
-`series[].color` works on every chart widget. See django_resaas
+`series[].color` works on every chart widget.
+
+`LineChartWidget` is also used outside dashboards, through
+`resolveWidgetComponent('line_chart')` (e.g. a lab parameter's evolution). There
+it accepts an optional `options` prop, ApexCharts options merged over
+`s-chart`'s (the same escape hatch as `s-chart`'s own `options`), e.g. a
+reference band:
+
+```vue
+<LineChartWidget :data="{ labels, series }"
+  :options="{ annotations: { yaxis: [{ y: 12, y2: 16, opacity: 0.12 }] } }" />
+```
+
+Dashboards don't pass it, so they are unchanged. See django_resaas
 [Dashboards](https://github.com/metanochava/django_resaas/blob/main/docs/architecture/dashboards.md)
 for the backend side.
 

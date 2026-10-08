@@ -6,6 +6,9 @@
 defineProps({
   widget: { type: Object, default: () => ({}) },
   data: { type: Object, required: true },
+  // ApexCharts options merged over s-chart's (e.g. a reference band as
+  // annotations); optional, so dashboards are unchanged
+  options: { type: Object, default: () => ({}) },
 })
 </script>
 
@@ -15,5 +18,6 @@ defineProps({
     :labels="data.labels || []"
     :series="data.series || []"
     :height="widget.height || 240"
+    :options="options"
   />
 </template>
