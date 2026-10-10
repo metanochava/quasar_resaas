@@ -12,8 +12,9 @@
 
     <div class="row q-col-gutter-lg">
 
-      <!-- CREATE -->
-      <div class="col-12 col-md-4 col-lg-3">
+      <!-- CREATE (add_app: the App catalogue is Root-only, see
+           django_resaas saas/profiles.py APP_PERMISSIONS) -->
+      <div v-if="can('add_app')" class="col-12 col-md-4 col-lg-3">
         <s-card bordered flat class="q-pa-lg create-card">
 
           <FormSection title="Create Module" icon="add_circle">
@@ -38,8 +39,9 @@
                   {{ existingApp.models || 0 }} {{ tdc(existingApp.models === 1 ? 'model' : 'models') }}
                 </div>
                 <div class="row q-gutter-xs q-mt-sm">
-                  <s-btn flat dense size="sm" icon="table_chart" :label="tdc('View models')" @click="openModels(existingApp)" />
+                  <s-btn v-if="can('view_app')" flat dense size="sm" icon="table_chart" :label="tdc('View models')" @click="openModels(existingApp)" />
                   <s-btn
+                    v-if="can('view_app')"
                     flat dense size="sm" icon="category" :label="tdc('Entity types')"
                     :disable="!existingAppId"
                     @click="openEntityTypes(existingApp)"
@@ -77,7 +79,7 @@
       </div>
 
       <!-- LIST -->
-      <div class="col-12 col-md-8 col-lg-9">
+      <div :class="can('add_app') ? 'col-12 col-md-8 col-lg-9' : 'col-12'">
         <div class="row q-col-gutter-md">
 
           <div
@@ -111,12 +113,14 @@
 
               <q-card-section class="col row q-gutter-xs items-start content-start">
                 <s-btn
+                  v-if="can('view_app')"
                   flat dense
                   icon="table_chart"
                   :label="tdc('Models')"
                   @click="openModels(app)"
                 />
                 <s-btn
+                  v-if="can('view_app')"
                   flat dense
                   icon="category"
                   :label="tdc('Entity Types')"
@@ -141,6 +145,7 @@
                 />
 
                 <s-btn
+                  v-if="can('change_app')"
                   flat
                   round
                   dense
@@ -160,6 +165,7 @@
                 </s-btn>
 
                 <s-btn
+                  v-if="can('delete_app')"
                   flat
                   round
                   dense
@@ -212,6 +218,10 @@ import { sDialog } from '../../services/dialog'
 
 // ---------------- STATE ----------------
 const router = useRouter()
+
+// UX only - the backend checks every action (AppAPIView/AppSchemaAPIView
+// action_permissions); only the Root profile holds these permissions.
+const can = (permission) => useUserStore().can(permission)
 
 const name = ref('')
 const loading = ref(false)

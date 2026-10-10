@@ -37,6 +37,25 @@ Another user signing in on the same browser never lands on it, and logout
 removes it ([Persistence](../stores/persistence.md#logout)). The old shared
 `last_route` key is deleted on the next load.
 
+### Header brand (logo and name)
+
+`components/header/HeaderBrand.vue` (`s-header-brand`) shows the Entity's logo
+and name (or the EntityType's icon and name before an Entity is chosen). Logo
+and name are one link:
+
+| The Entity has a site (`User.Entity.site`) | Click | Double click | Enter |
+|---|---|---|---|
+| yes | opens the site in **this tab** | opens the site in a **new tab** (`noopener`) | this tab |
+| no, `to` given (`MainLayout`: `{ name: 'home' }`) | opens `to` | - | opens `to` |
+| no, no `to` (`AuthLayout`) | plain brand, not a link | - | - |
+
+A click waits 250 ms for a possible second click, so a double click opens only
+the new tab. Only an absolute `http(s)` URL is followed; any other value
+(`javascript:`, a relative path) is ignored and the brand behaves as if there
+were no site. `Entity.site` comes from the backend (the Entity serializer, also
+returned by the public `site/` endpoint before sign-in). Tests:
+`components/header/HeaderBrand.spec.js`.
+
 ### Left menu search
 
 `SearchMenu.vue` (the field on top of the left menu) filters `User.AllMenus`

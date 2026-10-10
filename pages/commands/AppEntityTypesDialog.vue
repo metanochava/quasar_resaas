@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { tdc } from '../../services/translation'
 import { HTTPAuth, url } from '../../services/api'
 import { sDialog } from '../../services/dialog'
+import { useUserStore } from '../../stores/UserStore'
 
 // Quais EntityTypes têm esta App activa + possibilidade de adicionar -
 // mesma relação/idioma já usado do lado inverso por
@@ -18,6 +19,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+
+// UX only - addEntityType/removeEntityType need change_app on the backend
+const canChange = computed(() => useUserStore().can('change_app'))
 
 const loading = ref(false)
 const linked = ref([])
@@ -94,7 +98,7 @@ watch(() => [props.modelValue, props.appId], ([open]) => {
     @update:model-value="v => emit('update:modelValue', v)"
   >
     <s-modal-card :title="`${tdc('Entity Types')} — ${appName}`" icon="category" width="480px">
-      <template #subheader>
+      <template v-if="canChange" #subheader>
         <s-select
           v-model="pickerValue"
           :api="entityTypesUrl"
@@ -118,7 +122,7 @@ watch(() => [props.modelValue, props.appId], ([open]) => {
           <q-item-section>
             <q-item-label class="text-weight-medium">{{ et.name }}</q-item-label>
           </q-item-section>
-          <q-item-section side>
+          <q-item-section v-if="canChange" side>
             <s-btn flat round dense icon="close" color="negative" @click="confirmRemoveEntityType(et)">
               <s-tooltip>{{ tdc('Remove') }}</s-tooltip>
             </s-btn>
