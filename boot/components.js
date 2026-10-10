@@ -68,6 +68,7 @@ import HeaderBrand from './../components/header/HeaderBrand.vue'
 // HEADER COMPONENTS
 // =========================================================
 
+import HeaderSite from './../components/header/HeaderSite.vue'
 import HeaderDarkMode from './../components/header/HeaderDarkMode.vue'
 import HeaderFullScreen from './../components/header/HeaderFullScreen.vue'
 import HeaderLanguage from './../components/header/HeaderLanguage.vue'
@@ -214,6 +215,7 @@ export default boot(({ app }) => {
   // HEADER
   // =======================================================
 
+  app.component( 's-header-site', HeaderSite )
   app.component( 's-header-dark-mode', HeaderDarkMode  )
 
   app.component( 's-header-full-screen', HeaderFullScreen )

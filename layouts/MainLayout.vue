@@ -53,6 +53,9 @@
 
         <q-space />
 
+        <!-- Entity website (only when the Entity has one) -->
+        <HeaderSite />
+
         <!-- Dark Mode -->
         <HeaderDarkMode />
 
@@ -165,6 +168,7 @@ import { getUserPreference, setUserPreference } from '../base/persistence'
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
 import HeaderUser from '../components/header/HeaderUser.vue'
+import HeaderSite from '../components/header/HeaderSite.vue'
 import HeaderDarkMode from '../components/header/HeaderDarkMode.vue'
 import HeaderLanguage from '../components/header/HeaderLanguage.vue'
 import HeaderFullScreen from '../components/header/HeaderFullScreen.vue'
@@ -188,6 +192,7 @@ export default defineComponent({
   components: {
     HeaderBrand,
     HeaderUser,
+    HeaderSite,
     HeaderDarkMode,
     HeaderLanguage,
     HeaderFullScreen,
