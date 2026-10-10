@@ -46,8 +46,11 @@ route; without it (`AuthLayout`) it is a plain brand.
 
 `components/header/HeaderSite.vue` (`s-header-site`, a globe icon `public`, just
 before the dark-mode button) opens the current Entity's website
-(`User.Entity.site`, from the Entity serializer and the public `site/`
-endpoint). It is shown only when the Entity has a site:
+(`User.Entity.site`: the selected Entity comes from
+`django_resaas/users/{id}/userEntitys/`, which carries `site`; before sign-in,
+from the public `site/` endpoint). The selected Entity is cached in
+`localStorage` (`userEntity`), so after the backend starts sending `site` the
+user must select the Entity again (or sign in again) to see the button. It is shown only when the Entity has a site:
 
 | Click | Double click |
 |---|---|

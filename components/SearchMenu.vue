@@ -4,7 +4,7 @@
       v-model="User.search"
       :style="'height: 30px; line-height: 30px; width: '+size+'; padding: 0 8px;'"
       @input="filterMenus(User.search)"
-      :placeholder=" isSidebarMini? tdc('Sea') : tdc('Search')"
+      :placeholder="placeholder"
     />
   </div>
 </template>
@@ -28,6 +28,11 @@ export default defineComponent({
   computed: {
     isSidebarMini () {
       return !!this.User.ps?.layout?.sidebar?.mini
+    },
+    // the minimised (icon-only) menu is too narrow for the word: "Search"
+    // only while the menu is expanded
+    placeholder () {
+      return this.isSidebarMini ? '' : tdc('Search')
     }
   },
 
