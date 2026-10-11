@@ -73,7 +73,7 @@
 
             <q-separator class="q-mb-md" />
 
-            <q-form @submit.prevent="requestOtp">
+            <q-form class="column q-gutter-y-xs" @submit.prevent="requestOtp">
               <s-input
                 v-model="name"
                 outlined
@@ -109,7 +109,7 @@
                 </template>
               </s-input>
 
-              <div class="text-caption q-mt-xs q-mb-sm" :class="statusClass" data-test="register-username-status">
+              <div class="text-caption" :class="statusClass" data-test="register-username-status">
                 {{ statusText }}
                 <a
                   v-if="usernameEdited && suggestions.length"
@@ -120,7 +120,7 @@
                 >{{ tdc('Use the suggestion') }}</a>
               </div>
 
-              <div v-if="visibleSuggestions.length" class="q-mb-sm" data-test="register-suggestions">
+              <div v-if="visibleSuggestions.length" data-test="register-suggestions">
                 <div class="text-caption text-grey-7">{{ tdc('Suggestions') }}</div>
                 <q-chip
                   v-for="suggestion in visibleSuggestions"
@@ -135,7 +135,7 @@
                 >{{ suggestion }}</q-chip>
               </div>
 
-              <div v-if="fieldErrors.username" class="text-caption text-negative q-mb-sm">{{ fieldErrors.username }}</div>
+              <div v-if="fieldErrors.username" class="text-caption text-negative">{{ fieldErrors.username }}</div>
 
               <s-input
                 v-if="channel === 'email'"
@@ -152,7 +152,7 @@
                 </template>
               </s-input>
 
-              <div v-else class="row q-col-gutter-sm">
+              <div v-else class="row q-col-gutter-xs">
                 <div class="col-12">
                   <s-select
                     v-model="dial"
@@ -182,11 +182,11 @@
                 </div>
               </div>
 
-              <div v-if="fieldErrors.identifier" class="text-caption text-negative q-mb-sm">{{ fieldErrors.identifier }}</div>
+              <div v-if="fieldErrors.identifier" class="text-caption text-negative">{{ fieldErrors.identifier }}</div>
 
               <div
                 v-if="channel === 'mobile' && national && !isPhoneValid"
-                class="text-caption text-negative q-mb-sm"
+                class="text-caption text-negative"
               >
                 {{ tdc('Invalid phone number') }}
               </div>
@@ -226,13 +226,13 @@
                 </template>
               </s-input>
 
-              <div v-if="passwordMismatch" class="text-caption text-negative q-mb-sm">
+              <div v-if="passwordMismatch" class="text-caption text-negative">
                 {{ tdc('Passwords do not match') }}
               </div>
 
-              <div v-if="fieldErrors.password" class="text-caption text-negative q-mb-sm">{{ fieldErrors.password }}</div>
+              <div v-if="fieldErrors.password" class="text-caption text-negative">{{ fieldErrors.password }}</div>
 
-              <q-card-actions class="q-pa-none q-mt-md">
+              <q-card-actions class="q-pa-none">
                 <s-btn
                   type="submit"
                   unelevated
@@ -247,7 +247,7 @@
             </q-form>
           </template>
 
-          <q-card-actions align="center" class="q-mt-sm">
+          <q-card-actions align="center" class="q-pa-none q-mt-xs">
             <s-btn
               flat
               size="md"
