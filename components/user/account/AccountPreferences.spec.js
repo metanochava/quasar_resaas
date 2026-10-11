@@ -26,7 +26,7 @@ beforeEach(() => {
   pinia = createPinia()
   setActivePinia(pinia)
   User = useUserStore()
-  User.data = { id: 'u1', ui_config: { layout: { sidebar_mini: false, menu_rtl: false } } }
+  User.data = { id: 'u1', ui_config: { layout: { sidebar: { mini: false }, menu_rtl: false } } }
   Language = useLanguageStore()
   Language.rows = [{ id: 1, name: 'Português', code: 'pt-pt' }, { id: 2, name: 'English', code: 'en-us' }]
   Language.current = Language.rows[0]
@@ -44,6 +44,8 @@ describe('AccountPreferences - reuses what the app already has', () => {
 
     const radios = wrapper.findAll('[data-test="pref-language"] .q-radio')
     expect(radios).toHaveLength(2)
+    // one language per line
+    expect(wrapper.find('[data-test="pref-language"]').classes()).toContain('column')
     expect(radios[0].attributes('aria-checked')).toBe('true')
 
     await radios[1].trigger('click')
@@ -63,7 +65,7 @@ describe('AccountPreferences - reuses what the app already has', () => {
   })
 
   it('the menu switches reflect the resolved layout and only call the backend when they change', async () => {
-    User.data = { id: 'u1', ui_config: { layout: { sidebar_mini: true, menu_rtl: false } } }
+    User.data = { id: 'u1', ui_config: { layout: { sidebar: { mini: true }, menu_rtl: false } } }
     const wrapper = mountPrefs()
     await flushPromises()
 
@@ -81,5 +83,28 @@ describe('AccountPreferences - reuses what the app already has', () => {
     await wrapper.findAll('[data-test="pref-appearance"] .q-radio')[1].trigger('click')
 
     expect(Object.keys(localStorage)).toEqual(['dark'])
+  })
+
+  it('the compact menu switch follows the backend after each toggle (sidebar.mini is nested)', async () => {
+    // like the real action: the backend answers with the new effective layout
+    User.toggleSidebarMini.mockImplementation(async () => {
+      const mini = !User.data.ui_config.layout.sidebar.mini
+      User.data = { ...User.data, ui_config: { layout: { ...User.data.ui_config.layout, sidebar: { mini } } } }
+      return {}
+    })
+    const wrapper = mountPrefs()
+    await flushPromises()
+    const toggle = () => wrapper.find('[data-test="pref-mini"]')
+
+    expect(toggle().attributes('aria-checked')).toBe('false')
+
+    await toggle().trigger('click')
+    await flushPromises()
+    expect(toggle().attributes('aria-checked')).toBe('true')
+
+    await toggle().trigger('click')
+    await flushPromises()
+    expect(toggle().attributes('aria-checked')).toBe('false')
+    expect(User.toggleSidebarMini).toHaveBeenCalledTimes(2)
   })
 })

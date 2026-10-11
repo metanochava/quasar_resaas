@@ -20,6 +20,14 @@ const Language = useLanguageStore()
 
 const layout = computed(() => Session.ps?.layout || {})
 
+// the effective layout (LayoutSetting.to_dict()) nests the compact menu as
+// sidebar.mini, while menu_rtl is top level - read each where it really is
+// (the flat sidebar_mini is only a fallback for older payloads)
+const menuValues = computed(() => ({
+  sidebar_mini: !!(layout.value.sidebar?.mini ?? layout.value.sidebar_mini),
+  menu_rtl: !!layout.value.menu_rtl
+}))
+
 const languages = computed(() => Language.rows || [])
 const currentLanguageId = computed(() => Language.current?.id ?? Session.Language?.id ?? null)
 
@@ -39,7 +47,7 @@ const appearance = computed({
 // These two flip a backend value, so they only move when the switch and the
 // stored value disagree (a failure leaves the switch where the backend is).
 async function setMenu(field, wanted) {
-  const current = !!layout.value[field]
+  const current = menuValues.value[field]
   if (current === wanted) return
 
   try {
@@ -67,6 +75,7 @@ async function setMenu(field, wanted) {
             :options="languages.map(language => ({ label: language.name, value: language.id }))"
             type="radio"
             color="primary"
+            class="column"
             data-test="pref-language"
             @update:model-value="id => chooseLanguage(languages.find(language => language.id === id))"
           />
@@ -92,7 +101,7 @@ async function setMenu(field, wanted) {
           <div class="text-subtitle1 q-mb-sm">{{ tdc('Menu') }}</div>
 
           <q-toggle
-            :model-value="!!layout.sidebar_mini"
+            :model-value="menuValues.sidebar_mini"
             :label="tdc('Compact menu')"
             color="primary"
             data-test="pref-mini"
@@ -100,7 +109,7 @@ async function setMenu(field, wanted) {
           />
 
           <q-toggle
-            :model-value="!!layout.menu_rtl"
+            :model-value="menuValues.menu_rtl"
             :label="tdc('Menu on the right')"
             color="primary"
             data-test="pref-rtl"
