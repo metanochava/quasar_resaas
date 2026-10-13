@@ -17,7 +17,7 @@
           v-show="!User.ps?.layout?.menu_rtl "
           dense
           icon="home"
-          @click="$router.push({ name: 'home' })"
+          @click="$router.push({ name: 'dashboard' })"
         />
 
         <s-btn
@@ -50,7 +50,7 @@
           dense
           v-show="User.ps?.layout?.menu_rtl "
           icon="home"
-          @click="$router.push({ name: 'home' })"
+          @click="$router.push({ name: 'dashboard' })"
         />
 
         <s-btn

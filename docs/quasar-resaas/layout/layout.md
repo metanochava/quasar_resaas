@@ -6,7 +6,7 @@ composition happens via store/route, not props.
 
 ## AuthLayout
 
-Minimal layout for public pages (`/auth/login`, `/welcome`): header (brand,
+Minimal layout for public pages (`/auth/login`, `/home`): header (brand,
 dark mode, fullscreen, language, services) + `router-view` + footer. No
 drawers, no menus.
 
@@ -20,7 +20,7 @@ q-layout
   |     |            + HeaderSite + HeaderDarkMode + HeaderFullScreen + HeaderLanguage
   |     |            + HeaderServices + HeaderNotifications + HeaderUser
   |     |            + s-btn(right menu)
-  |     +-- q-bar: TopMenu (hidden on 'authwelcome'/'welcome')
+  |     +-- q-bar: TopMenu (hidden on 'welcome'/'home')
   |
   +-- q-drawer (left)  -> LeftMenu
   +-- q-drawer (right) -> RightMenu
@@ -41,7 +41,7 @@ removes it ([Persistence](../stores/persistence.md#logout)). The old shared
 
 `components/header/HeaderBrand.vue` (`s-header-brand`) shows the Entity's logo
 and name (or the EntityType's icon and name before an Entity is chosen). With
-`to` (`MainLayout` passes `{ name: 'home' }`) logo and name are one link to that
+`to` (`MainLayout` passes `{ name: 'dashboard' }`) logo and name are one link to that
 route; without it (`AuthLayout`) it is a plain brand.
 
 `components/header/HeaderSite.vue` (`s-header-site`, a globe icon `public`, just

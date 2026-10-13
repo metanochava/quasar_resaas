@@ -68,7 +68,7 @@ function routeLabel(to) {
 
 export function installAuthGuard(router, {
   loginRouteName = 'login',
-  forbiddenRouteName = 'home'
+  forbiddenRouteName = 'dashboard'
 } = {}) {
   router.beforeEach((to) => {
     if (to.meta?.requiresAuth && !getStorage('l', 'access')) {

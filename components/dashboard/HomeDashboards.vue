@@ -76,12 +76,12 @@ const selected = computed(() => {
   return list.some((d) => d.name === chosen.value) ? chosen.value : list[0].name
 })
 
-// Always reload on mount - this only ever mounts on the 'home' route
+// Always reload on mount - this only ever mounts on the 'dashboard' route
 // (<s-dashboard-home/> in IndexPage.vue), and the previous
 // !Dashboard.dashboards.length guard meant the list (and by extension
 // which dashboard - engine vs legacy registry - gets selected below)
 // was only ever fetched once per SPA session, going stale on every
-// subsequent visit to home after leaving and coming back.
+// subsequent visit to the dashboard after leaving and coming back.
 //
 // refreshResaasContext() runs FIRST and is awaited - the
 // X-RESAAS-Context token (services/tenantContext.js) lives in
@@ -91,7 +91,7 @@ const selected = computed(() => {
 // tab, an expired token, ...), and nothing else re-establishes it on a
 // fresh page load - every request (services/api.js's interceptor)
 // until then goes out with the wrong/no tenant context, which is why a
-// hard reload on '/home' showed no dashboard despite User.Entity itself
+// hard reload on '/dashboard' showed no dashboard despite User.Entity itself
 // being restored fine. Same call Group.select() already makes when
 // switching profile mid-session (User.selectContext() ->
 // refreshResaasContext()) - just also made once on a fresh mount here,

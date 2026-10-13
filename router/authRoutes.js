@@ -17,9 +17,11 @@ export const authRoutes = [
     component: () => import('../layouts/MainLayout.vue'),
     children: [
       { 
-        path: '/welcome', 
-        component: () => import('./../pages/WelcomeGuestPage.vue'), 
-        name: 'welcome'
+        // the signed-in user's start page while it has no Entity yet
+        // (was '/welcome' / name 'welcome')
+        path: '/home',
+        component: () => import('./../pages/WelcomeGuestPage.vue'),
+        name: 'home'
       }
     ],
   },

@@ -44,7 +44,7 @@ export default defineComponent({
 
   },
   props: {
-    // route location to open when the brand is clicked (e.g. { name: 'home' })
+    // route location to open when the brand is clicked (e.g. { name: 'dashboard' })
     to: { type: [Object, String], default: null }
   },
   setup () {

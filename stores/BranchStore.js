@@ -60,7 +60,7 @@ export const useBranchStore = createBaseStore(
           ) {
 
             User.redirect =
-              'authwelcome'
+              'welcome'
 
             return res
           }
@@ -114,7 +114,7 @@ export const useBranchStore = createBaseStore(
             () => {
 
               User.redirect =
-                'authwelcome'
+                'welcome'
 
             }
           )

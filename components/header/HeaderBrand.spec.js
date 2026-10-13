@@ -29,15 +29,15 @@ beforeEach(() => {
 
 describe('HeaderBrand - logo and entity name as the way home', () => {
   it('a click on the brand opens the given route', async () => {
-    const w = mountBrand({ to: { name: 'home' } })
+    const w = mountBrand({ to: { name: 'dashboard' } })
 
     await w.find('[data-test="header-brand"]').trigger('click')
 
-    expect(push).toHaveBeenCalledWith({ name: 'home' })
+    expect(push).toHaveBeenCalledWith({ name: 'dashboard' })
   })
 
   it('the logo and the name are part of the same clickable brand', async () => {
-    const w = mountBrand({ to: { name: 'home' } })
+    const w = mountBrand({ to: { name: 'dashboard' } })
 
     await w.find('img').trigger('click')
     await w.find('label').trigger('click')
@@ -46,14 +46,14 @@ describe('HeaderBrand - logo and entity name as the way home', () => {
   })
 
   it('is keyboard accessible (link role, focusable, Enter)', async () => {
-    const w = mountBrand({ to: { name: 'home' } })
+    const w = mountBrand({ to: { name: 'dashboard' } })
     const brand = w.find('[data-test="header-brand"]')
 
     expect(brand.attributes('role')).toBe('link')
     expect(brand.attributes('tabindex')).toBe('0')
 
     await brand.trigger('keydown.enter')
-    expect(push).toHaveBeenCalledWith({ name: 'home' })
+    expect(push).toHaveBeenCalledWith({ name: 'dashboard' })
   })
 
   it('shows the entity type instead when there is no entity', () => {
@@ -61,7 +61,7 @@ describe('HeaderBrand - logo and entity name as the way home', () => {
     user.Entity = null
     user.EntityType = { name: 'Hospital', icon: { url: 'http://x/i.png' } }
 
-    const w = mountBrand({ to: { name: 'home' } })
+    const w = mountBrand({ to: { name: 'dashboard' } })
 
     expect(w.text()).toContain('Hospital')
   })

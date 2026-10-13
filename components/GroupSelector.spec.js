@@ -67,7 +67,7 @@ describe('GroupSelector - click / double click', () => {
     expect(Group.select).toHaveBeenCalledTimes(1)
     expect(Group.select).toHaveBeenCalledWith(User.Group)
     expect(menuOpen(w)).toBe(false)
-    await vi.waitFor(() => expect(push).toHaveBeenCalledWith({ name: 'home' }))
+    await vi.waitFor(() => expect(push).toHaveBeenCalledWith({ name: 'dashboard' }))
   })
 
   it('choosing a profile in the list also ends on the home page', async () => {
@@ -80,6 +80,6 @@ describe('GroupSelector - click / double click', () => {
     expect(items.length).toBe(2)
     await items[1].trigger('click')
     await vi.waitFor(() => expect(Group.select).toHaveBeenCalledWith(User.Groups[1]))
-    await vi.waitFor(() => expect(push).toHaveBeenCalledWith({ name: 'home' }))
+    await vi.waitFor(() => expect(push).toHaveBeenCalledWith({ name: 'dashboard' }))
   })
 })

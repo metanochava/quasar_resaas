@@ -206,7 +206,7 @@ export default defineComponent({
       if (this.User) this.User.Group = group
 
       await this.getUserPermissions()
-      this.$router.push({ name: 'home', params: {} })
+      this.$router.push({ name: 'dashboard', params: {} })
     },
 
     /* --------------------- GET USER PERMISSIONS --------------------- */

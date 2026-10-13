@@ -27,7 +27,7 @@ const router = useRouter()
 // the page that was open may not be allowed with the new permissions.
 async function select (group) {
   await Group.select(group)
-  await router.push({ name: 'home' })
+  await router.push({ name: 'dashboard' })
 }
 
 // One click opens the list of profiles; a double click reloads the current

@@ -78,7 +78,7 @@ export const useGroupStore = createBaseStore(
 
 
         User.redirect =
-          'authwelcome'
+          'welcome'
       },
 
 
@@ -245,7 +245,7 @@ export const useGroupStore = createBaseStore(
           ) {
 
             User.redirect =
-              'authwelcome'
+              'welcome'
 
             return res
           }
@@ -311,7 +311,7 @@ export const useGroupStore = createBaseStore(
             () => {
 
               User.redirect =
-                'authwelcome'
+                'welcome'
 
             }
           )

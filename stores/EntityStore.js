@@ -681,7 +681,7 @@ export const useEntityStore = createBaseStore(
             ) {
 
               User.redirect =
-                'welcome'
+                'home'
 
               return
             }
@@ -726,7 +726,7 @@ export const useEntityStore = createBaseStore(
               () => {
 
                 User.redirect =
-                  'welcome'
+                  'home'
 
               }
             )

@@ -15,7 +15,7 @@
             round
             dense
             icon="home"
-            @click="$router.push({ name: 'home' })"
+            @click="$router.push({ name: 'dashboard' })"
           />
         </div> -->
         <div class=" col row items-center">

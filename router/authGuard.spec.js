@@ -62,7 +62,7 @@ describe('installAuthGuard - requiredRole', () => {
       fullPath: '/add_app'
     })
 
-    expect(result).toEqual({ name: 'home' })
+    expect(result).toEqual({ name: 'dashboard' })
   })
 
   it('warns with the current profile and the target route when blocking navigation', () => {
@@ -131,7 +131,7 @@ describe('installAuthGuard - requiredRole', () => {
       fullPath: '/add_app'
     })
 
-    expect(result).toEqual({ name: 'home' })
+    expect(result).toEqual({ name: 'dashboard' })
   })
 
   it('does not gate a route without requiredRole', () => {

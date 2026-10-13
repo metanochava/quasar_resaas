@@ -49,7 +49,7 @@
         <s-btn dense flat round icon="menu" @click="User.toggleLeftTop()" />
 
         <!-- Marca (logo + name): also the way back to the home page -->
-        <HeaderBrand :to="{ name: 'home' }" />
+        <HeaderBrand :to="{ name: 'dashboard' }" />
 
         <q-space />
 
@@ -77,7 +77,7 @@
         <!-- Menu Direito -->
         <s-btn dense flat round icon="menu" @click="User.toggleRightTop()" />
       </q-toolbar>
-      <q-bar  v-show="!User.LeftTop && !['authwelcome','welcome'].includes($route.name)">
+      <q-bar  v-show="!User.LeftTop && !['welcome','home'].includes($route.name)">
         <TopMenu ></TopMenu>
       </q-bar>
     </q-header>
@@ -275,7 +275,7 @@ export default defineComponent({
   // 🔥 WATCH GLOBAL (route + UI)
   watch: {
     $route(to) {
-      const ignore = ['authwelcome','welcome','login']
+      const ignore = ['welcome','home','login']
 
       // per user (base/persistence.js): another user signing in on this
       // browser never lands on this user's last page (and its ids)
@@ -328,8 +328,8 @@ export default defineComponent({
   // before any CHILD route component mounts, not after - Vue mounts
   // children bottom-up and only then runs the parent's own mounted(),
   // so putting loadFromStorage() there (as it was) meant a child like
-  // HomeDashboards.vue (mounted at '/home') read a still-empty
-  // User.Entity on a fresh page load. Works fine navigating to '/home' a
+  // HomeDashboards.vue (mounted at '/dashboard') read a still-empty
+  // User.Entity on a fresh page load. Works fine navigating to '/dashboard' a
   // second time within the same SPA session (MainLayout itself doesn't
   // remount, so loadFromStorage() already ran once) - only breaks on a
   // hard reload. beforeMount() still runs after MainLayout's OWN setup,
@@ -398,7 +398,7 @@ export default defineComponent({
     }
 
     // 🔥 your original behavior
-    if (['authwelcome','welcome'].includes(this.$route.name)){
+    if (['welcome','home'].includes(this.$route.name)){
       this.User.LeftTop = false
     }else{
       // 🔥 RESTORE MENUS

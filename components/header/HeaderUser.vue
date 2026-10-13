@@ -318,13 +318,13 @@ export default defineComponent({
       if (!val) return
 
       const allowedRoutes = [
-        'welcome',
-        'authwelcome'
+        'home',
+        'welcome'
       ]
 
       if (!allowedRoutes.includes(this.$route.name)) {
         this.$router.push({
-          name: 'home'
+          name: 'dashboard'
         })
       }
 
