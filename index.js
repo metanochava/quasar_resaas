@@ -151,6 +151,14 @@ export { default as PersonProfilePanel } from './components/person/PersonProfile
 
 
 export {
+  registerEntityTypeSite,
+  getEntityTypeSite,
+  clearEntityTypeSites
+} from "./services/entityTypeSites"
+
+export { entityTypeKey, findEntityType, entityTypeUrl } from "./utils/entityTypeHost"
+
+export {
   registerDashboard,
   registerDashboards,
   getDashboards,

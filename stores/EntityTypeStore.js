@@ -356,12 +356,15 @@ export const useEntityTypeStore = createBaseStore(
         }
       },
 
-      async getLayoutSettings(entityType) {
+      // force: load even without the 'userEntityType' flag - used by the
+      // public site at '/' (pages/EntityTypeSitePage.vue), which must show
+      // its EntityType's look; other callers keep the old behaviour.
+      async getLayoutSettings(entityType, { force = false } = {}) {
         try {
           const id = entityType || this.row?.id
           if (!id) return
 
-          if (!getStorage('l', 'userEntityType')) return
+          if (!force && !getStorage('l', 'userEntityType')) return
 
           const [theme, layout, typography, animation] = await Promise.all([
             HTTPClient.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/themeGet/` })),

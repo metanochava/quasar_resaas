@@ -38,6 +38,7 @@ import { tdc } from '../../services/translation'
 import { useUserStore } from '../../stores/UserStore'
 import { useEntityTypeStore } from '../../stores/EntityTypeStore'
 import { setStorage } from '../../services/storage';
+import { entityTypeKey, entityTypeUrl, isIpHost } from '../../utils/entityTypeHost'
 
 
 export default defineComponent({
@@ -72,24 +73,14 @@ export default defineComponent({
 
   methods: {
     isIP(host) {
-      return /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.includes(":");
+      return isIpHost(host)
     },
 
     async getHostname (tipoEnt) {
-      let domain = ''
+      // the EntityType of this host (utils/entityTypeHost.js, shared with
+      // the site page at '/')
+      const domain = entityTypeKey()
 
-      if (this.isIP(window.location.hostname)){
-        const url = new URL(window.location.href);
-        const entitytype = url.pathname.split("/").filter(Boolean)[0];
-        domain = entitytype
-
-      }else{
-        domain = window.location.href.split('/')[2].split('.')[0]
-        if (domain === 'www') {
-          domain = window.location.href.split('/')[2].split('.')[1]
-        }
-      }
-     
       if(domain){
         if (domain.toLocaleLowerCase() !== tipoEnt.name.toLowerCase()) {
           return true
@@ -107,16 +98,7 @@ export default defineComponent({
 
 
     selectteidadeLink(x){
-      var url = ''
-      if (this.isIP(window.location.hostname)){
-        url = new URL(window.location.href)
-        url.pathname = `/${x.name}/`
-      }else{
-        const parts = window.location.hostname.split('.')
-        parts[0] = x.name
-        url = `${window.location.protocol}//${parts.join('.')}`
-      }
-      window.open(url.toString(), '_blank');
+      window.open(entityTypeUrl(x), '_blank');
     }
 
   }
