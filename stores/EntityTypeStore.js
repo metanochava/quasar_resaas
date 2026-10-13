@@ -343,7 +343,7 @@ export const useEntityTypeStore = createBaseStore(
       async getEntityTypes() {
         try {
           const { data } = await HTTPAuth.get(
-            url({ type: "u", url: "django_resaas/entitytypes", params: {'objects': 'alive'} })
+            url({ type: "u", url: "django_resaas/entitytypes/", params: {'objects': 'alive'} })
           )
 
           this.rows = data || []

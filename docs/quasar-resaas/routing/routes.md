@@ -7,7 +7,7 @@ arrays for the host to mount however it wants.
 
 | Export | File | Contents |
 |---|---|---|
-| `authRoutes` | `router/authRoutes.js` | `/auth/login` (in `AuthLayout`) and `/home` (in `MainLayout`) |
+| `authRoutes` | `router/authRoutes.js` | `/` (the EntityType site) and `/auth/login` (in `AuthLayout`), and `/home` (in `MainLayout`) |
 | `restRoutes` | `router/restRoutes.js` | generic scaffold/crud + `entity`, `entity_type`, `group`, `branch`, `user`, `permission`, `employee` routes |
 | `docsRoutes` | `router/docsRoutes.js` | `/docs/:product/:slug(.*)*`, mounted under its own `DocLayout` (not `MainLayout`) — see [documentation (docsRoutes)](../README.md) |
 
@@ -52,6 +52,76 @@ the host app must define the other two:
 
 `MainLayout` hides the top q-bar and the left menu on `home` and `welcome`, and
 does not store them as the user's last route.
+
+## `/` - the site of the host's EntityType
+
+`authRoutes` starts with `/` (name `site`): `pages/EntityTypeSitePage.vue`
+inside `AuthLayout` (the login's header and footer, whose look is the
+EntityType's theme/layout configured in the backend).
+
+1. The page reads the EntityType catalogue (`GET django_resaas/entitytypes/`,
+   PUBLIC list: `id`, `name`, `label`, `icon`, `ordem`, `site`).
+2. It picks this host's type with `findEntityType()` (`utils/entityTypeHost.js`,
+   the same rule as the header's services menu): the first subdomain label
+   (`saude.example.com` → `Saude`, `www` skipped) or, on an IP address, the
+   first path segment. The comparison ignores case.
+3. It loads that type's theme, layout, typography and animation
+   (`EntityTypeStore.getLayoutSettings(id, { force: true })`, PUBLIC reads), so
+   the page wears the type's colours (`--q-primary`, `--q-secondary`,
+   `--q-accent`, set on `body` by `applyTheme()`).
+4. It renders the site an application registered for the type, or the
+   generic one, `components/site/EntityTypeDefaultSite.vue`. A host that
+   matches no type shows the list of sectors, each linking to its subdomain
+   (`entityTypeUrl()`).
+
+### The content comes from the database (`EntityType.site`)
+
+`EntityTypeDefaultSite.vue` draws everything from `entityType.site` (backend:
+the JSON field `EntityType.site`, see django_resaas
+[Public sites](../../django-resaas/features/public-sites.md#entity-type-sites-entitytypesite)).
+Every key is optional; texts are canonical English, translated with `tdc()`.
+
+| Key | Renders |
+|---|---|
+| `layout` | The look: `orbit` (default; the type's icon orbited by `hero.icons`), `centered` (one column, icon chips, a wave), `split` (deep striped hero with a card listing the first four features; accent on the call to action), `mosaic` (the other sectors as floating tiles). An unknown value is `orbit` |
+| `hero` | `eyebrow`, `title`, `subtitle`, `badges[]`, `icons[]` (Material icon names, up to 6) |
+| `stats[]` | `{value, label}` band under the hero |
+| `features` | `title`, `subtitle`, `items[]` of `{icon, title, text}` |
+| `steps` | `title`, `items[]` of `{title, text}` |
+| `faq` | `title`, `items[]` of `{question, answer}` |
+| `cta` | `title`, `text` - the closing band |
+| `show_sectors` | `true` lists the other types (the platform's own site) |
+
+Without content the page shows "Welcome to {name}" (or "Choose your sector"),
+Sign In / Create Account, or Open dashboard when signed in. Colours come from
+the type's Theme (`primary`, `secondary`, `accent`), never from `site`.
+Hooks: `entity-type-default-site` (with `data-layout`), `site-title`,
+`site-stats`, `site-features`, `site-steps`, `site-sectors`, `site-faq`,
+`site-cta`.
+
+### Override: a site per EntityType in code
+
+An application may still replace the body for a type (lazy):
+
+```js
+import { registerEntityTypeSite } from 'quasar_resaas'
+
+registerEntityTypeSite('Saude', () => import('./sites/SaudeSite.vue'))
+```
+
+A registered site gets the props `entityType`, `entityTypes` and `signedIn`
+and renders only the body (no header/footer). Only public data reaches this
+page; it never needs a session. Tests: `services/entityTypeSites.spec.js`,
+`utils/entityTypeHost.spec.js`.
+
+| Symptom | Check |
+|---|---|
+| `/` shows the list of sectors on a type's host | The subdomain's first label must equal the EntityType `name` (e.g. `farmacia.…` needs a type named `Farmacia`) |
+| Only "Welcome to {name}" | `EntityType.site` is empty: load it with `manage.py load_entity_type_sites` |
+| All types look the same | Their Themes have the same `primary`/`secondary`/`accent`; set them (the `themes` part of the same file) |
+| Texts stay in English | The Translation rows were not loaded, or the browser still holds the old translation map (sign out/in or switch language) |
+| The generic site instead of the application's | `registerEntityTypeSite` name differs from the EntityType `name`, or the registering module is not imported |
+| Endless loading | The API is unreachable (a 502 shows in the console as a CORS error) |
 
 > **Breaking change (renamed routes).** Before, these were `home` (`/home`,
 > dashboards), `welcome` (`/welcome`, no Entity) and `authwelcome`

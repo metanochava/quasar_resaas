@@ -2,9 +2,16 @@
 
 
 export const authRoutes = [
-  // '/': the public site of this host's EntityType (services/entityTypeSites.js).
-  // First, so it wins over the MainLayout parents that also match '/'.
-  { path: '/', component: () => import('../pages/EntityTypeSitePage.vue'), name: 'site' },
+  // '/': the public site of this host's EntityType (services/entityTypeSites.js),
+  // in the login's layout. First, so it wins over the MainLayout parents that
+  // also match '/'.
+  {
+    path: '/',
+    component: () => import('../layouts/AuthLayout.vue'),
+    children: [
+      { path: '', component: () => import('../pages/EntityTypeSitePage.vue'), name: 'site' },
+    ],
+  },
   {
     path: '/auth/',
     component: () => import('../layouts/AuthLayout.vue'),
