@@ -4,7 +4,7 @@ export const useNotificationTemplateStore = createBaseStore(
   'notificationTemplate',
   {
     app: 'notifications',
-    model: 'NotificationTemplate'
+    model: 'NotificationTemplate', url: 'notifications/templates'
   },
   {
     state: () => ({

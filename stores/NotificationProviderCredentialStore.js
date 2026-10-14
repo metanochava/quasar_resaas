@@ -4,7 +4,7 @@ export const useNotificationProviderCredentialStore = createBaseStore(
   'notificationProviderCredential',
   {
     app: 'notifications',
-    model: 'NotificationProviderCredential'
+    model: 'NotificationProviderCredential', url: 'notifications/provider-credentials'
   },
   {
     state: () => ({

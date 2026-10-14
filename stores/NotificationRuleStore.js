@@ -4,7 +4,7 @@ export const useNotificationRuleStore = createBaseStore(
   'notificationRule',
   {
     app: 'notifications',
-    model: 'NotificationRule'
+    model: 'NotificationRule', url: 'notifications/rules'
   },
   {
     state: () => ({

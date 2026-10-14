@@ -114,7 +114,13 @@ export function createBaseStore(name, config, extend = {}) {
 
   // 🔥 IMMUTABLE CONFIG (NEVER CHANGES)
   const BASE_CONFIG = Object.freeze({
-    url: '' + config.app + '/' + config.model.toLowerCase() + 's',
+    // config.url: the resource's real path when the backend registered the
+    // view under its own name (@register_view("instances") -> "workflow/
+    // instances"); otherwise the "{app}/{model}s" convention. The schema's
+    // model.endpoint still wins once loadSchema() resolves.
+    url: config.url
+      ? String(config.url).replace(/^\/+|\/+$/g, '')
+      : '' + config.app + '/' + config.model.toLowerCase() + 's',
     app: config.app,
     model: config.model
   })

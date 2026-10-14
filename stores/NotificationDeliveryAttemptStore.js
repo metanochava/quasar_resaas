@@ -4,7 +4,7 @@ export const useNotificationDeliveryAttemptStore = createBaseStore(
   'notificationDeliveryAttempt',
   {
     app: 'notifications',
-    model: 'NotificationDeliveryAttempt'
+    model: 'NotificationDeliveryAttempt', url: 'notifications/delivery-attempts'
   },
   {
     state: () => ({

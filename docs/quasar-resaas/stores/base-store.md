@@ -14,7 +14,12 @@ export const useBranchStore = createBaseStore(
 ## Immutable config
 
 `BASE_CONFIG` is generated once (`Object.freeze`) from `config.app`/`config.model`,
-and derives a fallback `url` as `` `${app}/${model.toLowerCase()}s` ``. Actions
+and derives a fallback `url` as `` `${app}/${model.toLowerCase()}s` `` - or takes
+`config.url` when the backend registered the view under its own name
+(`@register_view("instances")` → `createBaseStore('x', { app: 'workflow', model:
+'WorkflowInstance', url: 'workflow/instances' })`). Declare it in every store whose
+resource name is not the convention and which calls the API before (or without)
+loading its schema, e.g. custom actions like `${this.safeUrl}/inbox/`. Actions
 should never build this URL by hand — they always use the `safeApp`, `safeModel`,
 `safeUrl` getters.
 

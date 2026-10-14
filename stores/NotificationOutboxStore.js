@@ -4,7 +4,7 @@ export const useNotificationOutboxStore = createBaseStore(
   'notificationOutbox',
   {
     app: 'notifications',
-    model: 'NotificationOutbox'
+    model: 'NotificationOutbox', url: 'notifications/outbox'
   },
   {
     state: () => ({

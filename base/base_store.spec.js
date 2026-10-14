@@ -60,6 +60,16 @@ describe('createBaseStore - safeUrl authority', () => {
     expect(store.safeUrl).toBe('demo/products')
   })
 
+  it('uses config.url when the backend registered the view under its own name', () => {
+    const useInstanceStore = createBaseStore('instance-url-config', {
+      app: 'workflow',
+      model: 'WorkflowInstance',
+      url: '/workflow/instances/',
+    })
+
+    expect(useInstanceStore().safeUrl).toBe('workflow/instances')
+  })
+
   it('prefers schema.model.endpoint once loadSchema() resolves', async () => {
     buildFormFromSchema.mockResolvedValue({
       fields: [], actions: [], config: {}, permissions: {}, pdf: {},

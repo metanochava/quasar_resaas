@@ -4,7 +4,7 @@ export const useNotificationPreferenceStore = createBaseStore(
   'notificationPreference',
   {
     app: 'notifications',
-    model: 'NotificationPreference'
+    model: 'NotificationPreference', url: 'notifications/preferences'
   },
   {
     state: () => ({
