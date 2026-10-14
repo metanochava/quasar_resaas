@@ -18,7 +18,6 @@
       <s-modal-card :title="tdc('Theme Management')" icon="palette" fullscreen @close="openTheme = false">
         <ThemeStudioEngine
           scope="user"
-          :allow-scope-select="false"
           :user="UserAdmin.form"
           :user-store="UserAdmin"
           :themes="Theme.rows"

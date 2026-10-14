@@ -62,9 +62,7 @@
 
       <s-modal-card :title="tdc('Theme Management')" icon="palette" fullscreen @close="openTheme = false">
         <ThemeStudioEngine
-          v-model:scope="themeStudioScope"
-
-          :allow-scope-select="false"
+          scope="entity_type"
 
           :entity-type="EntityType.form"
 
@@ -311,11 +309,8 @@ const openTheme = ref(false)
 
 
 // ===========================================================
-// THEME STUDIO SCOPE
+// THEME STUDIO SCOPE: fixed to "entity_type" in the template
 // ===========================================================
-
-const themeStudioScope =
-  ref('entity_type')
 
 
 // ===========================================================
@@ -417,12 +412,6 @@ async function openThemeStudio() {
 
   try {
 
-    // =======================================================
-    // DESTA PÁGINA SÓ EDITAMOS ENTITY TYPE
-    // =======================================================
-
-    themeStudioScope.value =
-      'entity_type'
 
 
     // =======================================================

@@ -13,8 +13,7 @@
     <q-dialog v-model="User.ThemeStudio" full-width full-height>
       <s-modal-card :title="tdc('Theme Management')" icon="palette" fullscreen>
         <ThemeStudioEngine
-          v-model:scope="themeStudioScope"
-          allow-scope-select
+          scope="user"
           :entity-type="EntityType.row"
           :entity="User.Entity"
           :user="User.data"
@@ -23,7 +22,7 @@
           :user-store="User"
           :themes="Theme.rows"
           :layouts="LayoutSetting.rows"
-          @saved="Entity.getLayoutSettings(User.Entity?.id)"
+          @saved="onThemeSaved"
         />
       </s-modal-card>
     </q-dialog>
@@ -233,7 +232,6 @@ export default defineComponent({
       api_retorno_modal: false,
       visibilidadeLoad: false,
       comments: false,
-      themeStudioScope: 'entity',
       miniState: false,
     }
   },
@@ -415,7 +413,14 @@ export default defineComponent({
     })
   },
 
-  methods: {}
+  methods: {
+    // the user's own appearance changed: reload /me/ (its ui_config is the
+    // effective User > Entity > EntityType look) and apply it
+    async onThemeSaved () {
+      await this.User.me()
+      this.User.setSettings()
+    },
+}
 })
 </script>
 

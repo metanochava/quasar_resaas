@@ -12,6 +12,11 @@ const IGNORED_KEYS = [
   'created_by',
   'updated_by',
   'surfaces',
+  // ownership of a customized theme (django_resaas ThemeAPIView.customize)
+  'owner_entity_type',
+  'owner_entity',
+  'owner_user',
+  'owner_scope',
 ]
 
 function isColorValue(value) {

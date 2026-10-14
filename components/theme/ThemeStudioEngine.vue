@@ -25,8 +25,8 @@
               {{ tdc('Appearance') }}
             </div>
 
-            <div class="text-body2 text-white text-opacity-80 q-mt-xs">
-              {{ tdc('Customize theme, layout, typography and animations.') }}
+            <div class="text-body2 text-white text-opacity-80 q-mt-xs" data-test="theme-studio-scope-description">
+              {{ scopeDescription }}
             </div>
 
             <div class="row items-center q-gutter-sm q-mt-md">
@@ -73,44 +73,6 @@
               </div>
             </div>
 
-          </div>
-
-        </div>
-
-      </q-card-section>
-    </q-card>
-
-
-    <!-- ===================================================== -->
-    <!-- TARGET -->
-    <!-- ===================================================== -->
-
-    <q-card v-if="allowScopeSelect" flat bordered class="settings-card q-mt-md">
-      <q-card-section>
-
-        <div class="row items-center justify-between q-col-gutter-md">
-
-          <div class="col-12 col-md">
-            <div class="section-label">
-              {{ tdc('Configuration level') }}
-            </div>
-
-            <div class="text-caption text-grey-7">
-              {{ tdc('Choose which level you want to configure.') }}
-            </div>
-          </div>
-
-          <div class="col-12 col-md-auto">
-            <q-btn-toggle
-              v-model="localScope"
-              unelevated
-              no-caps
-              rounded
-              toggle-color="primary"
-              color="grey-2"
-              text-color="grey-8"
-              :options="scopeOptions"
-            />
           </div>
 
         </div>
@@ -185,38 +147,48 @@
                 @reset="resetField('theme')"
               />
 
-              <q-select
-                v-model="form.theme"
-                outlined
-                clearable
-                emit-value
-                map-options
-                option-value="value"
-                option-label="label"
-                :options="themeOptions"
-                :label="tdc('Theme')"
-                class="q-mt-md"
-              >
-                <template #prepend>
-                  <q-icon name="palette" />
-                </template>
+              <!-- TEMPLATES: use one as it is, customize a copy for this
+                   level, or edit a theme that already belongs to it -->
+              <div v-if="ownThemes.length" class="q-mt-md" data-test="theme-own">
+                <div class="text-subtitle2 text-weight-bold q-mb-sm">{{ tdc('Themes of this level') }}</div>
+                <div class="row q-col-gutter-sm">
+                  <div v-for="theme in ownThemes" :key="theme.id" class="col-12 col-sm-6 col-md-4">
+                    <div class="theme-tile" :class="{ 'theme-tile--active': String(form.theme) === String(theme.id) }">
+                      <div class="theme-tile__swatch" :style="themeOptionStyle(theme)" />
+                      <div class="theme-tile__body">
+                        <div class="text-weight-medium ellipsis">{{ theme.name }}</div>
+                        <div class="row q-gutter-xs q-mt-xs">
+                          <s-btn dense flat no-caps size="sm" color="primary" icon="check" :label="tdc('Use')" @click="useTheme(theme)" />
+                          <s-btn dense flat no-caps size="sm" color="secondary" icon="edit" :label="tdc('Edit')" data-test="theme-edit" @click="openEdit(theme)" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                <template #option="scope">
-                  <q-item v-bind="scope.itemProps">
-                    <q-item-section avatar>
-                      <div class="theme-option-preview" :style="themeOptionStyle(scope.opt.raw)" />
-                    </q-item-section>
-
-                    <q-item-section>
-                      <q-item-label>{{ scope.opt.label }}</q-item-label>
-                      <q-item-label caption>{{ tdc('Theme configuration') }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </template>
-              </q-select>
-
-              <div v-if="!themeOptions.length" class="text-caption text-grey-7 q-mt-sm">
-                {{ tdc('No themes available yet.') }}
+              <div class="q-mt-md" data-test="theme-templates">
+                <div class="text-subtitle2 text-weight-bold">{{ tdc('Templates') }}</div>
+                <div class="text-caption text-grey-7 q-mb-sm">
+                  {{ tdc('Use a template as it is, or customize a copy of it for this level. Templates themselves are never changed.') }}
+                </div>
+                <div v-if="!templateThemes.length && !ownThemes.length" class="text-caption text-grey-7">
+                  {{ tdc('No themes available yet.') }}
+                </div>
+                <div class="row q-col-gutter-sm">
+                  <div v-for="theme in templateThemes" :key="theme.id" class="col-12 col-sm-6 col-md-4">
+                    <div class="theme-tile" :class="{ 'theme-tile--active': String(form.theme) === String(theme.id) }">
+                      <div class="theme-tile__swatch" :style="themeOptionStyle(theme)" />
+                      <div class="theme-tile__body">
+                        <div class="text-weight-medium ellipsis">{{ theme.name }}</div>
+                        <div class="row q-gutter-xs q-mt-xs">
+                          <s-btn dense flat no-caps size="sm" color="primary" icon="check" :label="tdc('Use')" data-test="theme-use" @click="useTheme(theme)" />
+                          <s-btn dense flat no-caps size="sm" color="accent" icon="tune" :label="tdc('Customize')" data-test="theme-customize" @click="openCustomize(theme)" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <!-- THEME COLORS -->
@@ -664,6 +636,49 @@
 
 
     <!-- ===================================================== -->
+    <!-- THEME EDITOR (customize a copy / edit this level's theme) -->
+    <!-- ===================================================== -->
+
+    <q-dialog v-model="editor.open" persistent>
+      <s-modal-card
+        :title="editor.mode === 'edit' ? tdc('Edit theme') : tdc('Customize theme')"
+        icon="tune"
+        width="640px"
+        :close-disable="editor.saving"
+        @close="editor.open = false"
+      >
+        <div class="text-caption text-grey-7 q-mb-md">
+          {{ editor.mode === 'edit'
+            ? tdc('Changes apply wherever this theme of this level is used.')
+            : tdc('A new theme is created for this level from the chosen one, and applied. The original is not changed.') }}
+        </div>
+
+        <s-input v-model="editor.name" outlined dense :label="tdc('Name')" class="q-mb-md" data-test="theme-editor-name" />
+
+        <div class="theme-editor-preview q-mb-md" :style="themeOptionStyle({ ...editor.source, ...editor.values })" />
+
+        <div class="row q-col-gutter-sm">
+          <div v-for="color in editorColors" :key="color.key" class="col-12 col-sm-6">
+            <ColorField v-model="editor.values[color.key]" :label="color.label" />
+          </div>
+        </div>
+
+        <template #footer>
+          <s-btn flat no-caps :label="tdc('Cancel')" :disable="editor.saving" @click="editor.open = false" />
+          <s-btn
+            unelevated no-caps color="primary" icon="save"
+            :label="editor.mode === 'edit' ? tdc('Save') : tdc('Create and apply')"
+            :loading="editor.saving"
+            :disable="!editor.name"
+            data-test="theme-editor-save"
+            @click="saveEditor"
+          />
+        </template>
+      </s-modal-card>
+    </q-dialog>
+
+
+    <!-- ===================================================== -->
     <!-- ACTION BAR -->
     <!-- ===================================================== -->
 
@@ -721,6 +736,7 @@
 import { defineComponent, h } from 'vue'
 import { tdc } from '../../services/translation'
 import { useThemeStudio } from './useThemeStudio.js'
+import ColorField from './ColorField.vue'
 
 // ===========================================================
 // PROPS
@@ -728,15 +744,11 @@ import { useThemeStudio } from './useThemeStudio.js'
 
 const props = defineProps({
 
-  // entity_type | entity | user
+  // entity_type | entity | user - fixed by the screen that opens the
+  // studio (EntityType page, Entity page, user page / header Appearance)
   scope: {
     type: String,
     default: 'user',
-  },
-
-  allowScopeSelect: {
-    type: Boolean,
-    default: false,
   },
 
   // Registos completos - necessários para calcular
@@ -771,8 +783,16 @@ const {
   localScope,
   previewMode,
   previewDark,
-  scopeOptions,
   scopeLabel,
+  scopeDescription,
+  ownThemes,
+  templateThemes,
+  useTheme,
+  editor,
+  editorColors,
+  openCustomize,
+  openEdit,
+  saveEditor,
   targetName,
   inheritanceDescription,
   themeOptions,

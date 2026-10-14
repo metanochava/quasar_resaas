@@ -2,6 +2,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { Notify } from 'quasar'
 
 import { tdc } from '../../services/translation'
+import { HTTPAuth, url } from '../../services/api'
 import { errorMessage } from '../../utils/apiContract'
 import { resolveEffectiveConfig } from '../../theme/resolveEffectiveConfig.js'
 import { surfaceToStyle, surfacesToList } from '../../theme/surfaceToStyle.js'
@@ -35,12 +36,6 @@ export function useThemeStudio(props, emit) {
   const previewMode = ref('desktop') // desktop | mobile
   const previewDark = ref(false)
 
-  const scopeOptions = computed(() => [
-    { label: tdc('Entity Type'), value: 'entity_type', icon: 'category' },
-    { label: tdc('Entity'), value: 'entity', icon: 'business' },
-    { label: tdc('User'), value: 'user', icon: 'person' },
-  ])
-
   const scopeLabel = computed(() => {
     if (localScope.value === 'entity_type') return tdc('Entity Type')
     if (localScope.value === 'entity') return tdc('Entity')
@@ -62,6 +57,20 @@ export function useThemeStudio(props, emit) {
     if (localScope.value === 'entity_type') return props.entityTypeStore
     if (localScope.value === 'entity') return props.entityStore
     return props.userStore
+  })
+
+  // What this level is, said in its own words: the level is fixed by the
+  // screen that opened the studio (EntityType page, Entity page, user page /
+  // header Appearance) - it is never chosen here.
+  const scopeDescription = computed(() => {
+    const name = targetName.value
+    if (localScope.value === 'entity_type') {
+      return tdc('Default appearance of every Entity of this type. Entities and users may customize it.') + (name ? ` (${name})` : '')
+    }
+    if (localScope.value === 'entity') {
+      return tdc('Appearance of this organisation for all its users. Empty values come from the Entity Type.') + (name ? ` (${name})` : '')
+    }
+    return tdc('Your personal appearance: only you see it. Empty values come from your organisation.')
   })
 
   const inheritanceDescription = computed(() => {
@@ -102,7 +111,15 @@ export function useThemeStudio(props, emit) {
     }))
   }
 
-  const themeOptions = computed(() => makeOptions(props.themes))
+  // the catalogue as given by the parent, plus the copies made here
+  const localThemes = ref([...(props.themes || [])])
+  watch(() => props.themes, rows => {
+    const byId = new Map((rows || []).map(row => [String(row.id), row]))
+    for (const row of localThemes.value) if (!byId.has(String(row.id))) byId.set(String(row.id), row)
+    localThemes.value = [...byId.values()]
+  })
+
+  const themeOptions = computed(() => makeOptions(localThemes.value))
   const layoutOptions = computed(() => makeOptions(props.layouts))
   const typographyOptions = computed(() => makeOptions(props.typographies))
   const animationOptions = computed(() => makeOptions(props.animations))
@@ -210,7 +227,7 @@ export function useThemeStudio(props, emit) {
   // SELECTED OBJECTS
   // =========================================================
 
-  const selectedTheme = computed(() => findObject(props.themes, effectiveValue('theme')))
+  const selectedTheme = computed(() => findObject(localThemes.value, effectiveValue('theme')))
   const selectedLayout = computed(() => findObject(props.layouts, effectiveValue('layout_settings')))
   const selectedTypography = computed(() => findObject(props.typographies, effectiveValue('typography')))
   const selectedAnimation = computed(() => findObject(props.animations, effectiveValue('animation_settings')))
@@ -225,7 +242,7 @@ export function useThemeStudio(props, emit) {
     if (!value) return tdc('Not configured')
 
     const rowsByField = {
-      theme: props.themes,
+      theme: localThemes.value,
       layout_settings: props.layouts,
       typography: props.typographies,
       animation_settings: props.animations,
@@ -351,6 +368,94 @@ export function useThemeStudio(props, emit) {
   ]
 
   // =========================================================
+  // TEMPLATES (gallery) AND THE COLOUR EDITOR
+  // =========================================================
+  // A theme without owner is a template (shared): it can be USED as it is,
+  // or CUSTOMIZED - copied for this level (POST themes/{id}/customize/) and
+  // applied. A theme that belongs to this level can be EDITED in place.
+  // django_resaas data/theme/views/theme.py decides who may do what.
+
+  const OWNER_FIELD = { entity_type: 'owner_entity_type', entity: 'owner_entity', user: 'owner_user' }
+
+  function ownerId(theme, field) {
+    const value = theme?.[field]
+    return value && typeof value === 'object' ? (value.value ?? value.id) : value
+  }
+
+  function belongsHere(theme) {
+    const id = target.value?.id
+    return Boolean(id) && String(ownerId(theme, OWNER_FIELD[localScope.value]) || '') === String(id)
+  }
+
+  const ownThemes = computed(() => localThemes.value.filter(belongsHere))
+  const templateThemes = computed(() => localThemes.value.filter(theme => (theme.owner_scope || 'template') === 'template'))
+
+  function useTheme(theme) {
+    form.theme = getValue(theme)
+  }
+
+  const EDITABLE_COLORS = [
+    ['primary', 'Primary'], ['secondary', 'Secondary'], ['accent', 'Accent'],
+    ['positive', 'Positive'], ['negative', 'Negative'], ['warning', 'Warning'],
+    ['background', 'Background'], ['card', 'Card'],
+    ['header', 'Header'], ['header_text', 'Header text'],
+    ['footer', 'Footer'], ['footer_text', 'Footer text'],
+  ]
+  const editorColors = computed(() => EDITABLE_COLORS.map(([key, label]) => ({ key, label: tdc(label) })))
+
+  const editor = reactive({ open: false, mode: 'customize', source: null, name: '', values: {}, saving: false })
+
+  function openCustomize(theme) {
+    Object.assign(editor, {
+      open: true,
+      mode: 'customize',
+      source: theme,
+      name: `${optionLabel(theme)} (${targetName.value || scopeLabel.value})`.slice(0, 100),
+      values: Object.fromEntries(EDITABLE_COLORS.map(([key]) => [key, theme?.[key] || null])),
+    })
+  }
+
+  function openEdit(theme) {
+    openCustomize(theme)
+    editor.mode = 'edit'
+    editor.name = optionLabel(theme)
+  }
+
+  async function saveEditor() {
+    if (!editor.source) return
+    const values = Object.fromEntries(Object.entries(editor.values).filter(([, value]) => value))
+    editor.saving = true
+    try {
+      let theme
+      if (editor.mode === 'edit') {
+        const { data } = await HTTPAuth.patch(
+          url({ type: 'u', url: `django_resaas/themes/${editor.source.id}/` }),
+          { name: editor.name, ...values },
+        )
+        theme = data
+        localThemes.value = localThemes.value.map(row => (String(row.id) === String(theme.id) ? theme : row))
+      } else {
+        const { data } = await HTTPAuth.post(
+          url({ type: 'u', url: `django_resaas/themes/${editor.source.id}/customize/` }),
+          { scope: localScope.value, target: target.value?.id || null, name: editor.name, values },
+        )
+        theme = data
+        localThemes.value = [...localThemes.value, theme]
+        // the backend already applied it to this level
+        form.theme = theme.id
+        original.theme = theme.id
+      }
+      editor.open = false
+      emit('saved', { scope: localScope.value, id: target.value?.id, payload: { theme: form.theme } })
+    } catch (error) {
+      // the error itself is shown by the API response interceptor
+      console.error('[ThemeStudioEngine] theme editor', error)
+    } finally {
+      editor.saving = false
+    }
+  }
+
+  // =========================================================
   // SAVE
   // =========================================================
   // Grava só o override (FK id ou null) - nunca a configuração
@@ -399,6 +504,10 @@ export function useThemeStudio(props, emit) {
           await store.updateById(id, payload)
         } else if (typeof store.patch === 'function') {
           await store.patch(id, payload)
+        } else if (typeof store.updateProfile === 'function') {
+          // UserStore (the signed-in user, header Appearance): PATCH
+          // django_resaas/users/{id}/ with the 4 override fields
+          await store.updateProfile(payload)
         } else if (typeof store.save === 'function') {
           store.row = { ...(store.row || {}), ...payload, id }
           await store.save()
@@ -442,10 +551,7 @@ export function useThemeStudio(props, emit) {
     localScope.value = value
   })
 
-  watch(localScope, value => {
-    emit('update:scope', value)
-    loadForm()
-  })
+  watch(localScope, () => loadForm())
 
   watch(
     [() => props.entityType, () => props.entity, () => props.user],
@@ -460,11 +566,22 @@ export function useThemeStudio(props, emit) {
     localScope,
     previewMode,
     previewDark,
-    scopeOptions,
     scopeLabel,
+    scopeDescription,
     target,
     targetName,
     inheritanceDescription,
+
+    // templates / editor
+    ownThemes,
+    templateThemes,
+    belongsHere,
+    useTheme,
+    editor,
+    editorColors,
+    openCustomize,
+    openEdit,
+    saveEditor,
 
     // options
     themeOptions,

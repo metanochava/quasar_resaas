@@ -329,8 +329,12 @@ export const useUserStore = createBaseStore(
         })
     },
 
+    // applies the EFFECTIVE look (User > Entity > EntityType, /me/'s
+    // ui_config via the ps getter), falling back to the Entity's own settings
+    // until /me/ answers - so a user's personal theme really colours the app
     setSettings(){
-      setSettings(this.Theme, this.LayoutSettings, this.Typography, this.AnimationSettings)
+      const ps = this.ps
+      setSettings(ps.theme || this.Theme, ps.layout || this.LayoutSettings, ps.typography || this.Typography, ps.animation || this.AnimationSettings)
     },
    
     isTokenExpired (token) {

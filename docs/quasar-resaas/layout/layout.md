@@ -109,8 +109,9 @@ screen:
 - `User.Settings` (`User.toggleSettings()`) opens `UserAccountModal` — the
   logged-in user's own profile/security (personal data, password, phone
   number).
-- `User.ThemeStudio` (`User.toggleThemeStudio()`) opens `DefinicoesLayout`
-  — the entity-wide Theme Studio (colors, font, layout, animation).
+- `User.ThemeStudio` (`User.toggleThemeStudio()`, header **Appearance**) opens the
+  Theme Studio at the **user** level - the signed-in user's personal look. See
+  [Theme Management](../features/theme-studio.md).
 
 > [!NOTE]
 > There's also a page-permissions dialog (`PagePermissoes`) mounted here —

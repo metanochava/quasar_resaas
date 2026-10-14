@@ -455,3 +455,38 @@
     bottom: 4px;
   }
 }
+
+// template gallery (Theme tab) and the colour editor
+.theme-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(128, 128, 128, 0.22);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &--active {
+    border-color: var(--q-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--q-primary) 25%, transparent);
+  }
+
+  &__swatch {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  &__body {
+    min-width: 0;
+    flex: 1;
+  }
+}
+
+.theme-editor-preview {
+  height: 56px;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}

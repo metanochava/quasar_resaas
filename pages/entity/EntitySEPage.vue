@@ -64,9 +64,7 @@
 
       <s-modal-card :title="tdc('Theme Management')" icon="palette" fullscreen @close="openTheme = false">
         <ThemeStudioEngine
-          v-model:scope="themeStudioScope"
-
-          :allow-scope-select="false"
+          scope="entity"
 
           :entity-type="EntityType.row"
 
@@ -332,7 +330,6 @@ const entityTypeId = computed(() => {
 // THEME STUDIO
 // ===========================================================
 
-const themeStudioScope = ref('entity')
 
 
 // ===========================================================
@@ -473,12 +470,6 @@ async function openThemeStudio() {
 
   try {
 
-    // =======================================================
-    // Scope fixo desta página
-    // =======================================================
-
-    themeStudioScope.value =
-      'entity'
 
 
     // =======================================================
