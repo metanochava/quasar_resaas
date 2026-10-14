@@ -11,7 +11,8 @@ Minimal layout for the public pages (`/` - the EntityType site -,
 dark mode, fullscreen, language, services and - **while there is a session**
 (`User.isLogin` or a stored access token) - the same notifications
 (`HeaderNotifications`) and user menu (`HeaderUser`: profile, Entity / Branch /
-profile choice, and the actions Go to site (`/`, `header-site`), Settings
+profile choice - the Entity and Branch entries only when the user has at least
+one, and the actions Go to site (`/`, `header-site`), Settings
 (`header-settings`), Appearance (`header-appearance`) and Logout - each in its own Theme colour:
 `primary`, `secondary`, `accent`, `negative`) as
 MainLayout) + `router-view` + footer. No drawers, no menus.

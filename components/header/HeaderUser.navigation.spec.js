@@ -72,3 +72,23 @@ describe('HeaderUser - the site button', () => {
     expect(wrapper.find('[data-test="header-site"]').exists()).toBe(true)
   })
 })
+
+describe('HeaderUser - Entity / Branch entries', () => {
+  it('are hidden when the user has no Entity and no Branch', () => {
+    User.Entitys = []
+    User.Branchs = []
+    const wrapper = mountHeader('site')
+
+    expect(wrapper.find('[data-test="header-entities"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="header-branches"]').exists()).toBe(false)
+  })
+
+  it('are shown when there is something to choose', () => {
+    User.Entitys = [{ id: 'e1', name: 'Amal' }]
+    User.Branchs = [{ id: 'b1', name: 'Sede' }]
+    const wrapper = mountHeader('dashboard')
+
+    expect(wrapper.find('[data-test="header-entities"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="header-branches"]').exists()).toBe(true)
+  })
+})

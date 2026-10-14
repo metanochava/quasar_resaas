@@ -51,6 +51,8 @@ describe('HeaderUser - the settings button', () => {
 describe('HeaderUser - "Register Entity"', () => {
   it('is centred in its menu entry', async () => {
     User.EntityType = { crair_entity: true }
+    // the entry lives in the Entity list, shown only when there is an Entity
+    User.Entitys = [{ id: 'e1', name: 'Amal' }]
     const wrapper = mountHeader()
 
     const label = wrapper.find('[data-test="register-entity"]')

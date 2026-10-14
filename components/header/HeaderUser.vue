@@ -98,9 +98,12 @@
           <q-separator v-if="User" />
 
           <!-- ENTIDADES -->
+          <!-- only when there is something to choose: a user with no Entity
+               (or no Branch) sees no empty Entity / Branch entry -->
           <q-expansion-item
-            v-if="User.data"
+            v-if="User.data && User.Entitys?.length"
             v-model="entityClosed"
+            data-test="header-entities"
             dense
             group="header-user-group"
             :label="User?.Entity?.name || tdc('Entity')"
@@ -143,8 +146,9 @@
 
           <!-- SUCURSAIS -->
           <q-expansion-item
-            v-if="User.data"
+            v-if="User.data && User.Branchs?.length"
             v-model="branchClosed"
+            data-test="header-branches"
             dense
             group="header-user-group"
             :label="User?.Branch?.name || tdc('Branch')"
