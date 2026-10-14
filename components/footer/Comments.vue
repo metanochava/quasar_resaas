@@ -42,7 +42,6 @@
 
       <s-btn
         color="primary"
-        icon="send"
         :loading="loading"
         :disable="loading"
         @click="comentar"

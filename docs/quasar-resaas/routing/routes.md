@@ -7,7 +7,7 @@ arrays for the host to mount however it wants.
 
 | Export | File | Contents |
 |---|---|---|
-| `authRoutes` | `router/authRoutes.js` | `/` (the EntityType site) and `/auth/login` (in `AuthLayout`), and `/home` (in `MainLayout`) |
+| `authRoutes` | `router/authRoutes.js` | `/` (the EntityType site) and `/auth/login`, `/auth/register`, `/auth/forgot-password`, `/auth/resetpassword/:uidb64/:token` (in `AuthLayout`), and the compatibility redirect `/resetpassword/:uidb64/:token` → `resetPasswordConfirm` (reset links e-mailed before the backend used the `/auth/` route; the query string is dropped) |
 | `restRoutes` | `router/restRoutes.js` | generic scaffold/crud + `entity`, `entity_type`, `group`, `branch`, `user`, `permission`, `employee` routes |
 | `docsRoutes` | `router/docsRoutes.js` | `/docs/:product/:slug(.*)*`, mounted under its own `DocLayout` (not `MainLayout`) — see [documentation (docsRoutes)](../README.md) |
 
@@ -37,21 +37,21 @@ Each page group (`pages/entity/entityRoute.js`, etc.) exports its own array
     [`User.can()`](../features/permissions.md). By convention the route
     name matches `requiredRole` (`list_entity` → `list_entity`).
 
-Navigation-only routes (e.g. `docsRoutes`, `/home`) omit `requiredRole`.
+Navigation-only routes (e.g. `docsRoutes`, `/`) omit `requiredRole`.
 
 ## Route names the library relies on
 
-The library navigates by name to three routes; `home` comes from `authRoutes`,
+The library navigates by name to three routes; `site` comes from `authRoutes`,
 the host app must define the other two:
 
 | Name | Path | Page | Used by |
 |---|---|---|---|
 | `dashboard` | `/dashboard` | the host's dashboards page (`IndexPage.vue`, `<s-dashboard-home/>`) | brand link, `TopMenu`/`LeftMenu` home button, `GroupSelector` after a profile change, `RegisterEntity`, `HeaderUser`, and `installAuthGuard` (`forbiddenRouteName`) when a route is not allowed |
-| `home` | `/home` | `WelcomeGuestPage.vue` (`authRoutes`) | `EntityStore` when the user has no Entity (or cancels choosing one) |
+| `site` | `/` | `EntityTypeSitePage.vue` (`authRoutes`) | `EntityStore` when the signed-in user has no Entity (or cancels choosing one) - it also clears the previous session's Entity hint |
 | `welcome` | `/welcome` | the host's Entity welcome page | `GroupStore` / `BranchStore` after the Entity is chosen, before a profile |
 
-`MainLayout` hides the top q-bar and the left menu on `home` and `welcome`, and
-does not store them as the user's last route.
+`MainLayout` hides the top q-bar and the left menu on `welcome`, and does not
+store it as the user's last route.
 
 ## `/` - the site of the host's EntityType
 
@@ -70,7 +70,18 @@ EntityType's theme/layout configured in the backend).
    the page wears the type's colours (`--q-primary`, `--q-secondary`,
    `--q-accent`, set on `body` by `applyTheme()`).
 4. It renders the site an application registered for the type, or the
-   generic one, `components/site/EntityTypeDefaultSite.vue`. A host that
+   generic one, `components/site/EntityTypeDefaultSite.vue`.
+
+**Who is looking** (props `signedIn` and `hasEntity`, from `UserStore`):
+
+| Visitor | Hero call to action |
+|---|---|
+| Not signed in | Sign In / Create Account |
+| Signed in, working in an Entity (`User.Entity`) | Open dashboard |
+| Signed in, no Entity | a notice ("not linked to any organisation yet - ask an administrator") and Logout (`@logout` → `UserStore.logout()`); the closing call band is hidden |
+
+The no-Entity case is where `EntityStore` sends a user with no Entity after the
+login. Hooks: `site-dashboard`, `site-no-entity`, `site-logout`. A host that
    matches no type shows the list of sectors, each linking to its subdomain
    (`entityTypeUrl()`).
 
@@ -127,8 +138,13 @@ page; it never needs a session. Tests: `services/entityTypeSites.spec.js`,
 > dashboards), `welcome` (`/welcome`, no Entity) and `authwelcome`
 > (`/authwelcome`, Entity welcome). A host app must rename its own routes to
 > `dashboard` and `welcome` together with this version; `dev/front` keeps
-> `/authwelcome` as a redirect to `welcome`. An old bookmark of `/home` now
-> opens the page without an Entity, which leads to the profile choice.
+> `/authwelcome` as a redirect to `welcome`.
+
+> **Breaking change (`home` removed).** `/home` (`WelcomeGuestPage.vue`, the
+> start page of a signed-in user without an Entity) no longer exists: the site
+> at `/` handles that user. `/home` is a "not found" now; a host that navigates
+> to `{ name: 'home' }` must use `{ name: 'site' }`. `WelcomeGuestPage.vue` was
+> deleted.
 
 ## Mounting in the host
 

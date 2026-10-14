@@ -8,10 +8,18 @@
         <HeaderFullScreen />
         <HeaderLanguage />
         <Servicos />
+        <!-- while there is a session: the same notifications and user menu
+             as MainLayout (sign out, profile, ...) -->
+        <template v-if="signedIn">
+          <Notificacoes /> &nbsp;
+          <HeaderUser />
+        </template>
       </q-toolbar>
     </q-header>
 
-    <q-page-container :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-saass'">
+    <!-- a very translucent wash of the theme's colours (Entity's when signed
+         in with one, else the host's EntityType - see mounted) -->
+    <q-page-container class="auth-bg" :class="{ 'auth-bg--dark text-white': $q.dark.isActive }">
       <router-view />
     </q-page-container>
 
@@ -29,6 +37,8 @@
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import { useEntityStore } from '../stores/EntityStore'
+import { getStorage } from '../services/storage'
+import { findEntityType } from '../utils/entityTypeHost'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
@@ -37,6 +47,8 @@ import HeaderLanguage from '../components/header/HeaderLanguage.vue'
 import HeaderFullScreen from '../components/header/HeaderFullScreen.vue'
 import Servicos from '../components/header/HeaderServices.vue'
 import Rodape from '../components/footer/MainFooter.vue'
+import Notificacoes from '../components/header/HeaderNotifications.vue'
+import HeaderUser from '../components/header/HeaderUser.vue'
 
 
 import { defineComponent } from 'vue'
@@ -49,6 +61,8 @@ export default defineComponent({
     HeaderFullScreen,
     Servicos,
     Rodape,
+    Notificacoes,
+    HeaderUser,
   },
   setup() {
     const EntityType = useEntityTypeStore()
@@ -68,18 +82,53 @@ export default defineComponent({
   computed:{
     ps(){
       return this.User.ps || {}
+    },
+    signedIn () {
+      return Boolean(this.User.isLogin || getStorage('l', 'access'))
     }
   },
 
+  // The look of the auth pages (login, register, forgot password, the site):
+  // the Entity's theme when signed in with one (its endpoints need a
+  // session), else the theme of this host's EntityType (PUBLIC reads).
   async mounted(){
-    if(this.User){
-      this.User?.loadFromStorage()
-      await this.EntityType.getLayoutSettings(this.User?.EntityType?.id)
+    this.User.loadFromStorage()
+    const signedIn = Boolean(this.User.isLogin || getStorage('l', 'access'))
+    if (signedIn && this.User.Entity?.id) {
+      await this.Entity.getLayoutSettings(this.User.Entity.id)
+      return
+    }
+    const entityType = await this.hostEntityType()
+    if (entityType) {
+      this.User.EntityType = entityType
+      await this.EntityType.getLayoutSettings(entityType.id, { force: true })
     }
   },
 
-  methods: {},
+  methods: {
+    async hostEntityType () {
+      try {
+        if (!this.EntityType.rows?.length) await this.EntityType.getEntityTypes()
+        return findEntityType(this.EntityType.rows || []) || this.User.EntityType || null
+      } catch (e) {
+        return this.User.EntityType || null
+      }
+    },
+  },
 })
 </script>
 
-<style></style>
+<style>
+.auth-bg {
+  background:
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--q-primary) 10%, transparent) 0%, transparent 45%),
+    radial-gradient(circle at 88% 82%, color-mix(in srgb, var(--q-secondary, var(--q-primary)) 9%, transparent) 0%, transparent 45%),
+    color-mix(in srgb, var(--q-primary) 4%, #ffffff);
+}
+.auth-bg--dark {
+  background:
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--q-primary) 16%, transparent) 0%, transparent 45%),
+    radial-gradient(circle at 88% 82%, color-mix(in srgb, var(--q-secondary, var(--q-primary)) 12%, transparent) 0%, transparent 45%),
+    var(--q-dark-page, #121212);
+}
+</style>

@@ -30,7 +30,7 @@
           />
           <s-btn
             size="md"
-            color="positive"
+            color="primary"
             dense
             :disable="otp.length !== 6"
             :loading="loading"
@@ -539,6 +539,17 @@ export default defineComponent({
 
 .register-card {
   width: 100%;
+  border-radius: 20px !important;
+  /* a light glass card over the layout's translucent theme wash */
+  background: rgba(255, 255, 255, 0.62) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px -32px color-mix(in srgb, var(--q-primary) 55%, transparent);
+}
+.body--dark .register-card {
+  background: rgba(22, 27, 45, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .otp-card {

@@ -5,8 +5,15 @@ import { useBranchStore } from './BranchStore'
 import { useUserStore } from './UserStore'
 import { profileSplint } from '../utils/profile'
 import { tdc } from '../services/translation'
-import { getStorage, setStorage } from '../services/storage'
+import { deleteStorage, getStorage, setStorage } from '../services/storage'
 import { sDialog } from '../services/dialog'
+import { entityTypeKey } from '../utils/entityTypeHost'
+
+// ?entity_type_name=<the host's EntityType key> for userEntitys/
+function hostEntityTypeParams () {
+  const key = entityTypeKey()
+  return key ? { entity_type_name: key } : {}
+}
 
 export const useEntityStore = createBaseStore(
   'entity',
@@ -496,7 +503,8 @@ export const useEntityStore = createBaseStore(
               url({
                 type: 'u',
                 url:
-                  `django_resaas/users/${userId}/userEntitys/`
+                  `django_resaas/users/${userId}/userEntitys/`,
+                params: hostEntityTypeParams()
               })
             )
 
@@ -634,6 +642,13 @@ export const useEntityStore = createBaseStore(
         await Branch.getUserBranchs()
       },
 
+      // the Entity kept from a previous session (UserStore.logout) is only a
+      // hint: without a chosen Entity there is none
+      clearEntityHint (User) {
+        User.Entity = null
+        deleteStorage('l', 'userEntity')
+      },
+
       async getUserEntitys_ (UserId, q) {
 
         const User =
@@ -648,7 +663,10 @@ export const useEntityStore = createBaseStore(
                 type: 'u',
                 url:
                   `django_resaas/users/${UserId}/userEntitys/`,
-                params: {}
+                // only the Entities of the EntityType this host belongs to
+                // (saude.example.com -> Saude); the backend ignores a name
+                // that is no EntityType (e.g. app.example.com)
+                params: hostEntityTypeParams()
               })
             )
 
@@ -680,8 +698,12 @@ export const useEntityStore = createBaseStore(
               res.data.length === 0
             ) {
 
+              // no Entity: drop the last session's login hint, so the site
+              // ('/') does not offer a dashboard the user cannot open
+              this.clearEntityHint(User)
+
               User.redirect =
-                'home'
+                'site'
 
               return
             }
@@ -725,8 +747,10 @@ export const useEntityStore = createBaseStore(
             ).onCancel(
               () => {
 
+                this.clearEntityHint(User)
+
                 User.redirect =
-                  'home'
+                  'site'
 
               }
             )

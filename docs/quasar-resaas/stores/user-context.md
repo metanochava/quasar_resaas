@@ -60,6 +60,24 @@ Entity and makes no request, so a refused selection is never retried in a
 loop. This covers an Entity kept by a previous user's
 `logout(entityId)`. A network error or a `5xx` keeps the selection.
 
+### Choosing the Entity at sign-in (`EntityStore.getUserEntitys_`)
+
+After the login the store asks `GET django_resaas/users/{id}/userEntitys/` with
+`?entity_type_name=<host key>` - the EntityType of the host the user signs in on
+(`utils/entityTypeHost.js`: `saude.example.com` → `saude`). The backend then lists
+only the user's Entities of that EntityType; a key that is no EntityType name (e.g.
+`app` of `app.example.com`) filters nothing. It is a narrowing of the user's own
+list, not authorization: the signed context (`POST resaas/context/`) still decides.
+
+| Entities found | What happens |
+|---|---|
+| 1 | it is selected (`select_`) |
+| several | "Select the Entity" dialog |
+| 0, or the dialog is cancelled | the previous session's Entity hint is cleared (`clearEntityHint`) and the user goes to the site (`/`), which explains that the account has no organisation there |
+
+The admin panel of another user's Entities (`UserEntitiesPanel`) does not send the
+filter: it lists them all.
+
 ### Switching profile (`GroupSelector`)
 
 The header's profile button (`components/GroupSelector.vue`, in `TopMenu`) shows

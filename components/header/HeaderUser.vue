@@ -118,7 +118,7 @@
               <q-item-section class="item-content">
                 <q-item-label
                   overline
-                  class="text-blue ellipsis text-center"
+                  class="text-primary ellipsis text-center"
                   data-test="register-entity"
                 >
                   {{ tdc('Register Entity') }}
@@ -183,8 +183,25 @@
             align="around"
             class="menu-actions"
           >
+            <!-- the public site of the EntityType ('/', route 'site') -->
             <s-btn
+              icon="public"
+              dense
+              flat
+              color="primary"
+              v-close-popup
+              data-test="header-site"
+              :to="{ name: 'site' }"
+            >
+              <s-tooltip>
+                {{ tdc('Go to site') }}
+              </s-tooltip>
+            </s-btn>
 
+            <!-- each action its own colour, all from the Theme (database):
+                 site primary, settings secondary, appearance accent,
+                 sign out negative -->
+            <s-btn
               icon="settings"
               dense
               flat
@@ -203,7 +220,8 @@
               icon="palette"
               dense
               flat
-              color="secondary"
+              color="accent"
+              data-test="header-appearance"
               v-close-popup
               @click="User.toggleThemeStudio()"
             >
@@ -217,7 +235,7 @@
               icon="logout"
               dense
               flat
-              color="red"
+              color="negative"
               @click="pergunta = true"
             >
               <s-tooltip>
@@ -314,12 +332,15 @@ export default defineComponent({
   },
 
   watch: {
-    'User.Group' (val) {
-      if (!val) return
+    // a NEW profile (another id) opens the dashboard; the same profile read
+    // again from storage (UserStore.loadFromStorage, e.g. when AuthLayout
+    // mounts on '/') is no change and must not move the user
+    'User.Group' (val, old) {
+      if (!val || val.id === old?.id) return
 
       const allowedRoutes = [
-        'home',
-        'welcome'
+        'welcome',
+        'site'
       ]
 
       if (!allowedRoutes.includes(this.$route.name)) {
@@ -331,8 +352,8 @@ export default defineComponent({
       this.User.getMenus()
     },
 
-    'User.Entity' (val) {
-      if (!val) return
+    'User.Entity' (val, old) {
+      if (!val || val.id === old?.id) return
 
       this.User.getMenus()
       this.Entity.setEntityModelos(val.id)

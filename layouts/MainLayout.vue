@@ -77,7 +77,7 @@
         <!-- Menu Direito -->
         <s-btn dense flat round icon="menu" @click="User.toggleRightTop()" />
       </q-toolbar>
-      <q-bar  v-show="!User.LeftTop && !['welcome','home'].includes($route.name)">
+      <q-bar  v-show="!User.LeftTop && !['welcome'].includes($route.name)">
         <TopMenu ></TopMenu>
       </q-bar>
     </q-header>
@@ -275,7 +275,7 @@ export default defineComponent({
   // 🔥 WATCH GLOBAL (route + UI)
   watch: {
     $route(to) {
-      const ignore = ['welcome','home','login']
+      const ignore = ['welcome','login']
 
       // per user (base/persistence.js): another user signing in on this
       // browser never lands on this user's last page (and its ids)
@@ -398,7 +398,7 @@ export default defineComponent({
     }
 
     // 🔥 your original behavior
-    if (['welcome','home'].includes(this.$route.name)){
+    if (['welcome'].includes(this.$route.name)){
       this.User.LeftTop = false
     }else{
       // 🔥 RESTORE MENUS

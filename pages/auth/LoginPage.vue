@@ -182,14 +182,9 @@ const loginConfig = computed(() => {
     background:
       entity.background ||
       entityType.background ||
-      {
-        type: 'color',
-
-        value:
-          $q.dark.isActive
-            ? '#121212'
-            : '#ffffff'
-      },
+      // nothing configured: transparent, so AuthLayout's translucent wash
+      // of the theme colours shows (null -> the transparent default below)
+      null,
 
 
     // IMPORTANTE:
@@ -258,12 +253,7 @@ const loginBackgroundStyle = computed(() => {
   if (!background) {
 
     return {
-
-      backgroundColor:
-        $q.dark.isActive
-          ? '#121212'
-          : '#ffffff'
-
+      backgroundColor: 'transparent'
     }
 
   }

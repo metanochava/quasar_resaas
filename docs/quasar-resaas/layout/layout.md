@@ -6,9 +6,35 @@ composition happens via store/route, not props.
 
 ## AuthLayout
 
-Minimal layout for public pages (`/auth/login`, `/home`): header (brand,
-dark mode, fullscreen, language, services) + `router-view` + footer. No
-drawers, no menus.
+Minimal layout for the public pages (`/` - the EntityType site -,
+`/auth/login`, `/auth/register`, `/auth/forgot-password`): header (brand,
+dark mode, fullscreen, language, services and - **while there is a session**
+(`User.isLogin` or a stored access token) - the same notifications
+(`HeaderNotifications`) and user menu (`HeaderUser`: profile, Entity / Branch /
+profile choice, and the actions Go to site (`/`, `header-site`), Settings
+(`header-settings`), Appearance (`header-appearance`) and Logout - each in its own Theme colour:
+`primary`, `secondary`, `accent`, `negative`) as
+MainLayout) + `router-view` + footer. No drawers, no menus.
+
+**Its look.** On mount it applies a theme:
+
+1. signed in with an Entity → the Entity's theme
+   (`EntityStore.getLayoutSettings`; those endpoints need a session);
+2. otherwise → the theme of **this host's EntityType** (`findEntityType()`
+   over the PUBLIC EntityType list, then
+   `EntityTypeStore.getLayoutSettings(id, { force: true })`), so
+   `saude.example.com/#/auth/register` wears Saude's colours on a direct load.
+
+The page area (`.auth-bg`) is a very translucent wash of the theme's
+`primary`/`secondary` (about 4-10%, darker in dark mode); the login
+(`FormLogin`), register and forgot-password cards are light glass panels over
+it. Colours come only from the Theme (`--q-primary`, `--q-secondary`), never
+hardcoded per type.
+
+The login page keeps its own configurable background (`login_config` of the
+Entity, else of the EntityType: ThemeSurface area `login` - image, gradient
+or colour, plus overlay); when none is configured it is transparent, so the
+wash above shows. Before, that default was opaque white/`#121212`.
 
 ## MainLayout
 
@@ -20,7 +46,7 @@ q-layout
   |     |            + HeaderSite + HeaderDarkMode + HeaderFullScreen + HeaderLanguage
   |     |            + HeaderServices + HeaderNotifications + HeaderUser
   |     |            + s-btn(right menu)
-  |     +-- q-bar: TopMenu (hidden on 'welcome'/'home')
+  |     +-- q-bar: TopMenu (hidden on 'welcome')
   |
   +-- q-drawer (left)  -> LeftMenu
   +-- q-drawer (right) -> RightMenu

@@ -51,10 +51,14 @@
             {{ tdc('Passwords do not match') }}
           </div>
 
+          <div v-if="passwordError" class="text-caption text-negative q-mb-sm" data-test="reset-password-error">
+            {{ passwordError }}
+          </div>
+
           <s-btn
             type="submit"
             size="md"
-            color="positive"
+            color="primary"
             dense
             class="full-width q-mt-md"
             :disable="!canSubmit"
@@ -73,6 +77,7 @@ import { defineComponent } from 'vue'
 
 import { HTTPClient, url } from '../../services/api'
 import { tdc } from '../../services/translation'
+import { parseFieldErrors } from '../../utils/apiContract'
 
 import AllLogo from '../../components/AllLogo.vue'
 import { useShowLoginLogo } from '../../composables/useShowLoginLogo'
@@ -95,7 +100,8 @@ export default defineComponent({
       password: '',
       confirmPassword: '',
       loading: false,
-      failed: false
+      failed: false,
+      passwordError: ''
     }
   },
 
@@ -119,6 +125,7 @@ export default defineComponent({
       if (!this.canSubmit) return
 
       this.loading = true
+      this.passwordError = ''
 
       try {
         await HTTPClient.patch(
@@ -132,7 +139,14 @@ export default defineComponent({
 
         this.$router.push({ name: 'login' })
       } catch (e) {
-        this.failed = true
+        // the password policy refused the password: say it at the field;
+        // anything else means the link itself is invalid or expired
+        const fields = parseFieldErrors(e?.response?.data)
+        if (fields.password) {
+          this.passwordError = fields.password
+        } else {
+          this.failed = true
+        }
       } finally {
         this.loading = false
       }
@@ -149,5 +163,16 @@ export default defineComponent({
 
 .reset-card {
   width: 100%;
+  border-radius: 20px !important;
+  /* a light glass card over the layout's translucent theme wash */
+  background: rgba(255, 255, 255, 0.62) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px -32px color-mix(in srgb, var(--q-primary) 55%, transparent);
+}
+.body--dark .reset-card {
+  background: rgba(22, 27, 45, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.08);
 }
 </style>

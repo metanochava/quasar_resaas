@@ -1,6 +1,9 @@
 <template>
-  <div class="row items-center justify-evenly " :class="$q.dark.isActive ? 'bg-dark  ' : 'bg-transparent ' ">
-    <s-card flat square class="text-center bg-transparent login-card" :class="$q.dark.isActive ? 'bg-dark  ' : 'bg-transparent ' ">
+  <!-- transparent: the page behind it (AuthLayout's theme wash, or the
+       login background configured for the Entity/EntityType) shows through
+       a glass card, in light and dark mode -->
+  <div class="row items-center justify-evenly bg-transparent">
+    <s-card flat square class="text-center login-card">
       <AllLogo v-if="showLoginLogo" />
 
       <q-card-section class="text-left">
@@ -82,7 +85,7 @@
           <s-btn
             type="submit"
             size="md"
-            color="positive"
+            color="primary"
             dense
             class="full-width q-mt-md"
             :readonly="User.loading"
@@ -97,7 +100,7 @@
         <s-btn
           flat
           size="md"
-          color="purple"
+          color="primary"
           :to="{ name: 'esquecerpassword' }"
           :label="tdc('Forgot my password')"
         />
@@ -493,6 +496,17 @@ export default defineComponent({
 <style scoped>
 .login-card {
   width: 100%;
-  max-width: 300px;
+  max-width: 340px;
+  padding: 8px 4px;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.62) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px -32px color-mix(in srgb, var(--q-primary) 55%, transparent);
+}
+.body--dark .login-card {
+  background: rgba(22, 27, 45, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.08);
 }
 </style>

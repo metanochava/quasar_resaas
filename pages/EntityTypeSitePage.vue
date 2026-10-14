@@ -10,6 +10,8 @@
       :entity-type="entityType"
       :entity-types="entityTypes"
       :signed-in="signedIn"
+      :has-entity="hasEntity"
+      @logout="logout"
     />
   </q-page>
 </template>
@@ -23,7 +25,9 @@ import { getEntityTypeSite } from '../services/entityTypeSites'
 import { findEntityType } from '../utils/entityTypeHost'
 import EntityTypeDefaultSite from '../components/site/EntityTypeDefaultSite.vue'
 
-// '/' of the app (in AuthLayout): the public site of the host's EntityType
+// '/' of the app (in AuthLayout): the public site of the host's EntityType,
+// also the start page of a signed-in user (Open dashboard, or - without an
+// Entity - a notice and Sign out)
 // (resolved from the subdomain, utils/entityTypeHost.js). Public data only -
 // the EntityType catalogue (name, label, icon) and its look (themeGet & co.),
 // PUBLIC reads of EntityTypeAPIView. An unknown host gets the list of sectors.
@@ -37,6 +41,13 @@ const entityType = ref(null)
 const body = shallowRef(markRaw(EntityTypeDefaultSite))
 
 const signedIn = computed(() => Boolean(User.isLogin || getStorage('l', 'access')))
+// signed in AND working in an Entity: the dashboard is reachable; signed in
+// without one, the site says so (no Entity, no dashboard)
+const hasEntity = computed(() => Boolean(User.Entity?.id))
+
+async function logout () {
+  await User.logout()
+}
 
 onMounted(async () => {
   try {

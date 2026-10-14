@@ -15,11 +15,25 @@
           <h1 class="ets-hero__title" data-test="site-title">{{ heroTitle }}</h1>
           <p class="ets-hero__subtitle">{{ tdc(hero.subtitle || 'Smart platform for modern business management') }}</p>
 
+          <!-- signed in without an Entity: no dashboard to open -->
+          <div v-if="signedIn && !hasEntity" class="ets-hero__notice" data-test="site-no-entity">
+            <q-icon name="info" size="22px" />
+            <span>
+              {{ tdc('Your account is not linked to any organisation yet.') }}
+              {{ tdc('Ask an administrator of your organisation to add you.') }}
+            </span>
+          </div>
+
           <div class="ets-hero__cta">
             <s-btn
-              v-if="signedIn"
+              v-if="signedIn && hasEntity"
               unelevated rounded no-caps size="lg" color="white" text-color="primary" icon="dashboard"
-              :label="tdc('Open dashboard')" :to="{ name: 'dashboard' }"
+              :label="tdc('Open dashboard')" :to="{ name: 'dashboard' }" data-test="site-dashboard"
+            />
+            <s-btn
+              v-else-if="signedIn"
+              outline rounded no-caps size="lg" color="white" icon="logout"
+              :label="tdc('Logout')" data-test="site-logout" @click="emit('logout')"
             />
             <template v-else>
               <s-btn
@@ -174,7 +188,7 @@
     </section>
 
     <!-- CLOSING CALL -->
-    <section v-if="site.cta?.title" class="ets-cta-wrap" data-test="site-cta">
+    <section v-if="site.cta?.title && !(signedIn && !hasEntity)" class="ets-cta-wrap" data-test="site-cta">
       <div class="ets-cta">
         <h2 class="ets-cta__title">{{ tdc(site.cta.title) }}</h2>
         <p v-if="site.cta.text" class="ets-cta__text">{{ tdc(site.cta.text) }}</p>
@@ -204,7 +218,10 @@ const props = defineProps({
   entityType: { type: Object, default: null },
   entityTypes: { type: Array, default: () => [] },
   signedIn: { type: Boolean, default: false },
+  // signed in and working in an Entity (the dashboard is reachable)
+  hasEntity: { type: Boolean, default: false },
 })
+const emit = defineEmits(['logout'])
 
 const site = computed(() => props.entityType?.site || {})
 const hero = computed(() => site.value.hero || {})
@@ -325,6 +342,20 @@ function tileStyle (index) {
   line-height: 1.65;
   opacity: 0.92;
 }
+.ets-hero__notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 580px;
+  margin-top: 24px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.5;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.ets-hero--centered .ets-hero__notice { margin-left: auto; margin-right: auto; text-align: left; }
 .ets-hero__cta {
   display: flex;
   flex-wrap: wrap;

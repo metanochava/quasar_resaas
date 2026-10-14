@@ -12,6 +12,13 @@ export const authRoutes = [
       { path: '', component: () => import('../pages/EntityTypeSitePage.vue'), name: 'site' },
     ],
   },
+  // compatibility: reset links e-mailed before the backend built them on the
+  // real route (/#/resetpassword/<uidb64>/<token>?redirect_url=) - keep them
+  // working; the query string is dropped
+  {
+    path: '/resetpassword/:uidb64/:token',
+    redirect: to => ({ name: 'resetPasswordConfirm', params: to.params }),
+  },
   {
     path: '/auth/',
     component: () => import('../layouts/AuthLayout.vue'),
@@ -22,18 +29,7 @@ export const authRoutes = [
       { path: 'resetpassword/:uidb64/:token', component: () => import('./../pages/auth/ResetPasswordConfirmPage.vue'), name: 'resetPasswordConfirm' },
     ],
   },
-  {
-    path: '/',
-    component: () => import('../layouts/MainLayout.vue'),
-    children: [
-      { 
-        // the signed-in user's start page while it has no Entity yet
-        // (was '/welcome' / name 'welcome')
-        path: '/home',
-        component: () => import('./../pages/WelcomeGuestPage.vue'),
-        name: 'home'
-      }
-    ],
-  },
+  // there is no '/home' any more (WelcomeGuestPage was removed): the site at
+  // '/' handles signed-in users too; '/home' is a "not found" like any other
 
 ]
