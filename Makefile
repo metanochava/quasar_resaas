@@ -40,10 +40,7 @@ pushtag:
 	echo "Release v$$VERSION pushed and tagged successfully."
 
 
-# release-check: clean tree -> tests -> what `npm publish` would ship.
-# publish: release-check -> version commit + tag (local) -> npm publish ->
-# only then push. If npm publish fails, the local commit and tag are undone
-# and nothing reached GitHub or the registry.
+
 
 release-check:
 	if [[ -n "$$(git status --porcelain)" ]]; then
