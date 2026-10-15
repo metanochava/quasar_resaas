@@ -63,7 +63,7 @@ release-check:
 	rm -f /tmp/quasar_resaas-pack.json
 
 
-publish: release-check
+publish:
 	npm version patch --no-git-tag-version
 
 	VERSION="$$(node -p "require('./package.json').version")"
