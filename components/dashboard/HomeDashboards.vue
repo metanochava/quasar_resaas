@@ -101,8 +101,11 @@ const selected = computed(() => {
 // this same refresh - loadDashboardList() is idempotent, so a possible
 // extra call is harmless).
 onMounted(async () => {
+  // mounted while logout() ends the session (the page re-renders before
+  // the redirect to login): nothing to load
+  if (!User.hasSession()) return
   await User.refreshResaasContext()
-  await Dashboard.loadDashboardList()
+  if (User.hasSession()) await Dashboard.loadDashboardList()
 })
 
 // DashboardListAPIView filters by DashboardPermissionService against
@@ -121,8 +124,9 @@ onMounted(async () => {
 // writes the token services/api.js's request interceptor actually
 // sends. Watch User.ResaasContext (the token itself) instead, so this
 // only re-fetches once the new context is the one actually in use.
-watch(() => User.ResaasContext, () => {
-  Dashboard.loadDashboardList()
+// logout() clears the token (null): the session is gone, nothing to reload
+watch(() => User.ResaasContext, (token) => {
+  if (token && User.hasSession()) Dashboard.loadDashboardList()
 })
 </script>
 

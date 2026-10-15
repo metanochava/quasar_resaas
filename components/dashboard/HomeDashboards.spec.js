@@ -16,6 +16,7 @@ import { useDashboardStore } from '../../stores/DashboardStore'
 function setup(dashboards, entity = { entity_type: { label: 'saude' }, dashboard: { value: 'Auto' } }) {
   const User = useUserStore()
   User.Entity = entity
+  User.access = 'access-token'
   User.refreshResaasContext = vi.fn().mockResolvedValue()
 
   const Dashboard = useDashboardStore()
@@ -71,5 +72,40 @@ describe('HomeDashboards - dashboards of the EntityType module', () => {
     await flushPromises()
 
     expect(w.find('[data-test="renderer"]').text()).toBe('')
+  })
+})
+
+describe('HomeDashboards - after logout', () => {
+  it('loads nothing when mounted without a session', async () => {
+    const User = useUserStore()
+    User.Entity = { entity_type: { label: 'saude' } }
+    User.access = null
+    User.refreshResaasContext = vi.fn().mockResolvedValue()
+    const Dashboard = useDashboardStore()
+    Dashboard.loadDashboardList = vi.fn().mockResolvedValue()
+
+    mount(HomeDashboards, { global: { plugins: [[Quasar, {}]] } })
+    await flushPromises()
+
+    expect(User.refreshResaasContext).not.toHaveBeenCalled()
+    expect(Dashboard.loadDashboardList).not.toHaveBeenCalled()
+  })
+
+  it('does not reload the list when the context is cleared, only when a new one arrives', async () => {
+    setup([])
+    await flushPromises()
+    const User = useUserStore()
+    const Dashboard = useDashboardStore()
+    User.ResaasContext = 'old-context'
+    await flushPromises()
+    Dashboard.loadDashboardList.mockClear()
+
+    User.ResaasContext = null
+    await flushPromises()
+    expect(Dashboard.loadDashboardList).not.toHaveBeenCalled()
+
+    User.ResaasContext = 'new-context'
+    await flushPromises()
+    expect(Dashboard.loadDashboardList).toHaveBeenCalledTimes(1)
   })
 })

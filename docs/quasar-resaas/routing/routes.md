@@ -60,7 +60,7 @@ inside `AuthLayout` (the login's header and footer, whose look is the
 EntityType's theme/layout configured in the backend).
 
 1. The page reads the EntityType catalogue (`GET django_resaas/entitytypes/`,
-   PUBLIC list: `id`, `name`, `label`, `icon`, `ordem`, `site`).
+   PUBLIC list: `id`, `name`, `label`, `icon`, `ordem`).
 2. It picks this host's type with `findEntityType()` (`utils/entityTypeHost.js`,
    the same rule as the header's services menu): the first subdomain label
    (`saude.example.com` → `Saude`, `www` skipped) or, on an IP address, the
@@ -85,12 +85,30 @@ login. Hooks: `site-dashboard`, `site-no-entity`, `site-logout`. A host that
    matches no type shows the list of sectors, each linking to its subdomain
    (`entityTypeUrl()`).
 
-### The content comes from the database (`EntityType.site`)
+### The content is code of the application (`registerEntityTypeSiteContent`)
 
-`EntityTypeDefaultSite.vue` draws everything from `entityType.site` (backend:
-the JSON field `EntityType.site`, see django_resaas
-[Public sites](../../django-resaas/features/public-sites.md#entity-type-sites-entitytypesite)).
+`EntityTypeDefaultSite.vue` draws everything from the content the application
+registered for the type's `name` (case-insensitive). It is never stored in the
+database: the backend only serves the catalogue and the Theme.
+
+```js
+// dev/front: src/entity-type-sites/saude.js + index.js, boot/entity_type_sites.js
+import { registerEntityTypeSiteContent } from 'quasar_resaas'
+
+registerEntityTypeSiteContent('Saude', {
+  layout: 'orbit',
+  hero: { title: 'Care for your patients, not the paperwork', icons: ['medical_services'] },
+  faq: { title: 'Frequently asked questions', items: [{ question: '…', answer: '…' }] },
+})
+```
+
 Every key is optional; texts are canonical English, translated with `tdc()`.
+Their pt/es/fr translations go to the backend's static lang files
+(django_resaas `saas/lang/{ptpt,eses,frfr}.py`, or the lang files of the
+application's own module), the same as any other frontend string - see django_resaas
+[Public sites](../../django-resaas/features/public-sites.md#entity-type-sites).
+The content of the other types is read from the same registry (the sector
+list shows each one's `hero.title`).
 
 | Key | Renders |
 |---|---|
@@ -105,7 +123,7 @@ Every key is optional; texts are canonical English, translated with `tdc()`.
 
 Without content the page shows "Welcome to {name}" (or "Choose your sector"),
 Sign In / Create Account, or Open dashboard when signed in. Colours come from
-the type's Theme (`primary`, `secondary`, `accent`), never from `site`.
+the type's Theme (`primary`, `secondary`, `accent`), never from the content.
 Hooks: `entity-type-default-site` (with `data-layout`), `site-title`,
 `site-stats`, `site-features`, `site-steps`, `site-sectors`, `site-faq`,
 `site-cta`.
@@ -128,9 +146,9 @@ page; it never needs a session. Tests: `services/entityTypeSites.spec.js`,
 | Symptom | Check |
 |---|---|
 | `/` shows the list of sectors on a type's host | The subdomain's first label must equal the EntityType `name` (e.g. `farmacia.…` needs a type named `Farmacia`) |
-| Only "Welcome to {name}" | `EntityType.site` is empty: load it with `manage.py load_entity_type_sites` |
-| All types look the same | Their Themes have the same `primary`/`secondary`/`accent`; set them (the `themes` part of the same file) |
-| Texts stay in English | The Translation rows were not loaded, or the browser still holds the old translation map (sign out/in or switch language) |
+| Only "Welcome to {name}" | No content registered for that `name`: check the `registerEntityTypeSiteContent` key and that its boot file is in `quasar.config.js` |
+| All types look the same | Their Themes have the same `primary`/`secondary`/`accent`; set them with `manage.py load_entity_type_themes` |
+| Texts stay in English | The key is missing from the static lang files (exact English text), the backend copy was not updated, or the browser still holds the old translation map (sign out/in or switch language) |
 | The generic site instead of the application's | `registerEntityTypeSite` name differs from the EntityType `name`, or the registering module is not imported |
 | Endless loading | The API is unreachable (a 502 shows in the console as a CORS error) |
 

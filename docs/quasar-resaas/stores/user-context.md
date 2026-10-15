@@ -47,8 +47,19 @@ The active tenant lives in three `UserStore` fields: `Entity`, `Branch`,
 2. calls `refreshResaasContext()`.
 
 `refreshResaasContext()` calls `createResaasContext` (see below) only
-if `Entity.id` exists; otherwise it clears the context
-(`clearResaasContext()`).
+if `Entity.id` exists **and** there is a session (`hasSession()`: an access
+token in memory or in `localStorage`); otherwise it clears the context
+(`clearResaasContext()`) and makes no request. `renewResaasContextQuietly()`
+follows the same rule.
+
+`logout()` clears the tokens while the current page is still mounted (the
+redirect to login comes after). Components must therefore not send
+authenticated requests in reaction to it: `HomeDashboards` and
+`DashboardRenderer` load nothing without a session and ignore
+`ResaasContext` becoming `null`; they only reload when a new token arrives.
+Before this, logging out from a dashboard showed "Authentication credentials
+were not provided." (a `401` from `resaas/context/` or `dashboards/` sent
+without a token).
 
 The stored Entity/Branch/Group are **preferences**, not authorization. When
 `POST resaas/context/` refuses them, `discardContextSelection()` clears them

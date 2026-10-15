@@ -12,10 +12,6 @@ import { safeParse } from '../utils/json'
 const apiPrefix = process.env.API_PREFIX
 const apiBaseUrl = `${process.env.API}/${apiPrefix}`
 
-// Shared across every client instance (module-level, not per-
-// createClient()) so concurrent 401s from HTTPAuth AND HTTPAuthBlob
-// during the same expiry reuse one in-flight refresh instead of each
-// firing their own refresh_token/ call.
 let refreshPromise = null
 
 function refreshAccessToken() {
@@ -26,11 +22,6 @@ function refreshAccessToken() {
   return refreshPromise
 }
 
-// Same dedup pattern as refreshAccessToken() above, for the SEPARATE
-// RESAAS-context token (X-RESAAS-Context - its own TTL, shorter-lived
-// than the refresh token but independent of the access-token expiry
-// handled above; see saas/core/tenant/context.py's
-// ResaasContextService.get_ttl(), default 1h).
 let contextRefreshPromise = null
 
 function refreshResaasContext() {
@@ -45,21 +36,11 @@ export const url = (payload = { type: 'u', url: '', params: {} }) => {
   const entityType = useUserStore()?.EntityType?.name?.toLowerCase()
   let finalUrl = apiBaseUrl
 
-  // strip a leading slash the caller's path might carry, so
-  // "demo/products/" and "/demo/products/" both join onto apiBaseUrl
-  // with exactly one slash, never two. The trailing slash is NOT
-  // touched - DRF's routers require it (APPEND_SLASH), so every
-  // existing caller already includes it deliberately for detail/list
-  // endpoints ("demo/products/42/", "demo/products/42/archive/", ...).
   const path = String(payload.url || '').replace(/^\/+/, '')
 
   if (payload.type === 'nu') finalUrl += `/${entityType}`
   finalUrl += `/${path}`
 
-  // URLSearchParams (not manual string concatenation) so encoding is
-  // always correct - spaces, special characters, and arrays (appended
-  // as repeated `key=value` pairs, the convention DRF/django-filter
-  // expect for multi-value filters) all come out right.
   const query = new URLSearchParams({ format: 'json' })
 
   Object.entries(payload.params || {}).forEach(([key, value]) => {
@@ -92,12 +73,6 @@ const createClient = (auth = false, blob = false) => {
 
     config.headers ||= {}
 
-    // Proactive renewal, same idea as the access-token refresh: when the
-    // stored RESAAS-context token is about to expire, re-issue it BEFORE
-    // sending, so the user never sees "RESAAS context has expired." The
-    // call that issues the context itself is exempt (it would recurse),
-    // and a failed renewal just falls through - the reactive 403 retry
-    // below still covers it.
     if (
       auth &&
       !String(config.url || '').includes('resaas/context/') &&
@@ -147,14 +122,6 @@ const createClient = (auth = false, blob = false) => {
       const status = error?.response?.status
       const originalRequest = error?.config
 
-      // Silent refresh-and-retry: an expired ACCESS token is routine
-      // (short TTL, expected mid-session) and the REFRESH token is
-      // valid for a day - retry once with a fresh access token
-      // instead of forcing the user to log back in on every access-
-      // token expiry. Skip it for the refresh_token/ call itself
-      // (its own 401 means the refresh token is genuinely dead, not
-      // something another refresh could fix) and only ever retry a
-      // given request once.
       if (
         auth && status === 401 && originalRequest &&
         !originalRequest._retried &&
@@ -180,13 +147,6 @@ const createClient = (auth = false, blob = false) => {
         }
       }
 
-      // Same silent refresh-and-retry idea, for the RESAAS-context
-      // token instead of the JWT access token: ResaasContextService.
-      // decode() raises PermissionDenied("RESAAS context has
-      // expired.") -> 403 once its own (shorter) TTL passes, even
-      // while the access/refresh tokens are still perfectly valid.
-      // Re-issue it from the entity/branch/group already held in
-      // UserStore and retry once, silently.
       if (
         auth && originalRequest &&
         !originalRequest._retriedContext &&

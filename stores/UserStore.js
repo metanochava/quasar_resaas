@@ -189,14 +189,29 @@ export const useUserStore = createBaseStore(
 
 
   actions: {
+    // a session exists while an access token does (memory or storage).
+    // Without one every authenticated request answers 401 - e.g. a
+    // component that re-mounts or reacts while logout() tears the session
+    // down must not ask for a context.
+    hasSession() {
+      return Boolean(this.access || getStorage('l', 'access'))
+    },
     async refreshResaasContext() {
-      if (!this.Entity?.id) {
+      if (!this.Entity?.id || !this.hasSession()) {
         clearResaasContext()
         this.ResaasContext = null
         return null
       }
 
       const data = await issueResaasContext(this)
+
+      // logout() ran while the request was in flight: the answer belongs to
+      // a session that no longer exists
+      if (!this.hasSession()) {
+        clearResaasContext()
+        this.ResaasContext = null
+        return null
+      }
 
       this.ResaasContext = data.token
 
@@ -210,7 +225,7 @@ export const useUserStore = createBaseStore(
     // API client reads the token from storage, which createResaasContext()
     // has already updated.
     async renewResaasContextQuietly() {
-      if (!this.Entity?.id) return null
+      if (!this.Entity?.id || !this.hasSession()) return null
 
       return issueResaasContext(this)
     },

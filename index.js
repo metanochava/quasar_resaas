@@ -153,6 +153,8 @@ export { default as PersonProfilePanel } from './components/person/PersonProfile
 export {
   registerEntityTypeSite,
   getEntityTypeSite,
+  registerEntityTypeSiteContent,
+  getEntityTypeSiteContent,
   clearEntityTypeSites
 } from "./services/entityTypeSites"
 

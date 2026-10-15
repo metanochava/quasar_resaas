@@ -1,7 +1,7 @@
 <template>
   <div class="ets" :class="[`ets--${layout}`, { 'ets--dark': $q.dark.isActive }]" :data-layout="layout" data-test="entity-type-default-site">
 
-    <!-- HERO: EntityType.site.hero, or the type's name and icon -->
+    <!-- HERO: the registered content's hero, or the type's name and icon -->
     <section class="ets-hero" :class="`ets-hero--${layout}`">
       <div class="ets-hero__glow ets-hero__glow--a" />
       <div class="ets-hero__glow ets-hero__glow--b" />
@@ -161,7 +161,7 @@
           <img v-if="type.icon?.url" :src="type.icon.url" :alt="tdc(type.label || type.name)" class="ets-sector__icon">
           <q-icon v-else name="apps" size="40px" color="primary" />
           <span class="ets-sector__name">{{ tdc(type.label || type.name) }}</span>
-          <span v-if="type.site?.hero?.title" class="ets-sector__text">{{ tdc(type.site.hero.title) }}</span>
+          <span v-if="sectorTitle(type)" class="ets-sector__text">{{ tdc(sectorTitle(type)) }}</span>
           <q-icon name="arrow_forward" class="ets-sector__go" />
         </a>
       </div>
@@ -207,13 +207,14 @@
 import { computed } from 'vue'
 import { tdc } from '../../services/translation'
 import { entityTypeUrl } from '../../utils/entityTypeHost'
+import { getEntityTypeSiteContent } from '../../services/entityTypeSites'
 
-// The site at '/' (pages/EntityTypeSitePage.vue) drawn from the EntityType's
-// `site` content (backend: EntityType.site, loaded with manage.py
-// load_entity_type_sites). Every section is optional; with no content the
-// page shows the type's name and icon. Texts are canonical English, translated
-// here with tdc() (Translation rows). An application may replace this body for
-// a type with registerEntityTypeSite(); it gets the same props.
+// The site at '/' (pages/EntityTypeSitePage.vue) drawn from the content the
+// application registered for the EntityType (registerEntityTypeSiteContent -
+// code, not database). Every section is optional; with no content the page
+// shows the type's name and icon. Texts are canonical English, translated
+// here with tdc() (static lang files). An application may replace this body
+// for a type with registerEntityTypeSite(); it gets the same props.
 const props = defineProps({
   entityType: { type: Object, default: null },
   entityTypes: { type: Array, default: () => [] },
@@ -223,7 +224,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['logout'])
 
-const site = computed(() => props.entityType?.site || {})
+const site = computed(() => getEntityTypeSiteContent(props.entityType?.name) || {})
 const hero = computed(() => site.value.hero || {})
 const name = computed(() => tdc(props.entityType?.label || props.entityType?.name || ''))
 const iconUrl = computed(() => props.entityType?.icon?.url || null)
@@ -247,6 +248,11 @@ const sectors = computed(() => {
   if (props.entityType && !site.value.show_sectors) return []
   return props.entityTypes.filter(type => type.id !== props.entityType?.id)
 })
+
+// the hero title of another sector's site, under its name
+function sectorTitle (type) {
+  return getEntityTypeSiteContent(type?.name)?.hero?.title || ''
+}
 
 // mosaic: the other sectors (icon and name), topped up with the site's icons
 const mosaicTiles = computed(() => {

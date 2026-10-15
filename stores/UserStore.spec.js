@@ -42,6 +42,7 @@ describe('UserStore.refreshResaasContext', () => {
 
     const User = useUserStore()
     User.Entity = { id: 'entity-1' }
+    User.access = 'access-token'
 
     // Regression: MainLayout.vue, HomeDashboards.vue and
     // DashboardRenderer.vue each legitimately need to await a fresh
@@ -69,6 +70,7 @@ describe('UserStore.refreshResaasContext', () => {
 
     const User = useUserStore()
     User.Entity = { id: 'entity-1' }
+    User.access = 'access-token'
 
     await User.refreshResaasContext()
     expect(User.ResaasContext).toBe('token-a')
@@ -89,6 +91,34 @@ describe('UserStore.refreshResaasContext', () => {
     expect(User.ResaasContext).toBeNull()
     expect(createResaasContext).not.toHaveBeenCalled()
   })
+
+  it('drops a context that arrives after logout ended the session', async () => {
+    let resolveFn
+    createResaasContext.mockReturnValue(new Promise(resolve => { resolveFn = resolve }))
+    localStorage.removeItem('access')
+    const User = useUserStore()
+    User.Entity = { id: 'entity-1' }
+    User.access = 'access-token'
+
+    const pending = User.refreshResaasContext()
+    User.access = null
+    resolveFn({ token: 'late-token' })
+
+    expect(await pending).toBeNull()
+    expect(User.ResaasContext).toBeNull()
+  })
+
+  it('asks for no context without a session (logout cleared the tokens)', async () => {
+    localStorage.removeItem('access')
+    const User = useUserStore()
+    User.Entity = { id: 'entity-1' }
+    User.access = null
+
+    expect(await User.refreshResaasContext()).toBeNull()
+    expect(await User.renewResaasContextQuietly()).toBeNull()
+    expect(User.ResaasContext).toBeNull()
+    expect(createResaasContext).not.toHaveBeenCalled()
+  })
 })
 
 // ------------------------------------------------------------------
@@ -105,6 +135,7 @@ describe('UserStore - refused context selection', () => {
     createResaasContext.mockRejectedValue(refused(status))
     const User = useUserStore()
     User.Entity = { id: 'entity-of-another-user' }
+    User.access = 'access-token'
     User.Branch = { id: 'b1' }
     User.Group = { id: 'g1' }
     for (const key of ['userEntity', 'userBranch', 'userGroup', 'userBranchs', 'userGroups']) {
@@ -123,6 +154,7 @@ describe('UserStore - refused context selection', () => {
     createResaasContext.mockRejectedValue(refused(403))
     const User = useUserStore()
     User.Entity = { id: 'e1' }
+    User.access = 'access-token'
 
     await User.refreshResaasContext().catch(() => {})
     await User.refreshResaasContext()
@@ -138,6 +170,7 @@ describe('UserStore - refused context selection', () => {
     createResaasContext.mockRejectedValue(error)
     const User = useUserStore()
     User.Entity = { id: 'e1' }
+    User.access = 'access-token'
     localStorage.setItem('userEntity', '{"id":"e1"}')
 
     await expect(User.refreshResaasContext()).rejects.toThrow()
@@ -156,6 +189,7 @@ describe('UserStore.logout - what survives', () => {
     const User = useUserStore()
     User.data = { id: 'u1' }
     User.Entity = { id: 'e1', name: 'Clinic' }
+    User.access = 'access-token'
     User.Group = { id: 'g1', name: 'Doctor' }
     User.Permissions = new Set(['view_patient'])
     localStorage.setItem('userEntity', JSON.stringify(User.Entity))

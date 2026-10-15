@@ -37,7 +37,8 @@ const sortedWidgets = computed(() =>
 )
 
 async function load() {
-  if (!dashboardName.value) return
+  // no session (e.g. re-rendered while logout() ends it): nothing to load
+  if (!dashboardName.value || !User.hasSession()) return
 
   Dashboard.reset()
   Dashboard.restoreFiltersFromQuery(route.query)
@@ -68,7 +69,8 @@ watch(dashboardName, load)
 // on the Group?.id change would send its requests with the OLD
 // context - watch User.ResaasContext (the token itself) instead, so
 // load() only runs once the new context is the one actually sent.
-watch(() => User.ResaasContext, load)
+// logout() clears the token (null): the session is gone, nothing to reload
+watch(() => User.ResaasContext, (token) => { if (token) load() })
 
 // refreshResaasContext() runs FIRST and is awaited - needed here too
 // (not just HomeDashboards.vue's own): this component is also used
