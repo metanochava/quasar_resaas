@@ -6,7 +6,8 @@ SHELL := /bin/bash
 # =========================================================
 # NPM / GIT RELEASE
 # =========================================================
-
+npmlogin:
+	npm login --auth-type=legacy
 push:
 	npm version patch --no-git-tag-version
 
@@ -64,30 +65,44 @@ release-check:
 
 
 publish:
-	npm version patch --no-git-tag-version
+	@set -e
 
+	# 1. Verificar autenticacao antes de alterar a release
+	npm whoami
+	npm ping
+
+	PACKAGE="$$(node -p "require('./package.json').name")"
+	echo "Package: $$PACKAGE"
+
+	# Confirmar que o pacote existe e e visivel para esta conta
+	npm view "$$PACKAGE" version
+
+	# 2. Preparar a nova versao
+	npm version patch --no-git-tag-version
 	VERSION="$$(node -p "require('./package.json').version")"
 
 	read -p "Release message: " message
 
+	# 3. Criar commit e tag
 	git add package.json package-lock.json
 	git commit -m "release: v$$VERSION - $$message"
 
 	git tag -a "v$$VERSION" \
 		-m "release: v$$VERSION - $$message"
 
+	# 4. Publicar sem destruir o commit em caso de erro
 	if ! npm publish; then
-		echo "npm publish failed: undoing the local release commit and tag (nothing was pushed)."
-		git tag -d "v$$VERSION"
-		git reset --hard HEAD~1
+		echo "ERRO: npm publish falhou."
+		echo "O commit e a tag foram preservados."
+		echo "Corrige a autenticacao/permissoes e tenta publicar a mesma versao."
 		exit 1
 	fi
 
+	# 5. Enviar para GitHub apenas depois da publicacao
 	git push origin main
 	git push origin "v$$VERSION"
 
 	echo "Release v$$VERSION published successfully."
-
 
 # =========================================================
 # GIT UTILITIES
