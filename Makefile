@@ -64,7 +64,7 @@ release-check:
 	rm -f /tmp/quasar_resaas-pack.json
 
 
-publish:
+publish: release-check
 	@set -e
 
 	# 1. Verificar autenticacao antes de alterar a release
