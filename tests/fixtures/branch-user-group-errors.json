@@ -1,0 +1,55 @@
+{
+  "validation_400": {
+    "status": 400,
+    "body": {
+      "error": {
+        "message": "Please correct the highlighted fields.",
+        "details": {
+          "branch": [
+            "Does not belong to the current entity."
+          ]
+        }
+      }
+    }
+  },
+  "own_active_group_400": {
+    "status": 400,
+    "body": {
+      "error": {
+        "message": "You cannot remove the profile you are currently using.",
+        "code": "cannot_remove_own_active_group",
+        "details": null
+      }
+    }
+  },
+  "other_tenant_404": {
+    "status": 404,
+    "body": {
+      "error": {
+        "message": "Not found.",
+        "code": "not_found",
+        "details": null
+      }
+    }
+  },
+  "permission_403": {
+    "status": 403,
+    "body": {
+      "error": {
+        "message": "Permission denied",
+        "code": "permission_denied",
+        "details": null
+      }
+    }
+  },
+  "anonymous_401": {
+    "status": 401,
+    "body": {
+      "error": {
+        "message": "Authentication credentials were not provided.",
+        "code": "not_authenticated",
+        "details": null
+      }
+    }
+  }
+}

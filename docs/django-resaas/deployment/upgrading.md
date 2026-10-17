@@ -1,5 +1,25 @@
 # Upgrading
 
+## Self-elevation guard, legacy reset endpoints (next release after 0.0.658)
+
+| Change | Kind | What to do |
+|---|---|---|
+| **No self-elevation through profile assignment**: `branchusergroups/` (create/update) and `users/{id}/addGroup/` refuse to give the **caller** a profile holding permissions the caller's active profile lacks (`403 permission_not_held`, `group_access_service.check_delegation`; platform level - Root - exempt). Assigning other members is unchanged | **Breaking** (security fix) for a non-Root administrator who assigned powerful profiles to themselves | Ask a platform-level user, or give your own profile the permissions first through the normal (delegation-checked) flow |
+| **`POST mail/`** (deprecated) is an alias of `password/reset/email/`: the link is built on a trusted origin only and the answer is the same for any address (it used the raw `Origin` header and answered `500` for real accounts) | **Breaking** for callers without a trusted origin: `503 reset_link_unavailable` | Put the frontend origin in the CORS policy or set `FRONTEND_URL`; prefer `password/reset/request/` |
+| **`POST password/change/mobile/`** (deprecated) is an alias of `password/reset/otp/complete/` (`channel: "mobile"`): throttled, attempt-limited, password policy, answer `202 {"reset": true}`. The old counter HOTP (sent by nothing, never consumed, unlimited attempts) is refused | **Breaking** (security fix) for clients reading `alert_*` or using the HOTP | Request the code with `password/reset/request/` (`channel: "mobile"`, `method: "otp"`) |
+
+## Core viewsets access hardening, Python 3.10 (0.0.658)
+
+| Change | Kind | What to do |
+|---|---|---|
+| **`branchusergroups/` is tenant scoped and permission checked** (`ActionPermissionMixin`). Before, any authenticated user could list every tenant's profile assignments, read/change/delete them by id and create one - including giving **themselves** any Group (e.g. Root) in any Branch. Now: permission per action (`list_`/`view_`/`add_`/`change_`/`delete_branchusergroup`), rows of the current Branch only, and `branch` / `group` / `user` must be the current Branch, a Group the Entity owns and a member of the Entity. See [Permissions](../security/permissions.md#legacy-viewsets-per-action-permissions-actionpermissionmixin) | **Breaking** (security fix): cross-tenant reads are `404`, foreign relations `400`, a profile without the permission `403`; a Group not linked to the Entity (`EntityGroup`) can no longer be assigned here | Assign through `users/{id}/addGroup/` or link the Group to the Entity first; `delete_branchusergroup` is held by Root only by default |
+| **`branchusers/`** (branch membership) gets the same scope and per-action permissions (`*_branchuser`); `branch` comes from the signed context, `user` must be a member of the Entity. `create` used to fail (`branch` is read only and nothing set it); it now works | **Breaking** (security fix) | Grant `*_branchuser` to the profiles that manage memberships (Admin and Branch Admin hold list/view/add/change) |
+| **`branchs/`**: writes need `add_branch` / `change_branch` / `delete_branch` (any member of the Entity could rename or delete its branches); the detail actions resolve the branch inside the current Entity | **Breaking** for profiles without those permissions | Admin holds add/change; `delete_branch` is Root's by default |
+| **`files/`** is scoped to the current Entity (any authenticated user could read, change or delete any tenant's file by id; `por_entity/?entity=` listed any Entity's files) | **Breaking** (security fix): another Entity's file is `404`; files without an Entity (legacy uploads) are no longer reachable through this endpoint | Attribute legacy `File` rows to their Entity if they must stay reachable |
+| **Global catalogues**: `models/` (ContentType) is read only; `translations/`, `languages/`, `layoutsettings/` writes need `add_` / `change_` / `delete_` of the model (any authenticated user could change them for every tenant). Reads are unchanged (`languages/` reads stay public) | **Breaking** for non-Root profiles that wrote them | Nothing for Root; grant the permission to another profile only on purpose |
+| **Python 3.10+**: `requires-python` was `>=3.9`, but the pinned Django 5.2 needs 3.10 | Packaging fix | Use Python 3.10 - 3.14 |
+| **`black` and `gunicorn` are optional extras** (`scaffold`, `server`): the framework never imports gunicorn, and the Scaffold only formats generated code with black when it is installed (otherwise it writes it as generated) | **Breaking** for an installation that relied on them being pulled in by `django_resaas` | `pip install "django_resaas[scaffold,server]"`, or keep them in the application's own requirements (the reference application already pins both) |
+
 ## Person filiation, POST status codes (next release after 0.0.632)
 
 | Change | Kind | What to do |
