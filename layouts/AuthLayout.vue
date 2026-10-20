@@ -8,12 +8,9 @@
         <HeaderFullScreen />
         <HeaderLanguage />
         <Servicos />
-        <!-- while there is a session: the same notifications and user menu
-             as MainLayout (sign out, profile, ...) -->
-        <template v-if="signedIn">
-          <Notificacoes /> &nbsp;
-          <HeaderUser />
-        </template>
+
+        <Notificacoes v-if="signedIn"/>
+        <HeaderUser />
       </q-toolbar>
     </q-header>
 

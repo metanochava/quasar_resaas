@@ -68,7 +68,7 @@
         <Servicos />
 
         <!-- Notifications -->
-        <Notificacoes /> &nbsp;
+        <Notificacoes /> 
 
         <!-- User Menu -->
         <HeaderUser />
