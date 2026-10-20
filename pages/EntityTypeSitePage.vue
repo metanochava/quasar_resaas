@@ -18,7 +18,6 @@
 
 <script setup>
 import { computed, defineAsyncComponent, markRaw, onMounted, ref, shallowRef } from 'vue'
-import { getStorage } from '../services/storage'
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import { getEntityTypeSite } from '../services/entityTypeSites'
@@ -40,7 +39,7 @@ const entityTypes = ref([])
 const entityType = ref(null)
 const body = shallowRef(markRaw(EntityTypeDefaultSite))
 
-const signedIn = computed(() => Boolean(User.isLogin || getStorage('l', 'access')))
+const signedIn = computed(() => User.isSignedIn())
 // signed in AND working in an Entity: the dashboard is reachable; signed in
 // without one, the site says so (no Entity, no dashboard)
 const hasEntity = computed(() => Boolean(User.Entity?.id))

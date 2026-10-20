@@ -8,8 +8,10 @@ composition happens via store/route, not props.
 
 Minimal layout for the public pages (`/` - the EntityType site -,
 `/auth/login`, `/auth/register`, `/auth/forgot-password`): header (brand,
-dark mode, fullscreen, language, services and - **while there is a session**
-(`User.isLogin` or a stored access token) - the same notifications
+dark mode, fullscreen, language, services and - **while signed in**
+(`User.isSignedIn()`: `User.isLogin`, or a stored refresh token that has not
+expired; a leftover expired or invalid token does not count, so the login page
+never shows them) - the same notifications
 (`HeaderNotifications`) and user menu (`HeaderUser`: profile, Entity / Branch /
 profile choice - the Entity and Branch entries only when the user has at least
 one, and the actions Go to site (`/`, `header-site`), Settings

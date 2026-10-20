@@ -52,6 +52,13 @@ token in memory or in `localStorage`); otherwise it clears the context
 (`clearResaasContext()`) and makes no request. `renewResaasContextQuietly()`
 follows the same rule.
 
+`hasSession()` only says a token is stored (requests can try it and refresh
+it). To decide whether to **show** the signed-in UI use `isSignedIn()`:
+`isLogin`, or a refresh token in memory/`localStorage` that has not expired
+(`isTokenExpired`). `AuthLayout` (notifications and user menu) and
+`EntityTypeSitePage` (`signedIn` passed to the EntityType site) use it, so an
+expired or invalid leftover token shows the signed-out header and site.
+
 `logout()` clears the tokens while the current page is still mounted (the
 redirect to login comes after). Components must therefore not send
 authenticated requests in reaction to it: `HomeDashboards` and

@@ -196,6 +196,13 @@ export const useUserStore = createBaseStore(
     hasSession() {
       return Boolean(this.access || getStorage('l', 'access'))
     },
+    // for showing the signed-in UI (notifications, user menu, the site's
+    // signed-in sections): signed in now, or a refresh token that can still
+    // renew the session. A leftover expired or invalid token is not a session
+    // (hasSession() above would say yes and show them on the login page).
+    isSignedIn() {
+      return Boolean(this.isLogin || !this.isTokenExpired(this.refresh || getStorage('l', 'refresh')))
+    },
     async refreshResaasContext() {
       if (!this.Entity?.id || !this.hasSession()) {
         clearResaasContext()

@@ -228,3 +228,34 @@ describe('UserStore.logout - what survives', () => {
     expect(User.isLogout).toBe(true)
   })
 })
+
+describe('UserStore.isSignedIn - what shows the signed-in UI', () => {
+  const token = (exp) => `x.${btoa(JSON.stringify({ exp }))}.y`
+  const now = () => Math.floor(Date.now() / 1000)
+
+  beforeEach(() => localStorage.clear())
+
+  it('is false with no token, or with a leftover expired or invalid one', () => {
+    const User = useUserStore()
+    expect(User.isSignedIn()).toBe(false)
+
+    localStorage.setItem('access', token(now() - 3600))
+    localStorage.setItem('refresh', token(now() - 60))
+    expect(User.isSignedIn()).toBe(false)
+    expect(User.hasSession()).toBe(true) // the token is still there, for requests
+
+    localStorage.setItem('refresh', 'not-a-jwt')
+    expect(User.isSignedIn()).toBe(false)
+  })
+
+  it('is true when signed in, or while the refresh token can renew the session', () => {
+    const User = useUserStore()
+    localStorage.setItem('access', token(now() - 3600)) // access expired
+    localStorage.setItem('refresh', token(now() + 3600))
+    expect(User.isSignedIn()).toBe(true)
+
+    localStorage.clear()
+    User.isLogin = true
+    expect(User.isSignedIn()).toBe(true)
+  })
+})

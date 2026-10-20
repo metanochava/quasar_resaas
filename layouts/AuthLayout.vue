@@ -37,7 +37,6 @@
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import { useEntityStore } from '../stores/EntityStore'
-import { getStorage } from '../services/storage'
 import { findEntityType } from '../utils/entityTypeHost'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
@@ -84,7 +83,7 @@ export default defineComponent({
       return this.User.ps || {}
     },
     signedIn () {
-      return Boolean(this.User.isLogin || getStorage('l', 'access'))
+      return this.User.isSignedIn()
     }
   },
 
@@ -93,7 +92,7 @@ export default defineComponent({
   // session), else the theme of this host's EntityType (PUBLIC reads).
   async mounted(){
     this.User.loadFromStorage()
-    const signedIn = Boolean(this.User.isLogin || getStorage('l', 'access'))
+    const signedIn = this.User.isSignedIn()
     if (signedIn && this.User.Entity?.id) {
       await this.Entity.getLayoutSettings(this.User.Entity.id)
       return

@@ -445,6 +445,11 @@ export default defineComponent({
 .user-button {
   flex: 0 0 auto;
   max-width: 100%;
+  /* the avatar is the button: no extra side padding, so it sits at the
+     header's own padding from the right edge, like the brand on the left */
+  padding: 0;
+  min-height: 0;
+  border-radius: 50%;
 }
 
 .profile-image {
