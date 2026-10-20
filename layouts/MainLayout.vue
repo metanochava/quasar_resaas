@@ -55,14 +55,13 @@
         <!-- Entity website (only when the Entity has one) -->
         <HeaderSite />
 
-        <!-- Dark Mode -->
-        <HeaderDarkMode />
+        <HeaderDarkMode class="gt-xs" />
 
         <!-- Full Screen -->
-        <HeaderFullScreen />
+        <HeaderFullScreen class="gt-xs" />
 
         <!-- Languages -->
-        <HeaderLanguage />
+        <HeaderLanguage class="gt-xs" />
 
         <!-- Services -->
         <Servicos />

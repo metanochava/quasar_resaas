@@ -8,11 +8,11 @@ composition happens via store/route, not props.
 
 Minimal layout for the public pages (`/` - the EntityType site -,
 `/auth/login`, `/auth/register`, `/auth/forgot-password`): header (brand,
-dark mode, fullscreen, language, services and - **while signed in**
-(`User.isSignedIn()`: `User.isLogin`, or a stored refresh token that has not
-expired; a leftover expired or invalid token does not count, so the login page
-never shows them) - the same notifications
-(`HeaderNotifications`) and user menu (`HeaderUser`: profile, Entity / Branch /
+dark mode, fullscreen, language, services, the notifications
+(`HeaderNotifications`) only **while signed in** (`User.isSignedIn()`:
+`User.isLogin`, or a stored refresh token that has not expired; a leftover
+expired or invalid token does not count, so the login page never shows them),
+and always the user menu - for a visitor only Register and Login - (`HeaderUser`: profile, Entity / Branch /
 profile choice - the Entity and Branch entries only when the user has at least
 one, and the actions Go to site (`/`, `header-site`), Settings
 (`header-settings`), Appearance (`header-appearance`) and Logout - each in its own Theme colour:
@@ -38,6 +38,19 @@ The login page keeps its own configurable background (`login_config` of the
 Entity, else of the EntityType: ThemeSurface area `login` - image, gradient
 or colour, plus overlay); when none is configured it is transparent, so the
 wash above shows. Before, that default was opaque white/`#121212`.
+
+### Very small screens (xs, below 600px)
+
+Both layouts hide `HeaderDarkMode`, `HeaderFullScreen` and `HeaderLanguage`
+(Quasar class `gt-xs`) and the user menu (`HeaderUser`) shows the same three as
+menu items instead (`components/header/HeaderPreferences.vue`): a Dark mode
+switch, a Full screen switch (only where the browser supports it -
+`document.fullscreenEnabled`; not on iPhone Safari) and Language (the list,
+current one ticked). The hidden buttons stay mounted on purpose: `HeaderDarkMode`
+restores the saved dark mode and `HeaderLanguage` keeps Quasar's language in
+step. The items do what the buttons do (`$q.dark` + `localStorage` `dark`,
+Fullscreen API, `Language.change` + `User.setLanguage`); they are 48px tall for
+touch. Tests: `components/header/HeaderPreferences.spec.js`.
 
 ## MainLayout
 

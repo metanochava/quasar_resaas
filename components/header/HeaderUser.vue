@@ -178,7 +178,13 @@
 
 
           <GroupSelector  v-if="User.data" />
-          
+
+          <!-- very small screens: dark mode, full screen and language live
+               here (the header hides its own buttons for them) -->
+          <template v-if="$q.screen.xs">
+            <q-separator />
+            <HeaderPreferences />
+          </template>
 
           <q-separator />
           <!-- UTILIZADOR AUTENTICADO -->
@@ -299,13 +305,15 @@ import RegisterEntity from './RegisterEntity.vue'
 import { tdc } from '../../services/translation'
 import { profileSplint } from '../../utils/profile.js'
 import GroupSelector from './../GroupSelector.vue'
+import HeaderPreferences from './HeaderPreferences.vue'
 
 export default defineComponent({
   name: 'HeaderUser',
 
   components: {
     RegisterEntity,
-    GroupSelector
+    GroupSelector,
+    HeaderPreferences
   },
 
   setup () {

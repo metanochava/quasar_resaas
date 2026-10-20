@@ -4,9 +4,10 @@
       <q-toolbar class="no-wrap q-px-md">
         <HeaderBrand />
         <q-space />
-        <HeaderDarkMode />
-        <HeaderFullScreen />
-        <HeaderLanguage />
+
+        <HeaderDarkMode class="gt-xs" />
+        <HeaderFullScreen class="gt-xs" />
+        <HeaderLanguage class="gt-xs" />
         <Servicos />
 
         <Notificacoes v-if="signedIn"/>
