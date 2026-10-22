@@ -76,4 +76,13 @@ describe('HeaderBrand - logo and entity name as the way home', () => {
     expect(brand.attributes('role')).toBeUndefined()
     expect(brand.classes()).not.toContain('cursor-pointer')
   })
+
+  it('a long name stays on one line with an ellipsis (header height unchanged)', () => {
+    useUserStore().Entity = { name: '[DEMO] Farmácia Demo Chandkheda com um nome muito comprido' }
+
+    const name = mountBrand({ to: { name: 'dashboard' } }).find('[data-test="header-brand-name"]')
+
+    expect(name.classes()).toContain('ellipsis')
+    expect(name.text()).toContain('[DEMO] Farmácia Demo Chandkheda com um nome muito comprido')
+  })
 })

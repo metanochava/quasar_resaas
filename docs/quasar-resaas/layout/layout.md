@@ -84,7 +84,14 @@ removes it ([Persistence](../stores/persistence.md#logout)). The old shared
 `components/header/HeaderBrand.vue` (`s-header-brand`) shows the Entity's logo
 and name (or the EntityType's icon and name before an Entity is chosen). With
 `to` (`MainLayout` passes `{ name: 'dashboard' }`) logo and name are one link to that
-route; without it (`AuthLayout`) it is a plain brand.
+route; without it (`AuthLayout`) it is a plain brand. A name that does not fit
+stays on one line and is cut with an ellipsis (`…`), so the header never grows;
+the tooltip shows the full name (and the Branch, when there is one).
+
+The footer (`components/footer/MainFooter.vue`) follows the same rule: the
+copyright line (`© <since> - <year> <EntityType>: <Entity>`) is one line cut with
+an ellipsis, with the full text as its `title`, and "Send comment or feedback"
+keeps its place on the right. Tests: `components/footer/MainFooter.spec.js`.
 
 `components/header/HeaderSite.vue` (`s-header-site`, a globe icon `public`, just
 before the dark-mode button) opens the current Entity's website

@@ -12,11 +12,13 @@
       <div v-if="footerOverlayStyle" :style="footerOverlayStyle" />
       <q-toolbar>
         <q-toolbar-title>
-          <div class="row q-py-sm  justify-between ">
-            <div class="col-md-9   items-center" style="font-size:13px;" >
-              &copy; {{ User?.Entity?.created_at==null? '2020' : User?.Entity?.created_at }} - {{ new Date().getFullYear() }} {{ User?.Entity?.entityType.name }}{{ User?.Entity?.name ? ": "+User?.Entity?.name: "" }}
+          <!-- one line on every screen: the copyright is cut with an ellipsis
+               (the full text is its title), so the footer keeps its height -->
+          <div class="row no-wrap items-center q-py-sm q-col-gutter-x-sm justify-between">
+            <div class="col ellipsis main-footer__copyright" style="font-size:13px;" :title="copyright" data-test="footer-copyright">
+              {{ copyright }}
             </div>
-            <div class="col-md-3 text-right  items-center" style="font-size:12px;">
+            <div class="col-auto text-right ellipsis main-footer__actions" style="font-size:12px;">
               <q-spinner-gears size="md" color="white" v-show="Load.count !==0"/>
               <label v-show="Load.count !==0">{{ Load.count }}</label> <label  @click="this.comment = !this.comment">  {{tdc('Send comment or feedback')}} </label>
             </div>
@@ -87,6 +89,13 @@ export default defineComponent({
       return style
     },
 
+    copyright(){
+      const entity = this.User?.Entity
+      const since = entity?.created_at == null ? '2020' : entity.created_at
+      const name = entity?.name ? ': ' + entity.name : ''
+      return `© ${since} - ${new Date().getFullYear()} ${entity?.entityType?.name ?? ''}${name}`
+    },
+
     footerOverlayStyle(){
       return surfaceOverlayStyle(this.ps.theme?.surfaces?.footer)
     }
@@ -100,3 +109,8 @@ export default defineComponent({
   }
 })
 </script>
+
+<style scoped>
+.main-footer__copyright { min-width: 0; }
+.main-footer__actions { max-width: 50%; }
+</style>
