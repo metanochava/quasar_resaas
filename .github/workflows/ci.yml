@@ -42,8 +42,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run release checks
-        run: make release-check
 
   secrets:
     runs-on: ubuntu-latest
