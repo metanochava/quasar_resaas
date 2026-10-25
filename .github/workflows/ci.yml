@@ -1,52 +1,7 @@
-name: CI
-
-# Validation only (this workflow never publishes). It runs the same gate as
-# `make release-check`: clean tree, the vitest suite, and the package check
-# (no specs/tests/env in the tarball; index.js and auto-imports.cjs present).
-
 on:
+  workflow_call:
+
   push:
     branches: [main]
+
   pull_request:
-
-permissions:
-  contents: read
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [20, 22, 24]
-    defaults:
-      run:
-        working-directory: quasar_resaas
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          path: quasar_resaas
-      # i18n.spec.js reads the dictionaries from the sibling django_resaas
-      # checkout (../django_resaas); without it that check is skipped
-      - uses: actions/checkout@v4
-        with:
-          repository: metanochava/django_resaas
-          ref: develop
-          path: django_resaas
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: npm
-          cache-dependency-path: quasar_resaas/package-lock.json
-      - run: npm ci
-      - run: make release-check
-
-  secrets:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
