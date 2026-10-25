@@ -32,14 +32,6 @@ jobs:
         with:
           path: quasar_resaas
 
-      # i18n.spec.js uses dictionaries from the backend repository.
-      - name: Checkout django_resaas
-        uses: actions/checkout@v4
-        with:
-          repository: metanochava/django_resaas
-          ref: develop
-          path: django_resaas
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
