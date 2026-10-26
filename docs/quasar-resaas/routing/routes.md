@@ -103,8 +103,8 @@ registerEntityTypeSiteContent('Saude', {
 ```
 
 Every key is optional; texts are canonical English, translated with `tdc()`.
-Their pt/es/fr translations go to the backend's static lang files
-(django_resaas `saas/lang/{ptpt,eses,frfr}.py`, or the lang files of the
+Their Portuguese translations go to the backend's static lang files
+(django_resaas `saas/lang/ptpt.py`, or the lang files of the
 application's own module), the same as any other frontend string - see django_resaas
 [Public sites](../../django-resaas/features/public-sites.md#entity-type-sites).
 The content of the other types is read from the same registry (the sector
