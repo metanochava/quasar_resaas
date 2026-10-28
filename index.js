@@ -19,6 +19,7 @@ export * from './composables/useResaas.js'
 export * from './composables/usePersonIntake.js'
 export * from './composables/useRelationSearch.js'
 export * from './composables/useUserGroups.js'
+export * from './composables/useBrandIcon.js'
 
 
 // =========================================================

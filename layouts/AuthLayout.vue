@@ -34,6 +34,7 @@
 
 import { useUserStore } from '../stores/UserStore'
 import { useEntityTypeStore } from '../stores/EntityTypeStore'
+import { useBrandFavicon } from '../composables/useBrandIcon'
 import { useEntityStore } from '../stores/EntityStore'
 import { findEntityType } from '../utils/entityTypeHost'
 
@@ -62,6 +63,8 @@ export default defineComponent({
     HeaderUser,
   },
   setup() {
+    // the browser tab icon: the active Entity's logo, else its EntityType icon
+    useBrandFavicon()
     const EntityType = useEntityTypeStore()
     const Entity = useEntityStore()
     const User = useUserStore()

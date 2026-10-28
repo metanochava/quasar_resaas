@@ -123,7 +123,9 @@ export function resolveRouteTitle(route) {
   return typeof title === 'function' ? title(route) : title
 }
 
-export function installPageTitle(router, { appName, separator = ' | ', translate = tdc } = {}) {
+// suffix: false shows the page title alone (no " | <appName>"); the app name
+// is then only the title of a page that has none.
+export function installPageTitle(router, { appName, separator = ' | ', translate = tdc, suffix = true } = {}) {
   if (typeof document === 'undefined') return
 
   const baseName = appName || document.title || ''
@@ -138,7 +140,7 @@ export function installPageTitle(router, { appName, separator = ' | ', translate
     const override = pageTitle.overrideTitle()
     const title = override ?? translateTitle(pageTitle.state.routeTitle, translate)
 
-    return composeTitle(title, baseName, separator)
+    return suffix ? composeTitle(title, baseName, separator) : (String(title ?? '').trim() || baseName)
   })
 
   watchEffect(() => {

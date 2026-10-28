@@ -88,6 +88,41 @@ route; without it (`AuthLayout`) it is a plain brand. A name that does not fit
 stays on one line and is cut with an ellipsis (`…`), so the header never grows;
 the tooltip shows the full name (and the Branch, when there is one).
 
+### Browser tab icon (favicon) and title
+
+The tab icon is chosen like the header brand: the logo of the active Entity
+or, before an Entity is chosen (or when it has no logo), the icon of its
+EntityType (Saude, Farmacia, ...) - one or the other, never both. `MainLayout`
+and `AuthLayout` call `useBrandFavicon()` (`composables/useBrandIcon.js`,
+exported from the package):
+
+- the logo is `User.Entity.logo.url` (the selected Entity);
+- the EntityType is the one of the selected Entity (`User.Entity.entity_type`,
+  `{id, value, label}`) or, before an Entity is chosen, the EntityType of the
+  host (`User.EntityType`, set by `AuthLayout`). Its icon is the square PNG the
+  backend already serves for the installable app:
+  `GET django_resaas/entitytypes/{id}/app_icon/?size=192` - a PUBLIC read
+  (`public_actions` of the EntityType view), so it also works on the login page;
+- every `<link rel="icon">` of `index.html` points at it; with no brand (or
+  when the layout unmounts) the original icons and types come back. A page
+  with no icon link gets one.
+
+`setFavicon(href)` is the low-level helper (`null` restores the index.html
+icons): an application's own site layouts use it for the logo of their
+institution. `useBrandIcon()` gives the same URL (`iconUrl`) to any component
+that needs it. Tests: `composables/useBrandIcon.spec.js`.
+
+The tab title comes from `installPageTitle(router, options)`
+(`services/pageTitle.js`): by default `"<page title> | <app name>"`, the app
+name being the `<title>` of index.html. With `{ suffix: false }` the page
+title is shown alone, and the app name only for a page without a title.
+Tests: `services/pageTitle.spec.js`.
+
+Troubleshooting: the tab keeps the default icon when no brand is known yet (no
+Entity selected and the host is not an EntityType domain), or shows the
+browser's fallback when the EntityType has no readable image (`app_icon`
+answers 404).
+
 The footer (`components/footer/MainFooter.vue`) follows the same rule: the
 copyright line (`© <since> - <year> <EntityType>: <Entity>`) is one line cut with
 an ellipsis, with the full text as its `title`, and "Send comment or feedback"

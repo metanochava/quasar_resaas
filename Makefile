@@ -17,6 +17,7 @@ push:
 
 	git add .
 	git commit -m "release: v$$VERSION - $$message"
+	
 	git push origin main
 
 	echo "Release v$$VERSION pushed successfully."

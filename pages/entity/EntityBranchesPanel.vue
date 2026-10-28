@@ -60,7 +60,7 @@
               text-color="white"
               rounded
             >
-              {{ branch.state }}
+              {{ branch.state.label }}
             </q-badge>
           </q-item-label>
         </q-item-section>

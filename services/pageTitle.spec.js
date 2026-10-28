@@ -3,7 +3,7 @@ import { defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 
 import {
-  translateTitle, composeTitle, createPageTitleState, usePageTitle, pageTitle, resolveRouteTitle
+  translateTitle, composeTitle, createPageTitleState, usePageTitle, pageTitle, resolveRouteTitle, installPageTitle
 } from './pageTitle'
 
 const dictionary = {
@@ -137,5 +137,41 @@ describe('usePageTitle', () => {
   it('an empty title is no override', () => {
     mountPage(Page(() => ''))
     expect(pageTitle.overrideTitle()).toBe(null)
+  })
+})
+
+describe('installPageTitle - suffix', () => {
+  function fakeRouter() {
+    const hooks = []
+    return { afterEach: fn => hooks.push(fn), go: to => hooks.forEach(fn => fn(to)) }
+  }
+
+  afterEach(() => pageTitle.setRouteTitle(''))
+
+  it('adds " | <app name>" by default', async () => {
+    document.title = 'Mytech'
+    const router = fakeRouter()
+    installPageTitle(router, { translate })
+    router.go({ meta: { title: 'Patient' } })
+    await nextTick()
+    expect(document.title).toBe('paciente | Mytech')
+  })
+
+  it('with suffix: false shows the page title alone', async () => {
+    document.title = 'Mytech'
+    const router = fakeRouter()
+    installPageTitle(router, { translate, suffix: false })
+    router.go({ meta: { title: 'Patient' } })
+    await nextTick()
+    expect(document.title).toBe('paciente')
+  })
+
+  it('with suffix: false a page without title shows the app name', async () => {
+    document.title = 'Mytech'
+    const router = fakeRouter()
+    installPageTitle(router, { translate, suffix: false })
+    router.go({ meta: {} })
+    await nextTick()
+    expect(document.title).toBe('Mytech')
   })
 })
