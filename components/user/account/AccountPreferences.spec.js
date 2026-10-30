@@ -31,6 +31,7 @@ beforeEach(() => {
   Language.rows = [{ id: 1, name: 'Português', code: 'pt-pt' }, { id: 2, name: 'English', code: 'en-us' }]
   Language.current = Language.rows[0]
   vi.spyOn(Language, 'change').mockImplementation(() => {})
+  vi.spyOn(Language, 'choose').mockResolvedValue()
   vi.spyOn(User, 'setLanguage').mockImplementation(() => {})
   vi.spyOn(User, 'toggleSidebarMini').mockResolvedValue({})
   vi.spyOn(User, 'toggleMenuRtl').mockResolvedValue({})
@@ -38,7 +39,7 @@ beforeEach(() => {
 })
 
 describe('AccountPreferences - reuses what the app already has', () => {
-  it('lists the app languages with the current one selected, and switches through the existing store calls', async () => {
+  it('lists the app languages with the current one selected, and saves the pick through Language.choose', async () => {
     const wrapper = mountPrefs()
     await flushPromises()
 
@@ -50,8 +51,22 @@ describe('AccountPreferences - reuses what the app already has', () => {
 
     await radios[1].trigger('click')
 
-    expect(Language.change).toHaveBeenCalledWith(Language.rows[1])
-    expect(User.setLanguage).toHaveBeenCalledWith(Language.rows[1])
+    // choose() applies it and saves it as the user's own language
+    expect(Language.choose).toHaveBeenCalledWith(Language.rows[1])
+  })
+
+  it('offers going back to the entity\'s language only when the user has their own', async () => {
+    User.data = { id: 'u1' }
+    let wrapper = mountPrefs()
+    await flushPromises()
+    expect(wrapper.find('[data-test="pref-language-inherit"]').exists()).toBe(false)
+
+    User.data = { id: 'u1', own_language: 2 }
+    wrapper = mountPrefs()
+    await flushPromises()
+    await wrapper.find('[data-test="pref-language-inherit"]').trigger('click')
+
+    expect(Language.choose).toHaveBeenCalledWith(null)
   })
 
   it('appearance drives $q.dark and the same storage key the header button uses', async () => {

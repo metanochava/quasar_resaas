@@ -54,13 +54,12 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useQuasar } from 'quasar'
-import { useUserStore } from '../../stores/UserStore'
 import { useLanguageStore } from '../../stores/LanguageStore'
 import { setStorage } from '../../services/storage'
 import { tdc } from '../../services/translation'
+import { Alert } from '../../boot/alerts'
 
 const $q = useQuasar()
-const User = useUserStore()
 const Language = useLanguageStore()
 
 // the same effects as HeaderDarkMode, HeaderFullScreen and HeaderLanguage
@@ -85,9 +84,13 @@ async function toggleFullscreen () {
   }
 }
 
-function chooseLanguage (language) {
-  Language.change(language)
-  User.setLanguage(language)
+// applies it and, when signed in, saves it as the user's own language
+async function chooseLanguage (language) {
+  try {
+    await Language.choose(language)
+  } catch (error) {
+    Alert(error?.response)
+  }
 }
 
 onMounted(() => document.addEventListener('fullscreenchange', onFullscreenChange))

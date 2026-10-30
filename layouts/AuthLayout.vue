@@ -37,6 +37,9 @@ import { useEntityTypeStore } from '../stores/EntityTypeStore'
 import { useBrandFavicon } from '../composables/useBrandIcon'
 import { useEntityStore } from '../stores/EntityStore'
 import { findEntityType } from '../utils/entityTypeHost'
+import { useLanguageStore, CHOSEN_KEY } from '../stores/LanguageStore'
+import { getStorage } from '../services/storage'
+import { safeParse } from '../utils/json'
 
 /* -------------------- IMPORT COMPONENTS -------------------- */
 import HeaderBrand from '../components/header/HeaderBrand.vue'
@@ -68,11 +71,13 @@ export default defineComponent({
     const EntityType = useEntityTypeStore()
     const Entity = useEntityStore()
     const User = useUserStore()
+    const Language = useLanguageStore()
 
     return {
       EntityType,
       Entity,
       User,
+      Language,
     }
   },
   data() {
@@ -103,9 +108,31 @@ export default defineComponent({
       this.User.EntityType = entityType
       await this.EntityType.getLayoutSettings(entityType.id, { force: true })
     }
+    await this.applyLanguage(entityType)
   },
 
   methods: {
+    // Before signing in: the language this browser chose before, else the
+    // default language of this host's EntityType (public list), else the
+    // platform's (pt-pt). After signing in UserStore.me() applies the
+    // user's effective language (User > Entity > EntityType).
+    async applyLanguage (entityType) {
+      try {
+        if (!this.Language.rows?.length) await this.Language.get()
+        const rows = this.Language.rows || []
+        const stored = safeParse(getStorage('l', CHOSEN_KEY))
+        const byId = id => rows.find(row => String(row.id) === String(id))
+        const target =
+          (stored?.id && byId(stored.id)) ||
+          (entityType?.language?.id && byId(entityType.language.id)) ||
+          rows.find(row => row.code === 'pt-pt') ||
+          rows[0]
+        if (target && String(target.id) !== String(this.Language.current?.id)) this.Language.change(target)
+      } catch (e) {
+        // no language list: the texts stay in English (the canonical keys)
+      }
+    },
+
     async hostEntityType () {
       try {
         if (!this.EntityType.rows?.length) await this.EntityType.getEntityTypes()

@@ -10,7 +10,8 @@ import { Alert } from '../../../boot/alerts'
 
 // Personal preferences, through the mechanisms the app already has - nothing
 // new is stored or modelled here:
-//  - language   LanguageStore.change() + UserStore.setLanguage() (the header menu)
+//  - language   LanguageStore.choose(): saved as the user's own language
+//               (User > Entity > EntityType, resolved by the backend)
 //  - appearance $q.dark + the 'dark' storage key (the header dark-mode button)
 //  - menu       UserStore.toggleSidebarMini() / toggleMenuRtl() (personal layout
 //               overrides resolved User > Entity > EntityType by the backend)
@@ -31,9 +32,15 @@ const menuValues = computed(() => ({
 const languages = computed(() => Language.rows || [])
 const currentLanguageId = computed(() => Language.current?.id ?? Session.Language?.id ?? null)
 
-function chooseLanguage(language) {
-  Language.change(language)
-  Session.setLanguage(language)
+// the user's own language (null = inherits the Entity's / EntityType's)
+const ownLanguage = computed(() => Session.data?.own_language ?? null)
+
+async function chooseLanguage(language) {
+  try {
+    await Language.choose(language)
+  } catch (error) {
+    Alert(error?.response)
+  }
 }
 
 const appearance = computed({
@@ -79,6 +86,20 @@ async function setMenu(field, wanted) {
             data-test="pref-language"
             @update:model-value="id => chooseLanguage(languages.find(language => language.id === id))"
           />
+          <s-btn
+            v-if="ownLanguage"
+            flat
+            no-caps
+            dense
+            color="primary"
+            icon="restart_alt"
+            class="q-mt-sm"
+            :label="tdc('Use the entity\'s language')"
+            data-test="pref-language-inherit"
+            @click="chooseLanguage(null)"
+          >
+            <s-tooltip>{{ tdc('Use the entity\'s language') }}</s-tooltip>
+          </s-btn>
         </q-card-section>
       </s-card>
 

@@ -10,7 +10,16 @@ multi-tenancy on the frontend side.
 -   `login(data, q)` — `POST login/`, stores `access`/`refresh` in local
     storage (365 days) and calls `me()`.
 -   `me()` — `GET me/`, fills in `this.data` and switches the active language
-    via `LanguageStore` if the backend returns `language`.
+    via `LanguageStore` to the returned `language`. This is the effective
+    language (User > Entity > EntityType > pt-pt, resolved by the backend);
+    `own_language` is the user's own choice, or `null`.
+-   `LanguageStore.choose(language)` — the user's pick (header menus,
+    Account Center): applies it and, when signed in, saves it with
+    `PATCH django_resaas/users/{id}/ {language}`. `choose(null)` goes back
+    to the Entity's default. Before signing in, `AuthLayout` uses the
+    browser's explicit pick (`userLangChosen`), then the host EntityType's
+    `language`, then `pt-pt`. See django_resaas
+    `docs/features/languages.md`.
 -   `refreshToken()` / `isTokenExpired(token)` / `checkSession()` —
     token renewal based on the decoded JWT's `exp` (no signature
     verification, payload only).

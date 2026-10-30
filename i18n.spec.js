@@ -3,13 +3,14 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 // Standing rule (CLAUDE.md section 84): every tdc('...') literal in this
-// library must exist in the pt-pt, es-es and fr-fr dictionaries
+// library must exist in the pt-pt dictionary (en-us is the key itself;
+// es-es and fr-fr were removed on 2026-10-26)
 // (django_resaas/<app>/lang/<code>.py, merged the way Translate.tdc()/the
 // translations endpoint merge them). A new untranslated string fails here
 // instead of shipping as English in every other language.
 const ROOT = process.cwd()
 const LANG_ROOT = resolve(ROOT, '../django_resaas/src/django_resaas')
-const CODES = ['ptpt', 'eses', 'frfr']
+const CODES = ['ptpt']
 
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {

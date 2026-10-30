@@ -7,7 +7,7 @@
           v-for="language in Language.rows"
           :key="language"
           clickable
-          @click="Language?.change(language), User.setLanguage(language)"
+          @click="chooseLanguage(language)"
         >
 
           <q-item-section
@@ -51,6 +51,7 @@ import {
   useQuasar
 } from 'quasar'
 import { tdc } from '../../services/translation'
+import { Alert } from '../../boot/alerts'
 
 
 
@@ -276,6 +277,14 @@ export default defineComponent({
 
 
   methods: {
+    // applies it and, when signed in, saves it as the user's own language
+    async chooseLanguage (language) {
+      try {
+        await this.Language.choose(language)
+      } catch (error) {
+        Alert(error?.response)
+      }
+    },
 
   }
 

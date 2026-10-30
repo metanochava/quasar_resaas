@@ -31,6 +31,7 @@ beforeEach(() => {
   Language.rows = [{ id: 1, name: 'Português' }, { id: 2, name: 'English' }]
   Language.current = { id: 1, name: 'Português' }
   Language.change = vi.fn()
+  Language.choose = vi.fn().mockResolvedValue()
   User.setLanguage = vi.fn()
 })
 
@@ -44,14 +45,14 @@ describe('HeaderPreferences - dark mode, full screen and language as menu items'
     expect(localStorage.getItem('dark')).toBe('true')
   })
 
-  it('changes the language, as HeaderLanguage does', async () => {
+  it('changes the language through Language.choose, as HeaderLanguage does', async () => {
     const wrapper = mount(HeaderPreferences, { global })
 
     const english = wrapper.findAll('.header-preferences__option').find((item) => item.text().includes('English'))
     await english.trigger('click')
 
-    expect(Language.change).toHaveBeenCalledWith({ id: 2, name: 'English' })
-    expect(User.setLanguage).toHaveBeenCalledWith({ id: 2, name: 'English' })
+    // choose() applies it and, when signed in, saves it as the user's own
+    expect(Language.choose).toHaveBeenCalledWith({ id: 2, name: 'English' })
   })
 
   it('offers full screen only where the browser can do it', () => {
