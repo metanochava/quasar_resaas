@@ -30,6 +30,7 @@
 <script setup>
 import { computed, watch } from 'vue'
 import { tdc } from '../services/translation'
+import { pdfFileName, forgetPdf } from '../utils/pdfFile'
 
 // props
 const props = defineProps({
@@ -51,17 +52,31 @@ const dialog = computed({
 // PDF URL
 const pdfUrl = computed(() => props.src)
 
-// download
+// download under the server's file name (Content-Disposition), never the
+// blob URL's random uuid; a plain URL without a known name opens as before
 function downloadPdf() {
-  if (pdfUrl.value) {
+  if (!pdfUrl.value) return
+
+  const name = pdfFileName(pdfUrl.value)
+
+  if (!name) {
     window.open(pdfUrl.value, '_blank')
+    return
   }
+
+  const link = document.createElement('a')
+  link.href = pdfUrl.value
+  link.download = name
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
 }
 
 // free memory (blob)
 watch(() => props.modelValue, (val) => {
   if (!val && props.src?.startsWith('blob:')) {
     URL.revokeObjectURL(props.src)
+    forgetPdf(props.src)
   }
 })
 </script>

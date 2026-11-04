@@ -8,6 +8,7 @@ import { parseFieldErrors } from '../boot/alerts'
 import { toWriteShapes } from '../utils/payload'
 import { applyFieldAccess } from '../utils/fieldAccess'
 import { useUserStore } from '../stores/UserStore'
+import { pdfBlobUrl } from '../utils/pdfFile'
 
 // User.can for field-level authorization (utils/fieldAccess.js). Resolved
 // lazily - UserStore itself is built on this module - and fails closed
@@ -676,7 +677,7 @@ export function createBaseStore(name, config, extend = {}) {
           : `${this.safeUrl}/${pdfId}/pdf`
 
         const res = await HTTPAuthBlob.get(url({ type: 'u', url: endpoint }))
-        const blob = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+        const blob = pdfBlobUrl(res)
         this.pdf = blob
         this.showPdf = true
 
@@ -695,7 +696,7 @@ export function createBaseStore(name, config, extend = {}) {
               }
           }
         ))
-        const blob = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+        const blob = pdfBlobUrl(res)
         this.pdf = blob
         this.showPdf = true
 

@@ -126,6 +126,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { tdc } from '../../../services/translation'
 import { HTTPAuth, url } from '../../../services/api'
+import { statusColor } from '../../../utils/status'
 
 const loading = ref(true)
 const data = ref({
@@ -150,18 +151,6 @@ const successRateTextClass = computed(() => {
   return data.value.delivery_success_rate < 90 ? 'text-negative' : 'text-positive'
 })
 
-function statusColor(status) {
-  return {
-    pending: 'grey',
-    dispatching: 'info',
-    queued: 'info',
-    processing: 'primary',
-    retry: 'warning',
-    sent: 'positive',
-    failed: 'negative',
-    cancelled: 'grey',
-  }[status] || 'grey'
-}
 
 onMounted(async () => {
   loading.value = true

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
+import { statusColor } from '../../utils/status'
 import { resolveDashboardAction } from '../../services/dashboardActions'
 import { matchesSearch } from '../../utils/highlight'
 import HighlightText from '../engine/HighlightText.vue'
@@ -145,7 +146,7 @@ const selectedDateLabel = computed(() => selectedDate.value.split('/').reverse()
             </q-item-section>
 
             <q-item-section v-if="event.status" side>
-              <q-badge :color="event.status_color || 'grey'">{{ tdc(event.status) }}</q-badge>
+              <q-badge :color="event.status_color || statusColor(event.status)">{{ tdc(event.status) }}</q-badge>
             </q-item-section>
           </q-item>
         </q-list>

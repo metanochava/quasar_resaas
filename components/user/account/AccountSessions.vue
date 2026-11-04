@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
+import { ds } from '../../../services/data'
 
 import { useAccountSessions } from '../../../composables/useAccountSessions'
 import { tdc } from '../../../services/translation'
@@ -17,7 +18,7 @@ const { sessions, others, loading, failed, busy, endingOthers, load } = account
 
 onMounted(load)
 
-const when = (value) => (value ? new Date(value).toLocaleString() : '')
+const when = (value) => (value ? ds(new Date(value)) : '')
 
 const iconFor = (device) => {
   if (/iOS|Android/.test(device)) return 'smartphone'

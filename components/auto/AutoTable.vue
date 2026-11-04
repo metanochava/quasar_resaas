@@ -7,6 +7,8 @@ import { useRouter } from 'vue-router'
 import { useActionStore } from '../../stores/ActionStore'
 import { useUserStore } from '../../stores/UserStore'
 import { DEFAULT_UI, DEFAULT_PAGINATION, DEFAULT_PDF } from '../../utils/schema'
+import { statusColor, isStatusField } from '../../utils/status'
+import { ds, isDateLike } from '../../services/data'
 
 
 const User =useUserStore()
@@ -52,6 +54,28 @@ function resolveRawValue(val) {
   } catch {
     return val
   }
+}
+
+// A status column (status, <x>_status) is shown as a coloured badge.
+function statusItem(row, name) {
+  return isStatusField(name) ? firstItem(row, name) : null
+}
+
+// Date and date-time cells use the platform format (ds); time-only fields
+// and non-date values are shown as they are.
+function isDateColumn(name, value) {
+  const type = getField(name)?.type
+
+  if (type === 'DateField' || type === 'DateTimeField') return true
+  if (type === 'TimeField') return false
+
+  return isDateLike(value)
+}
+
+function shownValue(col, value) {
+  if (isDateColumn(col?.name, value)) return ds(value)
+
+  return isGroupColumn(col) ? groupLabel(value) : value
 }
 
 function isBoolean(val) {
@@ -1636,6 +1660,14 @@ function filteredItems(row, field) {
 
         </template>
 
+        <!-- STATUS -->
+        <template v-else-if="statusItem(props.row, props.col.name)">
+          <q-badge
+            :color="statusColor(props.row[props.col.name])"
+            :label="tdc(String(statusItem(props.row, props.col.name)?.label ?? ''))"
+          />
+        </template>
+
         <!-- RELATION / CHOICE / MANY TO MANY -->
         <template
           v-else-if="
@@ -1903,7 +1935,7 @@ function filteredItems(row, field) {
           </q-popup-edit>
 
           <span class="cursor-pointer">
-            {{ isGroupColumn(props.col) ? groupLabel(props.value) : props.value }}
+            {{ shownValue(props.col, props.value) }}
           </span>
 
         </template>
@@ -1913,7 +1945,8 @@ function filteredItems(row, field) {
 
         <template v-else>
 
-          <label class="insize" v-html="resolveValue(props.value, props.col)"></label>
+          <label v-if="isDateColumn(props.col.name, props.value)" class="insize">{{ ds(props.value) }}</label>
+          <label v-else class="insize" v-html="resolveValue(props.value, props.col)"></label>
 
         </template>
 

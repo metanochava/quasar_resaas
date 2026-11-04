@@ -64,6 +64,7 @@ import {
 } from '../../utils/schema'
 import { useUserStore } from '../../stores/UserStore'
 import { applyFieldAccess } from '../../utils/fieldAccess'
+import { pdfBlobUrl, forgetPdf } from '../../utils/pdfFile'
 
 const User = useUserStore()
 const emit = defineEmits(['runaction'])
@@ -175,12 +176,13 @@ function hasPermission(permission) {
   return !permission || User.can(permission)
 }
 
-function showPdfBlob(data) {
-  if (pdfUrl.value) URL.revokeObjectURL(pdfUrl.value)
+function showPdfBlob(response) {
+  if (pdfUrl.value) {
+    URL.revokeObjectURL(pdfUrl.value)
+    forgetPdf(pdfUrl.value)
+  }
 
-  pdfUrl.value = URL.createObjectURL(
-    new Blob([data], { type: 'application/pdf' })
-  )
+  pdfUrl.value = pdfBlobUrl(response)
 
   showPdf.value = true
 }
@@ -290,8 +292,7 @@ async function openPdf(row) {
   const pdfEndpoint = resolvePdfDetailEndpoint(schema.value, row)
   if (!pdfEndpoint) return
 
-  const { data } = await HTTPAuthBlob.get(endpoint(pdfEndpoint))
-  showPdfBlob(data)
+  showPdfBlob(await HTTPAuthBlob.get(endpoint(pdfEndpoint)))
 }
 
 async function openpdf_list() {
@@ -303,11 +304,9 @@ async function openpdf_list() {
     !pdf.list_endpoint
   ) return
 
-  const { data } = await HTTPAuthBlob.get(
+  showPdfBlob(await HTTPAuthBlob.get(
     endpoint(pdf.list_endpoint, requestParams.value)
-  )
-
-  showPdfBlob(data)
+  ))
 }
 
 async function onDelete(row) {

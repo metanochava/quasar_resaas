@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { ds } from '../../../services/data'
 
 import ChangePasswordDialog from './ChangePasswordDialog.vue'
 import AccountTwoFactor from './AccountTwoFactor.vue'
@@ -18,7 +19,7 @@ const Session = useUserStore()
 // only what /me/ reports - never guessed
 const passwordChangedAt = computed(() => {
   const at = Session.data?.password_changed_at
-  return at ? new Date(at).toLocaleString() : ''
+  return at ? ds(new Date(at)) : ''
 })
 </script>
 

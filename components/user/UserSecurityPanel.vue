@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { useQuasar, copyToClipboard } from 'quasar'
+import { ds } from '../../services/data'
 
 import { useUserAdminStore } from '../../stores/UserAdminStore'
 import { useUserStore } from '../../stores/UserStore'
@@ -50,7 +51,7 @@ const stateLabel = computed(() => ({
 
 const expiresText = computed(() => {
   const at = security.value?.expires_at
-  return at ? new Date(at).toLocaleString() : ''
+  return at ? ds(new Date(at)) : ''
 })
 
 async function load() {

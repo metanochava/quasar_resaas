@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { ds } from '../../../services/data'
 
 import { tdc } from '../../../services/translation'
 import { maskEmail, maskPhone } from '../../../utils/maskContact'
@@ -25,12 +26,12 @@ function flag(value) {
 
 const passwordChanged = computed(() => {
   const at = props.user?.password_changed_at
-  return at ? new Date(at).toLocaleString() : ''
+  return at ? ds(new Date(at)) : ''
 })
 
 const lastLogin = computed(() => {
   const at = props.user?.last_login
-  return at ? new Date(at).toLocaleString() : ''
+  return at ? ds(new Date(at)) : ''
 })
 
 function stateChip(state) {

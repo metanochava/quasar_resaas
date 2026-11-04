@@ -103,6 +103,7 @@ import { useQuasar } from 'quasar'
 
 import { tdc } from '../../services/translation'
 import { sDialog } from '../../services/dialog'
+import { statusColor as statusTone } from '../../utils/status'
 
 const props = defineProps({
   channel: { type: Object, required: true },
@@ -121,7 +122,7 @@ for (const field of props.channel.fields) {
 
 const statusColor = computed(() => {
   if (!props.credential) return 'grey'
-  return props.credential.is_active ? 'positive' : 'grey-7'
+  return statusTone(props.credential.is_active ? 'active' : 'inactive')
 })
 
 const statusLabel = computed(() => {

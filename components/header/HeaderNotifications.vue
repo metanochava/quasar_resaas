@@ -443,6 +443,8 @@ import { Notify } from 'quasar'
 
 import { tdc } from '../../services/translation'
 import { groupLabel } from '../../utils/groupLabel'
+import { statusColor as statusTone } from '../../utils/status'
+import { ds } from '../../services/data'
 import { getFirebase } from 'quasar_resaas'
 import { useAlertStore } from '../../stores/AlertStore'
 import AlertHistoryPanel from './AlertHistoryPanel.vue'
@@ -1273,42 +1275,7 @@ export default defineComponent({
     },
 
     formatDate (timestamp) {
-      if (!timestamp) {
-        return ''
-      }
-
-      const date =
-        new Date(timestamp)
-
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
-        return ''
-      }
-
-      return new Intl
-        .DateTimeFormat(
-          'pt-PT',
-          {
-            day:
-              '2-digit',
-
-            month:
-              '2-digit',
-
-            year:
-              'numeric',
-
-            hour:
-              '2-digit',
-
-            minute:
-              '2-digit'
-          }
-        )
-        .format(date)
+      return timestamp ? ds(new Date(timestamp)) : ''
     },
 
     statusLabel (status) {
@@ -1328,19 +1295,7 @@ export default defineComponent({
     },
 
     statusColor (status) {
-      return {
-        new:
-          'red',
-
-        in_progress:
-          'orange',
-
-        resolved:
-          'positive',
-
-        closed:
-          'grey'
-      }[status] || 'grey'
+      return statusTone(status)
     }
   }
 })

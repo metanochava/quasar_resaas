@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { tdc } from '../../services/translation'
+import { statusColor } from '../../utils/status'
 import { resolveDashboardAction } from '../../services/dashboardActions'
 
 const props = defineProps({
@@ -44,7 +45,7 @@ function onClick(item) {
 
       <q-item-section v-if="item.date || item.status" side top>
         <q-item-label v-if="item.date" caption>{{ item.date }}<span v-if="item.time"> {{ item.time }}</span></q-item-label>
-        <q-badge v-if="item.status" :color="item.status_color || 'grey'">{{ tdc(item.status) }}</q-badge>
+        <q-badge v-if="item.status" :color="item.status_color || statusColor(item.status)">{{ tdc(item.status) }}</q-badge>
       </q-item-section>
     </q-item>
   </q-list>

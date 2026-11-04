@@ -300,6 +300,7 @@ import { useUserStore } from '../../stores/UserStore'
 import { tdc } from '../../services/translation'
 import AddressMiniMap from '../address/AddressMiniMap.vue'
 import { displayValue, rawValue } from '../../utils/display'
+import { ds } from '../../services/data'
 
 // Read-only "Personal" tab of view_employee. Everything shown comes from
 // what the backend really returns for this Person (PersonSerializer via
@@ -371,9 +372,7 @@ function parseDate(value) {
 
 function formatDate(value) {
   const date = parseDate(value)
-  return date
-    ? date.toLocaleDateString(undefined, { day: '2-digit', month: 'long', year: 'numeric' })
-    : ''
+  return date ? ds(String(value).slice(0, 10)) : ''
 }
 
 function expiry(doc) {

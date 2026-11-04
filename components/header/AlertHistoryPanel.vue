@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { ds } from '../../services/data'
 
 import { useAlertStore } from '../../stores/AlertStore'
 import { tdc } from '../../services/translation'
@@ -39,7 +40,7 @@ const colorOf = (level) => levelToQuasar(level)
 
 // messages may carry the <b>...</b> some backend texts use; shown as plain text here
 const plain = (text) => String(text ?? '').replace(/<[^>]*>/g, '')
-const time = (value) => (value ? new Date(value).toLocaleString() : '')
+const time = (value) => (value ? ds(new Date(value)) : '')
 
 function open(alert) {
   Alerts.markAsRead(alert)

@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted } from 'vue'
+import { ds } from '../../../services/data'
 
 import { useAccountSessions } from '../../../composables/useAccountSessions'
 import { tdc } from '../../../services/translation'
@@ -24,7 +25,7 @@ const KINDS = {
 }
 
 const kind = (event) => KINDS[event.type] || { icon: 'info', label: 'Account activity' }
-const when = (value) => (value ? new Date(value).toLocaleString() : '')
+const when = (value) => (value ? ds(new Date(value)) : '')
 </script>
 
 <template>
