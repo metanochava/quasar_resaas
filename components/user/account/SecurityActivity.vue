@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ds } from '../../../services/data'
 
 import { useAccountSessions } from '../../../composables/useAccountSessions'
@@ -11,6 +11,26 @@ import { tdc } from '../../../services/translation'
 const { activity, loadingActivity, activityFailed, loadActivity } = useAccountSessions()
 
 onMounted(loadActivity)
+
+// The list grows down to the page footer and scrolls from there instead of
+// pushing the footer away: its height is what is left of the window below
+// its top (in the document), minus the footer.
+const list = ref(null)
+const maxHeight = ref(null)
+const MIN_HEIGHT = 160
+const GAP = 16
+
+function fit() {
+  const el = list.value?.$el
+  if (!el || typeof window === 'undefined') return
+  const top = el.getBoundingClientRect().top + window.scrollY
+  const footer = document.querySelector('.q-footer')?.offsetHeight || 0
+  maxHeight.value = Math.max(MIN_HEIGHT, window.innerHeight - top - footer - GAP)
+}
+
+watch(() => activity.value.length, () => nextTick(fit))
+onMounted(() => window.addEventListener('resize', fit))
+onBeforeUnmount(() => window.removeEventListener('resize', fit))
 
 const KINDS = {
   login: { icon: 'login', label: 'Signed in' },
@@ -46,7 +66,14 @@ const when = (value) => (value ? ds(new Date(value)) : '')
       {{ tdc('No recent activity.') }}
     </q-card-section>
 
-    <q-list v-else separator>
+    <q-list
+      v-else
+      ref="list"
+      separator
+      class="activity-list"
+      :style="maxHeight ? { maxHeight: `${maxHeight}px` } : null"
+      data-test="activity-list"
+    >
       <q-item v-for="(event, index) in activity" :key="index" data-test="activity-row">
         <q-item-section avatar>
           <q-icon :name="kind(event).icon" color="primary" />
@@ -59,3 +86,7 @@ const when = (value) => (value ? ds(new Date(value)) : '')
     </q-list>
   </s-card>
 </template>
+
+<style scoped>
+.activity-list { overflow-y: auto; }
+</style>

@@ -163,6 +163,25 @@ describe('SecurityActivity', () => {
     ])
   })
 
+  it('grows down to the footer and scrolls from there', async () => {
+    get.mockResolvedValue({ data: { data: [{ type: 'login', at: '2026-09-20T10:00:00Z', device: 'Chrome' }] } })
+    const footer = document.createElement('footer')
+    footer.className = 'q-footer'
+    Object.defineProperty(footer, 'offsetHeight', { value: 60 })
+    document.body.appendChild(footer)
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ top: 300 })
+    Object.defineProperty(window, 'innerHeight', { value: 900, configurable: true })
+
+    const wrapper = mountWith(SecurityActivity, pinia)
+    await flushPromises()
+
+    const list = wrapper.find('[data-test="activity-list"]')
+    expect(list.classes()).toContain('activity-list')
+    // 900 window - 300 above it - 60 footer - 16 gap
+    expect(list.attributes('style')).toContain('max-height: 524px')
+    footer.remove()
+  })
+
   it('has empty and error states', async () => {
     get.mockResolvedValueOnce({ data: { data: [] } })
     const empty = mountWith(SecurityActivity, pinia)
