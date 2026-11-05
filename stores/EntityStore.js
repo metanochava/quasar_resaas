@@ -729,7 +729,8 @@ export const useEntityStore = createBaseStore(
               options: {
                 type: 'radio',
                 model: 'opt1',
-                items: entitys
+                items: entitys,
+                filter: true
               },
 
               cancel: true,

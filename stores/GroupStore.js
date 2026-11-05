@@ -289,7 +289,8 @@ export const useGroupStore = createBaseStore(
                 val => true,
 
               items:
-                groups
+                groups,
+              filter: true
             },
 
             cancel:

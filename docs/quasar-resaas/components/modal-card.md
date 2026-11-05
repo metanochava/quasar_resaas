@@ -76,6 +76,13 @@ Confirmations and choices use `sDialog()` (exported by `quasar_resaas`,
 options and has the same `.onOk` / `.onCancel` / `.onDismiss` chain, and it
 is rendered in this same pattern by `components/engine/DialogPrompt.vue`.
 
+In a choice list (`options: { type, model, items }`) a double click on a row
+selects it and confirms, like the OK button. A filter sits static above the
+list (only the list scrolls): `options.filter: true` always shows it,
+`false` never does, and left out it appears from 7 items up. The login flow
+(Entity → Branch → Group in `EntityStore`, `BranchStore`, `GroupStore`)
+passes `filter: true`, so every step has it.
+
 ## Tests
 
 Query a modal through its stable hooks: `modal-card`, `modal-bar`,

@@ -95,7 +95,8 @@ export const useBranchStore = createBaseStore(
               isValid:
                 val => true,
               items:
-                branchs
+                branchs,
+              filter: true
             },
 
             cancel: true,

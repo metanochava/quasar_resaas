@@ -86,6 +86,65 @@ describe('sDialog', () => {
     expect(onOk).toHaveBeenCalledWith('b')
   })
 
+  it('double-clicking a choice selects it and confirms (OK), like the group picker', async () => {
+    const onOk = vi.fn()
+
+    sDialog({
+      title: 'Select the Groups',
+      cancel: true,
+      options: { type: 'radio', model: null, items: [{ label: 'Admin', value: 'a' }, { label: 'Doctor', value: 'd' }] }
+    }).onOk(onOk)
+    await flushPromises()
+
+    const rows = document.body.querySelectorAll('[data-test="dialog-choice"] .q-item')
+    rows[1].dispatchEvent(new MouseEvent('dblclick', { bubbles: true }))
+    await flushPromises()
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    expect(onOk).toHaveBeenCalledWith('d')
+  })
+
+  it('a long choice list shows a static filter that narrows the options', async () => {
+    const items = ['Admin', 'Cashier', 'Doctor', 'Guest', 'Nurse', 'Patient', 'Pharmacist', 'Receptionist']
+      .map((label, i) => ({ label, value: String(i) }))
+
+    sDialog({ title: 'Select the Groups', cancel: true, options: { type: 'radio', model: null, items } })
+    await flushPromises()
+
+    const input = inBody('[data-test="dialog-filter"]')
+    expect(input).not.toBeNull()
+
+    input.value = 'pharm'
+    input.dispatchEvent(new Event('input'))
+    await flushPromises()
+
+    const labels = [...document.body.querySelectorAll('[data-test="dialog-choice"] .q-item')]
+      .map(el => el.textContent.trim())
+    expect(labels).toEqual(['Pharmacist'])
+  })
+
+  it('a short choice list shows no filter', async () => {
+    sDialog({
+      title: 'Select the Branch',
+      cancel: true,
+      options: { type: 'radio', model: 'a', items: [{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }] }
+    })
+    await flushPromises()
+
+    expect(inBody('[data-test="dialog-filter"]')).toBeNull()
+  })
+
+  it('options.filter: true shows the filter even on a short list (login flow)', async () => {
+    sDialog({
+      title: 'Select the Branch',
+      cancel: true,
+      options: { type: 'radio', model: null, filter: true, items: [{ label: 'Sede', value: { id: 1 } }, { label: 'Beira', value: { id: 2 } }] }
+    })
+    await flushPromises()
+
+    expect(inBody('[data-test="dialog-filter"]')).not.toBeNull()
+  })
+
   it('a prompt resolves with the typed text and is blocked until it is valid', async () => {
     const onOk = vi.fn()
 
