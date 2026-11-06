@@ -17,12 +17,20 @@ const SBtn = {
   template: '<button data-test="group-selector" @click="$attrs.onClick" @dblclick="$attrs.onDblclick">{{ label }}<slot /></button>',
 }
 
+// a plain input standing in for s-input (v-model + keydown)
+const SInput = {
+  inheritAttrs: false,
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  template: '<input data-test="group-filter" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" @keydown="$attrs.onKeydown && $attrs.onKeydown($event)" />',
+}
+
 let User
 let Group
 
 function mountSelector () {
   return mount(GroupSelector, {
-    global: { plugins: [[Quasar, {}]], stubs: { 's-btn': SBtn, 's-tooltip': true } },
+    global: { plugins: [[Quasar, {}]], stubs: { 's-btn': SBtn, 's-tooltip': true, 's-input': SInput } },
   })
 }
 
@@ -81,5 +89,41 @@ describe('GroupSelector - click / double click', () => {
     await items[1].trigger('click')
     await vi.waitFor(() => expect(Group.select).toHaveBeenCalledWith(User.Groups[1]))
     await vi.waitFor(() => expect(push).toHaveBeenCalledWith({ name: 'dashboard' }))
+  })
+})
+
+describe('GroupSelector - filter', () => {
+  async function openMenu (w) {
+    await w.find('[data-test="group-selector"]').trigger('click')
+    vi.advanceTimersByTime(300)
+    await w.vm.$nextTick()
+  }
+
+  it('the filter on top of the list narrows the profiles', async () => {
+    const w = mountSelector()
+    await openMenu(w)
+
+    const input = [...document.body.querySelectorAll('[data-test="group-filter"]')].pop()
+    expect(input).not.toBeNull()
+    input.value = 'nur'
+    input.dispatchEvent(new Event('input'))
+    await w.vm.$nextTick()
+
+    const labels = w.findAllComponents(QItem).map(i => i.text().trim())
+    expect(labels).toEqual(['Nurse'])
+  })
+
+  it('Enter in the filter picks the first match', async () => {
+    const w = mountSelector()
+    await openMenu(w)
+
+    const input = [...document.body.querySelectorAll('[data-test="group-filter"]')].pop()
+    input.value = 'nur'
+    input.dispatchEvent(new Event('input'))
+    await w.vm.$nextTick()
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }))
+    await w.vm.$nextTick()
+
+    expect(Group.select).toHaveBeenCalledWith({ id: 'g2', name: 'Nurse' })
   })
 })

@@ -119,7 +119,7 @@ function confirm() {
           <template #prepend><q-icon name="search" /></template>
         </s-input>
 
-        <q-list class="choice-list" :class="{ 'choice-scroll': showFilter }">
+        <q-list dense class="choice-list" :class="{ 'choice-scroll': showFilter }">
           <q-item
             v-for="(item, i) in filteredItems"
             :key="item.value?.id ?? (typeof item.value === 'object' ? i : item.value)"
@@ -130,12 +130,14 @@ function confirm() {
           >
             <q-item-section side>
               <q-radio
+                dense
                 v-if="choiceType !== 'checkbox'"
                 :model-value="model"
                 :val="item.value"
                 @update:model-value="model = item.value"
               />
               <q-checkbox
+                dense
                 v-else
                 :model-value="isChecked(item.value)"
                 @update:model-value="pick(item.value)"

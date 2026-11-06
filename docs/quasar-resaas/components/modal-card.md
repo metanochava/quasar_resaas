@@ -82,6 +82,8 @@ list (only the list scrolls): `options.filter: true` always shows it,
 `false` never does, and left out it appears from 7 items up. The login flow
 (Entity → Branch → Group in `EntityStore`, `BranchStore`, `GroupStore`)
 passes `filter: true`, so every step has it.
+The rows are `dense`. The header's profile button (`GroupSelector.vue`)
+has the same filter on top of its menu; Enter picks the first match.
 
 ## Tests
 

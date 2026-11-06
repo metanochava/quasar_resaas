@@ -21,6 +21,21 @@ const label = computed(() => groupLabel(User.Group))
 
 const groups = computed(() => User.Groups || [])
 
+// A filter on top of the list of profiles (static: only the list scrolls),
+// like the login flow's group picker. Enter picks the first match.
+const filter = ref('')
+const filteredGroups = computed(() => {
+  const q = filter.value.trim().toLowerCase()
+  if (!q) return groups.value
+  return groups.value.filter(g => groupLabel(g).toLowerCase().includes(q))
+})
+
+function pickFirst () {
+  if (!filteredGroups.value.length) return
+  menuOpen.value = false
+  select(filteredGroups.value[0])
+}
+
 const router = useRouter()
 
 // Choosing a profile (or reloading the current one) ends on the home page:
@@ -72,13 +87,26 @@ onBeforeUnmount(() => clearTimeout(clickTimer))
     @dblclick="onDoubleClick"
   >
     <s-tooltip :delay="800">{{ tdc('Click: profiles · Double-click: reload permissions') }}</s-tooltip>
-    <q-menu v-model="menuOpen" fit no-parent-event>
+    <q-menu v-model="menuOpen" fit no-parent-event @hide="filter = ''">
+      <div class="group-filter q-pa-xs">
+        <s-input
+          v-model="filter"
+          dense
+          clearable
+          autofocus
+          :placeholder="tdc('Filter')"
+          data-test="group-filter"
+          @keydown.enter.prevent="pickFirst"
+        >
+          <template #prepend><q-icon name="search" /></template>
+        </s-input>
+      </div>
       <q-list
         dense
         class="group-list rounded-borders"
       >
         <q-item
-          v-for="group in groups"
+          v-for="group in filteredGroups"
           :key="group.id"
           clickable
           v-close-popup
@@ -94,15 +122,25 @@ onBeforeUnmount(() => clearTimeout(clickTimer))
             </q-item-label>
           </q-item-section>
         </q-item>
+        <q-item v-if="!filteredGroups.length">
+          <q-item-section class="text-grey">{{ tdc('No results') }}</q-item-section>
+        </q-item>
       </q-list>
     </q-menu>
   </s-btn>
 </template>
 
 <style scoped>
+.group-filter {
+  min-width: 180px;
+  max-width: 320px;
+}
+
 .group-list {
   min-width: 180px;
   max-width: 320px;
+  max-height: 50vh;
+  overflow-y: auto;
 }
 
 .item-content {
