@@ -223,5 +223,21 @@ security rules: django_resaas `docs/security/single-sign-on.md`. Code: `services
 
 The PKCE verifier and `state` stay in the tab's `sessionStorage` (`resaasSso`); the
 code and the adopt verifier only travel after `#` (hash routing, never sent to a
-server), and `SsoPage` removes them from the address bar. Signing out ends this
-domain's session only; with a fresh tab the shared session signs the user in again.
+server), and `SsoPage` removes them from the address bar.
+
+Signing out (`UserStore.logout`) with `SSO_URL` set calls `POST sso/logout/`
+instead of `logout/` (`services/sso.js` `signOutRequest`): the backend ends this
+session and every session of its single sign-on family (the central one and every
+domain of this browser), so no domain signs itself in again; other devices stay
+signed in. On the central domain, a session ended elsewhere makes `/sso` forget its
+tokens (`UserStore.logout('local')`) and answer as without a session. When the
+central domain adopts a local login it sends the session it replaces
+(`previous_refresh`), so the domains that came from that one are ended too.
+
+With `SSO_URL`, `HeaderUser`'s sign-out dialog offers two buttons instead of the
+Entity / Entity type choice (the Entity stays as the login hint): "Sign out of every
+site" (`UserStore.logout(x, { onlyHere: false })`, above) and "Sign out of this site
+only" (`{ onlyHere: true }` -> `signOutHereRequest`). The latter calls the plain `logout/` (this session only) and sets
+`localStorage.resaasSsoOptOut` on this domain: it no longer signs itself in from
+the central session, in any tab, until the next sign-in here (the login form or
+"Continue with single sign-on" clears it). The other domains stay signed in.

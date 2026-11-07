@@ -3,6 +3,7 @@ import { errorCode, errorMessage } from '../utils/apiContract'
 import { groupLabel } from '../utils/groupLabel'
 import { getStorage, setStorage, deleteStorage } from '../services/storage'
 import { HTTPAuth, HTTPClient, url } from '../services/api'
+import { signOutHereRequest, signOutRequest, ssoEnabled } from '../services/sso'
 import { useLanguageStore } from  './LanguageStore'
 
 import { createBaseStore } from '../base/base_store'
@@ -658,7 +659,10 @@ export const useUserStore = createBaseStore(
       }
     },
 
-    async logout(x) {
+    // x: 'N' (flag only), 'local' (device copy only), 'x' (forget the
+    // Entity too) or an Entity id (keep it as the login hint).
+    // options.onlyHere: with single sign-on, end this site's session only.
+    async logout(x, options = {}) {
       if (x == 'N') {
         this.isLogout = true
         this.isLogin = false
@@ -729,7 +733,24 @@ export const useUserStore = createBaseStore(
         this.isLogin = false
       }
 
-      const rsp = await HTTPAuth.post(url({type: "u", url: "logout/", params: {}}), {refresh: this.refresh} )
+      // 'local': the session is already over on the server (e.g. signed out
+      // on another domain) - only the device copy goes
+      if (x === 'local') {
+        clearLocalSession()
+        return
+      }
+
+      // with single sign-on, signing out ends every domain of this browser
+      // (services/sso.js); otherwise only this session
+      let request
+      if (!ssoEnabled())
+        request = HTTPAuth.post(url({type: "u", url: "logout/", params: {}}), {refresh: this.refresh} )
+      else if (options.onlyHere)
+        request = signOutHereRequest(this.refresh)
+      else
+        request = signOutRequest()
+
+      const rsp = await request
         .then(clearLocalSession)
         .catch(clearLocalSession)
 

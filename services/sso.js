@@ -14,6 +14,11 @@
 //                                         -> client /sso/callback (adopted)
 // "Continue with single sign-on" on the local login page: like the first case
 // without prompt=none (the central login page is shown when needed).
+// Signing out (UserStore.logout -> signOutRequest): POST sso/logout/ ends this
+// session and every session started from it or from which it came (the
+// central one included), so no domain of this browser signs itself in again.
+// "Sign out of this site only" (signOutHereRequest): only this session ends,
+// and this domain no longer signs itself in until the next sign-in here.
 //
 // Codes are single use, live seconds, are bound to their redirect_uri and a
 // PKCE (S256) challenge; the backend only issues them for origins its CORS
@@ -24,6 +29,7 @@ import { HTTPAuth, HTTPClient, url } from './api'
 const PENDING = 'resaasSso'          // sessionStorage: the flow this tab started
 const TRIED = 'resaasSsoTried'       // sessionStorage: silent attempt already made
 const CENTRAL_NEXT = 'resaasSsoNext' // sessionStorage (central): /sso query to resume after login
+const OPTED_OUT = 'resaasSsoOptOut'  // localStorage (this domain): signed out of this site only
 
 export const CALLBACK_PATH = '/sso/callback'
 export const ADOPT_PATH = '/sso/adopt'
@@ -120,6 +126,25 @@ function silentTried () {
   }
 }
 
+// "Sign out of this site only": this domain stops signing itself in from the
+// central session (every tab, until a sign-in here clears it).
+export function optedOut () {
+  try {
+    return localStorage.getItem(OPTED_OUT) === '1'
+  } catch {
+    return false
+  }
+}
+
+function setOptedOut (value) {
+  try {
+    if (value) localStorage.setItem(OPTED_OUT, '1')
+    else localStorage.removeItem(OPTED_OUT)
+  } catch {
+    // private mode: nothing to remember
+  }
+}
+
 function markSilentTried () {
   try {
     sessionStorage.setItem(TRIED, '1')
@@ -147,7 +172,7 @@ async function goToCentral ({ silent }) {
 // No session on a client domain: ask the central domain once per tab, without
 // showing anything. Returns true when the page is leaving for it.
 export function canStartSilent () {
-  return isClient() && !silentTried()
+  return isClient() && !silentTried() && !optedOut()
 }
 
 export async function startSilent () {
@@ -160,6 +185,7 @@ export async function startSilent () {
 // "Continue with single sign-on" on the local login page.
 export async function startInteractive () {
   if (!isClient()) return false
+  setOptedOut(false)
   markSilentTried()
   await goToCentral({ silent: false })
   return true
@@ -255,12 +281,15 @@ export function takeCentralNext () {
 
 // The central /sso/adopt page: redeem the client's code into a central
 // session, then send the user back with a code the backend validated the
-// destination for (no open redirect).
-export async function adopt (query, startSession) {
+// destination for (no open redirect). `previousRefresh`: the central session
+// being replaced - the backend joins it to the new one, so signing out later
+// also ends the domains that came from it.
+export async function adopt (query, startSession, previousRefresh) {
   const { data } = await HTTPClient.post(url({ type: 'u', url: 'sso/token/', params: {} }), {
     code: query.code,
     code_verifier: query.verifier,
     redirect_uri: adoptUri(),
+    previous_refresh: previousRefresh || undefined,
   })
   await startSession(data)
   await authorize(query)
@@ -270,6 +299,8 @@ export async function adopt (query, startSession) {
 // resume the /sso request that sent the user there; on a client domain, hand
 // the session to the central one. True when this took over the navigation.
 export async function afterLocalLogin (router) {
+  setOptedOut(false)
+
   if (isCentral()) {
     const next = takeCentralNext()
     if (!next) return false
@@ -278,4 +309,22 @@ export async function afterLocalLogin (router) {
   }
 
   return propagate()
+}
+
+// ---------------------------------------------------------------- sign out
+
+// UserStore.logout with single sign-on on: end this session and its whole
+// family on the backend (every domain of this browser). This tab does not
+// ask the central domain again.
+export function signOutRequest () {
+  markSilentTried()
+  return HTTPAuth.post(url({ type: 'u', url: 'sso/logout/', params: {} }), {})
+}
+
+// "Sign out of this site only": end just this session (logout/) and stop this
+// domain from signing itself in again; the other domains stay signed in.
+export function signOutHereRequest (refresh) {
+  setOptedOut(true)
+  markSilentTried()
+  return HTTPAuth.post(url({ type: 'u', url: 'logout/', params: {} }), { refresh })
 }

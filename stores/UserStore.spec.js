@@ -227,6 +227,53 @@ describe('UserStore.logout - what survives', () => {
     expect(User.data).toBeNull()
     expect(User.isLogout).toBe(true)
   })
+
+  it('with single sign-on, signing out ends every domain of the browser (sso/logout/)', async () => {
+    const { HTTPAuth } = await import('../services/api')
+    HTTPAuth.post.mockClear()
+    process.env.SSO_URL = 'https://auth.mytech.co.mz'
+    try {
+      await signedInAndLogout('x')
+    } finally {
+      delete process.env.SSO_URL
+    }
+
+    expect(HTTPAuth.post).toHaveBeenCalledWith('sso/logout/', {})
+    expect(HTTPAuth.post).not.toHaveBeenCalledWith('logout/', expect.anything())
+    expect(localStorage.getItem('access')).toBeNull()
+  })
+
+  it('with single sign-on, "this site only" ends just this session (logout/)', async () => {
+    const { HTTPAuth } = await import('../services/api')
+    HTTPAuth.post.mockClear()
+    HTTPAuth.post.mockResolvedValueOnce({ data: {} })
+    process.env.SSO_URL = 'https://auth.mytech.co.mz'
+    try {
+      const User = useUserStore()
+      User.refresh = 'r1'
+      await User.logout('x', { onlyHere: true })
+    } finally {
+      delete process.env.SSO_URL
+      localStorage.clear()
+    }
+
+    expect(HTTPAuth.post).toHaveBeenCalledWith('logout/', { refresh: 'r1' })
+    expect(HTTPAuth.post).not.toHaveBeenCalledWith('sso/logout/', expect.anything())
+  })
+
+  it("'local' only forgets the device copy (the server session is already over)", async () => {
+    const { HTTPAuth } = await import('../services/api')
+    HTTPAuth.post.mockClear()
+    const User = useUserStore()
+    User.access = 'access-token'
+    localStorage.setItem('access', 'token')
+
+    await User.logout('local')
+
+    expect(HTTPAuth.post).not.toHaveBeenCalled()
+    expect(localStorage.getItem('access')).toBeNull()
+    expect(User.isLogout).toBe(true)
+  })
 })
 
 describe('UserStore.isSignedIn - what shows the signed-in UI', () => {

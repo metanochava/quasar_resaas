@@ -7,8 +7,40 @@
 
     <!-- CONFIRMAÇÃO DE LOGOUT -->
     <q-dialog v-model="pergunta" persistent>
-      <s-modal-card :title="tdc('Which one do you want to log out of')" icon="logout" width="380px">
-        <div class="column q-gutter-y-sm">
+      <s-modal-card
+        :title="ssoOn ? tdc('How do you want to sign out?') : tdc('Which one do you want to log out of')"
+        icon="logout"
+        width="380px"
+      >
+        <!-- single sign-on: every site of this browser, or this one only
+             (the Entity stays as the login hint, as with "log out of this Entity") -->
+        <div v-if="ssoOn" class="column q-gutter-y-sm">
+          <s-btn
+            unelevated
+            color="negative"
+            icon="logout"
+            class="full-width"
+            :label="tdc('Sign out of every site')"
+            data-test="logout-everywhere"
+            @click="logoutSso(false)"
+          >
+            <s-tooltip>{{ tdc('You will be signed out of every site in this browser') }}</s-tooltip>
+          </s-btn>
+
+          <s-btn
+            outline
+            color="primary"
+            icon="web_asset_off"
+            class="full-width"
+            :label="tdc('Sign out of this site only')"
+            data-test="logout-only-here"
+            @click="logoutSso(true)"
+          >
+            <s-tooltip>{{ tdc('The other sites stay signed in, and this one no longer signs you in by itself') }}</s-tooltip>
+          </s-btn>
+        </div>
+
+        <div v-else class="column q-gutter-y-sm">
           <s-btn
             v-if="User.Entity"
             flat
@@ -303,6 +335,7 @@ import { useBranchStore } from '../../stores/BranchStore'
 import RegisterEntity from './RegisterEntity.vue'
 
 import { tdc } from '../../services/translation'
+import { ssoEnabled } from '../../services/sso'
 import { profileSplint } from '../../utils/profile.js'
 import GroupSelector from './../GroupSelector.vue'
 import HeaderPreferences from './HeaderPreferences.vue'
@@ -329,6 +362,7 @@ export default defineComponent({
       Branch,
       tdc,
       profileSplint,
+      ssoOn: ssoEnabled(),
       
     }
   },
@@ -419,6 +453,12 @@ export default defineComponent({
     logoutEntityType () {
       this.pergunta = false
       this.User.logout('x')
+    },
+
+    // single sign-on: every site of this browser, or this one only
+    logoutSso (onlyHere) {
+      this.pergunta = false
+      this.User.logout(this.User.Entity?.id || 'x', { onlyHere })
     },
  
 

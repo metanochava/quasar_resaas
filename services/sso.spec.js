@@ -27,6 +27,7 @@ function hashQuery (target) {
 beforeEach(() => {
   process.env.SSO_URL = CENTRAL + '/'
   sessionStorage.clear()
+  localStorage.clear()
   post.mockReset()
   get.mockReset()
 })
@@ -202,5 +203,58 @@ describe('sso - central', () => {
     expect(startSession).toHaveBeenCalled()
     expect(post.mock.calls[1][1]).toBe('sso/code/')
     expect(location.replace).toHaveBeenCalledWith(`${CLIENT}/#/sso/callback?code=c2&state=s1`)
+  })
+
+  it('adopt sends the central session it replaces, to be joined on the backend', async () => {
+    at(CENTRAL)
+    post.mockResolvedValueOnce({ data: { tokens: {} } }).mockResolvedValueOnce({ data: { code: 'c2' } })
+
+    await sso.adopt({ ...request, code: 'c1', verifier: 'v'.repeat(64) }, vi.fn(), 'old-refresh')
+
+    expect(post.mock.calls[0][2].previous_refresh).toBe('old-refresh')
+  })
+})
+
+describe('sso - sign out of this site only', () => {
+  it('ends this session only and this domain stops signing itself in, in every tab', async () => {
+    const location = at(CLIENT)
+    post.mockResolvedValue({ data: {} })
+
+    await sso.signOutHereRequest('r1')
+
+    expect(post).toHaveBeenCalledWith('auth', 'logout/', { refresh: 'r1' })
+    sessionStorage.clear() // a new tab
+    expect(sso.canStartSilent()).toBe(false)
+    expect(await sso.startSilent()).toBe(false)
+    expect(location.assign).not.toHaveBeenCalled()
+  })
+
+  it('a sign-in here (form or the single sign-on button) brings the automatic sign-in back', async () => {
+    at(CLIENT)
+    post.mockResolvedValue({ data: {} })
+    await sso.signOutHereRequest('r1')
+
+    await sso.startInteractive()
+    sessionStorage.clear()
+    expect(sso.canStartSilent()).toBe(true)
+
+    await sso.signOutHereRequest('r1')
+    post.mockResolvedValue({ data: { code: 'c1' } })
+    await sso.afterLocalLogin({ replace: vi.fn() })
+    sessionStorage.clear()
+    expect(sso.optedOut()).toBe(false)
+  })
+})
+
+describe('sso - sign out', () => {
+  it('ends the whole family on the backend and does not ask the central domain again', async () => {
+    const location = at(CLIENT)
+    post.mockResolvedValue({ data: { ended: 3 } })
+
+    await sso.signOutRequest()
+
+    expect(post).toHaveBeenCalledWith('auth', 'sso/logout/', {})
+    expect(await sso.startSilent()).toBe(false)
+    expect(location.assign).not.toHaveBeenCalled()
   })
 })

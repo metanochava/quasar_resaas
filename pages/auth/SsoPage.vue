@@ -27,6 +27,7 @@ import { useQuasar } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
 
 import { tdc } from '../../services/translation'
+import { getStorage } from '../../services/storage'
 import { useUserStore } from '../../stores/UserStore'
 import { loadUserSaas } from '../../boot/login_boot'
 import * as sso from '../../services/sso'
@@ -62,8 +63,15 @@ const startSession = data => User.startSession(data)
 
 async function authorizeStep (query) {
   if (User.isSignedIn()) {
-    await sso.authorize(query)
-    return
+    try {
+      await sso.authorize(query)
+      return
+    } catch (error) {
+      if (error?.response?.status !== 401) throw error
+      // this central session was signed out of (on another domain): forget
+      // it here too and answer as without a session
+      await User.logout('local')
+    }
   }
 
   const answer = await sso.loginRequired(query)
@@ -90,7 +98,7 @@ onMounted(async () => {
 
     forgetQuery()
 
-    if (route.name === 'ssoAdopt') return await sso.adopt(query, startSession)
+    if (route.name === 'ssoAdopt') return await sso.adopt(query, startSession, User.refresh || getStorage('l', 'refresh'))
     if (route.name === 'ssoCallback') return await callbackStep(query)
 
     failed.value = true
