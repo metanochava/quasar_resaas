@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router'
 import { useActionStore } from '../../stores/ActionStore'
 import { useUserStore } from '../../stores/UserStore'
 import { DEFAULT_UI, DEFAULT_PAGINATION, DEFAULT_PDF } from '../../utils/schema'
-import { statusColor, isStatusField } from '../../utils/status'
+import { statusColor, statusValue, stateLabel, isToggleState, isStatusField } from '../../utils/status'
 import { ds, isDateLike } from '../../services/data'
 
 
@@ -363,8 +363,8 @@ function isEditable(name) {
 // 🔥 TOGGLE STATE (NEW)
 function toggleEstado(row) {
   if (!can(permissions.value.change)) return
-  if (!row.state) return
-  const newValue = row.state.value === 'Active' ? 'Inactive' : 'Active'
+  if (!isToggleState(row.state)) return
+  const newValue = statusValue(row.state) === 'Active' ? 'Inactive' : 'Active'
 
   emit('inline-patch', {
     id: row.id,
@@ -1864,28 +1864,27 @@ function filteredItems(row, field) {
           Fall back to a plain, non-interactive label instead of a
           toggle button that can't actually do anything.
         -->
+        <!--
+          The colour comes from utils/status.js (Active positive, Inactive
+          negative, every other value its own tone). Only the TimeModel pair
+          Active/Inactive toggles; any other state value is shown, not flipped.
+        -->
         <template v-else-if="props.col.name === 'state' && props.row.state">
 
           <s-btn
+            v-if="isToggleState(props.row.state)"
             dense
             size="sm"
-            :color="
-              props.row.state?.value === 'Active'
-                ? 'positive'
-                : 'negative'
-            "
-            :label="
-              props.row.state?.value === 'Active'
-                ? tdc('Active')
-                : tdc('Inactive')
-            "
+            :color="statusColor(props.row.state)"
+            :label="tdc(statusValue(props.row.state))"
+            data-test="state-toggle"
             @click="() => toggleEstado(props.row)"
           >
 
             <s-tooltip>
               {{
                 tdc(
-                  props.row.state?.value === 'Active'
+                  statusValue(props.row.state) === 'Active'
                     ? 'Deactivate'
                     : 'Activate'
                 )
@@ -1893,6 +1892,13 @@ function filteredItems(row, field) {
             </s-tooltip>
 
           </s-btn>
+
+          <q-badge
+            v-else
+            :color="statusColor(props.row.state)"
+            :label="tdc(stateLabel(props.row.state))"
+            data-test="state-badge"
+          />
 
         </template>
 

@@ -5,6 +5,7 @@ import { useQuasar } from 'quasar'
 import { useUserStore } from '../../stores/UserStore'
 import { tdc } from '../../services/translation'
 import { groupLabel } from '../../utils/groupLabel'
+import { stateLabel, statusColor } from '../../utils/status'
 import { Alert, AlertSuccess } from '../../boot/alerts'
 import { sDialog } from '../../services/dialog'
 
@@ -152,8 +153,8 @@ function confirmRemove(group) {
         <q-item-section>
           <q-item-label class="text-weight-medium">{{ groupLabel(group) }}</q-item-label>
           <q-item-label caption>
-            <q-chip dense square size="sm" color="positive" text-color="white" class="q-ma-none">
-              {{ group.state === 'Inactive' ? tdc('Inactive') : tdc('Active') }}
+            <q-chip dense square size="sm" :color="statusColor(group.state || 'Active')" text-color="white" class="q-ma-none" data-test="profile-state">
+              {{ tdc(stateLabel(group.state || 'Active')) }}
             </q-chip>
           </q-item-label>
         </q-item-section>

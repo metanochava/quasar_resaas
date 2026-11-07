@@ -44,7 +44,7 @@
       >
         <q-item-section avatar>
           <q-avatar
-            :color="branch.state === 'Active' ? 'primary' : 'grey-5'"
+            :color="statusValue(branch.state) === 'Active' ? 'primary' : 'grey-5'"
             text-color="white"
             size="36px"
           >
@@ -56,11 +56,12 @@
           <q-item-label class="text-weight-medium">{{ branch.name }}</q-item-label>
           <q-item-label caption>
             <q-badge
-              :color="branch.state === 'Active' ? 'positive' : 'grey-6'"
+              :color="statusColor(branch.state)"
               text-color="white"
               rounded
+              data-test="branch-state"
             >
-              {{ branch.state.label }}
+              {{ tdc(stateLabel(branch.state)) }}
             </q-badge>
           </q-item-label>
         </q-item-section>
@@ -95,6 +96,7 @@ import { useRouter } from 'vue-router'
 import { useEntityStore } from '../../stores/EntityStore'
 import { HTTPAuth, url } from '../../services/api'
 import { tdc } from '../../services/translation'
+import { stateLabel, statusColor, statusValue } from '../../utils/status'
 import BranchesMapDialog from '../../components/address/BranchesMapDialog.vue'
 
 const props = defineProps({

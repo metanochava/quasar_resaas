@@ -1,5 +1,5 @@
-// One colour per status, everywhere a `status` is shown (AutoTable cells,
-// detail pages, dashboards): active-like states are positive, inactive or
+// One colour per status, everywhere a `status` or a `state` is shown
+// (AutoTable cells, detail pages, dashboards, panels): active-like states are positive, inactive or
 // deactivated-like states are negative, and every other known state gets
 // its own tone so a list reads at a glance. Unknown states fall back to grey.
 //
@@ -56,6 +56,20 @@ export function statusColor(status) {
   const label = status && typeof status === 'object' ? status.label : null
 
   return COLOR_BY_STATUS[normalise(label)] || 'grey'
+}
+
+// The English label of a status/state: its READ label, else its value
+// (translate it with tdc()).
+export function stateLabel(state) {
+  if (state && typeof state === 'object') return state.label ?? state.value ?? ''
+
+  return state ?? ''
+}
+
+// TimeModel.state (django_resaas core/base/models.py): the Active/Inactive
+// pair a click may flip; any other state value is only shown.
+export function isToggleState(state) {
+  return ['Active', 'Inactive'].includes(statusValue(state))
 }
 
 // `status` and any `<something>_status` column hold a state; marital_status

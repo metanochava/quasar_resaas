@@ -103,7 +103,7 @@
                   v-if="appIdByName[app.name.toLowerCase()]"
                   dense
                   square
-                  :color="isAppActive(app) ? 'positive' : 'grey-6'"
+                  :color="statusColor(isAppActive(app) ? 'Active' : 'Inactive')"
                   text-color="white"
                   :label="isAppActive(app) ? tdc('Active') : tdc('Inactive')"
                 />
@@ -149,7 +149,7 @@
                   flat
                   round
                   dense
-                  :color="isAppActive(app) ? 'positive' : 'grey-6'"
+                  :color="statusColor(isAppActive(app) ? 'Active' : 'Inactive')"
                   :icon="isAppActive(app) ? 'toggle_on' : 'toggle_off'"
                   :loading="togglingApp === app.name.toLowerCase()"
                   :disable="!appIdByName[app.name.toLowerCase()]"
@@ -211,6 +211,7 @@ import { useRouter } from 'vue-router'
 import { HTTPAuth, url } from '../../services/api'
 import { useUserStore } from '../../stores/UserStore'
 import { tdc } from '../../services/translation'
+import { statusColor } from '../../utils/status'
 import FormSection from '../../components/auto/FormSection.vue'
 import AppModelsDialog from './AppModelsDialog.vue'
 import AppEntityTypesDialog from './AppEntityTypesDialog.vue'

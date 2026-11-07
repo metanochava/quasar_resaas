@@ -139,6 +139,20 @@ toolbar/row button fetches the PDF as a blob (`HTTPAuthBlob`) and opens it in
 `s-pdf-render`, gated the same way as any other action by
 `User.can(schema.pdf.detail_permission)`/`list_permission`.
 
+## State and status colours
+
+One colour map serves every `state` and `status` shown (`utils/status.js`,
+`statusColor`): active-like values are `positive`, inactive-like `negative`,
+other known values their own tone (`warning` for pending/in progress, `info`
+for scheduled/new, `grey` for draft/closed, ...), unknown values `grey`. It
+reads the READ shape `{value, label}` or a plain value, and falls back to the
+label (the integer states of `FrontEnd`/`File`: `{value: 1, label: 'Ativo'}`).
+
+In `AutoTable`, the `state` cell of the TimeModel pair Active/Inactive is a
+coloured toggle button (`isToggleState`); any other value is a coloured badge
+(`stateLabel`). The backend's PDF list colours its `state` column with the same
+tones (`saas/core/utils/status_tone.py` - keep both lists in step).
+
 ## When to reach for `BaseStore` instead
 
 `AutoCrud` covers the common case: a tabular list with the standard CRUD
