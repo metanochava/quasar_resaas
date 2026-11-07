@@ -7,7 +7,7 @@ arrays for the host to mount however it wants.
 
 | Export | File | Contents |
 |---|---|---|
-| `authRoutes` | `router/authRoutes.js` | `/` (the EntityType site) and `/auth/login`, `/auth/register`, `/auth/forgot-password`, `/auth/resetpassword/:uidb64/:token` (in `AuthLayout`), and the compatibility redirect `/resetpassword/:uidb64/:token` → `resetPasswordConfirm` (reset links e-mailed before the backend used the `/auth/` route; the query string is dropped) |
+| `authRoutes` | `router/authRoutes.js` | `/` (the EntityType site) and `/auth/login`, `/auth/register`, `/auth/forgot-password`, `/auth/resetpassword/:uidb64/:token` (in `AuthLayout`), the compatibility redirect `/resetpassword/:uidb64/:token` → `resetPasswordConfirm` (reset links e-mailed before the backend used the `/auth/` route; the query string is dropped), and the single sign-on steps `/sso` (`ssoAuthorize`), `/sso/adopt` (`ssoAdopt`) and `/sso/callback` (`ssoCallback`), all `pages/auth/SsoPage.vue` (see [Single sign-on](#single-sign-on)) |
 | `restRoutes` | `router/restRoutes.js` | generic scaffold/crud + `entity`, `entity_type`, `group`, `branch`, `user`, `permission`, `employee` routes |
 | `docsRoutes` | `router/docsRoutes.js` | `/docs/:product/:slug(.*)*`, mounted under its own `DocLayout` (not `MainLayout`) — see [documentation (docsRoutes)](../README.md) |
 
@@ -207,3 +207,21 @@ The app's own module routes (`rhRoutes`, `saudeRoutes`, ...) follow the same
 
 `restRoutes` includes `/route/:route/:id` → `RotaEnexistente.vue`, used as
 the fallback target when a resource route doesn't exist.
+
+## Single sign-on
+
+With `SSO_URL` set (see [installation](../getting-started/installation.md#4-configure-the-environment)),
+a session on one domain starts a new session on the others. Backend contract and
+security rules: django_resaas `docs/security/single-sign-on.md`. Code: `services/sso.js`.
+
+| Situation | What happens |
+|---|---|
+| Client domain, no session, a route with `requiresAuth` or the `login` route | `installAuthGuard` sends the tab once (sessionStorage `resaasSsoTried`) to `<SSO_URL>/#/sso?prompt=none` with a PKCE challenge and a `state`. Central has a session: back to `/sso/callback` with a code, exchanged for this domain's own tokens (`UserStore.startSession`), then the usual Entity → Branch → Group choice. Central has none: back with `error=login_required` (only after `GET sso/redirect_check/` vouched for the destination) and the local login page is shown. |
+| Local login on a client domain | `FormLogin` (`afterLocalLogin`) asks `POST sso/code/` for the central `/sso/adopt` and goes there; the central domain redeems it into its own session, then sends the user back to `/sso/callback` with a destination the backend validated. The Entity choice follows. If the hand-over fails, the local session simply continues. |
+| "Continue with single sign-on" on a client's login page (`data-test="sso-start"`) | the same trip without `prompt=none`: the central login page is shown when needed, and the `/sso` request resumes after it. |
+| Central domain | a normal login; it is never sent anywhere else. |
+
+The PKCE verifier and `state` stay in the tab's `sessionStorage` (`resaasSso`); the
+code and the adopt verifier only travel after `#` (hash routing, never sent to a
+server), and `SsoPage` removes them from the address bar. Signing out ends this
+domain's session only; with a fresh tab the shared session signs the user in again.

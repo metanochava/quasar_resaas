@@ -109,6 +109,11 @@ FRONT_END_KEY=...
 FRONT_END_PASSWORD=...
 ```
 
+Optional: `SSO_URL` (for example `https://auth.mytech.co.mz`) turns on
+[single sign-on](../routing/routes.md#single-sign-on) between the domains of
+one deployment; that domain is the central one. Without it the login works
+per domain, as before.
+
 `FRONT_END_KEY`/`FRONT_END_PASSWORD` identify *this frontend application* to
 the backend (not a user) — see
 [`../../django-resaas/architecture/middleware.md`](../../django-resaas/architecture/middleware.md)

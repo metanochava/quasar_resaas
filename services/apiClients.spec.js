@@ -11,6 +11,7 @@ const PUBLIC_ENDPOINTS = [
   /^login\/$/,
   /^login\/two_factor\//,
   /^refresh_token\/$/,
+  /^sso\/(token|redirect_check)\/$/, // single sign-on: code + PKCE verifier -> session; is a redirect trusted
   /^register\//,
   /^password\/reset\//,
   /^password\/change\/temporary\/$/,

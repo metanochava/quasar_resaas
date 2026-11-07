@@ -3,6 +3,7 @@ import { JSONSafeParse } from '../utils/json'
 import { AlertWarning } from '../boot/alerts'
 import { tdc } from '../services/translation'
 import { groupLabel } from '../utils/groupLabel'
+import { canStartSilent, startSilent } from '../services/sso'
 
 // Routes already declare `meta.requiresAuth` (see router/restRoutes.js)
 // but nothing ever enforced it - a protected route mounted its
@@ -70,7 +71,7 @@ export function installAuthGuard(router, {
   loginRouteName = 'login',
   forbiddenRouteName = 'dashboard'
 } = {}) {
-  router.beforeEach((to) => {
+  function check (to) {
     if (to.meta?.requiresAuth && !getStorage('l', 'access')) {
       return { name: loginRouteName, query: { redirect: to.fullPath } }
     }
@@ -82,6 +83,19 @@ export function installAuthGuard(router, {
 
       return { name: forbiddenRouteName }
     }
+  }
+
+  router.beforeEach((to) => {
+    // single sign-on (services/sso.js): with no session, ask the central
+    // domain once per tab before showing the local login page. Off unless
+    // SSO_URL is configured - then this stays synchronous, as before.
+    const needsLogin = to.meta?.requiresAuth || to.name === loginRouteName
+
+    if (needsLogin && !getStorage('l', 'access') && canStartSilent()) {
+      return startSilent().then(leaving => (leaving ? false : check(to)))
+    }
+
+    return check(to)
   })
 
   return router

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 const AlertWarning = vi.fn()
 
@@ -152,5 +152,50 @@ describe('installAuthGuard - requiredRole', () => {
     })
 
     expect(result).toEqual({ name: 'forbidden' })
+  })
+})
+
+describe('installAuthGuard - single sign-on', () => {
+  const realLocation = window.location
+
+  beforeEach(() => {
+    sessionStorage.clear()
+    process.env.SSO_URL = 'https://auth.mytech.co.mz'
+    Object.defineProperty(window, 'location', {
+      value: { origin: 'https://docodela.co.mz', pathname: '/', assign: vi.fn(), replace: vi.fn() },
+      configurable: true,
+    })
+  })
+
+  afterEach(() => {
+    delete process.env.SSO_URL
+    Object.defineProperty(window, 'location', { value: realLocation, configurable: true })
+  })
+
+  it('without a session, asks the central domain first (once per tab)', async () => {
+    const first = await guardFn({ meta: { requiresAuth: true }, fullPath: '/protected' })
+    expect(first).toBe(false)
+    expect(window.location.assign).toHaveBeenCalledTimes(1)
+    expect(window.location.assign.mock.calls[0][0]).toContain('https://auth.mytech.co.mz/#/sso?')
+
+    // back with login_required: the local login page, no second trip
+    const second = guardFn({ meta: { requiresAuth: true }, fullPath: '/protected' })
+    expect(second).toEqual({ name: 'login', query: { redirect: '/protected' } })
+    expect(window.location.assign).toHaveBeenCalledTimes(1)
+  })
+
+  it('opening the login page also tries the shared session first', async () => {
+    expect(await guardFn({ name: 'login', meta: {}, fullPath: '/auth/login' })).toBe(false)
+  })
+
+  it('with a session nothing changes', () => {
+    localStorage.setItem('access', 'a-real-token')
+    expect(guardFn({ meta: { requiresAuth: true }, fullPath: '/protected' })).toBeUndefined()
+    expect(window.location.assign).not.toHaveBeenCalled()
+  })
+
+  it('on the central domain itself the local login is shown', () => {
+    window.location.origin = 'https://auth.mytech.co.mz'
+    expect(guardFn({ meta: { requiresAuth: true }, fullPath: '/protected' })).toEqual({ name: 'login', query: { redirect: '/protected' } })
   })
 })

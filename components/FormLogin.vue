@@ -96,6 +96,22 @@
         </q-form>
       </q-card-section>
 
+      <q-card-section v-if="ssoAvailable" class="q-pt-none">
+        <s-btn
+          outline
+          size="md"
+          color="primary"
+          icon="key"
+          class="full-width"
+          :disable="User.loading"
+          :label="tdc('Continue with single sign-on')"
+          data-test="sso-start"
+          @click="startSso"
+        >
+          <s-tooltip>{{ tdc('Use the account you are already signed in with on another site') }}</s-tooltip>
+        </s-btn>
+      </q-card-section>
+
       <q-card-actions align="around">
         <s-btn
           flat
@@ -226,6 +242,7 @@ import { useRouter } from 'vue-router'
 import AllLogo from './../components/AllLogo.vue'
 import TwoFactorSetupDialog from './user/TwoFactorSetupDialog.vue'
 import { loadUserSaas } from './../boot/login_boot'
+import { afterLocalLogin, isClient, startInteractive } from './../services/sso'
 import { tdc } from '../services/translation'
 import { Alert } from '../boot/alerts'
 import { getStorage, setStorage } from '../services/storage'
@@ -276,6 +293,11 @@ export default defineComponent({
   },
 
   computed: {
+    // single sign-on configured and this is not the central domain
+    ssoAvailable () {
+      return isClient()
+    },
+
     currentEntity () {
       return this.Entity?.row || null
     },
@@ -323,6 +345,8 @@ export default defineComponent({
 
     async 'User.isLogin' (value) {
       if (value) {
+        // single sign-on: may leave for the central domain first
+        if (await afterLocalLogin(this.router)) return
         await loadUserSaas(this.q)
       }
     }
@@ -334,6 +358,10 @@ export default defineComponent({
   },
 
   methods: {
+    startSso () {
+      return startInteractive()
+    },
+
     check () {
       setStorage(
         'l',

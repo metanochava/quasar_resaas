@@ -29,6 +29,17 @@ export const authRoutes = [
       { path: 'resetpassword/:uidb64/:token', component: () => import('./../pages/auth/ResetPasswordConfirmPage.vue'), name: 'resetPasswordConfirm' },
     ],
   },
+  // single sign-on between domains (services/sso.js): central steps
+  // (/sso, /sso/adopt) and the client's return (/sso/callback)
+  {
+    path: '/sso',
+    component: () => import('../layouts/AuthLayout.vue'),
+    children: [
+      { path: '', component: () => import('./../pages/auth/SsoPage.vue'), name: 'ssoAuthorize' },
+      { path: 'adopt', component: () => import('./../pages/auth/SsoPage.vue'), name: 'ssoAdopt' },
+      { path: 'callback', component: () => import('./../pages/auth/SsoPage.vue'), name: 'ssoCallback' },
+    ],
+  },
   // there is no '/home' any more (WelcomeGuestPage was removed): the site at
   // '/' handles signed-in users too; '/home' is a "not found" like any other
 
