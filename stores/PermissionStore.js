@@ -25,7 +25,13 @@ export const usePermissionStore = createBaseStore(
       dirty: false,
       // app labels this profile does not show in its menu (Group.hidden_menu_apps)
       hiddenMenuApps: [],
-      savingMenuApp: null
+      savingMenuApp: null,
+      // codenames whose menu entries this profile does not show
+      // (Group.hidden_menu_permissions) and the codenames the sidebars use
+      // as menu entries (Group.menu_permissions, the same for every group)
+      hiddenMenuPermissions: [],
+      menuPermissions: [],
+      savingMenuPermission: null
     }),
 
     actions: {
@@ -37,6 +43,8 @@ export const usePermissionStore = createBaseStore(
         this.loadingPermission = false
         this.dirty = false
         this.hiddenMenuApps = [...(group?.hidden_menu_apps || [])]
+        this.hiddenMenuPermissions = [...(group?.hidden_menu_permissions || [])]
+        this.menuPermissions = [...(group?.menu_permissions || [])]
         this.buildApps()
       },
 
@@ -60,7 +68,11 @@ export const usePermissionStore = createBaseStore(
         if (!id) return
         try {
           const { data } = await HTTPAuth.get(url({ type: 'u', url: `auth/groups/${id}/` }))
-          if (this.group?.id === id) this.hiddenMenuApps = [...(data?.hidden_menu_apps || [])]
+          if (this.group?.id === id) {
+            this.hiddenMenuApps = [...(data?.hidden_menu_apps || [])]
+            this.hiddenMenuPermissions = [...(data?.hidden_menu_permissions || [])]
+            this.menuPermissions = [...(data?.menu_permissions || [])]
+          }
         } catch {
           // keeps what the row had; the toggle still works
         }
@@ -79,6 +91,32 @@ export const usePermissionStore = createBaseStore(
           this.group.hidden_menu_apps = [...this.hiddenMenuApps]
         } finally {
           this.savingMenuApp = null
+        }
+      },
+
+      // a permission the sidebars use as a menu entry (the toggle is shown only for these)
+      hasMenuEntry(codename) {
+        return this.menuPermissions.includes(String(codename || '').toLowerCase())
+      },
+
+      isPermissionMenuVisible(codename) {
+        return !this.hiddenMenuPermissions.includes(String(codename || '').toLowerCase())
+      },
+
+      // only the menu entries of that permission: it stays granted
+      async setPermissionMenuVisible(codename, visible) {
+        const permission = String(codename || '').toLowerCase()
+        if (!this.group?.id || !permission) return
+        this.savingMenuPermission = permission
+        try {
+          const { data } = await HTTPAuth.post(
+            url({ type: 'u', url: `auth/groups/${this.group.id}/menu_visibility/` }),
+            { permission, visible: !!visible }
+          )
+          this.hiddenMenuPermissions = [...(data?.hidden_menu_permissions || [])]
+          this.group.hidden_menu_permissions = [...this.hiddenMenuPermissions]
+        } finally {
+          this.savingMenuPermission = null
         }
       },
 

@@ -69,6 +69,7 @@ export * from './utils/json.js'
 export * from './utils/text.js'
 export * from './utils/profile.js'
 export * from './utils/schema.js'
+export * from './utils/fileKind.js'
 export * from './utils/display.js'
 export * from './utils/status.js'
 export * from './utils/pdfFile.js'
@@ -152,6 +153,7 @@ export { default as Components } from './boot/components.js'
 export { default as FormTwo } from './components/auto/FormTwo.vue'
 export { default as AutoCrud } from './components/auto/AutoCrud.vue'
 export { default as PersonProfilePanel } from './components/person/PersonProfilePanel.vue'
+export { default as FilePreviewCard } from './components/engine/FilePreviewCard.vue'
 
 
 export {

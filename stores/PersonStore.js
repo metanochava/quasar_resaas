@@ -89,15 +89,18 @@ export const usePersonStore = createBaseStore(
       // exists (change_employee's edit flow): a brand new Person's
       // documents still go through EmployeeAPIView.register's atomic
       // person.documents.create() instead, same as before.
+      // payload.arquivos: the document's files (a document may have several)
       async addDocument(personId, payload) {
-        const hasFile = payload?.arquivo instanceof File
+        const files = [...(payload?.arquivos || []), payload?.arquivo].filter(f => f instanceof File)
 
         let body = payload
-        if (hasFile) {
+        if (files.length) {
           body = new FormData()
           Object.entries(payload).forEach(([key, value]) => {
+            if (key === 'arquivos' || key === 'arquivo') return
             if (value !== null && value !== undefined) body.append(key, value)
           })
+          files.forEach(file => body.append('files', file))
         }
 
         const { data } = await HTTPAuth.post(

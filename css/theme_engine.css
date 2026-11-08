@@ -7,6 +7,32 @@ body.body--dark {
   --scrollbar-accent: #ffffff;
 }
 
+/* native scrollbars (the page on the right edge, panels with overflow) follow
+   the same dynamic colour as the side menus' q-scroll-area (services/app.js
+   thumbStyle 0.75 / barStyle 0.2): the Entity's primary colour, white in dark
+   mode. Firefox and Chrome 121+ read scrollbar-color; older WebKit the
+   ::-webkit-scrollbar rules. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--scrollbar-accent) 75%, transparent)
+    color-mix(in srgb, var(--scrollbar-accent) 20%, transparent);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--scrollbar-accent) 20%, transparent);
+  border-radius: 14px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--scrollbar-accent) 75%, transparent);
+  border-radius: 8px;
+}
+
 /* HOVER */
 .insize{
   display: block;

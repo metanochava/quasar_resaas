@@ -355,17 +355,13 @@
               <div class="col-12 col-sm-6 col-md-3">
                 <s-field v-model="doc.numero" :field="fieldOf(Document, 'numero')" :label="tdc('Number')" :filled="false" dense outlined />
               </div>
-              <div class="col-12 col-sm-6 col-md-2">
+              <div class="col-12 col-sm-6 col-md-3">
                 <s-field v-model="doc.data_emissao" :field="fieldOf(Document, 'data_emissao')" :label="tdc('Issue date')" :filled="false" dense outlined />
               </div>
               <div class="col-12 col-sm-6 col-md-2">
                 <s-field v-model="doc.data_validade" :field="fieldOf(Document, 'data_validade')" :label="tdc('Expiry date')" :filled="false" dense outlined />
               </div>
-              <div class="col-12 col-sm-8 col-md-1">
-                <!-- camera: a document may be a photo of it, taken right here -->
-                <s-field v-model="doc.arquivo" :field="fieldOf(Document, 'arquivo')" :label="tdc('File')" camera />
-              </div>
-              <div class="col-12 col-sm-4 col-md-1 flex flex-center justify-end">
+              <div class="col-12 col-md-1 flex flex-center justify-end">
                 <s-btn
                   flat
                   round
@@ -376,6 +372,44 @@
                 >
                   <s-tooltip>{{ tdc('Remove document') }}</s-tooltip>
                 </s-btn>
+              </div>
+
+              <!-- the document's files (it may have several: both sides of an
+                   ID card, several pages), under its fields, centred -->
+              <div class="col-12" :data-test="`document-files-${index}`">
+                <div class="column items-center q-gutter-y-sm">
+                  <!-- the saved files: the same preview as the lab results
+                       (s-file-preview: thumbnail, full screen by type) -->
+                  <div v-if="doc.files?.length" class="row justify-center q-col-gutter-sm full-width">
+                    <div
+                      v-for="file in doc.files"
+                      :key="file.id"
+                      class="col-12 col-sm-6 col-md-3"
+                      :data-test="`document-file-${file.id}`"
+                    >
+                      <s-file-preview :file="file" thumb-height="140px">
+                        <template #actions>
+                          <s-btn
+                            flat
+                            round
+                            dense
+                            size="sm"
+                            color="negative"
+                            icon="close"
+                            :data-test="`document-file-remove-${file.id}`"
+                            @click.stop="removeSavedDocumentFile(doc, file.id)"
+                          >
+                            <s-tooltip>{{ tdc('Remove the file (when you save)') }}</s-tooltip>
+                          </s-btn>
+                        </template>
+                      </s-file-preview>
+                    </div>
+                  </div>
+                  <!-- new files: chosen or photographed here, saved with the document -->
+                  <div class="document-files__picker">
+                    <s-file v-model="doc.arquivos" multiple :camera="true" :label="tdc('Add files')" />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -499,6 +533,7 @@ const {
   matchDialogOpen, matchCandidatesList,
   fieldOf,
   addContact, removeContact, addDocument, removeDocument,
+  removeSavedDocumentFile,
   clearSelectedPerson, pickerValue, onPersonPicked,
   showSelectedPerson, detailOpen, detail, detailLoading,
   onMatchSelect, onMatchCreateNew, onMatchCancel
@@ -513,6 +548,10 @@ const canViewPerson = computed(() => User.can('view_person'))
 <style scoped>
 .person-intake .contact-block + .contact-block {
   border-top: 1px solid rgba(128, 128, 128, .25);
+}
+.person-intake .document-files__picker {
+  width: 100%;
+  max-width: 420px;
 }
 .person-intake .section-header {
   padding-bottom: 8px;

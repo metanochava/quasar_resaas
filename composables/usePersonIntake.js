@@ -70,8 +70,18 @@ export function usePersonIntake() {
       numero: '',
       data_emissao: null,
       data_validade: null,
-      arquivo: null
+      // a document may have several files: the ones already saved
+      // (DocumentFile, from the API), the new ones chosen here, and the
+      // saved ones removed here (deleted on save)
+      files: [],
+      arquivos: [],
+      removedFileIds: []
     })
+  }
+
+  function removeSavedDocumentFile(doc, fileId) {
+    doc.files = (doc.files || []).filter(f => f.id !== fileId)
+    doc.removedFileIds = [...(doc.removedFileIds || []), fileId]
   }
 
   function removeDocument(index) {
@@ -249,7 +259,7 @@ export function usePersonIntake() {
           numero: d.numero,
           data_emissao: d.data_emissao || null,
           data_validade: d.data_validade || null,
-          arquivo: d.arquivo instanceof File ? d.arquivo : null
+          arquivos: (d.arquivos || []).filter(f => f instanceof File)
         })),
       contacts: contacts.value
         .filter(c => c.name?.trim())
@@ -282,7 +292,10 @@ export function usePersonIntake() {
       _key: ++documentKeySeq,
       ...row,
       // raw pk -> the option object the relation select shows
-      tipo: row.tipo_data ? toRelationOption(row.tipo_data) : row.tipo
+      tipo: row.tipo_data ? toRelationOption(row.tipo_data) : row.tipo,
+      files: [...(row.files || [])],
+      arquivos: [],
+      removedFileIds: []
     }))
 
     originalContactIds.value = new Set(contacts.value.map(c => c.id))
@@ -302,18 +315,21 @@ export function usePersonIntake() {
   }
 
   async function saveDocumentRow(row, personId) {
-    const fields = omit(row, ['_key'])
+    const fields = omit(row, ['_key', 'files', 'arquivos', 'removedFileIds', 'arquivo'])
 
     if (row.id) {
       Document.form = { ...fields }
-      await updateWithPayload(Document, buildWritePayload(fields, Document.fields))
+      await updateWithPayload(Document, buildWritePayload(fields, Document.fields, { exclude: ['arquivo'] }))
+      // the document's files: new ones added, removed ones deleted
+      await Document.addFiles(row.id, row.arquivos)
+      for (const fileId of row.removedFileIds || []) await Document.removeFile(row.id, fileId)
     } else {
       await Person.addDocument(personId, {
         tipo: typeId(fields.tipo),
         numero: fields.numero,
         data_emissao: fields.data_emissao || null,
         data_validade: fields.data_validade || null,
-        arquivo: fields.arquivo instanceof File ? fields.arquivo : null
+        arquivos: (row.arquivos || []).filter(f => f instanceof File)
       })
     }
   }
@@ -398,7 +414,7 @@ export function usePersonIntake() {
     return {
       person: omit(Person.form, ['id', 'photo']),
       contacts: contacts.value.map(c => omit(c, ['_key'])),
-      documents: documents.value.map(d => omit(d, ['_key', 'arquivo'])),
+      documents: documents.value.map(d => omit(d, ['_key', 'arquivo', 'arquivos'])),
       selectedPerson: selectedPerson.value,
       matchResolved: matchResolved.value
     }
@@ -408,7 +424,7 @@ export function usePersonIntake() {
     if (!draft || typeof draft !== 'object') return
     Person.form = { ...Person.form, ...(draft.person || {}) }
     contacts.value = (draft.contacts || []).map(c => ({ ...c, _key: ++contactKeySeq }))
-    documents.value = (draft.documents || []).map(d => ({ ...d, arquivo: null, _key: ++documentKeySeq }))
+    documents.value = (draft.documents || []).map(d => ({ files: [], removedFileIds: [], ...d, arquivos: [], _key: ++documentKeySeq }))
     selectedPerson.value = draft.selectedPerson || null
     matchResolved.value = !!draft.matchResolved
   }
@@ -426,6 +442,7 @@ export function usePersonIntake() {
     Person, PersonContact, Document,
     // state
     contacts, documents, selectedPerson, matchResolved,
+    removeSavedDocumentFile,
     matchDialogOpen, matchCandidatesList,
     // helpers
     fieldOf,

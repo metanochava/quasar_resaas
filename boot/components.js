@@ -25,6 +25,7 @@ import UserSecurityPanel from './../components/user/UserSecurityPanel.vue'
 import DrawerComponent from './../components/engine/DrawerComponent.vue'
 import FieldComponent from './../components/engine/FieldComponent.vue'
 import FileComponent from './../components/engine/FileComponent.vue'
+import FilePreviewCard from './../components/engine/FilePreviewCard.vue'
 import PageTitleComponent from './../components/engine/PageTitleComponent.vue'
 import CheckBoxComponent from './../components/engine/CheckBoxComponent.vue'
 import SwitchComponent from './../components/engine/SwitchComponent.vue'
@@ -155,6 +156,8 @@ export default boot(({ app }) => {
   app.component('s-field', FieldComponent)
 
   app.component('s-file', FileComponent)
+  // a stored file: preview card + full-screen viewer (utils/fileKind.js)
+  app.component('s-file-preview', FilePreviewCard)
 
   app.component('s-checkbox', CheckBoxComponent)
 

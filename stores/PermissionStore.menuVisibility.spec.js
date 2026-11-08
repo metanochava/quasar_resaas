@@ -47,3 +47,36 @@ describe('PermissionStore menu visibility', () => {
     expect(store.dirty).toBe(false)
   })
 })
+
+describe('PermissionStore menu visibility per permission', () => {
+  it('knows which permissions have a menu entry and which are hidden', async () => {
+    get.mockResolvedValue({ data: {
+      hidden_menu_apps: [],
+      hidden_menu_permissions: ['list_item'],
+      menu_permissions: ['list_item', 'list_paciente'],
+    } })
+    const store = usePermissionStore()
+    store.initPermissions(perms, [], { id: 'g1' })
+    await store.loadMenuVisibility()
+
+    expect(store.hasMenuEntry('list_paciente')).toBe(true)
+    expect(store.hasMenuEntry('delete_paciente')).toBe(false)
+    expect(store.isPermissionMenuVisible('list_paciente')).toBe(true)
+    expect(store.isPermissionMenuVisible('LIST_ITEM')).toBe(false)
+  })
+
+  it('hides one permission from the menu and keeps it granted', async () => {
+    post.mockResolvedValue({ data: { hidden_menu_apps: [], hidden_menu_permissions: ['list_paciente'] } })
+    const store = usePermissionStore()
+    store.initPermissions(perms, [perms[0]], { id: 'g1', menu_permissions: ['list_paciente'] })
+
+    await store.setPermissionMenuVisible('list_paciente', false)
+
+    expect(post).toHaveBeenCalledWith('auth/groups/g1/menu_visibility/', { permission: 'list_paciente', visible: false })
+    expect(store.isPermissionMenuVisible('list_paciente')).toBe(false)
+    expect(store.group.hidden_menu_permissions).toEqual(['list_paciente'])
+    expect(store.groupPermissions).toEqual([perms[0]])
+    expect(store.dirty).toBe(false)
+    expect(store.savingMenuPermission).toBe(null)
+  })
+})

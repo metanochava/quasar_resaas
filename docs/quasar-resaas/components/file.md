@@ -31,11 +31,52 @@ default. Ask for it with `camera` - through `s-field` as well, since the attribu
 reaches `s-file`:
 
 ```vue
-<s-field v-model="doc.arquivo" :field="fieldOf(Document, 'arquivo')" :label="tdc('File')" camera />
+<s-file v-model="doc.arquivos" multiple :camera="true" :label="tdc('Add files')" />
 ```
 
-This is what the person intake form does for each document (`PersonIntakeSections.vue`,
-used by add/change patient and employee).
+## Several files of a document (person intake form)
+
+A document may have several files (django_resaas `DocumentFile`). The person intake
+form (`PersonIntakeSections.vue`, used by add/change patient and employee) shows them
+under each document's fields, centred in the card:
+
+- the saved files (`doc.files`, from `DocumentSerializer.files`) as preview cards
+  (`s-file-preview`, below); the cross on each removes it when the form is saved
+  (`removedFileIds`);
+- an `s-file multiple` with the camera for new files (`doc.arquivos`).
+
+On save (`usePersonIntake.saveExisting`) a saved document sends its new files with
+`Document.addFiles(id, files)` (`POST documents/{id}/files/`) and deletes the removed
+ones with `Document.removeFile(id, fileId)`. A new document goes with all its files
+(`Person.addDocument`, `files` repeated). The registrations build one multipart
+request with `appendDocumentFiles(formData, documents)` (`stores/DocumentStore.js`):
+each document lists its keys in `_file_keys`. A draft keeps the fields, never the
+chosen files (a browser cannot store them).
+
+Tests: `composables/usePersonIntake.spec.js`, `stores/DocumentStore.files.spec.js`.
+
+## Previewing a stored file (`s-file-preview`)
+
+`components/engine/FilePreviewCard.vue`, registered as `s-file-preview` and exported as
+`FilePreviewCard`: a card with a thumbnail of what the browser can show (image, PDF,
+text, video; audio plays in the card). A click opens it full screen, rendered by its
+type, with "Open in a new tab" and "Download"; anything else offers the download.
+It is the preview of the lab results (dev/front `FilePreviewDialog`) and of the
+documents' files.
+
+```vue
+<s-file-preview :file="file" thumb-height="140px">
+  <template #actions><!-- buttons on the card's name line --></template>
+  <template #empty><!-- shown when there is no file --></template>
+</s-file-preview>
+```
+
+`file` takes the shapes the API returns (`utils/fileKind.js`: `fileUrl`, `fileName`,
+`fileKind`): a lab result / explorer item (`{file: {url, mime_type}, nome}`), a
+document file (`{name, arquivo: {url, mime_type, ext}}`) or a plain `{url, name}`.
+An `http` file is loaded over `https` on an `https` page.
+
+Tests: `components/engine/FilePreviewCard.spec.js`, `utils/fileKind.spec.js`.
 
 The camera needs HTTPS (or localhost) and the user's permission in the browser.
 

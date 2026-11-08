@@ -49,6 +49,12 @@ describe('HeaderUser - signing out with single sign-on', () => {
     await wrapper.find('[data-test="logout-only-here"]').trigger('click')
     expect(User.logout).toHaveBeenLastCalledWith('e1', { onlyHere: true })
   })
+  it('lists "this site only" first and "every site" last', () => {
+    const wrapper = mountHeader()
+    const order = wrapper.findAll('[data-test^="logout-"]').map(b => b.attributes('data-test'))
+
+    expect(order).toEqual(['logout-only-here', 'logout-everywhere'])
+  })
 })
 
 describe('HeaderUser - signing out without single sign-on', () => {

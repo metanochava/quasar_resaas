@@ -12,21 +12,10 @@
         icon="logout"
         width="380px"
       >
-        <!-- single sign-on: every site of this browser, or this one only
-             (the Entity stays as the login hint, as with "log out of this Entity") -->
+        <!-- single sign-on: this site only, or every site of this browser
+             (last). This site only keeps the Entity as the login hint, as
+             "log out of this Entity" does -->
         <div v-if="ssoOn" class="column q-gutter-y-sm">
-          <s-btn
-            unelevated
-            color="negative"
-            icon="logout"
-            class="full-width"
-            :label="tdc('Sign out of every site')"
-            data-test="logout-everywhere"
-            @click="logoutSso(false)"
-          >
-            <s-tooltip>{{ tdc('You will be signed out of every site in this browser') }}</s-tooltip>
-          </s-btn>
-
           <s-btn
             outline
             color="primary"
@@ -37,6 +26,18 @@
             @click="logoutSso(true)"
           >
             <s-tooltip>{{ tdc('The other sites stay signed in, and this one no longer signs you in by itself') }}</s-tooltip>
+          </s-btn>
+
+          <s-btn
+            unelevated
+            color="negative"
+            icon="logout"
+            class="full-width"
+            :label="tdc('Sign out of every site')"
+            data-test="logout-everywhere"
+            @click="logoutSso(false)"
+          >
+            <s-tooltip>{{ tdc('You will be signed out of every site in this browser') }}</s-tooltip>
           </s-btn>
         </div>
 

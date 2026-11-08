@@ -79,6 +79,14 @@ Another user signing in on the same browser never lands on it, and logout
 removes it ([Persistence](../stores/persistence.md#logout)). The old shared
 `last_route` key is deleted on the next load.
 
+**Scrollbars:** both drawers scroll in a `q-scroll-area` styled by
+`thumbStyle`/`barStyle` (`services/app.js`). Every native scrollbar (the
+page on the right edge, any panel with `overflow`) uses the same colour,
+set in `css/theme_engine.css`: `--scrollbar-accent`, which is the Entity's
+`--q-primary` (set by `theme/applyTheme.js`), or white in dark mode, at the
+same opacities (thumb 75%, track 20%). Firefox and Chrome 121+ read
+`scrollbar-color`; older WebKit reads `::-webkit-scrollbar`.
+
 ### Header brand and website button
 
 `components/header/HeaderBrand.vue` (`s-header-brand`) shows the Entity's logo

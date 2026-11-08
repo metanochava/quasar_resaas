@@ -112,18 +112,40 @@
                   <div
                     v-for="perm in orderPermissions(perms)"
                     :key="perm.id"
-                    class="col-6"
+                    class="col-6 row items-center no-wrap"
                   >
                     <q-checkbox
                       :model-value="Permission.hasPermission(perm.id)"
                       :disable="Permission.loadingPermission"
                       :color="isMatch(perm, modelName) ? 'warning' : 'primary'"
                       dense
+                      class="col"
                       @update:model-value="Permission.toggle(perm)"
                     >
                       <HighlightText :text="label(perm.codename, modelName)" :search="Permission.search" />
                       <s-tooltip>{{ perm.codename }}</s-tooltip>
                     </q-checkbox>
+                    <!-- whether this profile's menu shows the entries of this
+                         permission (only the menu: it stays granted) -->
+                    <s-btn
+                      v-if="Permission.hasMenuEntry(perm.codename)"
+                      flat
+                      round
+                      dense
+                      size="xs"
+                      class="q-ml-xs"
+                      :icon="Permission.isPermissionMenuVisible(perm.codename) ? 'visibility' : 'visibility_off'"
+                      :color="Permission.isPermissionMenuVisible(perm.codename) ? 'primary' : 'grey'"
+                      :loading="Permission.savingMenuPermission === String(perm.codename).toLowerCase()"
+                      :data-test="`menu-visibility-perm-${perm.codename}`"
+                      @click.stop="Permission.setPermissionMenuVisible(perm.codename, !Permission.isPermissionMenuVisible(perm.codename))"
+                    >
+                      <s-tooltip>
+                        {{ Permission.isPermissionMenuVisible(perm.codename)
+                          ? tdc('Menu entry shown for this profile. Click to hide it.')
+                          : tdc('Menu entry hidden for this profile. Click to show it.') }}
+                      </s-tooltip>
+                    </s-btn>
                   </div>
                 </div>
               </div>

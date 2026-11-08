@@ -355,7 +355,7 @@ describe('usePersonIntake - draft (kept across reloads by the page)', () => {
     expect(fresh.Person.form.name).toBe('Ana')
     expect(fresh.contacts.value[0].name).toBe('Mother')
     expect(fresh.contacts.value[0]._key).toBeTruthy()
-    expect(fresh.documents.value[0]).toMatchObject({ numero: '123', arquivo: null })
+    expect(fresh.documents.value[0]).toMatchObject({ numero: '123', arquivos: [] })
     expect(fresh.hasUnsavedData()).toBe(true)
   })
 
@@ -364,5 +364,56 @@ describe('usePersonIntake - draft (kept across reloads by the page)', () => {
     intake.restoreDraft('x')
 
     expect(intake.contacts.value).toEqual([])
+  })
+})
+
+describe('usePersonIntake - several files per document', () => {
+  it('loads the saved files, uploads the new ones and deletes the removed ones', async () => {
+    vi.spyOn(intake.PersonContact, 'loadData').mockImplementation(async function () { this.rows = [] })
+    vi.spyOn(intake.Document, 'loadData').mockImplementation(async function () {
+      this.rows = [{ id: 'd1', tipo: 't1', numero: '1', files: [{ id: 'f1', name: 'frente.png' }, { id: 'f2', name: 'verso.png' }] }]
+    })
+    await intake.loadExisting({ id: 'p1', name: 'Ana' })
+
+    const doc = intake.documents.value[0]
+    expect(doc.files.map(f => f.id)).toEqual(['f1', 'f2'])
+
+    const page = new File(['x'], 'pagina2.png', { type: 'image/png' })
+    doc.arquivos = [page]
+    intake.removeSavedDocumentFile(doc, 'f1')
+    expect(doc.files.map(f => f.id)).toEqual(['f2'])
+
+    intake.Person.fields = []
+    vi.spyOn(intake.Person, 'update').mockResolvedValue()
+    vi.spyOn(intake.Document, 'update').mockResolvedValue()
+    const addFiles = vi.spyOn(intake.Document, 'addFiles').mockResolvedValue({})
+    const removeFile = vi.spyOn(intake.Document, 'removeFile').mockResolvedValue()
+
+    await intake.saveExisting()
+
+    expect(addFiles).toHaveBeenCalledWith('d1', [page])
+    expect(removeFile).toHaveBeenCalledWith('d1', 'f1')
+  })
+
+  it('a new document of an existing person goes with all its files', async () => {
+    intake.Person.fields = []
+    intake.Person.form = { id: 'p1' }
+    intake.addDocument()
+    const [a, b] = [new File(['a'], 'a.png'), new File(['b'], 'b.png')]
+    Object.assign(intake.documents.value[0], { tipo: 't', numero: 'N', arquivos: [a, b] })
+    vi.spyOn(intake.Person, 'update').mockResolvedValue()
+    const add = vi.spyOn(intake.Person, 'addDocument').mockResolvedValue({})
+
+    await intake.saveExisting()
+
+    expect(add).toHaveBeenCalledWith('p1', expect.objectContaining({ arquivos: [a, b] }))
+  })
+
+  it('the registration payload carries every file of each document', () => {
+    intake.addDocument()
+    const [a, b] = [new File(['a'], 'a.png'), new File(['b'], 'b.png')]
+    Object.assign(intake.documents.value[0], { tipo: 't', numero: 'N', arquivos: [a, b] })
+
+    expect(intake.registrationPayload().documents[0].arquivos).toEqual([a, b])
   })
 })
