@@ -61,6 +61,20 @@ token in memory or in `localStorage`); otherwise it clears the context
 (`clearResaasContext()`) and makes no request. `renewResaasContextQuietly()`
 follows the same rule.
 
+The token is kept in this tab's `sessionStorage`, while the selection is
+restored from `localStorage`, which every tab of the site shares.
+`createResaasContext` therefore also stores the selection the token was issued
+for (`resaasContextFor`: user, Entity, Branch and Group ids, built by
+`contextSelectionKey()` in `services/contextExpiry.js`). Before each `HTTPAuth`
+request, `services/api.js` compares it with the selection the tab shows
+(`contextNeedsReissue()`). When they differ, it re-issues the token with
+`renewResaasContextQuietly()` before sending, for example on a reload after
+another tab switched profile or signed in as someone else. Before this check,
+such a reload sent the old token and every protected request (patient,
+relations...) came back 403. A token stored by an older client has no recorded
+selection and is re-issued once. Nothing is re-issued while no Entity is
+selected, or for the `resaas/context/` request itself.
+
 `hasSession()` only says a token is stored (requests can try it and refresh
 it). To decide whether to **show** the signed-in UI use `isSignedIn()`:
 `isLogin`, or a refresh token in memory/`localStorage` that has not expired

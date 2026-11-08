@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   contextExpiresAt, shouldRenewContext, errorDetail, isContextExpiredError,
+  contextSelectionKey, contextNeedsReissue,
   CONTEXT_EXPIRED_DETAIL, RENEW_MARGIN_MS, DEFAULT_TTL_SECONDS
 } from './contextExpiry'
 
@@ -70,5 +71,31 @@ describe('isContextExpiredError - the stable code, not the text', () => {
 
   it('still understands an older backend (the English detail)', async () => {
     expect(await isContextExpiredError({ response: { status: 403, data: { detail: 'RESAAS context has expired.' } } })).toBe(true)
+  })
+})
+
+describe('contextSelectionKey / contextNeedsReissue', () => {
+  const selection = { user: { id: 'u1' }, entity: { id: 'e1' }, branch: { id: 'b1' }, group: { id: 'g1' } }
+
+  it('builds the same key from objects or ids', () => {
+    expect(contextSelectionKey(selection)).toBe('u1|e1|b1|g1')
+    expect(contextSelectionKey({ user: 'u1', entity: 'e1', branch: 'b1', group: 'g1' })).toBe('u1|e1|b1|g1')
+  })
+
+  it('keeps the token issued for the current selection', () => {
+    expect(contextNeedsReissue('u1|e1|b1|g1', selection)).toBe(false)
+  })
+
+  it('re-issues a token issued for another profile or user', () => {
+    expect(contextNeedsReissue('u1|e1|b1|g0', selection)).toBe(true)
+    expect(contextNeedsReissue('u0|e1|b1|g1', selection)).toBe(true)
+  })
+
+  it('re-issues a token without a recorded selection (older client)', () => {
+    expect(contextNeedsReissue(null, selection)).toBe(true)
+  })
+
+  it('does nothing without an Entity (nothing to issue for yet)', () => {
+    expect(contextNeedsReissue(null, { user: { id: 'u1' } })).toBe(false)
   })
 })

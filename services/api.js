@@ -3,7 +3,7 @@
 
 import axios from 'axios'
 import { getStorage } from './storage'
-import { shouldRenewContext, isContextExpiredError } from './contextExpiry'
+import { shouldRenewContext, isContextExpiredError, contextNeedsReissue } from './contextExpiry'
 import { useUserStore } from '../stores/UserStore'
 import { useLoadStore } from '../stores/LoadStore'
 import { Alert } from '../boot/alerts'
@@ -76,7 +76,14 @@ const createClient = (auth = false, blob = false) => {
     if (
       auth &&
       !String(config.url || '').includes('resaas/context/') &&
-      shouldRenewContext(getStorage('s', 'resaasContextExpiresAt'))
+      (
+        shouldRenewContext(getStorage('s', 'resaasContextExpiresAt')) ||
+        // issued for another profile/user than this tab now shows
+        // (contextNeedsReissue: e.g. reload after a switch in another tab)
+        (User.hasSession() && contextNeedsReissue(getStorage('s', 'resaasContextFor'), {
+          user: User.data, entity: User.Entity, branch: User.Branch, group: User.Group
+        }))
+      )
     ) {
       try {
         await User.renewResaasContextQuietly()

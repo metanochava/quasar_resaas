@@ -25,6 +25,27 @@ export function shouldRenewContext(expiresAt, now = Date.now(), margin = RENEW_M
   return Number.isFinite(at) && at > 0 && now >= at - margin
 }
 
+// Which selection (user + Entity + Branch + Group) a context token was
+// issued for. The token lives in this tab's sessionStorage, while the
+// selection is restored from localStorage, shared by every tab of the site:
+// after a profile switch or a different sign-in in another tab, a reload
+// sent the old token for the new profile and every protected request came
+// back 403. A token whose key differs from the current selection is
+// re-issued before the request leaves.
+const idOf = value => (value && typeof value === 'object' ? value.id : value) || ''
+
+export function contextSelectionKey({ user, entity, branch, group } = {}) {
+  return [user, entity, branch, group].map(idOf).join('|')
+}
+
+// true when there is a selection to issue a context for and the stored
+// token was issued for another one (or for no recorded one: a token from an
+// older client is re-issued once).
+export function contextNeedsReissue(storedKey, selection) {
+  if (!idOf(selection?.entity)) return false
+  return storedKey !== contextSelectionKey(selection)
+}
+
 // The error body of a blob request (PDFs, downloads) is a Blob, not the
 // JSON object - it has to be read before its `detail` can be compared.
 export async function errorDetail(error) {

@@ -48,7 +48,8 @@ function issueResaasContext(User) {
     resaasContextRefreshPromise = createResaasContext({
       entity: User.Entity,
       branch: User.Branch,
-      group: User.Group
+      group: User.Group,
+      user: User.data
     })
       .catch(error => {
         if (isRefusedSelection(error)) User.discardContextSelection()

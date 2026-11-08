@@ -1,11 +1,13 @@
 import { HTTPAuth, url } from './api'
 import { getStorage, setStorage, deleteStorage } from './storage'
-import { contextExpiresAt } from './contextExpiry'
+import { contextExpiresAt, contextSelectionKey } from './contextExpiry'
 
 const STORAGE_KEY = 'resaasContext'
 // When the stored token stops being valid (ms epoch) - lets the API client
 // renew it BEFORE it expires instead of only reacting to a 403.
 export const EXPIRES_KEY = 'resaasContextExpiresAt'
+// The selection the stored token was issued for (contextSelectionKey()).
+export const FOR_KEY = 'resaasContextFor'
 
 export const getResaasContextExpiresAt = () => getStorage('s', EXPIRES_KEY)
 
@@ -19,12 +21,14 @@ export const setResaasContext = token =>
 export const clearResaasContext = () => {
   deleteStorage('s', STORAGE_KEY)
   deleteStorage('s', EXPIRES_KEY)
+  deleteStorage('s', FOR_KEY)
 }
 
 export async function createResaasContext({
   entity,
   branch = null,
-  group = null
+  group = null,
+  user = null
 } = {}) {
   const getId = value =>
     typeof value === 'object' ? value?.id : value
@@ -49,6 +53,7 @@ export async function createResaasContext({
 
   setResaasContext(data.token)
   setStorage('s', EXPIRES_KEY, String(contextExpiresAt(data)))
+  setStorage('s', FOR_KEY, contextSelectionKey({ user, entity, branch, group }))
 
   return data
 }

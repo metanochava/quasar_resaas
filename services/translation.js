@@ -31,8 +31,21 @@ export const tdc = (texto = '') => {
 
   const store = useLanguageStore()
   const chave = texto?.toLowerCase()?.trim()
+  const traducao = store.TraducaoMap[chave]
 
-  return store.TraducaoMap[chave] || texto
+  if (!traducao) return texto
+
+  // keys are matched without case ("Exam request result" finds the
+  // "exam request result" row): a text that starts with a capital gets a
+  // translation that starts with one too ("Resultado de pedido de exame")
+  return capitalizeLike(String(texto).trim(), traducao)
+}
+
+export function capitalizeLike (original, translation) {
+  const first = original?.[0]
+  if (!first || !translation || typeof translation !== 'string') return translation
+  const isCapital = first !== first.toLowerCase() && first === first.toUpperCase()
+  return isCapital ? translation[0].toUpperCase() + translation.slice(1) : translation
 }
 
 

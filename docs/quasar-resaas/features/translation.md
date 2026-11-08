@@ -24,12 +24,23 @@ export const tdc = (texto = '') => {
   const store = useLanguageStore()
   const chave = texto?.toLowerCase()?.trim()
 
-  return store.TraducaoMap[chave] || texto
+  const traducao = store.TraducaoMap[chave]
+
+  if (!traducao) return texto
+
+  return capitalizeLike(String(texto).trim(), traducao)
 }
 ```
 
 -   Lookup key = the original text itself, lowercased — there are no
     `.json` translation files to maintain on the frontend.
+-   The key is matched without case, so a row stored in lower case
+    (`"exam request result": "resultado de pedido de exame"`) also answers
+    `tdc('Exam request result')`. `capitalizeLike()` then gives the
+    translation a capital when the original text starts with one
+    ("Resultado de pedido de exame"). A lower-case text, used mid-sentence as
+    in `tdc('Add') + ' ' + tdc('exam request result')`, keeps the
+    translation as stored. A translation is never lowered.
 -   If there's no active Pinia (e.g. called outside a component/store) or
     the key doesn't exist in the map, it returns the original text — it
     never throws or shows a raw key.

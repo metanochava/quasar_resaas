@@ -203,6 +203,23 @@ routes = [
 The app's own module routes (`rhRoutes`, `saudeRoutes`, ...) follow the same
 `meta` convention as the library's routes — there's no special handling.
 
+The router itself (`src/router/index.js`) installs the library's guards on its
+own instance:
+
+```js
+installAuthGuard(Router)    // requiresAuth / requiredRole, single sign-on silent check
+installChunkReload(Router)  // router/chunkReload.js
+installPageTitle(Router, { suffix: false })
+```
+
+`installChunkReload`: after a deploy, a tab (or a stale `index.html`) still on
+the previous build asks for route chunks that no longer exist, and the lazy
+import fails ("Failed to fetch dynamically imported module"). The navigation
+would abort and the page stay where it was (e.g. on `/#/sso/callback` right
+after signing in). Instead the page reloads once on the route it was going to,
+so the current build loads; a second failure for the same route in that tab is
+left alone (sessionStorage `resaasChunkReload`), never a reload loop.
+
 ## "Not found" route
 
 `restRoutes` includes `/route/:route/:id` → `RotaEnexistente.vue`, used as

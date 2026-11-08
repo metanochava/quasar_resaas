@@ -9,6 +9,7 @@ export * from './router/restRoutes.js'
 export * from './router/authRoutes.js'
 export * from './router/docsRoutes.js'
 export * from './router/authGuard.js'
+export * from './router/chunkReload.js'
 
 
 // =========================================================
