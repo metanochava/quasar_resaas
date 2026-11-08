@@ -62,6 +62,27 @@
                 {{ Object.keys(models).length }} {{ tdc('models') }}
               </div>
             </q-item-section>
+
+            <!-- whether this profile's menu shows the module (only the menu:
+                 the permissions are unchanged) -->
+            <q-item-section v-if="Permission.appLabelOf(models)" side>
+              <s-btn
+                flat
+                round
+                dense
+                :icon="Permission.isMenuVisible(Permission.appLabelOf(models)) ? 'visibility' : 'visibility_off'"
+                :color="Permission.isMenuVisible(Permission.appLabelOf(models)) ? 'primary' : 'grey'"
+                :loading="Permission.savingMenuApp === Permission.appLabelOf(models)"
+                :data-test="`menu-visibility-${Permission.appLabelOf(models)}`"
+                @click.stop="Permission.setMenuVisible(Permission.appLabelOf(models), !Permission.isMenuVisible(Permission.appLabelOf(models)))"
+              >
+                <s-tooltip>
+                  {{ Permission.isMenuVisible(Permission.appLabelOf(models))
+                    ? tdc('Shown in the menu of this profile. Click to hide it.')
+                    : tdc('Hidden from the menu of this profile. Click to show it.') }}
+                </s-tooltip>
+              </s-btn>
+            </q-item-section>
           </template>
 
           <!-- one cell per model, sized to the screen -->
@@ -194,6 +215,8 @@ watch(
       groupPermissions,
       group
     )
+    // which modules this profile hides from its menu
+    Permission.loadMenuVisibility()
   },
   { immediate: true }
 )

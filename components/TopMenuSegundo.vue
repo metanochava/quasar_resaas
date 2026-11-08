@@ -12,9 +12,13 @@
       class="top-menu-btn"
       :icon="App.icon"
       :label="tdc(App.menu)"
+      :to="isLink(App) ? resolveRoute(App, 0) : undefined"
+      :data-test="isLink(App) ? `top-menu-link-${App.route}` : undefined"
     >
+      <s-tooltip>{{ tdc(App.menu) }}</s-tooltip>
 
-      <q-menu>
+      <!-- a direct top-level link (sidebar ROUTE + ROLE) opens its route -->
+      <q-menu v-if="!isLink(App)">
 
         <q-list
           
@@ -51,6 +55,7 @@ import {
 } from '../stores/EntityTypeStore'
 
 import SubMenu from './SubMenu.vue'
+import { resolveRoute, isMenuLink } from '../services/routing'
 
 import {
   tdc,
@@ -87,7 +92,11 @@ export default defineComponent({
 
       tdc,
 
-      toPlural
+      toPlural,
+
+      resolveRoute,
+
+      isLink: isMenuLink
 
     }
 

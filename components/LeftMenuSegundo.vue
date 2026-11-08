@@ -24,6 +24,8 @@
             :key="App.menu"
             clickable
             v-ripple
+            :to="isLink(App) ? resolveRoute(App, 0) : undefined"
+            :data-test="isLink(App) ? `menu-link-${App.route}` : undefined"
             class="mini-menu-item"
             :class="
               $q.dark.isActive
@@ -50,8 +52,9 @@
               {{ tdc(App.menu) }}
             </s-tooltip>
 
-            <!-- Menu lateral -->
+            <!-- Menu lateral (a direct link has none) -->
             <q-menu
+              v-if="!isLink(App)"
               anchor="top right"
               self="top left"
               :offset="[5, 0]"
@@ -98,9 +101,30 @@
         <!-- ========================= -->
 
         <template v-else>
+          <template v-for="App in User.Menus" :key="App.menu">
+          <!-- a direct top-level link (sidebar ROUTE + ROLE): opens its route -->
+          <q-item
+            v-if="isLink(App)"
+            clickable
+            v-ripple
+            dense
+            :to="resolveRoute(App, 0)"
+            :data-test="`menu-link-${App.route}`"
+            class="text-subtitle1"
+            :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'"
+          >
+            <q-item-section avatar>
+              <q-icon :name="App.icon" />
+            </q-item-section>
+            <q-item-section>
+              <div class="ellipsis">
+                <HighlightText :text="tdc(App.menu)" :search="User.search" />
+              </div>
+            </q-item-section>
+          </q-item>
+
           <q-expansion-item
-            v-for="App in User.Menus"
-            :key="App.menu"
+            v-else
             dense
             class="q-pa-none full-width"
             :class="
@@ -140,6 +164,7 @@
             <q-separator />
 
           </q-expansion-item>
+          </template>
         </template>
 
       </q-list>
@@ -156,6 +181,7 @@ import { useEntityTypeStore } from '../stores/EntityTypeStore'
 
 import SubMenu from './SubMenu.vue'
 import HighlightText from './engine/HighlightText.vue'
+import { resolveRoute, isMenuLink } from '../services/routing'
 
 import {
   barStyle,
@@ -204,6 +230,8 @@ export default defineComponent({
 
       tdc,
       toPlural,
+      resolveRoute,
+      isLink: isMenuLink,
 
       barStyle,
       thumbStyle

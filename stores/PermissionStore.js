@@ -22,7 +22,10 @@ export const usePermissionStore = createBaseStore(
       apps: {},
       search: '',
       loadingPermission: false,
-      dirty: false
+      dirty: false,
+      // app labels this profile does not show in its menu (Group.hidden_menu_apps)
+      hiddenMenuApps: [],
+      savingMenuApp: null
     }),
 
     actions: {
@@ -33,7 +36,50 @@ export const usePermissionStore = createBaseStore(
         this.group = group || null
         this.loadingPermission = false
         this.dirty = false
+        this.hiddenMenuApps = [...(group?.hidden_menu_apps || [])]
         this.buildApps()
+      },
+
+      // the module (app label) of one app section of the editor
+      appLabelOf(models) {
+        for (const perms of Object.values(models || {})) {
+          const label = perms?.find((permission) => permission?.app_label)?.app_label
+          if (label) return label
+        }
+        return null
+      },
+
+      isMenuVisible(appLabel) {
+        return !this.hiddenMenuApps.includes(appLabel)
+      },
+
+      // the group as the API returns it (GroupSerializer) carries the hidden
+      // modules; the row the editor was opened with may not
+      async loadMenuVisibility() {
+        const id = this.group?.id
+        if (!id) return
+        try {
+          const { data } = await HTTPAuth.get(url({ type: 'u', url: `auth/groups/${id}/` }))
+          if (this.group?.id === id) this.hiddenMenuApps = [...(data?.hidden_menu_apps || [])]
+        } catch {
+          // keeps what the row had; the toggle still works
+        }
+      },
+
+      // only the menu of this profile: the permissions are unchanged
+      async setMenuVisible(appLabel, visible) {
+        if (!this.group?.id || !appLabel) return
+        this.savingMenuApp = appLabel
+        try {
+          const { data } = await HTTPAuth.post(
+            url({ type: 'u', url: `auth/groups/${this.group.id}/menu_visibility/` }),
+            { app_label: appLabel, visible: !!visible }
+          )
+          this.hiddenMenuApps = [...(data?.hidden_menu_apps || [])]
+          this.group.hidden_menu_apps = [...this.hiddenMenuApps]
+        } finally {
+          this.savingMenuApp = null
+        }
       },
 
       buildApps() {
