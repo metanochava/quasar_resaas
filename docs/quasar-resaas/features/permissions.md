@@ -72,8 +72,16 @@ what a whole-form PATCH does, is accepted.
 
 By convention, each route's `meta.requiredRole` is the route's own name
 (`list_cargo`, `add_cargo`, ...) — see [routing/routes.md](../routing/routes.md).
-The host's navigation guard checks `User.can(to.meta.requiredRole)` before
-allowing entry.
+The host's navigation guard (`installAuthGuard`, `router/authGuard.js`)
+checks `meta.requiredRole` against the stored `userPermissions` before
+allowing entry. Those are written when a profile is chosen
+(`GroupStore.getUserPermissions()`), while the menu is fetched on every load,
+so a permission the profile gained later (a profile file synced on deploy, an
+administrator's change) could show in the menu and still be refused. When the
+permission is missing, the guard therefore asks the backend once
+(`GroupStore.getUserPermissions()`, at most once every 10 s) and refuses only
+if it is still missing. `installAuthGuard(router, { refreshPermissions })`
+replaces that refresh (`null` turns it off).
 
 ## Group-level permission management
 

@@ -67,22 +67,54 @@ function routeLabel(to) {
   return to.meta?.title || String(to.name || to.fullPath || '')
 }
 
+// The stored 'userPermissions' are only written when a profile is chosen
+// (GroupStore.select/getUserPermissions), while the menu is fetched again on
+// every load: a permission the profile gained later (a profile file synced
+// on deploy, an admin's change) showed in the menu and was still refused
+// here. So a missing permission is asked to the backend once before the
+// route is refused - at most once every REFRESH_INTERVAL_MS, so a user who
+// really lacks it does not cost a request per click.
+const REFRESH_INTERVAL_MS = 10000
+let lastRefresh = 0
+
+async function refreshFromGroupStore () {
+  const { useGroupStore } = await import('../stores/GroupStore')
+  await useGroupStore().getUserPermissions()
+}
+
 export function installAuthGuard(router, {
   loginRouteName = 'login',
-  forbiddenRouteName = 'dashboard'
+  forbiddenRouteName = 'dashboard',
+  refreshPermissions = refreshFromGroupStore
 } = {}) {
+  lastRefresh = 0
+
+  function deny (to) {
+    AlertWarning(
+      `${tdc('Profile')} "${currentProfileLabel()}" ${tdc('does not have permission for route')} "${routeLabel(to)}"`
+    )
+
+    return { name: forbiddenRouteName }
+  }
+
   function check (to) {
     if (to.meta?.requiresAuth && !getStorage('l', 'access')) {
       return { name: loginRouteName, query: { redirect: to.fullPath } }
     }
 
-    if (to.meta?.requiredRole && !hasRequiredRole(to.meta.requiredRole)) {
-      AlertWarning(
-        `${tdc('Profile')} "${currentProfileLabel()}" ${tdc('does not have permission for route')} "${routeLabel(to)}"`
-      )
+    const role = to.meta?.requiredRole
+    if (!role || hasRequiredRole(role)) return
 
-      return { name: forbiddenRouteName }
+    const now = Date.now()
+    if (!refreshPermissions || !getStorage('l', 'access') || now - lastRefresh < REFRESH_INTERVAL_MS) {
+      return deny(to)
     }
+
+    lastRefresh = now
+    return Promise.resolve()
+      .then(() => refreshPermissions())
+      .catch(() => {})
+      .then(() => (hasRequiredRole(role) ? undefined : deny(to)))
   }
 
   router.beforeEach((to) => {

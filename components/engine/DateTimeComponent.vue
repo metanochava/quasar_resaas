@@ -3,7 +3,7 @@
     v-bind="inputAttrs"
     v-model="displayValue"
     :label="translatedLabel"
-    :placeholder="translatedPlaceholder"
+    :placeholder="translatedPlaceholder || pattern"
     :hint="translatedHint"
     :error="hasError"
     :error-message="firstError"
@@ -13,9 +13,7 @@
     :filled="attrs.filled"
     :standout="attrs.standout"
     :class="['s-date-time', attrs.class]"
-    mask="####-##-##"
-    fill-mask
-    
+    mask="##/##/#### ##:##"
   >
     <template #append>
       <q-icon
@@ -31,13 +29,14 @@
             <q-date
               v-model="dateValue"
               mask="YYYY-MM-DD"
+              :locale="calendarLocale"
             />
 
             <q-separator />
 
             <q-time
               v-model="timeValue"
-              mask="HH:mm:ss"
+              mask="HH:mm"
               format24h
             />
 
@@ -63,6 +62,10 @@
 import { defineComponent, computed, useAttrs, ref, watch } from "vue"
 import { useUserStore } from "../../stores/UserStore"
 import { tdc } from "../../services/translation"
+import {
+  dateOrder, datePattern, dateLocale,
+  splitIsoDateTime, isoDateTimeToDisplay, displayToIsoDateTime
+} from "../../utils/dateFormat"
 
 export default defineComponent({
   name: "s-date-time",
@@ -108,60 +111,71 @@ export default defineComponent({
 
     const layout = computed(() => User.ps?.layout || {})
 
-    const localValue = ref(props.modelValue)
+    // shown and typed in the language's order ("09/11/2026 14:30" in pt-pt,
+    // "11/09/2026 14:30" in en-us, 24h); v-model is always ISO
+    // "YYYY-MM-DD HH:mm:ss" (utils/dateFormat.js)
+    const languageCode = computed(() => User.Language?.code || '')
+    const order = computed(() => dateOrder(languageCode.value))
+    const pattern = computed(() => `${tdc(datePattern(order.value))} HH:mm`)
+    const calendarLocale = computed(() => dateLocale(languageCode.value))
 
+    const displayValue = ref(isoDateTimeToDisplay(props.modelValue, order.value))
     const dateValue = ref("")
-    const timeValue = ref("00:00:00")
+    const timeValue = ref("00:00")
 
     const hasError = computed(() => !!props.error)
     const firstError = computed(() =>
       (typeof props.error === "string" && props.error) || props.errorMessage || ""
     )
 
+    // the pickers start on the current value
+    function syncPickers (value) {
+      const { date, time } = splitIsoDateTime(value)
+      dateValue.value = date
+      timeValue.value = time || "00:00"
+    }
+    syncPickers(props.modelValue)
+
     watch(
       () => props.modelValue,
       v => {
-        localValue.value = v
-
-        if (v) {
-          const parts = String(v).split(" ")
-
-          dateValue.value = parts[0] || ""
-          timeValue.value = parts[1] || "00:00:00"
-        }
-      },
-      { immediate: true }
+        syncPickers(v)
+        // what was typed already means this value: keep the text as typed
+        const typed = displayToIsoDateTime(displayValue.value, order.value)
+        if (typed && splitIsoDateTime(typed).date === splitIsoDateTime(v).date &&
+            splitIsoDateTime(typed).time === splitIsoDateTime(v).time) return
+        displayValue.value = isoDateTimeToDisplay(v, order.value)
+      }
     )
 
-    watch(localValue, v => {
-      emit("update:modelValue", v)
+    watch(order, () => {
+      displayValue.value = isoDateTimeToDisplay(props.modelValue, order.value)
     })
 
-    const displayValue = computed({
-      get() {
-        return localValue.value
-      },
-      set(v) {
-        localValue.value = v
-      }
+    watch(displayValue, text => {
+      // incomplete or impossible: no value yet
+      const iso = displayToIsoDateTime(text, order.value)
+      if ((iso || null) !== (props.modelValue || null)) emit("update:modelValue", iso)
     })
 
     function applyDateTime() {
       if (!dateValue.value) return
-
-      localValue.value =
-        `${dateValue.value} ${timeValue.value || "00:00:00"}`
+      displayValue.value = isoDateTimeToDisplay(`${dateValue.value} ${timeValue.value || "00:00"}`, order.value)
     }
 
     const computedRules = computed(() => {
       const rules = []
 
       if (props.required) {
-        rules.push(v => !!v || tdc("Required field"))
+        rules.push(v => !!String(v || '').trim() || tdc("Required field"))
       }
 
+      // something typed that is not a date and time in the language's order
+      rules.push(v => !String(v || '').trim() || !!displayToIsoDateTime(v, order.value) || tdc("Invalid date"))
+
+      // the field's own validators see the ISO value, as before
       for (const validator of props.validators) {
-        rules.push(validator)
+        rules.push(v => validator(displayToIsoDateTime(v, order.value)))
       }
 
       return rules
@@ -206,7 +220,8 @@ export default defineComponent({
     return {
       attrs,
       layout,
-      localValue,
+      pattern,
+      calendarLocale,
       dateValue,
       timeValue,
       displayValue,

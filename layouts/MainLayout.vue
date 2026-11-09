@@ -120,24 +120,35 @@
 
     <!-- -------------------- PAGE CONTAINER -------------------- -->
 
+   <!-- the routes scroll INSIDE their own area (like a card), between the
+        header, the footer and the drawers - not the whole page: the
+        scrollbar starts under the header instead of running the device's
+        full height. html/body do not scroll while this layout is mounted
+        (html.resaas-route-scroll). -->
    <q-page-container
-      class="page-container full-height"
+      class="page-container"
       :class="$q.dark.isActive ? 'bg-dark-saas text-white' : 'bg-saass'"
     >
+      <div
+        ref="routeScroll"
+        class="route-scroll scroll-y"
+        data-test="route-scroll"
+        @scroll.passive="onRouteScroll"
+      >
+        <router-view v-slot="{ Component }">
 
-      <router-view v-slot="{ Component }">
+          <transition
+            v-if="ps.animation?.enable_animations"
+            :name="ps.animation?.page_transition?.value || 'fade'"
+            mode="out-in"
+          >
+            <component :is="Component" />
+          </transition>
 
-        <transition
-          v-if="ps.animation?.enable_animations"
-          :name="ps.animation?.page_transition?.value || 'fade'"
-          mode="out-in"
-        >
-          <component :is="Component" />
-        </transition>
+          <component v-else :is="Component" />
 
-        <component v-else :is="Component" />
-
-      </router-view>
+        </router-view>
+      </div>
 
     </q-page-container>
 
@@ -146,10 +157,14 @@
 
     <Rodape />
 
-    <!-- -------------------- PAGE SCROLLER -------------------- -->
-    <q-page-scroller position="bottom-right" :scroll-offset="50" :offset="[18, -10]">
-      <s-btn icon="keyboard_arrow_up" color="primary" round />
-    </q-page-scroller>
+    <!-- -------------------- PAGE SCROLLER --------------------
+         back to the top of the routes' own scroll area (q-page-scroller
+         only follows the page's scroll, which no longer moves) -->
+    <q-page-sticky v-if="showScrollTop" position="bottom-right" :offset="[18, 18]">
+      <s-btn icon="keyboard_arrow_up" color="primary" round data-test="route-scroll-top" @click="scrollRouteToTop">
+        <s-tooltip>{{ tdc('Back to top') }}</s-tooltip>
+      </s-btn>
+    </q-page-sticky>
   </q-layout>
 </template>
 
@@ -235,6 +250,7 @@ export default defineComponent({
       visibilidadeLoad: false,
       comments: false,
       miniState: false,
+      showScrollTop: false,
     }
   },
 
@@ -390,12 +406,20 @@ export default defineComponent({
 
 
     // 🔥 RESTORE SCROLL
+    // the page itself no longer scrolls: the routes' own area does
+    document.documentElement.classList.add('resaas-route-scroll')
+
     const scroll = localStorage.getItem('scroll_position')
     if (scroll) {
       setTimeout(() => {
-        window.scrollTo(0, parseInt(scroll))
+        this.$refs.routeScroll?.scrollTo(0, parseInt(scroll))
       }, 100)
     }
+
+    // a new route starts at its top
+    this.$watch(() => this.$route.path, () => {
+      this.$refs.routeScroll?.scrollTo(0, 0)
+    })
 
     // 🔥 your original behavior
     if (['welcome'].includes(this.$route.name)){
@@ -411,11 +435,23 @@ export default defineComponent({
 
     // 🔥 SAVE SCROLL ON EXIT
     window.addEventListener('beforeunload', () => {
-      localStorage.setItem('scroll_position', window.scrollY)
+      localStorage.setItem('scroll_position', this.$refs.routeScroll?.scrollTop || 0)
     })
   },
 
+  beforeUnmount () {
+    document.documentElement.classList.remove('resaas-route-scroll')
+  },
+
   methods: {
+    onRouteScroll (event) {
+      this.showScrollTop = event.target.scrollTop > 50
+    },
+
+    scrollRouteToTop () {
+      this.$refs.routeScroll?.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+
     // the user's own appearance changed: reload /me/ (its ui_config is the
     // effective User > Entity > EntityType look) and apply it
     async onThemeSaved () {
@@ -427,6 +463,21 @@ export default defineComponent({
 </script>
 
 <style>
+/* the routes' own scroll area (see the q-page-container comment): the
+   container takes the viewport, its padding is the header / footer room
+   Quasar gives it, and the inner area scrolls */
+html.resaas-route-scroll,
+html.resaas-route-scroll body {
+  height: 100%;
+  overflow: hidden;
+}
+
+.route-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
 /* menu_rtl (LayoutSetting) - troca a direcção do header; os drawers
    trocam de lado via :side em vez de CSS (ver menuRtl no script). */
@@ -445,9 +496,12 @@ html, body, #q-app {
   /* overflow: hidden; 🔥 locks global scroll */
 }
 
-/* 🔥 main container */
+/* 🔥 main container: the viewport's height (its padding is the header /
+   footer room), the routes' area (.route-scroll) scrolls inside it */
 .page-container {
-  height: 100%;
+  height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   overflow: hidden;

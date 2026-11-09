@@ -20,7 +20,8 @@ const fakeRouter = {
 beforeEach(() => {
   localStorage.clear()
   AlertWarning.mockClear()
-  installAuthGuard(fakeRouter)
+  // the refresh-before-refusing path has its own tests below
+  installAuthGuard(fakeRouter, { refreshPermissions: null })
 })
 
 describe('installAuthGuard - requiresAuth', () => {
@@ -144,7 +145,7 @@ describe('installAuthGuard - requiredRole', () => {
   })
 
   it('respects a custom forbiddenRouteName', () => {
-    installAuthGuard(fakeRouter, { forbiddenRouteName: 'forbidden' })
+    installAuthGuard(fakeRouter, { forbiddenRouteName: 'forbidden', refreshPermissions: null })
 
     const result = guardFn({
       meta: { requiresAuth: true, requiredRole: 'add_app' },
@@ -197,5 +198,49 @@ describe('installAuthGuard - single sign-on', () => {
   it('on the central domain itself the local login is shown', () => {
     window.location.origin = 'https://auth.mytech.co.mz'
     expect(guardFn({ meta: { requiresAuth: true }, fullPath: '/protected' })).toEqual({ name: 'login', query: { redirect: '/protected' } })
+  })
+})
+
+
+describe('installAuthGuard - a permission the profile gained later', () => {
+  // The menu is fetched on every load but 'userPermissions' only when a
+  // profile is chosen: a permission added to the profile afterwards showed in
+  // the menu and the route was still refused ("Admin" / view_employee).
+  beforeEach(() => {
+    localStorage.setItem('access', 'a-real-token')
+    localStorage.setItem('userPermissions', JSON.stringify(['view_hr_dashboard']))
+  })
+
+  it('asks the backend once and lets the route through when the profile has it now', async () => {
+    const refreshPermissions = vi.fn(async () => {
+      localStorage.setItem('userPermissions', JSON.stringify(['view_hr_dashboard', 'view_employee']))
+    })
+    installAuthGuard(fakeRouter, { refreshPermissions })
+
+    const result = await guardFn({ meta: { requiresAuth: true, requiredRole: 'view_employee' }, fullPath: '/employee/1' })
+
+    expect(refreshPermissions).toHaveBeenCalledTimes(1)
+    expect(result).toBeUndefined()
+    expect(AlertWarning).not.toHaveBeenCalled()
+  })
+
+  it('still refuses when the refreshed permissions do not have it, and does not ask again right away', async () => {
+    const refreshPermissions = vi.fn(async () => {})
+    installAuthGuard(fakeRouter, { refreshPermissions })
+    const to = { meta: { requiresAuth: true, requiredRole: 'add_app' }, fullPath: '/add_app' }
+
+    expect(await guardFn(to)).toEqual({ name: 'dashboard' })
+    expect(await guardFn(to)).toEqual({ name: 'dashboard' })
+
+    expect(refreshPermissions).toHaveBeenCalledTimes(1)
+    expect(AlertWarning).toHaveBeenCalledTimes(2)
+  })
+
+  it('a failed refresh refuses as before', async () => {
+    installAuthGuard(fakeRouter, { refreshPermissions: vi.fn(async () => { throw new Error('offline') }) })
+
+    const result = await guardFn({ meta: { requiresAuth: true, requiredRole: 'add_app' }, fullPath: '/add_app' })
+
+    expect(result).toEqual({ name: 'dashboard' })
   })
 })

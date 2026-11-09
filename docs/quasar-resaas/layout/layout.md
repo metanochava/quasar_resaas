@@ -79,12 +79,22 @@ Another user signing in on the same browser never lands on it, and logout
 removes it ([Persistence](../stores/persistence.md#logout)). The old shared
 `last_route` key is deleted on the next load.
 
+**Route scroll area:** the routes scroll inside their own area
+(`div.route-scroll.scroll-y` in the `q-page-container`), between the header,
+the footer and the drawers, like a card - not the whole page: while
+`MainLayout` is mounted, `html.resaas-route-scroll` stops `html`/`body` from
+scrolling. A new route starts at the top; the position is kept across a
+reload (`scroll_position`); the "back to top" button (`q-page-sticky`) follows
+this area. A `q-infinite-scroll` without `scroll-target` finds it by itself
+(`.scroll-y`); code that read `window.scrollY` must read this element.
+
 **Scrollbars:** both drawers scroll in a `q-scroll-area` styled by
 `thumbStyle`/`barStyle` (`services/app.js`). Every native scrollbar (the
 page on the right edge, any panel with `overflow`) has the same look, set in
 `css/theme_engine.css`: an 8px rounded thumb (3px transparent border on a
 14px transparent track) in the solid `--scrollbar-accent`, which is the
-Entity's `--q-primary` (set by `theme/applyTheme.js`), or white in dark mode
+Entity's `--q-primary` (set by `theme/applyTheme.js` on `<body>` and on
+`<html>`, where the page's own scrollbar resolves it), or white in dark mode
 - the colour the menus show, since their translucent thumb and track sit
 on the drawer's own primary background.
 Chrome/Edge/Safari draw it with `::-webkit-scrollbar` (Chrome 121+ ignores

@@ -34,6 +34,11 @@ export function applyTheme(theme = {}) {
     if (!isColorValue(value)) return
 
     setCssVar(key, value)
+    // Quasar's setCssVar() writes on <body>; <html> keeps Quasar's default
+    // (--q-primary #1976D2). The page's own scrollbar belongs to <html> and
+    // --scrollbar-accent (css/theme_engine.css) is resolved there, so the
+    // colours go on <html> too - the scrollbars follow the site's colour.
+    setCssVar(key, value, root)
   })
 
   root.style.setProperty('--input-bg', theme.input_background || '#ffffff')

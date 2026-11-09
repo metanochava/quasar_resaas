@@ -3,7 +3,8 @@
   --scrollbar-accent: var(--q-primary);
 }
 
-body.body--dark {
+body.body--dark,
+html:has(body.body--dark) {
   --scrollbar-accent: #ffffff;
 }
 
