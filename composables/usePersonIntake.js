@@ -70,6 +70,7 @@ export function usePersonIntake() {
       numero: '',
       data_emissao: null,
       data_validade: null,
+      issued_by: '',
       // a document may have several files: the ones already saved
       // (DocumentFile, from the API), the new ones chosen here, and the
       // saved ones removed here (deleted on save)
@@ -82,6 +83,31 @@ export function usePersonIntake() {
   function removeSavedDocumentFile(doc, fileId) {
     doc.files = (doc.files || []).filter(f => f.id !== fileId)
     doc.removedFileIds = [...(doc.removedFileIds || []), fileId]
+  }
+
+  // the person's identity document type (Person.identity_document_type):
+  // chosen in the personal data, it becomes the type of the first document
+  function setIdentityDocumentType(type) {
+    Person.form.identity_document_type = type || null
+    if (!type) return
+    if (!documents.value.length) addDocument()
+    documents.value[0].tipo = type
+  }
+
+  // a document with type and number - of the identity type when the person
+  // has one (the backend rule: patient_registration_service.has_identity_document)
+  function hasIdentityDocument() {
+    const identityType = typeId(Person.form.identity_document_type)
+    return documents.value.some(d =>
+      d?.tipo && String(d.numero || '').trim() &&
+      (!identityType || String(typeId(d.tipo)) === String(identityType))
+    )
+  }
+
+  // a page that needs an identity document (e.g. add/change patient) starts
+  // the section with one row to fill when the person has none
+  function ensureDocumentRow() {
+    if (!documents.value.length) addDocument()
   }
 
   function removeDocument(index) {
@@ -242,7 +268,10 @@ export function usePersonIntake() {
   // person is never edited from here - so personData/photo are only sent
   // for a genuinely new Person.
   function buildPersonData() {
-    return omit(Person.form, ['photo', 'id'])
+    const data = omit(Person.form, ['photo', 'id'])
+    // a relation sent as its raw id (the select holds {value, label})
+    if (data.identity_document_type) data.identity_document_type = rawValue(data.identity_document_type)
+    return data
   }
 
   function registrationPayload() {
@@ -259,6 +288,7 @@ export function usePersonIntake() {
           numero: d.numero,
           data_emissao: d.data_emissao || null,
           data_validade: d.data_validade || null,
+          issued_by: d.issued_by || null,
           arquivos: (d.arquivos || []).filter(f => f instanceof File)
         })),
       contacts: contacts.value
@@ -329,6 +359,7 @@ export function usePersonIntake() {
         numero: fields.numero,
         data_emissao: fields.data_emissao || null,
         data_validade: fields.data_validade || null,
+        issued_by: fields.issued_by || null,
         arquivos: (row.arquivos || []).filter(f => f instanceof File)
       })
     }
@@ -433,7 +464,8 @@ export function usePersonIntake() {
     return !!(
       selectedPerson.value ||
       Person.form.name || Person.form.surname || Person.form.email || Person.form.phone ||
-      documents.value.length || contacts.value.some(c => c.name?.trim())
+      documents.value.some(d => d.tipo || String(d.numero || '').trim()) ||
+      contacts.value.some(c => c.name?.trim())
     )
   }
 
@@ -446,7 +478,8 @@ export function usePersonIntake() {
     matchDialogOpen, matchCandidatesList,
     // helpers
     fieldOf,
-    addContact, removeContact, addDocument, removeDocument,
+    addContact, removeContact, addDocument, removeDocument, ensureDocumentRow,
+    setIdentityDocumentType, hasIdentityDocument,
     // matching
     resolveMatch, clearSelectedPerson, useExistingPerson, showSelectedPerson,
     detailOpen, detail, detailLoading, pickerValue, onPersonPicked,

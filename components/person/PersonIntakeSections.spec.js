@@ -58,6 +58,11 @@ describe('PersonIntakeSections', () => {
     }
   })
 
+  it('says the identity document is required only when the page asks for it', () => {
+    expect(mountSections().find('[data-test="identity-document-required"]').exists()).toBe(false)
+    expect(mountSections({ identityDocumentRequired: true }).find('[data-test="identity-document-required"]').exists()).toBe(true)
+  })
+
   it('binds the personal fields to Person.form (v-model both ways)', async () => {
     intake.Person.form = { name: 'Ana' }
     const wrapper = mountSections()

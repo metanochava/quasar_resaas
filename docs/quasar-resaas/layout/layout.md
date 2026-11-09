@@ -81,11 +81,16 @@ removes it ([Persistence](../stores/persistence.md#logout)). The old shared
 
 **Scrollbars:** both drawers scroll in a `q-scroll-area` styled by
 `thumbStyle`/`barStyle` (`services/app.js`). Every native scrollbar (the
-page on the right edge, any panel with `overflow`) uses the same colour,
-set in `css/theme_engine.css`: `--scrollbar-accent`, which is the Entity's
-`--q-primary` (set by `theme/applyTheme.js`), or white in dark mode, at the
-same opacities (thumb 75%, track 20%). Firefox and Chrome 121+ read
-`scrollbar-color`; older WebKit reads `::-webkit-scrollbar`.
+page on the right edge, any panel with `overflow`) has the same look, set in
+`css/theme_engine.css`: an 8px rounded thumb (3px transparent border on a
+14px transparent track) in the solid `--scrollbar-accent`, which is the
+Entity's `--q-primary` (set by `theme/applyTheme.js`), or white in dark mode
+- the colour the menus show, since their translucent thumb and track sit
+on the drawer's own primary background.
+Chrome/Edge/Safari draw it with `::-webkit-scrollbar` (Chrome 121+ ignores
+those rules on an element that has `scrollbar-color`, so that property is
+only set, under `@supports not selector(::-webkit-scrollbar)`, for Firefox,
+which shows a thin bar in the same colours without the rounded track).
 
 ### Header brand and website button
 

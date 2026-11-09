@@ -417,3 +417,42 @@ describe('usePersonIntake - several files per document', () => {
     expect(intake.registrationPayload().documents[0].arquivos).toEqual([a, b])
   })
 })
+
+describe('usePersonIntake - the identity document row', () => {
+  it('ensureDocumentRow adds one row only when there is none, and a blank row is not unsaved data', () => {
+    intake.reset({ withBlankContact: false })
+    intake.ensureDocumentRow()
+    intake.ensureDocumentRow()
+
+    expect(intake.documents.value).toHaveLength(1)
+    expect(intake.hasUnsavedData()).toBe(false)
+
+    intake.documents.value[0].numero = '110100253480B'
+    expect(intake.hasUnsavedData()).toBe(true)
+  })
+})
+
+describe('usePersonIntake - the person\'s identity document type', () => {
+  it('fills the type of the first document (adding one when there is none)', () => {
+    intake.reset({ withBlankContact: false })
+    const bi = { value: 'bi', label: 'BI' }
+
+    intake.setIdentityDocumentType(bi)
+
+    expect(intake.Person.form.identity_document_type).toEqual(bi)
+    expect(intake.documents.value).toHaveLength(1)
+    expect(intake.documents.value[0].tipo).toEqual(bi)
+  })
+
+  it('an identity document must be of that type, and is sent as its id', () => {
+    intake.reset({ withBlankContact: false })
+    intake.addDocument()
+    Object.assign(intake.documents.value[0], { tipo: { value: 'nuit', label: 'NUIT' }, numero: '1' })
+    intake.Person.form.identity_document_type = { value: 'bi', label: 'BI' }
+
+    expect(intake.hasIdentityDocument()).toBe(false)
+    intake.documents.value[0].tipo = { value: 'bi', label: 'BI' }
+    expect(intake.hasIdentityDocument()).toBe(true)
+    expect(intake.registrationPayload().personData.identity_document_type).toBe('bi')
+  })
+})

@@ -220,7 +220,10 @@ export default defineComponent({
 
       async (newLanguage) => {
 
-        if (!newLanguage) {
+        // the initial {} of LanguageStore.current (immediate watch, every
+        // page load) is no language: it used to overwrite the stored one and
+        // drop the L header of every request until me() put it back
+        if (!newLanguage?.id) {
           return
         }
 

@@ -197,6 +197,7 @@
                     <span v-if="doc.data_emissao && doc.data_validade"> · </span>
                     <span v-if="doc.data_validade">{{ tdc('Expires') }} {{ formatDate(doc.data_validade) }}</span>
                   </q-item-label>
+                  <q-item-label v-if="doc.issued_by" caption>{{ tdc('Issued by') }}: {{ doc.issued_by }}</q-item-label>
                 </q-item-section>
 
                 <q-item-section side>

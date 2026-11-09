@@ -13,6 +13,11 @@ multi-tenancy on the frontend side.
     via `LanguageStore` to the returned `language`. This is the effective
     language (User > Entity > EntityType > pt-pt, resolved by the backend);
     `own_language` is the user's own choice, or `null`.
+-   `setLanguage(language)` stores the language whose id is the `L` header of
+    every request (`userLang`). A language without `id` is ignored: the
+    initial `{}` of `LanguageStore.current` (seen by `HeaderLanguage`'s
+    immediate watch on every page load) used to overwrite it and drop the
+    header until `me()` put it back. Tests: `stores/UserStore.language.spec.js`.
 -   `LanguageStore.choose(language)` — the user's pick (header menus,
     Account Center): applies it and, when signed in, saves it with
     `PATCH django_resaas/users/{id}/ {language}`. `choose(null)` goes back

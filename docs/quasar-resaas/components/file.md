@@ -55,6 +55,17 @@ chosen files (a browser cannot store them).
 
 Tests: `composables/usePersonIntake.spec.js`, `stores/DocumentStore.files.spec.js`.
 
+## The identity document
+
+`Person.identity_document_type` is in the personal data ("Identity document").
+Choosing it calls `setIdentityDocumentType(type)`, which fills the first document's
+type (adding a row when there is none); loading a person never changes its saved
+documents. `hasIdentityDocument()` is true with a document that has a type and a
+number, of the identity type when one is chosen. A page that requires it passes
+`identity-document-required` to `<s-person-intake>` (a hint in the Documents section)
+and calls `ensureDocumentRow()` (one row to fill when there is none; a blank row is
+not unsaved data).
+
 ## Previewing a stored file (`s-file-preview`)
 
 `components/engine/FilePreviewCard.vue`, registered as `s-file-preview` and exported as

@@ -372,7 +372,10 @@ export const useUserStore = createBaseStore(
       }
     },
 
+    // the stored language sets the L header of every request: a language
+    // without id (LanguageStore.current starts as {}) never replaces it
     setLanguage(language){
+      if (!language?.id) return
       this.Language = language
       setStorage('l', 'userLang', JSON.stringify(language))
     },

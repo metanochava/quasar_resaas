@@ -7,30 +7,43 @@ body.body--dark {
   --scrollbar-accent: #ffffff;
 }
 
-/* native scrollbars (the page on the right edge, panels with overflow) follow
-   the same dynamic colour as the side menus' q-scroll-area (services/app.js
-   thumbStyle 0.75 / barStyle 0.2): the Entity's primary colour, white in dark
-   mode. Firefox and Chrome 121+ read scrollbar-color; older WebKit the
-   ::-webkit-scrollbar rules. */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--scrollbar-accent) 75%, transparent)
-    color-mix(in srgb, var(--scrollbar-accent) 20%, transparent);
-}
-
+/* native scrollbars (the page on the right edge, panels with overflow) look
+   like the side menus' q-scroll-area (services/app.js): an 8px rounded thumb
+   in --scrollbar-accent (the Entity's primary colour, white in dark mode) on
+   a 14px track. The menus draw thumb (75%) and track (20%) translucent over
+   their own primary background, so what is seen there is the plain accent
+   colour with no visible track: here the thumb is the solid accent and the
+   track is left transparent, so the page shows the same colour. The thumb's 3px transparent border
+   (background-clip) is the space the menu's thumb keeps inside its bar.
+   Chrome 121+ drops the ::-webkit-scrollbar rules for any element with
+   scrollbar-color, so the standard properties are only for browsers without
+   ::-webkit-scrollbar (Firefox), which cannot draw the rounded track. */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 14px;
+  height: 14px;
 }
 
 ::-webkit-scrollbar-track {
-  background: color-mix(in srgb, var(--scrollbar-accent) 20%, transparent);
+  background: transparent;
   border-radius: 14px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--scrollbar-accent) 75%, transparent);
+  background: var(--scrollbar-accent);
+  background-clip: padding-box;
+  border: 3px solid transparent;
   border-radius: 8px;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-accent) transparent;
+  }
 }
 
 /* HOVER */

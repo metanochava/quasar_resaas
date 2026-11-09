@@ -196,6 +196,17 @@
                       dense outlined
                     />
                   </div>
+                  <!-- the type of the identity document: it fills the type of the
+                       first document below (and is what the documents print) -->
+                  <div class="col-12 col-sm-4" data-test="identity-document-type">
+                    <s-field
+                      :model-value="Person.form.identity_document_type"
+                      :field="fieldOf(Person, 'identity_document_type')"
+                      :label="tdc('Identity document')"
+                      dense outlined
+                      @update:model-value="setIdentityDocumentType"
+                    />
+                  </div>
 
                   <!-- filiation, as on identity documents -->
                   <div class="col-12 col-sm-6">
@@ -317,6 +328,13 @@
 
           <q-separator />
 
+          <q-card-section v-if="identityDocumentRequired" class="q-pb-none" data-test="identity-document-required">
+            <div class="row items-center no-wrap text-caption text-primary">
+              <q-icon name="info" size="18px" class="q-mr-sm" />
+              {{ tdc('An identity document with its type and number is required: it is printed on the documents issued for this person.') }}
+            </div>
+          </q-card-section>
+
         <!-- Existing documents (read-only) - the matched person's own
                documents, from PersonAPIView.match's own response - never
                recreated, only shown so the admin can see what's already
@@ -355,13 +373,10 @@
               <div class="col-12 col-sm-6 col-md-3">
                 <s-field v-model="doc.numero" :field="fieldOf(Document, 'numero')" :label="tdc('Number')" :filled="false" dense outlined />
               </div>
-              <div class="col-12 col-sm-6 col-md-3">
-                <s-field v-model="doc.data_emissao" :field="fieldOf(Document, 'data_emissao')" :label="tdc('Issue date')" :filled="false" dense outlined />
+              <div class="col-12 col-sm-6 col-md-5">
+                <s-field v-model="doc.issued_by" :field="fieldOf(Document, 'issued_by')" :label="tdc('Issued by')" :filled="false" dense outlined />
               </div>
-              <div class="col-12 col-sm-6 col-md-2">
-                <s-field v-model="doc.data_validade" :field="fieldOf(Document, 'data_validade')" :label="tdc('Expiry date')" :filled="false" dense outlined />
-              </div>
-              <div class="col-12 col-md-1 flex flex-center justify-end">
+              <div class="col-12 col-sm-6 col-md-1 flex flex-center justify-end">
                 <s-btn
                   flat
                   round
@@ -372,6 +387,12 @@
                 >
                   <s-tooltip>{{ tdc('Remove document') }}</s-tooltip>
                 </s-btn>
+              </div>
+              <div class="col-12 col-sm-6 col-md-3">
+                <s-field v-model="doc.data_emissao" :field="fieldOf(Document, 'data_emissao')" :label="tdc('Issue date')" :filled="false" dense outlined />
+              </div>
+              <div class="col-12 col-sm-6 col-md-3">
+                <s-field v-model="doc.data_validade" :field="fieldOf(Document, 'data_validade')" :label="tdc('Expiry date')" :filled="false" dense outlined />
               </div>
 
               <!-- the document's files (it may have several: both sides of an
@@ -524,7 +545,10 @@ const props = defineProps({
   intake: { type: Object, required: true },
   // The owning page's Person relation config (schema field "person" ->
   // relation_config). Omit it (edit pages) to hide the picker.
-  relationConfig: { type: Object, default: null }
+  relationConfig: { type: Object, default: null },
+  // the page needs an identity document (type and number), printed on the
+  // person's documents: the Documents section says so (add/change patient)
+  identityDocumentRequired: { type: Boolean, default: false }
 })
 
 const {
@@ -533,7 +557,7 @@ const {
   matchDialogOpen, matchCandidatesList,
   fieldOf,
   addContact, removeContact, addDocument, removeDocument,
-  removeSavedDocumentFile,
+  removeSavedDocumentFile, setIdentityDocumentType,
   clearSelectedPerson, pickerValue, onPersonPicked,
   showSelectedPerson, detailOpen, detail, detailLoading,
   onMatchSelect, onMatchCreateNew, onMatchCancel
