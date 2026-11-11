@@ -52,8 +52,12 @@
 
         <!-- User account (login linked to this Person, read-only) -->
         <s-card flat bordered class="user-card">
-          <q-card-section class="section-title">
-            <q-icon name="manage_accounts" size="20px" /> {{ tdc('User account') }}
+          <q-card-section class="section-title row items-center no-wrap">
+            <q-icon name="manage_accounts" size="20px" class="q-mr-xs" /> {{ tdc('User account') }}
+            <q-space />
+            <!-- the page's own account actions on the right of the title
+                 (e.g. the employee profile's Security button) -->
+            <slot name="account-actions" />
           </q-card-section>
           <q-separator />
           <q-card-section v-if="userInfo">

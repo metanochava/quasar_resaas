@@ -206,6 +206,8 @@ const AlertSuccess = (data) => {
 
   // the contract: any number of alerts next to the normal payload (any 2xx)
   pushContractAlerts(data?.data, request)
+  // when the backend said something itself, the generic message is not added
+  const hasContractAlerts = normalizeAlerts(data?.data).length > 0
 
   // Older answers: a status-based generic message, then the backend's alert_* keys.
   // A plain 200 stays silent (as before) - GETs and reads must not toast.
@@ -237,7 +239,7 @@ const AlertSuccess = (data) => {
 
   // the generic message is feedback for a click: not for the sign-in / session
   // plumbing, nor for a request that asked to stay quiet ({ silent: true })
-  if (generic && isSilent(data)) go = false
+  if (generic && (isSilent(data) || hasContractAlerts)) go = false
 
   // backend messages
   if (data?.data?.alert_success) { sms = data.data.alert_success; go = true; generic = false }
@@ -246,7 +248,9 @@ const AlertSuccess = (data) => {
 
   if (data?.data?.alert_warning) { sms = data.data.alert_warning; tipo = 'warning'; go = true; generic = false }
 
-  if (data?.status !== 200 && go) {
+  // a plain 200 to a read never sets `go` (no method case above): a write
+  // answered 200 (PATCH/PUT/DELETE, a POST action) shows its message too
+  if (go) {
     // "Created successfully!" is feedback for the click, not a message to keep
     pushAlert(sms, tipo, { request, history: !generic })
   }

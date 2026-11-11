@@ -39,15 +39,17 @@
                   {{ existingApp.models || 0 }} {{ tdc(existingApp.models === 1 ? 'model' : 'models') }}
                 </div>
                 <div class="row q-gutter-xs q-mt-sm">
-                  <s-btn v-if="can('view_app')" flat dense size="sm" icon="table_chart" :label="tdc('View models')" @click="openModels(existingApp)" />
+                  <s-btn v-if="can('view_app')" flat dense size="sm" icon="table_chart" :label="tdc('View models')" @click="openModels(existingApp)">
+                    <s-tooltip>{{ tdc('See the models of this module') }}</s-tooltip>
+                  </s-btn>
                   <s-btn
                     v-if="can('view_app')"
                     flat dense size="sm" icon="category" :label="tdc('Entity types')"
                     :disable="!existingAppId"
                     @click="openEntityTypes(existingApp)"
                   >
-                    <s-tooltip v-if="!existingAppId">
-                      {{ tdc('This module has no registry entry yet') }}
+                    <s-tooltip>
+                      {{ existingAppId ? tdc('Choose the entity types that use this module') : tdc('This module has no registry entry yet') }}
                     </s-tooltip>
                   </s-btn>
                 </div>
@@ -71,7 +73,9 @@
                 :loading="loading"
                 :disable="!cleanedName || !!existingApp"
                 @click="createApp"
-              />
+              >
+                <s-tooltip>{{ existingApp ? tdc('This module already exists') : tdc('Create the module (backend and frontend folders)') }}</s-tooltip>
+              </s-btn>
             </div>
           </FormSection>
 
@@ -83,15 +87,24 @@
         <div class="row q-col-gutter-md">
 
           <div
-            v-for="app in apps"
+            v-for="app in sortedApps"
             :key="app.name"
             class="col-12 col-sm-6 col-lg-4"
           >
             <s-card bordered flat class="app-card column">
 
               <q-card-section class="row items-center no-wrap">
-                <q-avatar color="primary" text-color="white" icon="folder" />
-
+                <!-- the "i" opens what the module is for (App.description) -->
+                <s-btn
+                  round unelevated color="primary" text-color="white" icon="info"
+                  :disable="!appIdByName[app.name.toLowerCase()]"
+                  :data-test="`app-description-${app.name}`"
+                  @click="openDescription(app)"
+                >
+                  <s-tooltip>
+                    {{ appIdByName[app.name.toLowerCase()] ? tdc('What this module is for') : tdc('This module has no registry entry yet') }}
+                  </s-tooltip>
+                </s-btn>
                 <div class="q-ml-sm col ellipsis">
                   <div class="text-subtitle1 text-weight-medium ellipsis">{{ app.name }}</div>
                   <div class="text-caption app-models-count">
@@ -118,7 +131,9 @@
                   icon="table_chart"
                   :label="tdc('Models')"
                   @click="openModels(app)"
-                />
+                >
+                  <s-tooltip>{{ tdc('See the models of this module') }}</s-tooltip>
+                </s-btn>
                 <s-btn
                   v-if="can('view_app')"
                   flat dense
@@ -127,8 +142,8 @@
                   :disable="!appIdByName[app.name.toLowerCase()]"
                   @click="openEntityTypes(app)"
                 >
-                  <s-tooltip v-if="!appIdByName[app.name.toLowerCase()]">
-                    {{ tdc('This module has no registry entry yet') }}
+                  <s-tooltip>
+                    {{ appIdByName[app.name.toLowerCase()] ? tdc('Choose the entity types that use this module') : tdc('This module has no registry entry yet') }}
                   </s-tooltip>
                 </s-btn>
               </q-card-section>
@@ -138,11 +153,14 @@
               <q-card-actions align="between">
                 <s-btn
                   flat
+                  round
+                  dense
                   color="secondary"
                   icon="build"
-                  :label="tdc('Open')"
                   @click="openScaffold(app.name)"
-                />
+                >
+                  <s-tooltip>{{ tdc('Open the module in the scaffold') }}</s-tooltip>
+                </s-btn>
 
                 <s-btn
                   v-if="can('change_app')"
@@ -196,6 +214,39 @@
 
     <AppModelsDialog v-model="modelsOpen" :app-name="activeApp?.name" />
 
+    <!-- what the module is for (App.description, a Text field): read by
+         whoever sees the page, edited with change_app -->
+    <q-dialog v-model="descriptionOpen">
+      <s-modal-card :title="`${tdc('About the module')} — ${activeApp?.name || ''}`" icon="info" width="560px">
+        <s-input
+          v-if="can('change_app')"
+          v-model="descriptionText"
+          type="textarea"
+          autogrow
+          :label="tdc('What this module is for')"
+          data-test="app-description-input"
+        />
+        <div v-else class="text-body2" style="white-space: pre-line" data-test="app-description-text">
+          {{ descriptionText || tdc('No description yet.') }}
+        </div>
+
+        <template #footer>
+          <s-btn flat :label="tdc('Close')" v-close-popup>
+            <s-tooltip>{{ tdc('Close') }}</s-tooltip>
+          </s-btn>
+          <s-btn
+            v-if="can('change_app')"
+            color="primary" icon="save" :label="tdc('Save')"
+            :loading="savingDescription"
+            data-test="app-description-save"
+            @click="saveDescription"
+          >
+            <s-tooltip>{{ tdc('Save the description') }}</s-tooltip>
+          </s-btn>
+        </template>
+      </s-modal-card>
+    </q-dialog>
+
     <AppEntityTypesDialog
       v-model="entityTypesOpen"
       :app-id="activeApp ? appIdByName[activeApp.name.toLowerCase()] : null"
@@ -245,6 +296,12 @@ const appIdByName = ref({})
 const appStateByName = ref({})
 const togglingApp = ref(null)
 
+// name (lowercase) -> App.description (what the module is for)
+const appDescriptionByName = ref({})
+const descriptionOpen = ref(false)
+const descriptionText = ref('')
+const savingDescription = ref(false)
+
 const activeApp = ref(null)
 const modelsOpen = ref(false)
 const entityTypesOpen = ref(false)
@@ -275,6 +332,20 @@ const existingApp = computed(() => {
 const existingAppId = computed(() =>
   existingApp.value ? appIdByName.value[existingApp.value.name.toLowerCase()] : null
 )
+
+// ---------------- ORDER ----------------
+// the platform's own modules first: those starting with "django_resaas" or
+// with a dot in the name (e.g. "django_resaas.saas"); the others after, each
+// group in the order the backend lists them
+function isPlatformModule(name) {
+  const n = (name || '').toLowerCase()
+  return n.startsWith('django_resaas') || n.includes('.')
+}
+
+const sortedApps = computed(() => [
+  ...apps.value.filter(app => isPlatformModule(app.name)),
+  ...apps.value.filter(app => !isPlatformModule(app.name)),
+])
 
 // ---------------- PROTECTED (core platform) ----------------
 // Mesma regra do backend (AppSchemaAPIView.destroy() - qualquer
@@ -307,6 +378,7 @@ async function loadAppRegistry () {
     const { data } = await HTTPAuth.get(url({ type: 'u', url: 'django_resaas/apps/', params: { page_size: 0 } }))
     const idMap = {}
     const stateMap = {}
+    const descriptionMap = {}
     for (const row of data?.results || []) {
       const key = (row.name || '').toLowerCase()
       idMap[key] = row.id
@@ -315,9 +387,11 @@ async function loadAppRegistry () {
       // AutoTable.vue's toggleEstado()), even though it still accepts
       // a plain string on write (see toggleAppState() below).
       stateMap[key] = row.state?.value
+      descriptionMap[key] = row.description || ''
     }
     appIdByName.value = idMap
     appStateByName.value = stateMap
+    appDescriptionByName.value = descriptionMap
   } catch (e) {
     console.error(e)
   }
@@ -401,6 +475,29 @@ async function deleteApp(app) {
 
   } catch (e) {
     apps.value = old
+  }
+}
+
+// ---------------- DESCRIPTION MODAL ----------------
+function openDescription(app) {
+  activeApp.value = app
+  descriptionText.value = appDescriptionByName.value[app.name.toLowerCase()] || ''
+  descriptionOpen.value = true
+}
+
+async function saveDescription() {
+  const key = activeApp.value?.name?.toLowerCase()
+  const id = key && appIdByName.value[key]
+  if (!id) return
+  savingDescription.value = true
+  try {
+    await HTTPAuth.patch(url({ type: 'u', url: `django_resaas/apps/${id}/`, params: {} }), {
+      description: descriptionText.value || null
+    })
+    appDescriptionByName.value = { ...appDescriptionByName.value, [key]: descriptionText.value }
+    descriptionOpen.value = false
+  } finally {
+    savingDescription.value = false
   }
 }
 

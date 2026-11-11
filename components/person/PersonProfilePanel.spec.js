@@ -178,3 +178,18 @@ describe('PersonProfilePanel', () => {
     expect(w.text()).toContain('No documents on file.')
   })
 })
+
+describe('PersonProfilePanel - account actions', () => {
+  it('puts the page\'s account actions on the right of the User account title', async () => {
+    const w = mount(PersonProfilePanel, {
+      props: { person },
+      slots: { 'account-actions': '<button class="security-btn">Security</button>' },
+      global: globalOptions
+    })
+    await flushPromises()
+
+    const title = w.find('.user-card .section-title')
+    expect(title.text()).toContain('User account')
+    expect(title.find('.security-btn').exists()).toBe(true)
+  })
+})

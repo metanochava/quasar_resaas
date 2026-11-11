@@ -96,7 +96,11 @@ kept in the history), chosen from the status the backend answers (see the backen
 | `201` | `POST` | Created successfully! |
 | `202` | `POST` | Processed successfully! |
 | `204` | `POST` / `DELETE` / `PATCH`·`PUT` | Processed / Deleted / Modified successfully! |
-| `200` | any | none (reads stay silent) |
+| `200` | `PATCH`·`PUT` / `DELETE` / `POST` | Modified / Deleted / Processed successfully! (DRF's update and destroy answer 200) |
+| `200` | `GET` | none (reads stay silent) |
+
+When the answer carries its own alerts (`{"alerts": [...]}`), they are shown and the generic
+message is not added.
 
 No generic toast for the sign-in and session plumbing — `login/` (and `login/two_factor/...`),
 `logout/`, `refresh_token/`, `resaas/context/`, `two_factor/...` and any `.../otp/...` path

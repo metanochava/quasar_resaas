@@ -122,6 +122,14 @@ describe('the status of a successful POST (201 / 202 / 204, never 200)', () => {
     expect(toasts().map(t => t.message)).toEqual(['Processed successfully!', 'Deleted successfully!', 'Modified successfully!'])
   })
 
+  it('a write answered with a plain 200 (DRF update / destroy) says what it did; a read stays silent', () => {
+    Alert(response(200, { id: 1 }, { method: 'patch', url: '/api/hr/specialtys/1/' }))
+    Alert(response(200, { results: [] }, { method: 'get', url: '/api/hr/specialtys/' }))
+    Alert(response(200, '', { method: 'delete', url: '/api/hr/specialtys/2/' }))
+
+    expect(toasts().map(t => t.message)).toEqual(['Modified successfully!', 'Deleted successfully!'])
+  })
+
   it('signing in, refreshing the token, switching context, 2FA and OTP stay silent', () => {
     for (const url of ['/api/login/', '/api/login/two_factor/', '/api/logout/', '/api/refresh_token/',
       '/api/resaas/context/', '/api/two_factor/confirm/', '/api/register/otp/request/']) {

@@ -21,6 +21,11 @@
       </template>
     </FormTwo>
 
+    <!-- when the branch is open (edited once the branch exists) -->
+    <div v-if="route.params.id" class="q-mt-md">
+      <BranchOpeningHours :branch-id="route.params.id" />
+    </div>
+
   </q-page>
 </template>
 
@@ -31,6 +36,7 @@ import { useRoute } from 'vue-router'
 import { useBranchStore } from '../../stores/BranchStore'
 import FormTwo from '../../components/auto/FormTwo.vue'
 import AddressLocationPicker from '../../components/address/AddressLocationPicker.vue'
+import BranchOpeningHours from '../../components/branch/BranchOpeningHours.vue'
 
 // ---------------- ROUTE ----------------
 const route = useRoute()
