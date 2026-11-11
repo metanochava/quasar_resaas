@@ -1,4 +1,5 @@
 <script setup>
+import { routeScrollY } from '../../../composables/useRouteScroll'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ds } from '../../../services/data'
 
@@ -23,7 +24,7 @@ const GAP = 16
 function fit() {
   const el = list.value?.$el
   if (!el || typeof window === 'undefined') return
-  const top = el.getBoundingClientRect().top + window.scrollY
+  const top = el.getBoundingClientRect().top + routeScrollY()
   const footer = document.querySelector('.q-footer')?.offsetHeight || 0
   maxHeight.value = Math.max(MIN_HEIGHT, window.innerHeight - top - footer - GAP)
 }

@@ -21,6 +21,7 @@ export * from './composables/usePersonIntake.js'
 export * from './composables/useRelationSearch.js'
 export * from './composables/useUserGroups.js'
 export * from './composables/useBrandIcon.js'
+export * from './composables/useRouteScroll.js'
 
 
 // =========================================================
@@ -177,6 +178,11 @@ export {
 export {
   default as MainLayout
 } from './layouts/MainLayout.vue'
+
+// the area where a layout renders its routes (also <s-route-scroll>)
+export {
+  default as RouteScroll
+} from './components/layout/RouteScroll.vue'
 
 export {
   default as AuthLayout

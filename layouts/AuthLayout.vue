@@ -17,15 +17,15 @@
 
     <!-- a very translucent wash of the theme's colours (Entity's when signed
          in with one, else the host's EntityType - see mounted) -->
-    <q-page-container class="auth-bg" :class="{ 'auth-bg--dark text-white': $q.dark.isActive }">
-      <router-view />
+    <!-- the routes scroll inside their own area (s-route-scroll), between the
+         header and the footer, like MainLayout -->
+    <q-page-container class="auth-bg resaas-page-container" :class="{ 'auth-bg--dark text-white': $q.dark.isActive }">
+      <s-route-scroll>
+        <router-view />
+      </s-route-scroll>
     </q-page-container>
 
     <Rodape />
-
-    <q-page-scroller position="bottom-right" :scroll-offset="50" :offset="[18, -10]">
-      <s-btn icon="keyboard_arrow_up" color="primary"  />
-    </q-page-scroller>
   </q-layout>
 </template>
 

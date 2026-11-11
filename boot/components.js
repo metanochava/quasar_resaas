@@ -12,6 +12,7 @@ import ModalCard from './../components/engine/ModalCard.vue'
 import ChartComponent from './../components/engine/ChartComponent.vue'
 import TooltipComponent from './../components/engine/TooltipComponent.vue'
 import HighlightText from './../components/engine/HighlightText.vue'
+import RouteScroll from './../components/layout/RouteScroll.vue'
 import InputComponent from './../components/engine/InputComponent.vue'
 import DateComponent from './../components/engine/DateComponent.vue'
 import TimeComponent from './../components/engine/TimeComponent.vue'
@@ -126,6 +127,8 @@ export default boot(({ app }) => {
   app.component('s-tooltip', TooltipComponent)
   // text with the part matching `search` highlighted (case- and accent-insensitive),
   // the same as the left menu's search
+  // the area where a layout renders its routes (scrolls inside, not the page)
+  app.component('s-route-scroll', RouteScroll)
   app.component('s-highlight', HighlightText)
 
   app.component('s-input', InputComponent)

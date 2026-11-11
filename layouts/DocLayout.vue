@@ -21,8 +21,12 @@
       </q-toolbar>
     </q-header>
 
-    <q-page-container>
-      <router-view />
+    <!-- the routes' own scroll area (s-route-scroll), like MainLayout; the
+         docs page splits it into its own navigation and content scrolls -->
+    <q-page-container class="resaas-page-container">
+      <s-route-scroll>
+        <router-view />
+      </s-route-scroll>
     </q-page-container>
   </q-layout>
 </template>
@@ -44,9 +48,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style scoped>
-.doc-layout :deep(.q-page-container) {
-  height: 100%;
-}
-</style>
