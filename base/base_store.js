@@ -668,7 +668,8 @@ export function createBaseStore(name, config, extend = {}) {
         }
       },
       
-      async getPdf(id) {
+      // params: extra query of the PDF request (e.g. { date } of a reprint)
+      async getPdf(id, params = null) {
         const pdfId = id || this.row.id
         // prefer the schema-provided endpoint (already resolved against the
         // model's real RESAAS config) over re-deriving it from safeUrl
@@ -676,7 +677,7 @@ export function createBaseStore(name, config, extend = {}) {
           ? this.pdfConfig.detail_endpoint.replace('{id}', pdfId)
           : `${this.safeUrl}/${pdfId}/pdf`
 
-        const res = await HTTPAuthBlob.get(url({ type: 'u', url: endpoint }))
+        const res = await HTTPAuthBlob.get(url(params ? { type: 'u', url: endpoint, params } : { type: 'u', url: endpoint }))
         const blob = pdfBlobUrl(res)
         this.pdf = blob
         this.showPdf = true
