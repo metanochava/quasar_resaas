@@ -77,6 +77,15 @@ function routeLabel(to) {
 const REFRESH_INTERVAL_MS = 10000
 let lastRefresh = 0
 
+// Permissions checked inside a page (User.can - a section, a button) never
+// reach the route check above: a permission the profile gained on a deploy
+// stayed hidden until the profile was chosen again. So navigating also asks
+// for the permissions again, in the background (the navigation never waits),
+// at most once every BACKGROUND_REFRESH_MS; User.Permissions is reactive, so
+// what they show updates when the answer arrives.
+const BACKGROUND_REFRESH_MS = 5 * 60 * 1000
+let lastBackgroundRefresh = 0
+
 async function refreshFromGroupStore () {
   const { useGroupStore } = await import('../stores/GroupStore')
   await useGroupStore().getUserPermissions()
@@ -88,6 +97,16 @@ export function installAuthGuard(router, {
   refreshPermissions = refreshFromGroupStore
 } = {}) {
   lastRefresh = 0
+  lastBackgroundRefresh = 0
+
+  function refreshInBackground () {
+    const now = Date.now()
+    if (!refreshPermissions || !getStorage('l', 'access')) return
+    if (now - lastBackgroundRefresh < BACKGROUND_REFRESH_MS || now - lastRefresh < REFRESH_INTERVAL_MS) return
+    lastBackgroundRefresh = now
+    lastRefresh = now
+    Promise.resolve().then(() => refreshPermissions()).catch(() => {})
+  }
 
   function deny (to) {
     AlertWarning(
@@ -103,7 +122,10 @@ export function installAuthGuard(router, {
     }
 
     const role = to.meta?.requiredRole
-    if (!role || hasRequiredRole(role)) return
+    if (!role || hasRequiredRole(role)) {
+      refreshInBackground()
+      return
+    }
 
     const now = Date.now()
     if (!refreshPermissions || !getStorage('l', 'access') || now - lastRefresh < REFRESH_INTERVAL_MS) {
@@ -111,6 +133,7 @@ export function installAuthGuard(router, {
     }
 
     lastRefresh = now
+    lastBackgroundRefresh = now
     return Promise.resolve()
       .then(() => refreshPermissions())
       .catch(() => {})

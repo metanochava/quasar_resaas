@@ -236,6 +236,33 @@ describe('installAuthGuard - a permission the profile gained later', () => {
     expect(AlertWarning).toHaveBeenCalledTimes(2)
   })
 
+  it('an allowed navigation refreshes the permissions in the background, at most once every 5 minutes', async () => {
+    // a section/button of a page (User.can) gained on a deploy: no route is
+    // refused, so only this brings the new permission to an open session
+    vi.useFakeTimers()
+    let release
+    const refreshPermissions = vi.fn(() => new Promise(resolve => { release = resolve }))
+    installAuthGuard(fakeRouter, { refreshPermissions })
+    const to = { meta: { requiresAuth: true }, fullPath: '/add_pedidoexamemedico' }
+
+    expect(guardFn(to)).toBeUndefined()            // the navigation never waits
+    await Promise.resolve()
+    expect(refreshPermissions).toHaveBeenCalledTimes(1)
+    release()
+
+    guardFn(to)
+    vi.advanceTimersByTime(60 * 1000)
+    guardFn(to)
+    await Promise.resolve()
+    expect(refreshPermissions).toHaveBeenCalledTimes(1)
+
+    vi.advanceTimersByTime(5 * 60 * 1000)
+    guardFn(to)
+    await Promise.resolve()
+    expect(refreshPermissions).toHaveBeenCalledTimes(2)
+    vi.useRealTimers()
+  })
+
   it('a failed refresh refuses as before', async () => {
     installAuthGuard(fakeRouter, { refreshPermissions: vi.fn(async () => { throw new Error('offline') }) })
 
