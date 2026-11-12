@@ -23,6 +23,13 @@ export * from './composables/useUserGroups.js'
 export * from './composables/useBrandIcon.js'
 export * from './composables/useRouteScroll.js'
 
+// Form Engine (saas/core/forms): the renderer, its component registry and the
+// helpers shared with the backend's rules (conditions, validation, Schema 1.0)
+export { default as DynamicForm } from './components/forms/DynamicForm.vue'
+export { registerFormComponent, unregisterFormComponent, resolveFormComponent, formComponentNames } from './components/forms/registry.js'
+export { evaluateCondition } from './utils/formConditions.js'
+export { validateData, definitionFromSchema, applySchema, fillEndpoint } from './utils/formDefinition.js'
+
 
 // =========================================================
 // STORES

@@ -13,6 +13,7 @@ import ChartComponent from './../components/engine/ChartComponent.vue'
 import TooltipComponent from './../components/engine/TooltipComponent.vue'
 import HighlightText from './../components/engine/HighlightText.vue'
 import RouteScroll from './../components/layout/RouteScroll.vue'
+import DynamicForm from './../components/forms/DynamicForm.vue'
 import InputComponent from './../components/engine/InputComponent.vue'
 import DateComponent from './../components/engine/DateComponent.vue'
 import TimeComponent from './../components/engine/TimeComponent.vue'
@@ -129,6 +130,8 @@ export default boot(({ app }) => {
   // the same as the left menu's search
   // the area where a layout renders its routes (scrolls inside, not the page)
   app.component('s-route-scroll', RouteScroll)
+  // a form from a definition (Form Engine: schema / declarative / hybrid / workflow)
+  app.component('s-dynamic-form', DynamicForm)
   app.component('s-highlight', HighlightText)
 
   app.component('s-input', InputComponent)
