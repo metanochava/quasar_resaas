@@ -59,6 +59,19 @@ export let restRoutes = [
     }
   },
   {
+    // the Form Engine's layers (django_resaas formdefinitions): list, write a
+    // version, preview, publish, see the resolved form
+    path: '/list_formdefinition',
+    name: 'list_formdefinition',
+    component: () => import('../pages/forms/FormDefinitionsPage.vue'),
+    meta: {
+      title: tdc('Forms'),
+      requiresAuth: true,
+      icon: 'dynamic_form',
+      requiredRole: 'list_formdefinition'
+    }
+  },
+  {
     path: '/add_app',
     name: 'add_app',
     component: () => import('../pages/commands/AppCreatePage.vue'),
