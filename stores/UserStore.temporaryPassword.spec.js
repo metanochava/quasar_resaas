@@ -101,8 +101,9 @@ describe('UserStore - passwords are never persisted', () => {
     expect(localStorage.getItem('username')).toBeNull()
     expect(storedEverywhere()).not.toContain('Permanent-Pass-1')
     expect(storedEverywhere()).not.toContain('must-never-be-stored')
-    // "keep me signed in" is the token pair
-    expect(localStorage.getItem('access')).toBe('A')
+    // "keep me signed in" is the refresh token; the access token stays in memory
+    expect(localStorage.getItem('access')).toBeNull()
+    expect(User.access).toBe('A')
     expect(localStorage.getItem('refresh')).toBe('R')
   })
 
@@ -157,6 +158,7 @@ describe('UserStore - passwords are never persisted', () => {
     post.mockResolvedValueOnce({ data: SESSION })
     await User.changeTemporaryPassword({ identifier: 'joao', password: 'Temp-Pass-1234', newPassword: 'My-own-Password-1' })
     expect(User.isLogin).toBe(true)
-    expect(localStorage.getItem('access')).toBe('A')
+    expect(User.access).toBe('A')
+    expect(localStorage.getItem('access')).toBeNull()      // memory only
   })
 })

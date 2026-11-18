@@ -1,5 +1,6 @@
 
 import { errorCode, errorMessage } from '../utils/apiContract'
+import { hasSessionToken, cookieSessionLive } from '../services/sessionToken'
 import { groupLabel } from '../utils/groupLabel'
 import { getStorage, setStorage, deleteStorage } from '../services/storage'
 import { HTTPAuth, HTTPClient, url } from '../services/api'
@@ -195,15 +196,17 @@ export const useUserStore = createBaseStore(
     // Without one every authenticated request answers 401 - e.g. a
     // component that re-mounts or reacts while logout() tears the session
     // down must not ask for a context.
+    // (the access token lives in memory only: after a reload a live refresh
+    // token is the session until it mints the next access token)
     hasSession() {
-      return Boolean(this.access || getStorage('l', 'access'))
+      return hasSessionToken(this.access)
     },
     // for showing the signed-in UI (notifications, user menu, the site's
     // signed-in sections): signed in now, or a refresh token that can still
     // renew the session. A leftover expired or invalid token is not a session
     // (hasSession() above would say yes and show them on the login page).
     isSignedIn() {
-      return Boolean(this.isLogin || !this.isTokenExpired(this.refresh || getStorage('l', 'refresh')))
+      return Boolean(this.isLogin || !this.isTokenExpired(this.refresh || getStorage('l', 'refresh')) || cookieSessionLive())
     },
     async refreshResaasContext() {
       if (!this.Entity?.id || !this.hasSession()) {
@@ -555,10 +558,11 @@ export const useUserStore = createBaseStore(
 
     async startSession(data) {
       this.data = data
+      // the access token stays in memory; the refresh token is either in the
+      // HttpOnly cookie (the API's own site: only until when it lives is kept)
+      // or stored (services/sessionToken.js)
       this.access = data.tokens.access
-      this.refresh = data.tokens.refresh
-      setStorage('l', 'access', this.access,  365)
-      setStorage('l', 'refresh', this.refresh,  365)
+      this.keepRefresh(data.tokens.refresh, data.refresh_cookie)
       // "Keep me signed in" lives in the access/refresh tokens stored above
       // (loadFromStorage() refreshes them) - a password is NEVER written to
       // any storage. Older versions stored 'username'/'password' keys here
@@ -587,12 +591,52 @@ export const useUserStore = createBaseStore(
       return rsp
     },
 
+    // The refresh token ROTATES (django_resaas session_service): each refresh
+    // answers a new one, kept here. The tabs of a browser share the stored
+    // token, so a tab uses the one another tab already rotated - and, when
+    // its refresh lost the race to another tab, retries once with that one.
     async refreshToken() {
-      const data = {refresh: this.refresh }
-      const rsp = await HTTPClient.post(url({type: "u", url: "refresh_token/", params: {}}), data )
+      const send = (refresh) => HTTPClient.post(url({type: "u", url: "refresh_token/", params: {}}), { refresh })
+
+      const stored = getStorage('l', 'refresh')
+      if (stored && stored !== this.refresh) this.refresh = stored
+
+      const used = this.refresh
+      let rsp
+      try {
+        rsp = await send(used)
+      } catch (error) {
+        const latest = getStorage('l', 'refresh')
+        if (latest && latest !== used) {
+          this.refresh = latest
+          rsp = await send(latest)
+        } else if (!used && cookieSessionLive()) {
+          // the HttpOnly cookie: another tab rotated it a moment ago - the
+          // browser already holds the new one, try once more
+          await new Promise(resolve => setTimeout(resolve, 300))
+          rsp = await send(null)
+        } else {
+          throw error
+        }
+      }
+
       this.access = rsp.data.access
-      setStorage('l', 'access', this.access,  365)
+      this.keepRefresh(rsp.data.refresh, rsp.data.refresh_cookie)
       return rsp
+    },
+
+    // where the session's refresh token lives: in the body -> stored; in the
+    // HttpOnly cookie -> nothing readable is stored, only until when it lives
+    keepRefresh(refresh, cookie) {
+      if (refresh) {
+        this.refresh = refresh
+        setStorage('l', 'refresh', refresh, 365)
+        deleteStorage('l', 'refreshUntil')
+      } else if (cookie?.expires_at) {
+        this.refresh = null
+        deleteStorage('l', 'refresh')
+        setStorage('l', 'refreshUntil', cookie.expires_at, 365)
+      }
     },
 
     async updateProfile(payload) {
@@ -636,7 +680,10 @@ export const useUserStore = createBaseStore(
       this.Group   = JSONSafeParse(getStorage('l', 'userGroup'))
       this.Groups   = JSONSafeParse(getStorage('l', 'userGroups'))
       this.data   = JSONSafeParse(getStorage('l', 'user'))
-      this.access   = getStorage('l', 'access')
+      // the access token is never stored (services/sessionToken.js): one left
+      // by an older version is dropped; the next request mints a new one
+      this.access   = null
+      deleteStorage('l', 'access')
       this.refresh   = getStorage('l', 'refresh')
       this.RightTop   = ('' + getStorage('l', 'right_top')).toLowerCase() === 'true'
       this.LeftTop   = ('' + getStorage('l', 'left_top')).toLowerCase() === 'true'
@@ -703,6 +750,7 @@ export const useUserStore = createBaseStore(
 
         deleteStorage('l', 'access')
         deleteStorage('l', 'refresh')
+        deleteStorage('l', 'refreshUntil')
         deleteStorage('l', 'userEntitys')
         deleteStorage('l', 'userEntity')
         deleteStorage('l', 'userBranchs')

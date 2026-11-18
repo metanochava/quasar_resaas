@@ -12,6 +12,9 @@ vi.mock('../services/translation', () => ({
 
 const { installAuthGuard } = await import('./authGuard')
 
+// the session: a refresh token that can still renew it (the access token is memory only)
+const LIVE_REFRESH = `x.${btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 }))}.y`
+
 let guardFn
 const fakeRouter = {
   beforeEach: (fn) => { guardFn = fn }
@@ -25,14 +28,21 @@ beforeEach(() => {
 })
 
 describe('installAuthGuard - requiresAuth', () => {
-  it('redirects to login when the route requires auth and there is no access token', () => {
+  it('redirects to login when the route requires auth and there is no session', () => {
     const result = guardFn({ meta: { requiresAuth: true }, fullPath: '/protected' })
 
     expect(result).toEqual({ name: 'login', query: { redirect: '/protected' } })
   })
 
-  it('allows navigation when an access token is present', () => {
-    localStorage.setItem('access', 'a-real-token')
+  it('an expired refresh token, or a stored access token alone, is no session', () => {
+    localStorage.setItem('refresh', `x.${btoa(JSON.stringify({ exp: 1 }))}.y`)
+    localStorage.setItem('access', 'left-by-an-old-version')
+    const result = guardFn({ meta: { requiresAuth: true }, fullPath: '/x' })
+    expect(result).toEqual({ name: 'login', query: { redirect: '/x' } })
+  })
+
+  it('allows navigation when a live refresh token is present', () => {
+    localStorage.setItem('refresh', LIVE_REFRESH)
 
     const result = guardFn({ meta: { requiresAuth: true }, fullPath: '/protected' })
 
@@ -52,7 +62,7 @@ describe('installAuthGuard - requiredRole', () => {
   // ever checked it - any logged-in user could navigate straight to any
   // route's URL regardless of their actual permissions.
   beforeEach(() => {
-    localStorage.setItem('access', 'a-real-token')
+    localStorage.setItem('refresh', LIVE_REFRESH)
   })
 
   it('redirects to the forbidden route when the user lacks the required permission', () => {
@@ -190,7 +200,7 @@ describe('installAuthGuard - single sign-on', () => {
   })
 
   it('with a session nothing changes', () => {
-    localStorage.setItem('access', 'a-real-token')
+    localStorage.setItem('refresh', LIVE_REFRESH)
     expect(guardFn({ meta: { requiresAuth: true }, fullPath: '/protected' })).toBeUndefined()
     expect(window.location.assign).not.toHaveBeenCalled()
   })
@@ -207,7 +217,7 @@ describe('installAuthGuard - a permission the profile gained later', () => {
   // profile is chosen: a permission added to the profile afterwards showed in
   // the menu and the route was still refused ("Admin" / view_employee).
   beforeEach(() => {
-    localStorage.setItem('access', 'a-real-token')
+    localStorage.setItem('refresh', LIVE_REFRESH)
     localStorage.setItem('userPermissions', JSON.stringify(['view_hr_dashboard']))
   })
 

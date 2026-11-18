@@ -1,3 +1,4 @@
+import { apiOrigin } from './apiOrigin'
 
 
 
@@ -50,13 +51,14 @@ export const autoLabel = function (name) {
 
 
 export const urlBase = (url = '') => {
+  // the API's origin for this page (services/apiOrigin.js)
   if (url === '') {
-    return process.env.API
+    return apiOrigin()
   }
 
   if (url != null) {
     if (url[0] === '/') {
-      return process.env.API + url
+      return apiOrigin() + url
     }
     if (url[0] === 'h') {
       return url

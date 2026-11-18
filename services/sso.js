@@ -58,7 +58,8 @@ export function isClient () {
   return ssoEnabled() && !isCentral()
 }
 
-const hashUri = (origin, path) => `${origin}/#${path}`
+// a route of the app at an origin: /path in history mode, /#/path in hash mode
+const hashUri = (origin, path) => (process.env.VUE_ROUTER_MODE === 'history' ? `${origin}${path}` : `${origin}/#${path}`)
 export const callbackUri = () => hashUri(window.location.origin, CALLBACK_PATH)
 export const adoptUri = () => hashUri(ssoOrigin(), ADOPT_PATH)
 

@@ -1,4 +1,5 @@
 import { getStorage } from '../services/storage'
+import { hasSessionToken } from '../services/sessionToken'
 import { JSONSafeParse } from '../utils/json'
 import { AlertWarning } from '../boot/alerts'
 import { tdc } from '../services/translation'
@@ -101,7 +102,7 @@ export function installAuthGuard(router, {
 
   function refreshInBackground () {
     const now = Date.now()
-    if (!refreshPermissions || !getStorage('l', 'access')) return
+    if (!refreshPermissions || !hasSessionToken()) return
     if (now - lastBackgroundRefresh < BACKGROUND_REFRESH_MS || now - lastRefresh < REFRESH_INTERVAL_MS) return
     lastBackgroundRefresh = now
     lastRefresh = now
@@ -117,7 +118,7 @@ export function installAuthGuard(router, {
   }
 
   function check (to) {
-    if (to.meta?.requiresAuth && !getStorage('l', 'access')) {
+    if (to.meta?.requiresAuth && !hasSessionToken()) {
       return { name: loginRouteName, query: { redirect: to.fullPath } }
     }
 
@@ -128,7 +129,7 @@ export function installAuthGuard(router, {
     }
 
     const now = Date.now()
-    if (!refreshPermissions || !getStorage('l', 'access') || now - lastRefresh < REFRESH_INTERVAL_MS) {
+    if (!refreshPermissions || !hasSessionToken() || now - lastRefresh < REFRESH_INTERVAL_MS) {
       return deny(to)
     }
 
@@ -146,7 +147,7 @@ export function installAuthGuard(router, {
     // SSO_URL is configured - then this stays synchronous, as before.
     const needsLogin = to.meta?.requiresAuth || to.name === loginRouteName
 
-    if (needsLogin && !getStorage('l', 'access') && canStartSilent()) {
+    if (needsLogin && !hasSessionToken() && canStartSilent()) {
       return startSilent().then(leaving => (leaving ? false : check(to)))
     }
 

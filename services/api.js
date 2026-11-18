@@ -3,6 +3,8 @@
 
 import axios from 'axios'
 import { getStorage } from './storage'
+import { canRefresh } from './sessionToken'
+import { apiOrigin } from './apiOrigin'
 import { shouldRenewContext, isContextExpiredError, contextNeedsReissue } from './contextExpiry'
 import { useUserStore } from '../stores/UserStore'
 import { useLoadStore } from '../stores/LoadStore'
@@ -10,7 +12,8 @@ import { Alert } from '../boot/alerts'
 import { safeParse } from '../utils/json'
 
 const apiPrefix = process.env.API_PREFIX
-const apiBaseUrl = `${process.env.API}/${apiPrefix}`
+// the page's own origin on a site that serves the API itself (services/apiOrigin.js)
+const apiBaseUrl = `${apiOrigin()}/${apiPrefix}`
 
 let refreshPromise = null
 
@@ -62,7 +65,8 @@ export const url = (payload = { type: 'u', url: '', params: {} }) => {
 const createClient = (auth = false, blob = false) => {
   const instance = axios.create({
     baseURL: apiBaseUrl,
-    withCredentials: false,
+    // the HttpOnly refresh cookie of the API's own site (services/sessionToken.js)
+    withCredentials: true,
     headers: { Accept: 'application/json' },
     responseType: blob ? 'blob' : 'json'
   })
@@ -93,7 +97,16 @@ const createClient = (auth = false, blob = false) => {
     }
 
     if (auth) {
-      const accessToken = User.access || getStorage('l', 'access')
+      // the access token lives in memory only (services/sessionToken.js):
+      // after a reload, mint one from the refresh token before the request
+      if (!User.access && (canRefresh() || !User.isTokenExpired(User.refresh))) {
+        try {
+          await refreshAccessToken()
+        } catch {
+          // no new access token: the request goes without one (401 -> login)
+        }
+      }
+      const accessToken = User.access
       const contextToken = getStorage('s', 'resaasContext')
 
       if (accessToken)
@@ -135,10 +148,10 @@ const createClient = (auth = false, blob = false) => {
         !String(originalRequest.url || '').includes('refresh_token/')
       ) {
         const User = useUserStore()
-        const refreshToken = User.refresh || getStorage('l', 'refresh')
 
-        if (!User.isTokenExpired(refreshToken)) {
-          User.refresh = refreshToken
+        // a refresh token (in memory or stored), or the HttpOnly cookie, can
+        // mint a new one
+        if (canRefresh() || !User.isTokenExpired(User.refresh)) {
           originalRequest._retried = true
 
           try {

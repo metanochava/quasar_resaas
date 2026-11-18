@@ -289,7 +289,8 @@ describe('UserStore.isSignedIn - what shows the signed-in UI', () => {
     localStorage.setItem('access', token(now() - 3600))
     localStorage.setItem('refresh', token(now() - 60))
     expect(User.isSignedIn()).toBe(false)
-    expect(User.hasSession()).toBe(true) // the token is still there, for requests
+    // a stored access token is ignored (memory only) and the refresh expired
+    expect(User.hasSession()).toBe(false)
 
     localStorage.setItem('refresh', 'not-a-jwt')
     expect(User.isSignedIn()).toBe(false)
@@ -306,3 +307,80 @@ describe('UserStore.isSignedIn - what shows the signed-in UI', () => {
     expect(User.isSignedIn()).toBe(true)
   })
 })
+
+describe('UserStore - the access token lives in memory only', () => {
+  const token = (exp) => `x.${btoa(JSON.stringify({ exp }))}.y`
+  const now = () => Math.floor(Date.now() / 1000)
+
+  beforeEach(() => localStorage.clear())
+
+  it('a live refresh token is the session after a reload', () => {
+    const User = useUserStore()
+    User.access = null
+    localStorage.setItem('refresh', token(now() + 3600))
+    expect(User.hasSession()).toBe(true)
+  })
+
+  it('a refresh keeps the new access token in memory and stores the rotated refresh', async () => {
+    const User = useUserStore()
+    User.refresh = 'R1'
+    localStorage.setItem('refresh', 'R1')
+    const { HTTPClient } = await import('../services/api')
+    const post = vi.spyOn(HTTPClient, 'post').mockResolvedValue({ data: { access: 'A2', refresh: 'R2' } })
+
+    await User.refreshToken()
+
+    expect(User.access).toBe('A2')
+    expect(localStorage.getItem('access')).toBeNull()
+    expect(localStorage.getItem('refresh')).toBe('R2')
+    post.mockRestore()
+  })
+
+  it('uses the refresh another tab already rotated', async () => {
+    const User = useUserStore()
+    User.refresh = 'R-old'
+    localStorage.setItem('refresh', 'R-new')
+    const { HTTPClient } = await import('../services/api')
+    const post = vi.spyOn(HTTPClient, 'post').mockResolvedValue({ data: { access: 'A', refresh: 'R-next' } })
+
+    await User.refreshToken()
+
+    expect(post.mock.calls[0][1]).toEqual({ refresh: 'R-new' })
+    expect(localStorage.getItem('refresh')).toBe('R-next')
+    post.mockRestore()
+  })
+})
+
+describe('UserStore - the refresh token in the HttpOnly cookie (the API\'s own site)', () => {
+  beforeEach(() => localStorage.clear())
+
+  it('a cookie sign-in keeps no refresh token, only until when the cookie lives', async () => {
+    const User = useUserStore()
+    const until = new Date(Date.now() + 3600 * 1000).toISOString()
+    localStorage.setItem('refresh', 'left-over')
+
+    User.keepRefresh(undefined, { expires_at: until })
+
+    expect(User.refresh).toBeNull()
+    expect(localStorage.getItem('refresh')).toBeNull()
+    expect(User.hasSession()).toBe(true)          // the cookie can mint an access token
+  })
+
+  it('refreshes with the cookie (no token in the body) and keeps its new lifetime', async () => {
+    const User = useUserStore()
+    User.refresh = null
+    localStorage.setItem('refreshUntil', new Date(Date.now() + 60000).toISOString())
+    const later = new Date(Date.now() + 86400000).toISOString()
+    const { HTTPClient } = await import('../services/api')
+    const post = vi.spyOn(HTTPClient, 'post').mockResolvedValue({ data: { access: 'A', refresh_cookie: { expires_at: later } } })
+
+    await User.refreshToken()
+
+    expect(post.mock.calls[0][1]).toEqual({ refresh: null })
+    expect(User.access).toBe('A')
+    expect(localStorage.getItem('refreshUntil')).toContain(later.slice(0, 16))
+    expect(localStorage.getItem('refresh')).toBeNull()
+    post.mockRestore()
+  })
+})
+
