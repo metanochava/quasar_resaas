@@ -163,29 +163,8 @@
 
         </template>
 
-
-        <!-- ================================================= -->
-        <!-- FOOTER -->
-        <!-- ================================================= -->
-
-        <template
-          #footer
-          v-if="EntityType.form?.id"
-        >
-
-          <div class="col-6">
-            <MudarApp
-              :entityTypeId="EntityType.form?.id"
-            />
-          </div>
-
-          <div class="col-6">
-            <MudarApp
-              :entityTypeId="EntityType.form?.id"
-            />
-          </div>
-
-        </template>
+        <!-- no #footer: FormTwo's own ActionForm (cancel, reset, edit,
+             delete, save) is the footer in add and in change mode -->
 
       </FormTwo>
 
