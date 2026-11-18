@@ -1,106 +1,86 @@
 <template>
-  <div>
-    <!-- HeaderServices content -->
-    <s-btn round dense flat  size="14px" icon="apps">
-          <s-tooltip>{{tdc("Services")}}</s-tooltip>
-          <q-menu flat bordered square  fit :offset="[175, 5]"  >
-            <s-card class="my-card"  style="min-width:270px;" >
-                <q-card-section class="text-center"   flat bordered square  >
-                  <q-scroll-area
-                    :thumb-style="thumbStyle"
-                    :bar-style="barStyle"
-                    style="height: 300px"
-                  >
-                    <div class="row col-xs-12"  >
-                      <div  v-for=" te in User.EntityTypes" :key="te">
-                        <q-item   v-close-popup   flat bordered   class="col-4 " v-if="getHostname(te)"  >
-                          <q-item-label  clickable @click="selectteidadeLink(te)"  class="localhover">
-                            <q-avatar class="" size="45px" style="border-radius:5px;" >
-                              <img :src="te?.icon?.url" >
-                            </q-avatar>
-                            <br>
-                            {{tdc(te.name)}}
-                          </q-item-label>
-                        </q-item  >
-                        </div>
-                    </div>
-                  </q-scroll-area>
-                </q-card-section>
-              </s-card>
-          </q-menu>
-      </s-btn>
-  </div>
+  <!-- Header "apps" menu: the sites of the other EntityTypes of this
+       installation (the current host's EntityType is left out). -->
+  <s-btn round dense flat size="14px" icon="apps" data-test="header-services">
+    <s-tooltip>{{ tdc('Services') }}</s-tooltip>
+    <q-menu flat bordered square fit :offset="[175, 5]">
+      <s-card style="min-width: 270px;">
+        <q-card-section class="text-center">
+          <q-scroll-area :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 300px">
+            <div class="row">
+              <q-item
+                v-for="type in otherTypes"
+                :key="type.id"
+                v-close-popup
+                clickable
+                class="col-4 column items-center localhover"
+                data-test="header-service"
+                @click="openType(type)"
+              >
+                <q-avatar size="45px" style="border-radius: 5px;">
+                  <img v-if="type.icon?.url" :src="type.icon.url" :alt="tdc(type.name)">
+                  <q-icon v-else name="apps" />
+                </q-avatar>
+                <div class="q-mt-xs">{{ tdc(type.name) }}</div>
+              </q-item>
+            </div>
+          </q-scroll-area>
+        </q-card-section>
+      </s-card>
+    </q-menu>
+  </s-btn>
 </template>
 
 <script>
 import { defineComponent } from 'vue'
 import { tdc } from '../../services/translation'
+import { setStorage } from '../../services/storage'
+import { barStyle, thumbStyle } from '../../services/app'
 import { useUserStore } from '../../stores/UserStore'
 import { useEntityTypeStore } from '../../stores/EntityTypeStore'
-import { setStorage } from '../../services/storage';
-import { entityTypeKey, entityTypeUrl, isIpHost } from '../../utils/entityTypeHost'
-
+import { entityTypeKey, entityTypeUrl, findEntityType } from '../../utils/entityTypeHost'
 
 export default defineComponent({
-
   setup () {
-    const User = useUserStore()
-    const EntityType = useEntityTypeStore()
     return {
-      User,
-      EntityType
+      User: useUserStore(),
+      EntityType: useEntityTypeStore(),
+      tdc,
+      barStyle,
+      thumbStyle
     }
   },
-  props: {
 
-  },
-
-  data () {
-    return {
-      tdc: tdc
-    }
-  },
-  created () {
-  },
   computed: {
+    // every EntityType except the one this host belongs to
+    otherTypes () {
+      const key = entityTypeKey().toLowerCase()
+      return (this.User.EntityTypes || []).filter(
+        type => String(type?.name || '').toLowerCase() !== key
+      )
+    }
   },
+
   async mounted () {
     await this.EntityType.getEntityTypes()
-    this.User.EntityTypes?.forEach(async entityType => {
-      await this.getHostname(entityType)
-    })
+    await this.applyHostType()
   },
 
   methods: {
-    isIP(host) {
-      return isIpHost(host)
+    // the host's EntityType becomes the current one, with its look - once,
+    // on mount (it used to run from the template on every render)
+    async applyHostType () {
+      const current = findEntityType(this.User.EntityTypes)
+      if (!current) return
+      this.User.EntityType = current
+      this.EntityType.row = current
+      setStorage('l', 'entityType', JSON.stringify(current))
+      await this.EntityType.getLayoutSettings(current.id)
     },
 
-    async getHostname (tipoEnt) {
-      // the EntityType of this host (utils/entityTypeHost.js, shared with
-      // the site page at '/')
-      const domain = entityTypeKey()
-
-      if(domain){
-        if (domain.toLocaleLowerCase() !== tipoEnt.name.toLowerCase()) {
-          return true
-        } else {
-          this.User.EntityType = tipoEnt
-          this.EntityType.row = tipoEnt
-          await this.EntityType.getLayoutSettings(tipoEnt?.id)
-          setStorage('l', 'entityType', JSON.stringify(this.User.EntityType))
-          return false
-        }
-      }
-
-    },
-
-
-
-    selectteidadeLink(x){
-      window.open(entityTypeUrl(x), '_blank');
+    openType (type) {
+      window.open(entityTypeUrl(type), '_blank')
     }
-
   }
 })
 </script>

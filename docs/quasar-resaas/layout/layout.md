@@ -168,6 +168,17 @@ The rule lives in `composables/useEntitySite.js` (`useEntitySite()`,
 (`javascript:`, a relative path) hides the button. Tests:
 `components/header/HeaderSite.spec.js`, `components/header/HeaderBrand.spec.js`.
 
+### EntityTypes menu (HeaderServices)
+
+`components/header/HeaderServices.vue` (icon `apps`, tooltip "Services") loads
+the EntityTypes (`EntityType.getEntityTypes()` → `User.EntityTypes`) and lists
+every one except the host's own (`utils/entityTypeHost.js`: subdomain, or first
+path segment on an IP); a click opens that type's site in a new tab
+(`entityTypeUrl`). Once, on mount, the host's EntityType becomes
+`User.EntityType` / `EntityType.row`, is stored in `localStorage`
+(`entityType`) and its look is loaded (`getLayoutSettings`). Tests:
+`components/header/HeaderServices.spec.js`.
+
 ### Left menu search
 
 `SearchMenu.vue` (the field on top of the left menu) filters `User.AllMenus`
