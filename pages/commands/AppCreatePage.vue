@@ -39,12 +39,12 @@
                   {{ existingApp.models || 0 }} {{ tdc(existingApp.models === 1 ? 'model' : 'models') }}
                 </div>
                 <div class="row q-gutter-xs q-mt-sm">
-                  <s-btn v-if="can('view_app')" flat dense size="sm" icon="table_chart" :label="tdc('View models')" @click="openModels(existingApp)">
+                  <s-btn v-if="can('view_app')" flat round dense size="sm" icon="table_chart" @click="openModels(existingApp)">
                     <s-tooltip>{{ tdc('See the models of this module') }}</s-tooltip>
                   </s-btn>
                   <s-btn
                     v-if="can('view_app')"
-                    flat dense size="sm" icon="category" :label="tdc('Entity types')"
+                    flat round dense size="sm" icon="category"
                     :disable="!existingAppId"
                     @click="openEntityTypes(existingApp)"
                   >
@@ -124,33 +124,46 @@
 
               <q-separator />
 
-              <q-card-section class="col row q-gutter-xs items-start content-start">
+              <q-card-section class="col row q-gutter-xs items-center justify-center content-center">
+                <!-- icon-only buttons: the tooltips say what each one does -->
                 <s-btn
                   v-if="can('view_app')"
-                  flat dense
+                  flat round dense color="primary"
                   icon="table_chart"
-                  :label="tdc('Models')"
+                  :data-test="`app-models-${app.name}`"
                   @click="openModels(app)"
                 >
                   <s-tooltip>{{ tdc('See the models of this module') }}</s-tooltip>
                 </s-btn>
                 <s-btn
                   v-if="can('view_app')"
-                  flat dense
+                  flat round dense color="primary"
                   icon="category"
-                  :label="tdc('Entity Types')"
                   :disable="!appIdByName[app.name.toLowerCase()]"
+                  :data-test="`app-entity-types-${app.name}`"
                   @click="openEntityTypes(app)"
                 >
                   <s-tooltip>
                     {{ appIdByName[app.name.toLowerCase()] ? tdc('Choose the entity types that use this module') : tdc('This module has no registry entry yet') }}
                   </s-tooltip>
                 </s-btn>
+                <s-btn
+                  v-if="can('view_app')"
+                  flat round dense color="primary"
+                  icon="apartment"
+                  :disable="!appIdByName[app.name.toLowerCase()]"
+                  :data-test="`app-entities-${app.name}`"
+                  @click="openEntities(app)"
+                >
+                  <s-tooltip>
+                    {{ appIdByName[app.name.toLowerCase()] ? tdc('Choose the entities that use this module') : tdc('This module has no registry entry yet') }}
+                  </s-tooltip>
+                </s-btn>
               </q-card-section>
 
               <q-separator />
 
-              <q-card-actions align="between">
+              <q-card-actions align="center" class="q-gutter-xs">
                 <s-btn
                   flat
                   round
@@ -253,6 +266,12 @@
       :app-name="activeApp?.name"
     />
 
+    <AppEntitiesDialog
+      v-model="entitiesOpen"
+      :app-id="activeApp ? appIdByName[activeApp.name.toLowerCase()] : null"
+      :app-name="activeApp?.name"
+    />
+
   </q-page>
 </template>
 
@@ -266,6 +285,7 @@ import { statusColor } from '../../utils/status'
 import FormSection from '../../components/auto/FormSection.vue'
 import AppModelsDialog from './AppModelsDialog.vue'
 import AppEntityTypesDialog from './AppEntityTypesDialog.vue'
+import AppEntitiesDialog from './AppEntitiesDialog.vue'
 import { sDialog } from '../../services/dialog'
 
 // ---------------- STATE ----------------
@@ -305,6 +325,7 @@ const savingDescription = ref(false)
 const activeApp = ref(null)
 const modelsOpen = ref(false)
 const entityTypesOpen = ref(false)
+const entitiesOpen = ref(false)
 
 // ---------------- DOT/SUB-FOLDER PREVIEW ----------------
 // Mesma limpeza que o backend aplica de facto (AppScaffoldService.
@@ -511,6 +532,12 @@ function openModels(app) {
 function openEntityTypes(app) {
   activeApp.value = app
   entityTypesOpen.value = true
+}
+
+// ---------------- ENTITIES MODAL ----------------
+function openEntities(app) {
+  activeApp.value = app
+  entitiesOpen.value = true
 }
 
 // ---------------- OPEN SCAFFOLD ----------------
