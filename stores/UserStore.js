@@ -89,6 +89,9 @@ export const useUserStore = createBaseStore(
     Menus: [],
     search: '',
     AllMenus: [],
+    // the phone bottom tabs of the CURRENT profile (users/{id}/mobile_tabs/:
+    // filtered by the backend - permissions, active modules, entitlements)
+    MobileTabs: [],
     // ThemeStudio: the entity-wide layout/branding modal. The user's own
     // account (profile/security) is no longer a modal: it is the page behind
     // the route "account" (pages/user/UserAccountPage.vue).
@@ -354,6 +357,11 @@ export const useUserStore = createBaseStore(
           this.AllMenus = res.data
           this.Menus = this.AllMenus
         })
+      // the same moment as the menus (a group / profile change refreshes both);
+      // a failure only leaves the phone with the footer
+      HTTPAuth.get(url({ type: 'u', url: 'django_resaas/users/' + this.data.id + '/mobile_tabs/', params: {} }))
+        .then(res => { this.MobileTabs = Array.isArray(res.data) ? res.data : [] })
+        .catch(() => { this.MobileTabs = [] })
     },
 
     // applies the EFFECTIVE look (User > Entity > EntityType, /me/'s

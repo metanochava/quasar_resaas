@@ -13,6 +13,8 @@ import { templateRoutes } from '../pages/notifications/template/templateRoute'
 import { preferenceRoutes } from '../pages/notifications/preference/preferenceRoute'
 import { settingsRoutes } from '../pages/notifications/settings/settingsRoute'
 import { outboxRoutes } from '../pages/notifications/outbox/outboxRoute'
+import { entity_type_mobile_tabRoutes } from '../pages/entity_type_mobile_tab/entity_type_mobile_tabRoute'
+import { entity_mobile_tabRoutes } from '../pages/entity_mobile_tab/entity_mobile_tabRoute'
 import { delivery_attemptRoutes } from '../pages/notifications/delivery_attempt/delivery_attemptRoute'
 import { tdc } from '../services/translation'
 
@@ -124,6 +126,8 @@ export let restRoutes = [
     } 
   },
   ...entityRoutes,
+  ...entity_type_mobile_tabRoutes,
+  ...entity_mobile_tabRoutes,
   ...entity_typeRoutes,
   ...groupRoutes,
   ...branchRoutes,

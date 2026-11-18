@@ -75,7 +75,10 @@
         <!-- Menu Direito -->
         <s-btn dense flat round icon="menu" @click="User.toggleRightTop()" />
       </q-toolbar>
-      <q-bar  v-show="!User.LeftTop && !['welcome'].includes($route.name)">
+      <!-- the horizontal menu: not on a phone-sized screen (xs, < 600px),
+           where the ☰ button opens the same menu (LeftMenu: menus, group
+           selector, search) -->
+      <q-bar  v-show="$q.screen.gt.xs && !User.LeftTop && !['welcome'].includes($route.name)" data-test="top-menu-bar">
         <TopMenu ></TopMenu>
       </q-bar>
     </q-header>
@@ -150,7 +153,10 @@
 
     <!-- -------------------- FOOTER -------------------- -->
 
-    <Rodape />
+    <!-- on a phone-sized screen (xs) with tabs for this profile, the bottom
+         tab bar replaces the footer; otherwise the footer -->
+    <MobileTabBar v-if="$q.screen.xs && User.MobileTabs?.length && !['welcome'].includes($route.name)" />
+    <Rodape v-else />
 
     <!-- back to top: s-route-scroll's own button -->
   </q-layout>
@@ -181,6 +187,7 @@ import LeftMenu from '../components/LeftMenu.vue'
 import TopMenu from '../components/TopMenu.vue'
 import RightMenu from '../components/RightMenu.vue'
 import Rodape from '../components/footer/MainFooter.vue'
+import MobileTabBar from '../components/footer/MobileTabBar.vue'
 
 import { defineComponent } from 'vue'
 import { barStyle, thumbStyle } from '../services/app'
@@ -204,6 +211,7 @@ export default defineComponent({
     TopMenu,
     RightMenu,
     Rodape,
+    MobileTabBar,
     UserPermissioes,
     PagePermissoes,
     ThemeStudioEngine
