@@ -13,7 +13,7 @@
                 :key="type.id"
                 v-close-popup
                 clickable
-                class="col-4 column items-center localhover"
+                class="col-4 column items-center header-service"
                 data-test="header-service"
                 @click="openType(type)"
               >
@@ -84,3 +84,14 @@ export default defineComponent({
   }
 })
 </script>
+
+<style scoped>
+/* an almost invisible hover (2%): Quasar's q-item paints currentColor at 0.15 */
+.header-service {
+  border-radius: 8px;
+}
+.header-service:hover :deep(.q-focus-helper),
+.header-service:focus :deep(.q-focus-helper) {
+  opacity: 0.02 !important;
+}
+</style>
