@@ -97,7 +97,9 @@ onUnmounted(() => Dashboard.reset())
 </script>
 
 <template>
-  <q-page class="q-pa-sm">
+  <!-- a block, not a q-page: it is rendered INSIDE a route's q-page (a nested
+       q-page takes the window height again and the empty page scrolls) -->
+  <div class="q-pa-sm">
     <div v-if="Dashboard.dashboardLoading" class="flex flex-center q-pa-xl">
       <q-spinner :color="$q.dark.isActive ? 'white' : 'primary'" size="48px" />
     </div>
@@ -124,5 +126,5 @@ onUnmounted(() => Dashboard.reset())
 
       <DashboardDialogHost />
     </template>
-  </q-page>
+  </div>
 </template>

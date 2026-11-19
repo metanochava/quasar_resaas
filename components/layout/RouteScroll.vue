@@ -116,5 +116,16 @@ html.resaas-route-scroll body {
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* q-page sets its min-height from the WINDOW (innerHeight - header - footer,
+   whole pixels), which can be a pixel or two taller than this area (zoom,
+   fractional sizes): an empty page scrolled. Here the page fills the area
+   and only grows with its content. */
+.route-scroll > .q-page {
+  min-height: 0 !important;
+  flex: 1 0 auto;
 }
 </style>

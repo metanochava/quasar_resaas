@@ -1,7 +1,9 @@
 
 <template>
 
-  <q-page class="q-pa-sm">
+  <!-- a block, not a q-page: it is rendered inside the route's q-page
+       (HomeDashboards); a nested q-page made the empty page scroll -->
+  <div class="q-pa-sm">
 
     <!-- ===================================================== -->
     <!-- DASHBOARDS -->
@@ -59,7 +61,7 @@
 
     </div>
 
-  </q-page>
+  </div>
 
 </template>
 

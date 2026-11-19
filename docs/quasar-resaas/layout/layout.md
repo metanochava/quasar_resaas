@@ -87,6 +87,10 @@ scrolling. A new route starts at the top; the position is kept across a
 reload (`scroll_position`); the "back to top" button (`q-page-sticky`) follows
 this area. A `q-infinite-scroll` without `scroll-target` finds it by itself
 (`.scroll-y`); code that read `window.scrollY` must read this element.
+The area is a flex column and a `q-page` directly in it fills it
+(`min-height: 0; flex: 1 0 auto`) instead of Quasar's window-based
+`min-height`, which could be a pixel or two taller than the area and made an
+empty page (e.g. `/dashboard`) scroll.
 
 **Scrollbars:** both drawers scroll in a `q-scroll-area` styled by
 `thumbStyle`/`barStyle` (`services/app.js`). Every native scrollbar (the
