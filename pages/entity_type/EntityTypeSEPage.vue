@@ -161,6 +161,11 @@
             <EntityTypeEntitiesPanel :entity-type-id="EntityType.form?.id" />
           </div>
 
+          <!-- the phone's bottom tabs of this Entity Type -->
+          <div v-if="User.can('list_entitytypemobiletab')" class="q-mt-md">
+            <EntityTypeMobileTabsPanel :entity-type-id="EntityType.form?.id" />
+          </div>
+
         </template>
 
         <!-- no #footer: FormTwo's own ActionForm (cancel, reset, edit,
@@ -205,6 +210,7 @@ import AppManager from './AppManager.vue'
 import GroupManager from '../group/GroupManagerEntityType.vue'
 
 import EntityTypeEntitiesPanel from './EntityTypeEntitiesPanel.vue'
+import EntityTypeMobileTabsPanel from './EntityTypeMobileTabsPanel.vue'
 
 import {
   ThemeStudioEngine

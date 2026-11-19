@@ -1,7 +1,8 @@
 <template>
   <!-- the phone's bottom bar (WhatsApp-like): the profile's tabs, already
-       filtered by the backend (users/{id}/mobile_tabs/), then "More" (the
-       drawer with every menu). Coloured like the footer (theme surface). -->
+       filtered by the backend (users/{id}/mobile_tabs/, at most 5). No "More"
+       tab: the header's ☰ (top left) already opens the drawer with every
+       menu. Coloured like the footer (theme surface). -->
   <q-footer bordered class="mobile-tab-bar" :class="$q.dark.isActive ? 'bg-dark text-white' : 'bg-primary text-white'" data-test="mobile-tab-bar">
     <q-tabs
       :model-value="active"
@@ -14,7 +15,6 @@
         :name="tab.route" :to="{ name: tab.route }" :icon="tab.icon" :label="tdc(tab.label)"
         class="mobile-tab-bar__tab" :data-test="`mobile-tab-${tab.route}`"
       />
-      <q-tab name="__more" icon="menu" :label="tdc('More')" class="mobile-tab-bar__tab" data-test="mobile-tab-more" @click="User.toggleLeftTop()" />
     </q-tabs>
   </q-footer>
 </template>
@@ -27,7 +27,7 @@ import { useUserStore } from '../../stores/UserStore'
 
 const User = useUserStore()
 const route = useRoute()
-const tabs = computed(() => (User.MobileTabs || []).slice(0, 4))
+const tabs = computed(() => (User.MobileTabs || []).slice(0, 5))
 const active = computed(() => (tabs.value.some(t => t.route === route.name) ? route.name : null))
 </script>
 
