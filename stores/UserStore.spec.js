@@ -383,4 +383,3 @@ describe('UserStore - the refresh token in the HttpOnly cookie (the API\'s own s
     post.mockRestore()
   })
 })
-
