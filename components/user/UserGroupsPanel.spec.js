@@ -277,3 +277,49 @@ describe('UserGroupsPanel - stays on the page', () => {
     expect(push).not.toHaveBeenCalled()
   })
 })
+
+describe('UserGroupsPanel - switching an assigned profile on/off', () => {
+  const withState = () => { session.Permissions = new Set(['list_branchusergroup', 'change_branchusergroup']) }
+
+  it('shows the toggle only with change_branchusergroup', () => {
+    session.Permissions = new Set(['list_branchusergroup'])
+    expect(mountPanel().wrapper.find('[data-test="profile-state-toggle"]').exists()).toBe(false)
+
+    withState()
+    expect(mountPanel().wrapper.find('[data-test="profile-state-toggle"]').exists()).toBe(true)
+  })
+
+  it('switches an active profile off through the controller', async () => {
+    withState()
+    const controller = makeController({ setActive: vi.fn(async () => {}), getUserId: () => 'u-other' })
+    const { wrapper } = mountPanel({}, controller)
+
+    await wrapper.find('[data-test="profile-state-toggle"]').trigger('click')
+    await flushPromises()
+
+    expect(controller.setActive).toHaveBeenCalledWith(nurse, false)
+    expect(alertSuccess).toHaveBeenCalled()
+  })
+
+  it("cannot switch off the session's own current profile", () => {
+    withState()
+    session.data = { id: 'me' }
+    session.Group = { id: 'g1', name: 'Nurse' }
+    const controller = makeController({ setActive: vi.fn(), getUserId: () => 'me' })
+    const { wrapper } = mountPanel({}, controller)
+
+    expect(wrapper.find('[data-test="profile-state-toggle"]').classes()).toContain('disabled')
+  })
+
+  it('shows the API message when the change is refused', async () => {
+    withState()
+    const refusal = { response: { status: 400 } }
+    const controller = makeController({ setActive: vi.fn(async () => { throw refusal }), getUserId: () => 'u-other' })
+    const { wrapper } = mountPanel({}, controller)
+
+    await wrapper.find('[data-test="profile-state-toggle"]').trigger('click')
+    await flushPromises()
+
+    expect(alertError).toHaveBeenCalledWith(refusal.response)
+  })
+})

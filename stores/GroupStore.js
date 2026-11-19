@@ -149,6 +149,10 @@ export const useGroupStore = createBaseStore(
           )
 
 
+        // only an Active assignment is a profile to act with (an Admin may
+        // switch one off in the Profiles tab; the backend refuses it)
+        res.data = (res.data || []).filter(group => (group.state || 'Active') === 'Active')
+
         // Lista completa de grupos
         setStorage(
           'l',
@@ -203,6 +207,10 @@ export const useGroupStore = createBaseStore(
             })
           )
 
+
+        // only an Active assignment is a profile to act with (an Admin may
+        // switch one off in the Profiles tab; the backend refuses it)
+        res.data = (res.data || []).filter(group => (group.state || 'Active') === 'Active')
 
         // Lista completa de grupos
         setStorage(

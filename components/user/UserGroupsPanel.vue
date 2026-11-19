@@ -40,6 +40,24 @@ const entityName = computed(() => Session.Entity?.name || '')
 const canList = computed(() => Session.can('list_branchusergroup'))
 const canAssign = computed(() => Session.can('add_branchusergroup'))
 const canRemove = computed(() => Session.can('delete_branchusergroup'))
+const canChangeState = computed(() => Session.can('change_branchusergroup'))
+
+// the profile the session is acting with cannot be switched off by itself
+// (the backend refuses it too)
+const isOwnCurrent = (group) =>
+  String(props.controller.getUserId?.() || '') === String(Session.data?.id || '') &&
+  String(group.id) === String(Session.Group?.id || '')
+
+const isActive = (group) => (group.state || 'Active') === 'Active'
+
+async function toggleState(group, active) {
+  try {
+    await props.controller.setActive(group, active)
+    AlertSuccess(tdc(active ? 'Profile activated.' : 'Profile deactivated.'))
+  } catch (error) {
+    Alert(error?.response)
+  }
+}
 
 // ---------------- assign (modal) ----------------
 const dialogOpen = ref(false)
@@ -157,6 +175,24 @@ function confirmRemove(group) {
               {{ tdc(stateLabel(group.state || 'Active')) }}
             </q-chip>
           </q-item-label>
+        </q-item-section>
+
+        <q-item-section v-if="canChangeState" side>
+          <!-- q-toggle: s-toggle does not forward disable -->
+          <q-toggle
+            :model-value="isActive(group)"
+            :disable="isBusy(group) || (isOwnCurrent(group) && isActive(group))"
+            color="positive"
+            dense
+            data-test="profile-state-toggle"
+            @update:model-value="value => toggleState(group, value)"
+          >
+            <s-tooltip>
+              {{ isOwnCurrent(group) && isActive(group)
+                ? tdc('You cannot deactivate the profile you are currently using.')
+                : tdc(isActive(group) ? 'Deactivate this profile: it stops giving access' : 'Activate this profile: it gives access again') }}
+            </s-tooltip>
+          </q-toggle>
         </q-item-section>
 
         <q-item-section v-if="canRemove" side>

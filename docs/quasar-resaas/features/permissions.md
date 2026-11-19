@@ -168,6 +168,15 @@ current Entity's groups unless the user is platform level. The EntityType templa
 (`EntityTypeStore.loadGroups()`) therefore shows every group only to platform-level users. See
 [django_resaas: Permissions → Managing group permissions](../../django-resaas/security/permissions.md).
 
+**Active / Inactive profiles (2026-11-19).** Only an Active assignment gives access (the backend
+enforces it). `GroupStore.getGroups()` / `getGroups_()` offer only Active profiles to pick. In
+view_employee's Profiles tab, `<s-user-groups-panel>` shows a toggle per assigned profile to whoever
+holds `change_branchusergroup` (`useUserGroups().setActive(group, active)` →
+`UserAdminStore.setGroupState()` → `users/{id}/groupState/`); the profile the session is acting
+with cannot be switched off (disabled toggle, and `400 cannot_deactivate_own_active_group`).
+Tests: `components/user/UserGroupsPanel.spec.js`, `composables/useUserGroups.spec.js`,
+`stores/GroupStore.state.spec.js`.
+
 > [!WARNING]
 > `components/UserPermissioes.vue` and `components/PagePermissoes.vue` exist
 > as mounting points (used in `MainLayout`'s `pagepermissoes` dialog) but are

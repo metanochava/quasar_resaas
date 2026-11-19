@@ -124,6 +124,25 @@ export function useUserGroups(getUserId, { enabled = () => true } = {}) {
     }
   }
 
+  // Active <-> Inactive; the list follows the backend's answer
+  async function setActive(group, active) {
+    const userId = getUserId()
+    if (!userId || isBusy(group)) return
+
+    setBusy(group, true)
+
+    try {
+      const data = await Users.setGroupState(userId, group.id, active ? 'Active' : 'Inactive')
+      const state = data?.state || (active ? 'Active' : 'Inactive')
+
+      assigned.value = assigned.value.map(item =>
+        String(item.id) === String(group.id) ? { ...item, state } : item
+      )
+    } finally {
+      setBusy(group, false)
+    }
+  }
+
   // loads as soon as there is a user, and follows it: another employee (same
   // page instance) or an account that appears/disappears reloads the list
   watch(() => [getUserId(), enabled()], () => load(), { immediate: true })
@@ -131,7 +150,7 @@ export function useUserGroups(getUserId, { enabled = () => true } = {}) {
   return {
     assigned, available, count,
     loading, loadingAvailable, failed, availableFailed,
-    load, loadAvailable, assign, unassign,
+    load, loadAvailable, assign, unassign, setActive, getUserId,
     isAssigned, isBusy
   }
 }

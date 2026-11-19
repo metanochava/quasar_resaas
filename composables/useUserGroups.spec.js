@@ -151,3 +151,25 @@ describe('useUserGroups', () => {
     expect(groups.available.value).toEqual([nurse, clerk])
   })
 })
+
+describe('useUserGroups - switching a profile on/off', () => {
+  it("sends the state and keeps the backend's answer in the list", async () => {
+    vi.spyOn(admin, 'setGroupState').mockResolvedValue({ id: 'g1', name: 'Nurse', state: 'Inactive' })
+    const groups = useUserGroups(() => 'u1')
+    await flush()
+
+    await groups.setActive(nurse, false)
+
+    expect(admin.setGroupState).toHaveBeenCalledWith('u1', 'g1', 'Inactive')
+    expect(groups.assigned.value).toEqual([{ ...nurse, state: 'Inactive' }])
+  })
+
+  it('a refused change leaves the list untouched and rethrows', async () => {
+    vi.spyOn(admin, 'setGroupState').mockRejectedValue(new Error('400'))
+    const groups = useUserGroups(() => 'u1')
+    await flush()
+
+    await expect(groups.setActive(nurse, false)).rejects.toThrow('400')
+    expect(groups.assigned.value).toEqual([nurse])
+  })
+})

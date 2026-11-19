@@ -107,6 +107,16 @@ export const useUserAdminStore = createBaseStore(
         return data
       },
 
+      // switch an assigned profile on/off ('Active' | 'Inactive'); only an
+      // Active one grants access - the backend decides
+      async setGroupState(userId, groupId, state) {
+        const { data } = await HTTPAuth.post(
+          url({ type: 'u', url: `${this.safeUrl}/${userId}/groupState/` }),
+          { group: groupId, state }
+        )
+        return data
+      },
+
       async unassignGroup(userId, groupId) {
         await HTTPAuth.post(
           url({ type: 'u', url: `${this.safeUrl}/${userId}/removeGroup/` }),
