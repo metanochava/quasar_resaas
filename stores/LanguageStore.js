@@ -2,6 +2,7 @@ import { createBaseStore } from './../base/base_store'
 import { HTTPAuth, HTTPClient, url } from '../services/api'
 import { useUserStore } from './UserStore'
 import { setStorage, deleteStorage } from '../services/storage'
+import { shared } from '../utils/sharedRequest'
 
 // the language this browser picked explicitly (see choose)
 export const CHOSEN_KEY = 'userLangChosen'
@@ -49,13 +50,15 @@ export const useLanguageStore = createBaseStore(
         // Reset map
         this.TraducaoMap = {}
 
-        const res = await HTTPClient.get(
+        // every me/ applies the language again: one download per language,
+        // kept 10 minutes
+        const res = await shared(`translations:${language.id}`, () => HTTPClient.get(
           url({
             type: "u",
             url: `django_resaas/languages/${language?.id}/translations/`,
             params: {}
           })
-        )
+        ), { ttl: 600000 })
 
         const payload = res.data
 
@@ -82,7 +85,7 @@ export const useLanguageStore = createBaseStore(
     },
 
     async get() {
-      await HTTPClient.get(url({type: "u", url: "django_resaas/languages/", params: {}}) )
+      await shared('languages', () => HTTPClient.get(url({type: "u", url: "django_resaas/languages/", params: {}}) ), { ttl: 60000 })
       .then(res => {
         // only the list: which language is current is decided by
         // UserStore.me() (signed in), AuthLayout.applyLanguage() (before

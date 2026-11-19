@@ -281,3 +281,72 @@ describe('installAuthGuard - a permission the profile gained later', () => {
     expect(result).toEqual({ name: 'dashboard' })
   })
 })
+
+describe('installAuthGuard - the session shared through the API cookie (*.mytech.co.mz)', () => {
+  const realLocation = window.location
+  let resumeSession
+
+  function at (origin) {
+    Object.defineProperty(window, 'location', {
+      value: { origin, hostname: new URL(origin).hostname, pathname: '/', assign: vi.fn(), replace: vi.fn() },
+      configurable: true,
+    })
+  }
+
+  beforeEach(() => {
+    sessionStorage.clear()
+    process.env.SSO_URL = 'https://auth.mytech.co.mz'
+    process.env.API = 'https://app.mytech.co.mz'
+    resumeSession = vi.fn()
+    installAuthGuard(fakeRouter, { refreshPermissions: null, resumeSession })
+  })
+
+  afterEach(() => {
+    delete process.env.SSO_URL
+    delete process.env.API
+    Object.defineProperty(window, 'location', { value: realLocation, configurable: true })
+  })
+
+  it('a signed-in browser is resumed in the background, with no page leaving for the central domain', async () => {
+    at('https://saude.mytech.co.mz')
+    resumeSession.mockResolvedValue(true)
+
+    // nothing chosen on this site yet: the Entity -> Branch -> Group choice
+    expect(await guardFn({ meta: { requiresAuth: true }, fullPath: '/dashboard' })).toEqual({ name: 'ssoResume' })
+    expect(window.location.assign).not.toHaveBeenCalled()
+  })
+
+  it('with a profile already chosen on this site the navigation goes on', async () => {
+    at('https://saude.mytech.co.mz')
+    localStorage.setItem('userGroup', JSON.stringify({ id: 'g1', name: 'Doctor' }))
+    // as UserStore.resumeFromCookie does (keepRefresh): until when the cookie lives
+    resumeSession.mockImplementation(async () => {
+      localStorage.setItem('refreshUntil', new Date(Date.now() + 3600e3).toISOString())
+      return true
+    })
+
+    expect(await guardFn({ meta: { requiresAuth: true }, fullPath: '/dashboard' })).toBeUndefined()
+    // a fresh page load of the login page in a signed-in browser goes to the dashboard
+    localStorage.removeItem('refreshUntil')
+    installAuthGuard(fakeRouter, { refreshPermissions: null, resumeSession })
+    expect(await guardFn({ name: 'login', meta: {}, fullPath: '/auth/login' })).toEqual({ name: 'dashboard' })
+  })
+
+  it('not signed in: the local login, once - the central domain has the same cookie, so no redirect', async () => {
+    at('https://saude.mytech.co.mz')
+    resumeSession.mockResolvedValue(false)
+
+    expect(await guardFn({ meta: { requiresAuth: true }, fullPath: '/x' })).toEqual({ name: 'login', query: { redirect: '/x' } })
+    expect(guardFn({ meta: { requiresAuth: true }, fullPath: '/x' })).toEqual({ name: 'login', query: { redirect: '/x' } })
+    expect(resumeSession).toHaveBeenCalledTimes(1)
+    expect(window.location.assign).not.toHaveBeenCalled()
+  })
+
+  it('a site on its own domain still asks the central domain (its API cookie is its own)', async () => {
+    at('https://docodela.co.mz')
+
+    expect(await guardFn({ meta: { requiresAuth: true }, fullPath: '/x' })).toBe(false)
+    expect(resumeSession).not.toHaveBeenCalled()
+    expect(window.location.assign).toHaveBeenCalledTimes(1)
+  })
+})

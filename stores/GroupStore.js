@@ -5,6 +5,7 @@ import { setStorage } from '../services/storage'
 import { profileSplint } from '../utils/profile'
 import { tdc } from '../services/translation'
 import { sDialog } from '../services/dialog'
+import { shared } from '../utils/sharedRequest'
 
 
 // Every user also holds Guest in each branch (django_resaas
@@ -341,17 +342,21 @@ export const useGroupStore = createBaseStore(
         const User =
           useUserStore()
 
+        // before /me/ answers there is no user: users/undefined/permissions/
+        // was a 401/403/404 on every sign-in
+        if (!User.data?.id) return
 
+        // concurrent callers (group step, route guard) share one request
         const { data } =
-          await HTTPAuth.get(
+          await shared(`permissions:${User.data.id}:${User.Group?.id || ''}`, () => HTTPAuth.get(
             url({
               type:
                 'u',
 
               url:
-                `django_resaas/users/${User.data?.id}/permissions/`
+                `django_resaas/users/${User.data.id}/permissions/`
             })
-          )
+          ))
 
 
         const Permissions =

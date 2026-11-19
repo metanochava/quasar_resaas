@@ -13,7 +13,7 @@ export function sameOriginHosts () {
 }
 
 export function apiOrigin () {
-  if (typeof window !== 'undefined' && sameOriginHosts().includes(window.location.hostname.toLowerCase())) {
+  if (typeof window !== 'undefined' && sameOriginHosts().includes(String(window.location.hostname || '').toLowerCase())) {
     return window.location.origin
   }
   return process.env.API

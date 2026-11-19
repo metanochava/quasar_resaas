@@ -17,6 +17,7 @@ import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
 
 import { HTTPAuth, url } from '../services/api'
+import { shared } from '../utils/sharedRequest'
 
 function serializeFilterParam(params, name, type, value) {
   if (value === undefined || value === null || value === '') return
@@ -101,9 +102,10 @@ export const useDashboardStore = defineStore('dashboard', {
     async loadDashboardList() {
       this.dashboardsLoading = true
       try {
-        const { data } = await HTTPAuth.get(
+        // concurrent callers (home, layout) share one request
+        const { data } = await shared('dashboards', () => HTTPAuth.get(
           url({ type: 'u', url: 'django_resaas/dashboards/' })
-        )
+        ))
         this.dashboards = data || []
       } finally {
         this.dashboardsLoading = false

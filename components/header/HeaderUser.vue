@@ -337,6 +337,7 @@ import RegisterEntity from './RegisterEntity.vue'
 
 import { tdc } from '../../services/translation'
 import { ssoEnabled } from '../../services/sso'
+import { sharesCentralSession } from '../../services/sessionSite'
 import { profileSplint } from '../../utils/profile.js'
 import GroupSelector from './../GroupSelector.vue'
 import HeaderPreferences from './HeaderPreferences.vue'
@@ -363,7 +364,9 @@ export default defineComponent({
       Branch,
       tdc,
       profileSplint,
-      ssoOn: ssoEnabled(),
+      // "this site only" exists only where the site has its own session: on
+      // the sites that share the API cookie signing out is for all of them
+      ssoOn: ssoEnabled() && !sharesCentralSession(),
       
     }
   },

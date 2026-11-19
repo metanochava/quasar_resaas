@@ -13,6 +13,7 @@ import { setSettings } from '../services/theme'
 import { JSONSafeParse } from '../utils/json'
 
 import { createResaasContext,  clearResaasContext, getResaasContext } from '../services/tenantContext'
+import { shared, forgetShared } from '../utils/sharedRequest'
 
 // Module-level (not store state - a Promise isn't serializable/reactive
 // state anyway), shared across every call regardless of which component
@@ -352,14 +353,17 @@ export const useUserStore = createBaseStore(
       }
     },
     async getMenus () {
-      await HTTPAuth.get(url({ type: 'u', url: 'django_resaas/users/' + this.data.id + '/menus/', params: {} }))
+      if (!this.data?.id) return
+      // concurrent callers (group step, layout, header) share one request per profile
+      const profile = `${this.data.id}:${this.Group?.id || ''}`
+      await shared(`menus:${profile}`, () => HTTPAuth.get(url({ type: 'u', url: 'django_resaas/users/' + this.data.id + '/menus/', params: {} })))
         .then(res => {
           this.AllMenus = res.data
           this.Menus = this.AllMenus
         })
       // the same moment as the menus (a group / profile change refreshes both);
       // a failure only leaves the phone with the footer
-      HTTPAuth.get(url({ type: 'u', url: 'django_resaas/users/' + this.data.id + '/mobile_tabs/', params: {} }))
+      shared(`mobile_tabs:${profile}`, () => HTTPAuth.get(url({ type: 'u', url: 'django_resaas/users/' + this.data.id + '/mobile_tabs/', params: {} })))
         .then(res => { this.MobileTabs = Array.isArray(res.data) ? res.data : [] })
         .catch(() => { this.MobileTabs = [] })
     },
@@ -590,7 +594,8 @@ export const useUserStore = createBaseStore(
     },
 
     async me() {
-      const rsp = await HTTPAuth.get(url({type: "u", url: "me/", params: {}}) )
+      // concurrent callers (login boot, layouts, entity step) share one request
+      const rsp = await shared('me', () => HTTPAuth.get(url({type: "u", url: "me/", params: {}}) ))
 
       this.data = rsp.data
       const Language = useLanguageStore()
@@ -631,6 +636,27 @@ export const useUserStore = createBaseStore(
       this.access = rsp.data.access
       this.keepRefresh(rsp.data.refresh, rsp.data.refresh_cookie)
       return rsp
+    },
+
+    // The browser may already be signed in on a sibling site (*.mytech.co.mz
+    // share the API's HttpOnly session cookie - services/sessionSite.js): a
+    // refresh in the background finds out, without leaving the page. True
+    // when it started this tab's session.
+    async resumeFromCookie() {
+      try {
+        const rsp = await HTTPClient.post(url({ type: 'u', url: 'refresh_token/', params: {} }), {}, { silent: true })
+        if (!rsp.data?.access) return false
+        this.access = rsp.data.access
+        this.keepRefresh(rsp.data.refresh, rsp.data.refresh_cookie)
+        await this.me()
+        if (!this.data?.id) return false
+        this.loginMsg = 'good'
+        this.isLogout = false
+        this.isLogin = true
+        return true
+      } catch {
+        return false
+      }
     },
 
     // where the session's refresh token lives: in the body -> stored; in the
@@ -731,6 +757,9 @@ export const useUserStore = createBaseStore(
       // persisted BaseStore state of this user (filters, searches... of every
       // Entity/Branch) goes with the session; global preferences stay
       const userId = this.data?.id
+
+      // nothing fetched for this session is reused by the next one
+      forgetShared()
 
       // The local cleanup runs whether or not the server answered: a failed
       // logout request must not leave the session (tokens) on the device.

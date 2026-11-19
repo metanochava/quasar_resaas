@@ -123,6 +123,17 @@ describe('sso - client', () => {
     expect(state).not.toBe(second.state)
   })
 
+  it('after a local login on a site sharing the central API cookie nothing leaves the page', async () => {
+    process.env.API = 'https://app.mytech.co.mz'
+    const location = at('https://venda.mytech.co.mz')
+    Object.assign(location, { hostname: 'venda.mytech.co.mz' })
+
+    expect(await sso.afterLocalLogin({ replace: vi.fn() })).toBe(false)
+    expect(post).not.toHaveBeenCalled()
+    expect(location.assign).not.toHaveBeenCalled()
+    delete process.env.API
+  })
+
   it('after a local login the session is handed to the central domain', async () => {
     const location = at(CLIENT)
     post.mockResolvedValue({ data: { code: 'c1' } })

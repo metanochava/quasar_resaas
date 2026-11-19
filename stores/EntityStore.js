@@ -8,6 +8,7 @@ import { tdc } from '../services/translation'
 import { deleteStorage, getStorage, setStorage } from '../services/storage'
 import { sDialog } from '../services/dialog'
 import { entityTypeKey } from '../utils/entityTypeHost'
+import { shared } from '../utils/sharedRequest'
 
 // ?entity_type_name=<the host's EntityType key> for userEntitys/
 function hostEntityTypeParams () {
@@ -380,12 +381,13 @@ export const useEntityStore = createBaseStore(
 
           if (!id) return
 
+          // the 4 look endpoints once per Entity (kept 30 s; ThemeStudio forgets it)
           const [
             theme,
             layout,
             typography,
             animation
-          ] = await Promise.all([
+          ] = await shared(`look:entity:${id}`, () => Promise.all([
             HTTPAuth.get(
               url({
                 type: 'u',
@@ -417,7 +419,7 @@ export const useEntityStore = createBaseStore(
                   `django_resaas/entitys/${id}/animationSettingsGet/`
               })
             )
-          ])
+          ]), { ttl: 30000 })
 
           this.Theme =
             theme.data || {}

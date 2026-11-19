@@ -22,6 +22,8 @@
 //   ssoAuthorize  /sso           CENTRAL: a code for a client domain
 //   ssoAdopt      /sso/adopt     CENTRAL: take over a client's local session
 //   ssoCallback   /sso/callback  CLIENT:  turn the answer into a session
+//   ssoResume     /sso/resume    a session resumed from the API cookie: choose
+//                                Entity -> Branch -> Group (authGuard)
 import { onMounted, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
@@ -62,6 +64,10 @@ function forgetQuery () {
 const startSession = data => User.startSession(data)
 
 async function authorizeStep (query) {
+  // the central domain may hold the session only in the API cookie (signed
+  // in on a sibling site): find it before answering "login required"
+  if (!User.isSignedIn()) await User.resumeFromCookie()
+
   if (User.isSignedIn()) {
     try {
       await sso.authorize(query)
@@ -100,6 +106,7 @@ onMounted(async () => {
 
     if (route.name === 'ssoAdopt') return await sso.adopt(query, startSession, User.refresh || getStorage('l', 'refresh'))
     if (route.name === 'ssoCallback') return await callbackStep(query)
+    if (route.name === 'ssoResume') return await loadUserSaas(q)
 
     failed.value = true
   } catch {

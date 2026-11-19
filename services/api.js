@@ -142,6 +142,10 @@ const createClient = (auth = false, blob = false) => {
       const status = error?.response?.status
       const originalRequest = error?.config
 
+      // a probe whose failure is an answer, not an error (UserStore
+      // .resumeFromCookie: "is this browser signed in?") - no message, no logout
+      if (originalRequest?.silent) return Promise.reject(error)
+
       if (
         auth && status === 401 && originalRequest &&
         !originalRequest._retried &&

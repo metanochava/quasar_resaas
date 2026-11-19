@@ -383,3 +383,39 @@ describe('UserStore - the refresh token in the HttpOnly cookie (the API\'s own s
     post.mockRestore()
   })
 })
+
+describe('UserStore.resumeFromCookie - the session of a sibling site', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    localStorage.clear()
+  })
+
+  it('a live API cookie starts this tab\'s session without any page leaving', async () => {
+    const { HTTPClient, HTTPAuth } = await import('../services/api')
+    const until = new Date(Date.now() + 3600e3).toISOString()
+    HTTPClient.post.mockResolvedValueOnce({ data: { access: 'acc', refresh_cookie: { expires_at: until } } })
+    HTTPAuth.get.mockResolvedValueOnce({ data: { id: 'u1', username: 'ana' } })
+    const User = useUserStore()
+
+    expect(await User.resumeFromCookie()).toBe(true)
+
+    const [, body, config] = HTTPClient.post.mock.calls.at(-1)
+    expect(body).toEqual({})
+    // a failure is an answer ("not signed in"): no message, no logout
+    expect(config).toEqual({ silent: true })
+    expect(User.access).toBe('acc')
+    expect(User.data.id).toBe('u1')
+    expect(User.isLogin).toBe(true)
+    expect(localStorage.getItem('refreshUntil')).toBe(until)
+  })
+
+  it('no cookie: false, and nothing changes', async () => {
+    const { HTTPClient } = await import('../services/api')
+    HTTPClient.post.mockRejectedValueOnce({ response: { status: 401 } })
+    const User = useUserStore()
+
+    expect(await User.resumeFromCookie()).toBe(false)
+    expect(User.access).toBeFalsy()
+    expect(User.isLogin).toBeFalsy()
+  })
+})

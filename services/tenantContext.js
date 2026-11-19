@@ -51,9 +51,15 @@ export async function createResaasContext({
   if (!data?.token)
     throw new Error('RESAAS context token was not returned')
 
+  storeResaasContext(data, { user, entity, branch, group })
+
+  return data
+}
+
+// Keeps an issued context ({token, expires_in, ...}: resaas/context/ or the
+// sign-in boot, resaas/boot/) as the current one for that selection.
+export function storeResaasContext (data, { user = null, entity = null, branch = null, group = null } = {}) {
   setResaasContext(data.token)
   setStorage('s', EXPIRES_KEY, String(contextExpiresAt(data)))
   setStorage('s', FOR_KEY, contextSelectionKey({ user, entity, branch, group }))
-
-  return data
 }

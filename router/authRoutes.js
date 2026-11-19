@@ -38,6 +38,9 @@ export const authRoutes = [
       { path: '', component: () => import('./../pages/auth/SsoPage.vue'), name: 'ssoAuthorize' },
       { path: 'adopt', component: () => import('./../pages/auth/SsoPage.vue'), name: 'ssoAdopt' },
       { path: 'callback', component: () => import('./../pages/auth/SsoPage.vue'), name: 'ssoCallback' },
+      // a session resumed from the API cookie (authGuard) with nothing chosen
+      // here yet: the Entity -> Branch -> Group choice, without signing in
+      { path: 'resume', component: () => import('./../pages/auth/SsoPage.vue'), name: 'ssoResume' },
     ],
   },
   // there is no '/home' any more (WelcomeGuestPage was removed): the site at

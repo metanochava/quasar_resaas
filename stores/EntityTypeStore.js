@@ -3,6 +3,7 @@ import { createBaseStore } from '../base/base_store'
 import { HTTPClient, HTTPAuth, url } from '../services/api'
 import { useUserStore } from './UserStore'
 import { getStorage, setStorage } from '../services/storage'
+import { shared } from '../utils/sharedRequest'
 
 export const useEntityTypeStore = createBaseStore(
   'entitytype',
@@ -342,9 +343,10 @@ export const useEntityTypeStore = createBaseStore(
       // ===============================
       async getEntityTypes() {
         try {
-          const { data } = await HTTPAuth.get(
+          // one request for every caller (header, layouts, site page): kept 60 s
+          const { data } = await shared('entitytypes', () => HTTPAuth.get(
             url({ type: "u", url: "django_resaas/entitytypes/", params: {'objects': 'alive'} })
-          )
+          ), { ttl: 60000 })
 
           this.rows = data || []
 
@@ -366,12 +368,13 @@ export const useEntityTypeStore = createBaseStore(
 
           if (!force && !getStorage('l', 'userEntityType')) return
 
-          const [theme, layout, typography, animation] = await Promise.all([
+          // the 4 look endpoints once per EntityType (kept 30 s; ThemeStudio forgets it)
+          const [theme, layout, typography, animation] = await shared(`look:entitytype:${id}`, () => Promise.all([
             HTTPClient.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/themeGet/` })),
             HTTPClient.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/layoutSettingsGet/` })),
             HTTPClient.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/typographyGet/` })),
             HTTPClient.get(url({ type: 'u', url: `django_resaas/entitytypes/${id}/animationSettingsGet/` }))
-          ])
+          ]), { ttl: 30000 })
 
           this.Theme = theme.data || {}
           this.LayoutSettings = layout.data || {}

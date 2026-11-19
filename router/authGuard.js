@@ -5,6 +5,7 @@ import { AlertWarning } from '../boot/alerts'
 import { tdc } from '../services/translation'
 import { groupLabel } from '../utils/groupLabel'
 import { canStartSilent, startSilent } from '../services/sso'
+import { cookieSessionPossible, sharesCentralSession } from '../services/sessionSite'
 
 // Routes already declare `meta.requiresAuth` (see router/restRoutes.js)
 // but nothing ever enforced it - a protected route mounted its
@@ -87,6 +88,17 @@ let lastRefresh = 0
 const BACKGROUND_REFRESH_MS = 5 * 60 * 1000
 let lastBackgroundRefresh = 0
 
+// A page with no session of its own may still be in a signed-in browser: on
+// the sites that share the API cookie (services/sessionSite.js) a refresh in
+// the background finds it - no page leaves for the central domain. Asked once
+// per page load.
+let resumeTried = false
+
+async function resumeFromCookie () {
+  const { useUserStore } = await import('../stores/UserStore')
+  return useUserStore().resumeFromCookie()
+}
+
 async function refreshFromGroupStore () {
   const { useGroupStore } = await import('../stores/GroupStore')
   await useGroupStore().getUserPermissions()
@@ -95,10 +107,13 @@ async function refreshFromGroupStore () {
 export function installAuthGuard(router, {
   loginRouteName = 'login',
   forbiddenRouteName = 'dashboard',
-  refreshPermissions = refreshFromGroupStore
+  refreshPermissions = refreshFromGroupStore,
+  resumeSession = resumeFromCookie,
+  resumeRouteName = 'ssoResume'
 } = {}) {
   lastRefresh = 0
   lastBackgroundRefresh = 0
+  resumeTried = false
 
   function refreshInBackground () {
     const now = Date.now()
@@ -141,14 +156,36 @@ export function installAuthGuard(router, {
       .then(() => (hasRequiredRole(role) ? undefined : deny(to)))
   }
 
+  // signed in again from the cookie: where to go now
+  function afterResume (to) {
+    // nothing chosen on this site yet: the Entity -> Branch -> Group choice
+    if (!getStorage('l', 'userGroup')) return { name: resumeRouteName }
+    if (to.name === loginRouteName) return { name: forbiddenRouteName }
+    return check(to)
+  }
+
+  // single sign-on (services/sso.js): with no session, ask the central
+  // domain once per tab before showing the local login page - unless this
+  // site shares the central domain's cookie (the refresh already answered)
+  function withoutSession (to) {
+    if (canStartSilent() && !sharesCentralSession()) {
+      return startSilent().then(leaving => (leaving ? false : check(to)))
+    }
+    return check(to)
+  }
+
   router.beforeEach((to) => {
-    // single sign-on (services/sso.js): with no session, ask the central
-    // domain once per tab before showing the local login page. Off unless
-    // SSO_URL is configured - then this stays synchronous, as before.
     const needsLogin = to.meta?.requiresAuth || to.name === loginRouteName
 
-    if (needsLogin && !hasSessionToken() && canStartSilent()) {
-      return startSilent().then(leaving => (leaving ? false : check(to)))
+    if (needsLogin && !hasSessionToken()) {
+      if (!resumeTried && resumeSession && cookieSessionPossible()) {
+        resumeTried = true
+        return Promise.resolve()
+          .then(() => resumeSession())
+          .catch(() => false)
+          .then(resumed => (resumed ? afterResume(to) : withoutSession(to)))
+      }
+      return withoutSession(to)
     }
 
     return check(to)

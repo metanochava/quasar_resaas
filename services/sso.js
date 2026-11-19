@@ -25,6 +25,7 @@
 // policy trusts. Tokens never travel in a URL. With hash routing everything
 // after '#' stays in the browser (never sent to a server).
 import { HTTPAuth, HTTPClient, url } from './api'
+import { sharesCentralSession } from './sessionSite'
 
 const PENDING = 'resaasSso'          // sessionStorage: the flow this tab started
 const TRIED = 'resaasSsoTried'       // sessionStorage: silent attempt already made
@@ -308,6 +309,10 @@ export async function afterLocalLogin (router) {
     await router.replace({ name: 'ssoAuthorize', query: next })
     return true
   }
+
+  // the central domain already has this session (the same API cookie):
+  // handing it over was two page loads for nothing
+  if (sharesCentralSession()) return false
 
   return propagate()
 }

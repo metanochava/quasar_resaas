@@ -7,6 +7,7 @@ import { errorMessage } from '../../utils/apiContract'
 import { resolveEffectiveConfig } from '../../theme/resolveEffectiveConfig.js'
 import { surfaceToStyle, surfacesToList } from '../../theme/surfaceToStyle.js'
 import { unwrapChoice } from '../../theme/unwrapChoice.js'
+import { forgetShared } from '../../utils/sharedRequest'
 
 // Estado + lógica do ThemeStudioEngine (ver CLAUDE.md secção 4: o
 // .vue fica só com template/composição, este ficheiro concentra
@@ -423,6 +424,8 @@ export function useThemeStudio(props, emit) {
 
   async function saveEditor() {
     if (!editor.source) return
+    // the Entity / EntityType looks kept by the stores are about to change
+    forgetShared('look:')
     const values = Object.fromEntries(Object.entries(editor.values).filter(([, value]) => value))
     editor.saving = true
     try {
@@ -462,6 +465,8 @@ export function useThemeStudio(props, emit) {
   // completa (CLAUDE.md secção 14).
   async function save() {
     const row = target.value
+    // the Entity / EntityType looks kept by the stores are about to change
+    forgetShared('look:')
 
     const id = row?.id || row?.pk
 
