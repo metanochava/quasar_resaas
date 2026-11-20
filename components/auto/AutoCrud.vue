@@ -111,7 +111,13 @@ const store = reactive({
   app: null,
   model: null,
   data: null,
-  form: null
+  form: null,
+  // the form modal (FormComponent) saves to `${store.safeUrl}/`: the same
+  // endpoint this list reads (the schema's, else "app/models/"). Without it
+  // "New" and "Edit" posted to /api/undefined/.
+  get safeUrl () {
+    return modelEndpoint.value.replace(/\/+$/, '')
+  }
 })
 
 const pagination = ref({
@@ -310,6 +316,7 @@ async function openpdf_list() {
 }
 
 async function onDelete(row) {
+  if (schema.value?.operations?.delete === false) return
   if (!hasPermission(schema.value?.permissions?.delete)) return
 
   await HTTPAuth.delete(
@@ -371,12 +378,19 @@ function onApplyFilter(payload = {}) {
 }
 
 async function onInlinePatch({ id, field, value }) {
+  if (schema.value?.operations?.update === false) return
   if (!hasPermission(schema.value?.permissions?.change)) return
 
-  await HTTPAuth.patch(
-    endpoint(`${modelEndpoint.value}${id}/`),
-    { [field]: value }
-  )
+  try {
+    // a list has no field on screen: the refusal names its own reason
+    await HTTPAuth.patch(
+      endpoint(`${modelEndpoint.value}${id}/`),
+      { [field]: value },
+      { showFieldErrors: true }
+    )
+  } catch {
+    // shown by the API client (boot/alerts.js); the row reloads as it is
+  }
 
   await loadData()
 }

@@ -290,6 +290,13 @@ const AlertError = (error) => {
 
     if (body?.alert_error) { sms = body.alert_error; go = true }
     if (failure?.message && data.status !== 413) { sms = failure.message; go = true }
+
+    // a request with no field on screen to show its errors (an inline edit in
+    // a list) asks for them in the message itself: "A service has no stock."
+    // instead of "Please correct the highlighted fields."
+    if (failure?.validation && data?.config?.showFieldErrors) {
+      sms = Object.values(failure.fields).join(' · ') || sms
+    }
   }
 
   if (!go) return

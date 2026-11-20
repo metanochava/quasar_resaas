@@ -192,6 +192,14 @@ describe('a failed response', () => {
     expect(Alerts.data).toEqual([])
   })
 
+  it('with no field on screen (an inline edit in a list) the toast says the field\'s own reason', () => {
+    AlertError(failure(400,
+      { error: { message: 'Please correct the highlighted fields.', details: { track_batches: ['A service has no stock.'] } } },
+      { method: 'patch', url: '/api/catalog/products/1/', showFieldErrors: true }))
+
+    expect(toasts()[0].message).toBe('A service has no stock.')
+  })
+
   it('a 401 is the sign-in flow talking: toast, no history', () => {
     AlertError(failure(401, { error: { code: 'not_authenticated', message: 'Sign in.' } }))
 

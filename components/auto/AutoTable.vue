@@ -187,12 +187,17 @@ const show_filter = ref(false)
 // ---------------- UI STATE ----------------
 const visibleColumns = ref([])
 
+// the writes the API accepts (schema.operations; absent = all): a read-only
+// endpoint (e.g. StockItem) gets no Add / Edit / Delete / inline edit - an
+// empty permission is never held (can())
+const operations = computed(() => ({ create: true, update: true, delete: true, ...(props.schema?.operations || {}) }))
+
 const permissions = computed(() => ({
   list: props.schema?.permissions?.list || `list_${props.model.toLowerCase()}`,
   view: props.schema?.permissions?.view || `view_${props.model.toLowerCase()}`,
-  add: props.schema?.permissions?.add || `add_${props.model.toLowerCase()}`,
-  change: props.schema?.permissions?.change || `change_${props.model.toLowerCase()}`,
-  delete: props.schema?.permissions?.delete || `delete_${props.model.toLowerCase()}`,
+  add: operations.value.create ? (props.schema?.permissions?.add || `add_${props.model.toLowerCase()}`) : '',
+  change: operations.value.update ? (props.schema?.permissions?.change || `change_${props.model.toLowerCase()}`) : '',
+  delete: operations.value.delete ? (props.schema?.permissions?.delete || `delete_${props.model.toLowerCase()}`) : '',
   restore: props.schema?.permissions?.restore || `restore_${props.model.toLowerCase()}`,
   hard_delete: props.schema?.permissions?.hard_delete || `hard_delete_${props.model.toLowerCase()}`,
   pdf: props.schema?.permissions?.pdf || `pdf_${props.model.toLowerCase()}`,
@@ -373,8 +378,16 @@ function toggleEstado(row) {
   })
 }
 
+// {field: reason} the serializer gives for a row (e.g. ProductSerializer:
+// "A service has no stock."): that field cannot change on this row
+function lockedReason(row, name) {
+  const locked = row?.locked_fields
+  return locked && typeof locked === 'object' ? locked[name] || '' : ''
+}
+
 function toggleBoolean(row, name) {
   if (!can(permissions.value.change)) return
+  if (lockedReason(row, name)) return
   const newValue = !row[name]
 
   emit('inline-patch', {
@@ -1828,26 +1841,32 @@ function filteredItems(row, field) {
 
         <template v-else-if="isBoolean(props.value)">
 
-          <s-btn
-            dense
-            size="sm"
-            :color="
-              toBoolean(props.value)
-                ? 'positive'
-                : 'negative'
-            "
-            :label="
-              toBoolean(props.value)
-                ? tdc('Yes')
-                : tdc('No')
-            "
-            @click="
-              () => toggleBoolean(
-                props.row,
-                props.col.name
-              )
-            "
-          />
+          <!-- a disabled button gets no hover: the reason sits on its wrapper -->
+          <span class="inline-block">
+            <s-btn
+              dense
+              size="sm"
+              :color="
+                toBoolean(props.value)
+                  ? 'positive'
+                  : 'negative'
+              "
+              :label="
+                toBoolean(props.value)
+                  ? tdc('Yes')
+                  : tdc('No')
+              "
+              :disable="Boolean(lockedReason(props.row, props.col.name))"
+              :data-test="`cell-bool-${props.col.name}`"
+              @click="
+                () => toggleBoolean(
+                  props.row,
+                  props.col.name
+                )
+              "
+            />
+            <s-tooltip v-if="lockedReason(props.row, props.col.name)">{{ lockedReason(props.row, props.col.name) }}</s-tooltip>
+          </span>
 
         </template>
 

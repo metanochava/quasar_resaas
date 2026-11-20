@@ -9,6 +9,7 @@ import { defineAsyncComponent } from 'vue'
 import BtnComponent from './../components/engine/BtnComponent.vue'
 import CardComponent from './../components/engine/CardComponent.vue'
 import ModalCard from './../components/engine/ModalCard.vue'
+import PrintButton from './../components/print/PrintButton.vue'
 import ChartComponent from './../components/engine/ChartComponent.vue'
 import TooltipComponent from './../components/engine/TooltipComponent.vue'
 import HighlightText from './../components/engine/HighlightText.vue'
@@ -202,6 +203,8 @@ export default boot(({ app }) => {
 
   app.component('s-confirm-delete',  ConfirmDeleteDialog  )
   app.component('s-modal-card', ModalCard)
+  // a printable document (core/printing): default paper, or choose printer / paper
+  app.component('s-print-btn', PrintButton)
   app.component('s-chart', ChartComponent)
 
 

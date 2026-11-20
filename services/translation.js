@@ -61,83 +61,52 @@ function matchCase(original, transformed) {
   return transformed
 }
 
+// The plural a menu shows for its label (SubMenu). A label that already is a
+// plural stays as it is: "Sales", "Purchase orders", "Vendas" - the menus
+// carry plural labels too ("Saless" was the old blind "+s"). The rules follow
+// the language family (pt-pt -> pt, en-us -> en; "en-en" never matched).
 export function toPlural(word, count = 2) {
   const User = useUserStore()
-  const lang = User.Language.code
+  const family = String(User.Language?.code || '').toLowerCase().split('-')[0]
   const w = String(word || '').trim()
   if (!w) return ''
 
   // if 0/1 -> singular
   if (Number(count) === 1) return w
 
-  const lower = w.toLowerCase()
+  // only the last word changes ("Purchase order" -> "Purchase orders")
+  const parts = w.split(/(\s+)/)
+  const last = parts[parts.length - 1]
+  const lower = last.toLowerCase()
 
-  // 🔥 Irregulars (feel free to grow this over time)
   const irregular = {
-    pt: {
-      'mão': 'mãos',
-      'cão': 'cães',
-      'pão': 'pães',
-      'país': 'países',
-      'luz': 'luzes',
-      'cidadão': 'cidadãos',
-      'alemão': 'alemães',
-    },
-    en: {
-      'person': 'people',
-      'man': 'men',
-      'woman': 'women',
-      'child': 'children',
-      'mouse': 'mice',
-      'goose': 'geese',
-      'tooth': 'teeth',
-      'foot': 'feet',
-    }
+    pt: { 'mão': 'mãos', 'cão': 'cães', 'pão': 'pães', 'país': 'países', 'luz': 'luzes', 'cidadão': 'cidadãos', 'alemão': 'alemães' },
+    en: { person: 'people', man: 'men', woman: 'women', child: 'children', mouse: 'mice', goose: 'geese', tooth: 'teeth', foot: 'feet' }
+  }
+  const plurals = new Set(Object.values(irregular[family] || {}))
+  const done = (plural) => [...parts.slice(0, -1), plural].join('')
+
+  if (plurals.has(lower)) return w
+  const irr = irregular[family]?.[lower]
+  if (irr) return done(matchCase(last, irr))
+
+  if (family === 'pt') {
+    // a label of several words is the translator's ("Ordem de compra" ->
+    // "Ordens de compra" changes the first word, "Conta aberta" both): as written
+    if (parts.length > 1) return w
+    // already ends in s/x: a plural, or invariable (lápis, tórax)
+    if (/[sx]$/i.test(last)) return w
+    if (/m$/i.test(last)) return done(last.replace(/m$/i, 'ns'))      // homem -> homens
+    if (/[rz]$/i.test(last)) return done(last + 'es')                  // flor -> flores
+    if (/ão$/i.test(last)) return done(last.replace(/ão$/i, 'ões'))   // ação -> ações
+    if (/l$/i.test(last)) return done(last.replace(/l$/i, 'is'))      // papel -> papeis
+    return done(last + 's')
   }
 
-  const irr = irregular[lang]?.[lower]
-  if (irr) return matchCase(w, irr)
-
-  // =========================
-  // 🇵🇹 PORTUGUESE (common rules)
-  // =========================
-  if (lang === 'pt-pt') {
-    // already ends in s/x/z? often invariable in the plural (lápis, tórax, juiz->juízes is an exception)
-    // as a safe general rule: if it ends in "s" or "x", keep it
-    if (/[sx]$/i.test(w)) return w
-
-    // ends in "m" => "ns" (homem->homens)
-    if (/m$/i.test(w)) return w.replace(/m$/i, 'ns')
-
-    // ends in "r" or "z" => +es (flor->flores, luz->luzes [already covered by +es, but luz usually takes +es])
-    if (/[rz]$/i.test(w)) return w + 'es'
-
-    // ends in "l" => "is" (papel->papeis) (there are accented exceptions we don't handle here)
-    if (/l$/i.test(w)) return w.replace(/l$/i, 'is')
-
-    // ends in "ão" => "ões" (most common pattern; exceptions go in the dictionary)
-    if (/ão$/i.test(w)) return w.replace(/ão$/i, 'ões')
-
-    // default: +s
-    return w + 's'
-  }
-
-  // =========================
-  // 🇬🇧 ENGLISH (common rules)
-  // =========================
-  if (lang === 'en-en') {
-    // city -> cities
-    if (/[^aeiou]y$/i.test(w)) return w.replace(/y$/i, 'ies')
-
-    // box, church, class -> +es
-    if (/(s|sh|ch|x|z)$/i.test(w)) return w + 'es'
-
-    // default
-    return w + 's'
-  }
-
-  // =========================
-  // 🌍 fallback
-  // =========================
-  return w + 's'
+  // English (and any other language)
+  // already a plural: "sales", "orders", "categories" (not "class", "status")
+  if (/[^su]s$/i.test(last) || /ies$/i.test(last)) return w
+  if (/[^aeiou]y$/i.test(last)) return done(last.replace(/y$/i, 'ies'))   // city -> cities
+  if (/(s|sh|ch|x|z)$/i.test(last)) return done(last + 'es')              // branch -> branches
+  return done(last + 's')
 }

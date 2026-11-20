@@ -13,13 +13,32 @@
        html/body do not scroll while it is mounted (html.resaas-route-scroll);
        code that used window.scrollY / window.scrollTo / window 'scroll' uses
        composables/useRouteScroll.js. -->
+  <!-- the native scrollbar of this area is hidden (it took 14px of width):
+       on a large screen a thin bar is drawn OVER the content instead, shown
+       while scrolling or hovering; on a phone or a small screen, none (touch
+       scrolls). The element that scrolls is still the native one. -->
   <div
-    ref="area"
-    class="route-scroll scroll-y"
-    data-test="route-scroll"
-    @scroll.passive="onScroll"
+    class="route-scroll-wrap"
+    @mouseenter="hovering = true; reveal()"
+    @mouseleave="hovering = false; reveal()"
   >
-    <slot />
+    <div
+      ref="area"
+      class="route-scroll scroll-y"
+      data-test="route-scroll"
+      @scroll.passive="onScroll"
+    >
+      <slot />
+    </div>
+
+    <div
+      v-if="overlayOn && thumb.size"
+      class="route-scroll-thumb"
+      :class="{ 'route-scroll-thumb--shown': shown || dragging }"
+      :style="{ height: thumb.size + 'px', transform: `translateY(${thumb.offset}px)` }"
+      data-test="route-scroll-thumb"
+      @pointerdown.prevent="startDrag"
+    />
   </div>
 
   <!-- back to the top of this area (q-page-scroller only follows the page's
@@ -32,8 +51,9 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useQuasar } from 'quasar'
 import { tdc } from '../../services/translation'
 import { setRouteScrollTarget } from '../../composables/useRouteScroll'
 
@@ -44,7 +64,9 @@ const props = defineProps({
   // a new route starts at its top
   resetOnRoute: { type: Boolean, default: true },
   // localStorage key: the position is saved on unload and restored on load
-  restoreKey: { type: String, default: '' }
+  restoreKey: { type: String, default: '' },
+  // the thin bar over the content on large screens (false: no bar at all)
+  overlayScrollbar: { type: Boolean, default: true }
 })
 
 const emit = defineEmits(['scroll'])
@@ -53,8 +75,80 @@ const area = ref(null)
 const showTop = ref(false)
 const route = useRoute()
 
+/* -------- the overlay bar -------- */
+const $q = useQuasar()
+const MIN_THUMB = 32
+// large screens only: a phone or a small screen keeps all its width
+const overlayOn = computed(() => props.overlayScrollbar && !$q.platform?.is?.mobile && !!$q.screen?.gt?.sm)
+const thumb = reactive({ size: 0, offset: 0 })
+const shown = ref(false)
+const hovering = ref(false)
+const dragging = ref(false)
+let hideTimer = null
+let observer = null
+
+function refresh () {
+  const el = area.value
+  if (!el) return
+  const { clientHeight, scrollHeight, scrollTop } = el
+  if (!clientHeight || scrollHeight <= clientHeight + 1) {
+    thumb.size = 0
+    thumb.offset = 0
+    return
+  }
+  const size = Math.max(MIN_THUMB, Math.round(clientHeight * clientHeight / scrollHeight))
+  const room = clientHeight - size
+  thumb.size = size
+  thumb.offset = Math.round(room * scrollTop / (scrollHeight - clientHeight))
+}
+
+// visible while scrolling or hovering, fades a second later
+function reveal () {
+  shown.value = true
+  clearTimeout(hideTimer)
+  hideTimer = setTimeout(() => { if (!hovering.value) shown.value = false }, 1000)
+}
+
+let drag = null
+function startDrag (event) {
+  const el = area.value
+  if (!el) return
+  dragging.value = true
+  drag = { y: event.clientY, top: el.scrollTop }
+  window.addEventListener('pointermove', onDrag)
+  window.addEventListener('pointerup', endDrag)
+}
+function onDrag (event) {
+  const el = area.value
+  if (!el || !drag) return
+  const room = el.clientHeight - thumb.size
+  if (room <= 0) return
+  el.scrollTop = drag.top + (event.clientY - drag.y) * (el.scrollHeight - el.clientHeight) / room
+  refresh()
+}
+function endDrag () {
+  dragging.value = false
+  drag = null
+  window.removeEventListener('pointermove', onDrag)
+  window.removeEventListener('pointerup', endDrag)
+  reveal()
+}
+
+// the content grows when a route loads its data: watch the area and its children
+function observe () {
+  if (!observer || !area.value) return
+  observer.disconnect()
+  observer.observe(area.value)
+  for (const child of area.value.children) observer.observe(child)
+  refresh()
+}
+
 function onScroll (event) {
   showTop.value = event.target.scrollTop > 50
+  if (overlayOn.value) {
+    refresh()
+    reveal()
+  }
   emit('scroll', event)
 }
 
@@ -70,10 +164,17 @@ function savePosition () {
 if (props.resetOnRoute) {
   watch(() => route?.path, () => area.value?.scrollTo(0, 0))
 }
+watch(() => route?.path, () => nextTick(observe))
 
 onMounted(() => {
   document.documentElement.classList.add('resaas-route-scroll')
   setRouteScrollTarget(area.value)
+  if (typeof ResizeObserver !== 'undefined') {
+    observer = new ResizeObserver(refresh)
+    observe()
+  } else {
+    refresh()
+  }
 
   if (props.restoreKey) {
     let saved = null
@@ -85,11 +186,14 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', savePosition)
+  observer?.disconnect()
+  clearTimeout(hideTimer)
+  endDrag()
   document.documentElement.classList.remove('resaas-route-scroll')
   setRouteScrollTarget(null)
 })
 
-defineExpose({ el: area, toTop })
+defineExpose({ el: area, toTop, refresh })
 </script>
 
 <style>
@@ -111,6 +215,16 @@ html.resaas-route-scroll body {
   overflow: hidden;
 }
 
+/* holds the area and its overlay bar; takes the area's old place in the
+   page container's column */
+.route-scroll-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .route-scroll {
   flex: 1 1 auto;
   min-height: 0;
@@ -118,6 +232,38 @@ html.resaas-route-scroll body {
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  /* no native bar: it took 14px of width and showed as a strip beside the
+     content (the overlay bar below replaces it on large screens) */
+  scrollbar-width: none;
+}
+
+.route-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* the overlay bar: over the content, in the menus' accent colour */
+.route-scroll-thumb {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  width: 6px;
+  border-radius: 6px;
+  background: var(--scrollbar-accent, var(--q-primary));
+  opacity: 0;
+  transition: opacity .3s, width .15s;
+  cursor: pointer;
+  z-index: 5;
+  touch-action: none;
+}
+
+.route-scroll-thumb--shown {
+  opacity: .55;
+}
+
+.route-scroll-thumb:hover,
+.route-scroll-thumb:active {
+  opacity: .85;
+  width: 8px;
 }
 
 /* q-page sets its min-height from the WINDOW (innerHeight - header - footer,

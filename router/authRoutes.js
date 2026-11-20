@@ -19,6 +19,15 @@ export const authRoutes = [
     path: '/resetpassword/:uidb64/:token',
     redirect: to => ({ name: 'resetPasswordConfirm', params: to.params }),
   },
+  // a printed document's QR code (django_resaas core/printing/verify.py):
+  // public, no session - says whether this system issued it and its state
+  {
+    path: '/v/:token',
+    component: () => import('../layouts/AuthLayout.vue'),
+    children: [
+      { path: '', component: () => import('../pages/print/PrintVerifyPage.vue'), name: 'printVerify' },
+    ],
+  },
   {
     path: '/auth/',
     component: () => import('../layouts/AuthLayout.vue'),

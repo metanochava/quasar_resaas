@@ -8,6 +8,7 @@ import './css/theme_engine.css'
 export * from './router/restRoutes.js'
 export * from './router/authRoutes.js'
 export * from './router/docsRoutes.js'
+export * from './services/printing.js'
 export * from './router/authGuard.js'
 export * from './router/chunkReload.js'
 
@@ -194,6 +195,10 @@ export {
 export {
   default as AuthLayout
 } from './layouts/AuthLayout.vue'
+
+export {
+  default as PrintButton
+} from './components/print/PrintButton.vue'
 
 export {
   default as CrudPage
