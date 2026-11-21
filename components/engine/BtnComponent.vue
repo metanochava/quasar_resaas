@@ -2,7 +2,7 @@
 
   <q-btn
     v-bind="btnAttrs"
-    :label="translatedLabel"
+    :label="iconOnly ? undefined : translatedLabel"
     :dense="attrs.dense ?? layout.dense"
     :round="attrs.round ?? false"
     :unelevated="defaultUnelevated"
@@ -16,6 +16,9 @@
   >
 
     <slot/>
+    <!-- the label hidden on a small screen: it becomes the tooltip when the
+         button brings none of its own -->
+    <q-tooltip v-if="iconOnly && !$slots.default && labelText">{{ labelText }}</q-tooltip>
 
   </q-btn>
 
@@ -24,6 +27,7 @@
 <script>
 
 import { defineComponent, computed, useAttrs } from "vue"
+import { useQuasar } from "quasar"
 import { useUserStore } from "../../stores/UserStore"
 import { unwrapChoice } from "../../theme/unwrapChoice.js"
 import { tdc } from "../../services/translation"
@@ -38,6 +42,7 @@ export default defineComponent({
 
     const attrs = useAttrs()
     const User = useUserStore()
+    const $q = useQuasar()
 
     // LayoutSetting só expõe `dense`/`rounded` como flags globais de
     // estilo (django_resaas.saas.models.layout_setting.LayoutSetting) -
@@ -69,6 +74,14 @@ export default defineComponent({
       return attrs.label ? tdc(attrs.label) : undefined
     })
 
+    // owner rule: on a small screen (xs) a button with an icon shows only the
+    // icon - the text goes to its tooltip. `keep-label` opts out.
+    const keepLabel = computed(() => attrs['keep-label'] !== undefined && attrs['keep-label'] !== false)
+    const iconOnly = computed(() =>
+      Boolean($q?.screen?.xs && (attrs.icon || attrs['icon-right']) && translatedLabel.value && !keepLabel.value)
+    )
+    const labelText = computed(() => translatedLabel.value || '')
+
     // --------------------------
     // 🎛️ ATTRS
     // --------------------------
@@ -77,6 +90,7 @@ export default defineComponent({
 
       const {
         label,
+        'keep-label': _keepLabel,
         ...rest
       } = attrs
 
@@ -92,6 +106,8 @@ export default defineComponent({
       hoverStyle,
       defaultUnelevated,
       translatedLabel,
+      iconOnly,
+      labelText,
       btnAttrs
     }
 

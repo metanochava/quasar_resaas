@@ -62,6 +62,18 @@ function printBlob (blob) {
   setTimeout(() => { frame.remove(); URL.revokeObjectURL(objectUrl) }, 60000)
 }
 
+// The PDF of `code` for `objectId` on `paper` (else the chosen one), for the
+// print dialog's preview: { blob, paper, document }.
+export async function documentPdf (code, objectId, { paper = null } = {}) {
+  const { documents } = await loadPrinting()
+  const document_ = documents.find(row => row.code === code)
+  if (!document_) throw new Error(`printing: ${code} is not available`)
+  const chosen = paperFor(document_, { paper })
+  const response = await HTTPAuthBlob.get(pdfUrl(code, objectId, chosen))
+  const blob = response.data instanceof Blob ? response.data : new Blob([response.data], { type: 'application/pdf' })
+  return { blob, paper: chosen, document: document_ }
+}
+
 // Prints `code` for `objectId`; returns the paper used. Throws when the
 // document cannot be printed here (no permission, unknown) or the request fails.
 export async function printDocument (code, objectId, { paper = null } = {}) {

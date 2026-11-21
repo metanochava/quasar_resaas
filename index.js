@@ -199,6 +199,9 @@ export {
 export {
   default as PrintButton
 } from './components/print/PrintButton.vue'
+export {
+  default as PrintDialog
+} from './components/print/PrintDialog.vue'
 
 export {
   default as CrudPage
