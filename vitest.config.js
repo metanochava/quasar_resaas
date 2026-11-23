@@ -26,6 +26,7 @@ export default defineConfig({
   },
   test: {
     environment: 'happy-dom',
+    setupFiles: ['./tests/setup.js'],
     include: ['**/*.spec.js'],
     exclude: ['node_modules/**'],
   },
