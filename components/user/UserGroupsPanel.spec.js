@@ -54,7 +54,7 @@ const clickInBody = async (selector) => {
   await flushPromises()
 }
 const confirmButton = (label) =>
-  [...document.body.querySelectorAll('.q-dialog .q-btn')].find(button => button.textContent.trim() === label)
+  [...document.body.querySelectorAll('.q-dialog .q-btn')].find(button => (button.querySelector('.block')?.textContent ?? button.textContent).trim() === label)
 
 const grantAll = () => { session.Permissions = new Set(['list_branchusergroup', 'add_branchusergroup', 'delete_branchusergroup']) }
 

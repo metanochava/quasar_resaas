@@ -1,7 +1,7 @@
 
 <template>
   <q-select
-    v-bind="selectAttrs"
+    v-bind="{ ...selectAttrs, ...look }"
 
     v-model="localValue"
 
@@ -20,10 +20,6 @@
     :error="hasError"
     :error-message="firstError"
 
-    :dense="attrs.dense ?? layout.dense"
-
-    :outlined="attrs.outlined ?? attrs.filled === undefined"
-    :filled="attrs.filled"
 
     :class="attrs.class"
 
@@ -85,6 +81,7 @@ import {
 } from "vue"
 
 import { useUserStore } from "../../stores/UserStore"
+import { fieldLook } from "../../utils/fieldLook"
 import { tdc } from "../../services/translation"
 import { HTTPAuth } from "../../services/api"
 import { toRelationOption } from "../../utils/autoForm"
@@ -161,6 +158,9 @@ export default defineComponent({
     const layout = computed(() => {
       return User.ps?.layout || {}
     })
+
+    // field_style / dense from the backend, the bottom line reserved (utils/fieldLook)
+    const look = computed(() => fieldLook(attrs, layout.value))
 
     // With `emit-value` the select holds the option's VALUE. A record loaded from the
     // API brings the READ shape {id, value, label}: converted here (see utils/choice.js)
@@ -302,9 +302,24 @@ export default defineComponent({
     // MODEL
     // ==========================================================
 
+    // a multiple select's value is an array: semantic() makes a NEW one each
+    // time, so the two watchers below fed each other forever (the page froze -
+    // add_printer's "Default for"). Same value = nothing to do.
+    const sameValue = (a, b) => {
+      try {
+        return JSON.stringify(a ?? null) === JSON.stringify(b ?? null)
+      } catch {
+        return a === b
+      }
+    }
+
     watch(
       localValue,
       (value) => {
+
+        // what the parent already holds: nothing to hand back (a READ shape
+        // {id, value, label} still differs, so it is handed back plain)
+        if (sameValue(value, props.modelValue)) return
 
         emit(
           "update:modelValue",
@@ -318,7 +333,9 @@ export default defineComponent({
       () => props.modelValue,
       (value) => {
 
-        localValue.value = semantic(value)
+        const next = semantic(value)
+        if (sameValue(next, localValue.value)) return
+        localValue.value = next
 
       }
     )
@@ -747,6 +764,7 @@ export default defineComponent({
       attrs,
 
       layout,
+      look,
 
       localValue,
 

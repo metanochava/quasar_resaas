@@ -3,6 +3,7 @@
   <q-btn
     v-bind="btnAttrs"
     :label="iconOnly ? undefined : translatedLabel"
+    :icon="icon"
     :dense="attrs.dense ?? layout.dense"
     :round="attrs.round ?? false"
     :unelevated="defaultUnelevated"
@@ -76,9 +77,24 @@ export default defineComponent({
 
     // owner rule: on a small screen (xs) a button with an icon shows only the
     // icon - the text goes to its tooltip. `keep-label` opts out.
+    // owner rule: Cancel / Close / Reset always carry a suggestive icon (the
+    // canonical English label, before translation); an icon given wins
+    // canonical English label, or the same already translated (a caller may
+    // pass tdc('Cancel') = "Cancelar")
+    const DEFAULT_ICONS = { Cancel: "close", Close: "close", Reset: "restart_alt" }
+    const icon = computed(() => {
+      if (attrs.icon) return attrs.icon
+      const label = String(attrs.label || "").trim().toLowerCase()
+      if (!label) return undefined
+      const hit = Object.entries(DEFAULT_ICONS).find(([text]) =>
+        label === text.toLowerCase() || label === String(tdc(text) || "").trim().toLowerCase()
+      )
+      return hit ? hit[1] : undefined
+    })
+
     const keepLabel = computed(() => attrs['keep-label'] !== undefined && attrs['keep-label'] !== false)
     const iconOnly = computed(() =>
-      Boolean($q?.screen?.xs && (attrs.icon || attrs['icon-right']) && translatedLabel.value && !keepLabel.value)
+      Boolean($q?.screen?.xs && (icon.value || attrs['icon-right']) && translatedLabel.value && !keepLabel.value)
     )
     const labelText = computed(() => translatedLabel.value || '')
 
@@ -90,6 +106,7 @@ export default defineComponent({
 
       const {
         label,
+        icon: _icon,
         'keep-label': _keepLabel,
         ...rest
       } = attrs
@@ -106,6 +123,7 @@ export default defineComponent({
       hoverStyle,
       defaultUnelevated,
       translatedLabel,
+      icon,
       iconOnly,
       labelText,
       btnAttrs

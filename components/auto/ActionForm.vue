@@ -29,7 +29,9 @@
           :loading="store.saving"
           :label="tdc('Delete')"
           @click="showConfirmDelete = true"
-        />
+        >
+          <s-tooltip>{{ tdc('Delete this record') }}</s-tooltip>
+        </s-btn>
 
       </div>
 
@@ -44,20 +46,26 @@
         <s-btn
           v-if="has('cancel')"
           flat
-          color="grey"
+          color="grey-7"
+          icon="close"
           :label="tdc('Cancel')"
           @click="emit('cancel')"
-        />
+        >
+          <s-tooltip>{{ tdc('Leave without saving') }}</s-tooltip>
+        </s-btn>
 
         <!-- RESET -->
         <s-btn
           v-if="has('reset')"
           flat
           type="reset"
-          color="grey"
+          color="warning"
+          icon="restart_alt"
           :label="tdc('Reset')"
           @click="reset"
-        />
+        >
+          <s-tooltip>{{ tdc('Undo the changes not saved') }}</s-tooltip>
+        </s-btn>
 
         <!-- EDIT -->
         <s-btn
@@ -70,13 +78,15 @@
           "
           v-show="isEdit"
           type="submit"
-          color="secondary"
+          color="positive"
           unelevated
-          icon="edit"
+          icon="save_as"
           :loading="store.saving"
           :label="tdc('Edit')"
           @click="emit('save')"
-        />
+        >
+          <s-tooltip>{{ tdc('Save the changes') }}</s-tooltip>
+        </s-btn>
 
         <!-- SAVE -->
         <s-btn
@@ -95,7 +105,9 @@
           :loading="store.saving"
           :label="tdc('Save')"
           @click="emit('save')"
-        />
+        >
+          <s-tooltip>{{ tdc('Save the record') }}</s-tooltip>
+        </s-btn>
 
       </div>
 

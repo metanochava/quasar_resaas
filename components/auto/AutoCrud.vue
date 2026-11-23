@@ -31,6 +31,7 @@
     @objects="onChangeObjects"
     @hard_delete="onHardDelete"
     @restore="onRestore"
+    @bulk="onBulk"
     @search="onSearch"
   />
 
@@ -63,6 +64,8 @@ import {
   resolvePdfDetailEndpoint
 } from '../../utils/schema'
 import { useUserStore } from '../../stores/UserStore'
+import { AlertSuccess, AlertWarning } from '../../boot/alerts'
+import { sDialog } from '../../services/dialog'
 import { applyFieldAccess } from '../../utils/fieldAccess'
 import { pdfBlobUrl, forgetPdf } from '../../utils/pdfFile'
 
@@ -345,6 +348,38 @@ async function onRestore(row) {
   )
 
   await loadData()
+}
+
+// the selected rows (AutoTable): delete or restore each through the same
+// endpoints as one row, after one confirmation; a failure does not stop the
+// others, and the result says how many went through
+function onBulk ({ type, rows }) {
+  const restore = type === 'restore'
+  if (!rows?.length) return
+  if (!hasPermission(schema.value?.permissions?.[restore ? 'restore' : 'delete'])) return
+  if (!restore && schema.value?.operations?.delete === false) return
+  sDialog({
+    title: tdc(restore ? 'Restore selected' : 'Delete selected'),
+    message: `${tdc(restore ? 'Restore the selected records?' : 'Delete the selected records?')} (${rows.length})`,
+    persistent: true,
+    ok: { label: tdc(restore ? 'Restore' : 'Delete'), color: restore ? 'positive' : 'negative', flat: true },
+    cancel: { label: tdc('Cancel'), flat: true }
+  }).onOk(async () => {
+    let done = 0
+    let failed = 0
+    for (const row of rows) {
+      try {
+        if (restore) await HTTPAuth.post(endpoint(`${modelEndpoint.value}${row.id}/restore/`), {})
+        else await HTTPAuth.delete(endpoint(`${modelEndpoint.value}${row.id}/`))
+        done += 1
+      } catch {
+        failed += 1
+      }
+    }
+    if (done) AlertSuccess(`${tdc(restore ? 'Records restored' : 'Records deleted')}: ${done}`)
+    if (failed) AlertWarning(`${tdc('Could not process')}: ${failed}`)
+    await loadData()
+  })
 }
 
 async function onSaved() {

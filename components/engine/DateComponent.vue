@@ -1,6 +1,6 @@
 <template>
   <q-input
-    v-bind="inputAttrs"
+    v-bind="{ ...inputAttrs, ...look }"
     v-model="displayText"
     :label="translatedLabel"
     :placeholder="translatedPlaceholder || pattern"
@@ -8,10 +8,6 @@
     :error="hasError"
     :error-message="firstError"
     :rules="computedRules"
-    :dense="attrs.dense ?? layout.dense"
-    :outlined="attrs.outlined ?? (attrs.filled === undefined && attrs.standout === undefined)"
-    :filled="attrs.filled"
-    :standout="attrs.standout"
     :class="['s-date', attrs.class]"
     mask="##/##/####"
   >
@@ -50,6 +46,7 @@
 <script>
 import { defineComponent, computed, useAttrs, ref, watch } from "vue"
 import { useUserStore } from "../../stores/UserStore"
+import { fieldLook } from "../../utils/fieldLook"
 import { tdc } from "../../services/translation"
 import { dateOrder, datePattern, isoToDisplay, displayToIso, dateLocale } from "../../utils/dateFormat"
 
@@ -96,6 +93,10 @@ export default defineComponent({
     const User = useUserStore()
 
     const layout = computed(() => User.ps?.layout || {})
+
+    // field_style / dense from the backend, the bottom line reserved (utils/fieldLook)
+
+    const look = computed(() => fieldLook(attrs, layout.value))
 
     // shown and typed in the language's order (pt-pt 09/11/2026, en-us
     // 11/09/2026); v-model is always ISO "YYYY-MM-DD" (utils/dateFormat.js)
@@ -193,6 +194,7 @@ export default defineComponent({
     return {
       attrs,
       layout,
+      look,
       displayText,
       pickerValue,
       pattern,

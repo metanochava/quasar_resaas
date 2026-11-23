@@ -19,7 +19,7 @@ const chrome = { id: 'j1', device: 'Chrome · macOS', created_at: '2026-09-20T10
 const firefox = { id: 'j2', device: 'Firefox · Windows', created_at: '2026-09-19T10:00:00Z', current: false }
 const iphone = { id: 'j3', device: 'Safari · iOS', created_at: '2026-09-18T10:00:00Z', current: false }
 
-const confirmButton = (label) => [...document.body.querySelectorAll('.q-dialog .q-btn')].find(button => button.textContent.trim() === label)
+const confirmButton = (label) => [...document.body.querySelectorAll('.q-dialog .q-btn')].find(button => (button.querySelector('.block')?.textContent ?? button.textContent).trim() === label)
 
 async function mountSessions() {
   const wrapper = mountWith(AccountSessions, pinia)

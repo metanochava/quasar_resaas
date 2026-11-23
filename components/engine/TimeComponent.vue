@@ -1,6 +1,6 @@
 <template>
   <q-input
-    v-bind="inputAttrs"
+    v-bind="{ ...inputAttrs, ...look }"
     v-model="localValue"
     :label="translatedLabel"
     :placeholder="translatedPlaceholder"
@@ -8,10 +8,6 @@
     :error="hasError"
     :error-message="firstError"
     :rules="computedRules"
-    :dense="attrs.dense ?? layout.dense"
-    :outlined="attrs.outlined ?? (attrs.filled === undefined && attrs.standout === undefined)"
-    :filled="attrs.filled"
-    :standout="attrs.standout"
     :class="['s-time', attrs.class]"
     readonly
   >
@@ -49,6 +45,7 @@
 <script>
 import { defineComponent, computed, useAttrs, ref, watch } from "vue"
 import { useUserStore } from "../../stores/UserStore"
+import { fieldLook } from "../../utils/fieldLook"
 import { tdc } from "../../services/translation"
 
 export default defineComponent({
@@ -94,6 +91,10 @@ export default defineComponent({
     const User = useUserStore()
 
     const layout = computed(() => User.ps?.layout || {})
+
+    // field_style / dense from the backend, the bottom line reserved (utils/fieldLook)
+
+    const look = computed(() => fieldLook(attrs, layout.value))
 
     const localValue = ref(props.modelValue)
 
@@ -159,6 +160,7 @@ export default defineComponent({
     return {
       attrs,
       layout,
+      look,
       localValue,
       computedRules,
       translatedLabel,

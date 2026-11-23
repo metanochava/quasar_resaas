@@ -234,7 +234,7 @@ describe('UserSecurityPanel - regenerate', () => {
 
     await wrapper.find('[data-test="security-regenerate"]').trigger('click')
     await flushPromises()
-    ;[...document.body.querySelectorAll('.q-dialog .q-btn')].find(button => button.textContent.trim() === 'Cancel').click()
+    ;[...document.body.querySelectorAll('.q-dialog .q-btn')].find(button => (button.querySelector('.block')?.textContent ?? button.textContent).trim() === 'Cancel').click()
     await flushPromises()
 
     expect(admin.regenerateTemporaryPassword).not.toHaveBeenCalled()

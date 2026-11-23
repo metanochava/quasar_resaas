@@ -34,3 +34,26 @@ describe('s-btn on a small screen: icon only', () => {
     expect(mountBtn({ label: 'Save', icon: 'save', 'keep-label': '' }).text()).toContain('Save')
   })
 })
+
+describe('s-btn: Cancel / Close / Reset carry a suggestive icon', () => {
+  const iconOf = w => w.find('.q-icon').exists() ? w.find('.q-icon').text() : null
+  it('without an icon of their own', () => {
+    expect(iconOf(mountBtn({ label: 'Cancel' }))).toBe('close')
+    expect(iconOf(mountBtn({ label: 'Close' }))).toBe('close')
+    expect(iconOf(mountBtn({ label: 'Reset' }))).toBe('restart_alt')
+  })
+  it('an icon given wins; other buttons get none', () => {
+    expect(iconOf(mountBtn({ label: 'Cancel', icon: 'arrow_back' }))).toBe('arrow_back')
+    expect(iconOf(mountBtn({ label: 'Save' }))).toBe(null)
+  })
+})
+
+describe('s-btn: the translated label gets the icon too', () => {
+  it('"Cancelar" (tdc("Cancel")) still gets close', async () => {
+    vi.resetModules()
+    vi.doMock('../../services/translation', () => ({ tdc: t => ({ Cancel: 'Cancelar', Reset: 'Repor', Close: 'Fechar' }[t] || t) }))
+    const { default: Translated } = await import('./BtnComponent.vue')
+    const w = mount(Translated, { attrs: { label: 'Repor' }, global: { plugins: [Quasar] } })
+    expect(w.find('.q-icon').text()).toBe('restart_alt')
+  })
+})

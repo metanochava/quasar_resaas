@@ -126,7 +126,9 @@ function onDelete() {
         </div>
       </div>
 
-      <div class="row q-gutter-sm">
+      <!-- the buttons sit at the bottom (ActionForm): only a page that gives
+           its own footer (which may hold none) keeps them up here -->
+      <div v-if="hasFooter" class="row q-gutter-sm" data-test="form-two-top-buttons">
         <s-btn
           flat
           color="grey-7"
