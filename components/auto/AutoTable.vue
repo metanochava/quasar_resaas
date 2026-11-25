@@ -986,6 +986,7 @@ function filteredItems(row, field) {
 
       <q-td :props="slotRow">
         <template v-if="slotRow.col.field === '__lactions'">
+          <div class="auto-table-side">
           <q-checkbox
             dense
             class="auto-table-slot"
@@ -1259,7 +1260,7 @@ function filteredItems(row, field) {
             :key="a.action || a.endpoint || a.url"
             v-show="
               canAction(a) &&
-              ['l', 'L', 'b', 'B'].includes(a.position) && !compactBar &&
+              ['l', 'L', 'r', 'R', 'b', 'B'].includes(a.position) && !compactBar &&
               !isDeleted(slotRow.row)
             "
             dense
@@ -1272,19 +1273,12 @@ function filteredItems(row, field) {
               {{ tdc(a.tooltip)+ " left" }}
             </s-tooltip>
           </s-btn>
+          </div>
         </template>
 
 
         <template v-if="slotRow.col.field === '__ractions'">
-          <div class="auto-table-side auto-table-side--right">
-          <q-checkbox
-            dense
-            class="auto-table-slot"
-            :disable="!bulkEnabled"
-            :model-value="isSelected(slotRow.row)"
-            data-test="auto-table-select-row-right"
-            @update:model-value="toggleRow(slotRow.row)"
-          />
+          <div class="auto-table-side auto-table-side--end">
           <s-btn
             dense
             flat
@@ -1292,7 +1286,7 @@ function filteredItems(row, field) {
             :key="a.action || a.endpoint || a.url"
             v-show="
               canAction(a) &&
-              ['r', 'R','b', 'B'].includes(a.position) && !compactBar &&
+              ['l', 'L', 'r', 'R', 'b', 'B'].includes(a.position) && !compactBar &&
               !isDeleted(slotRow.row) &&
               slotRow.col.field == '__ractions'
             "
@@ -1565,6 +1559,14 @@ function filteredItems(row, field) {
             </s-tooltip>
 
           </s-btn>
+          <q-checkbox
+            dense
+            class="auto-table-slot"
+            :disable="!bulkEnabled"
+            :model-value="isSelected(slotRow.row)"
+            data-test="auto-table-select-row-right"
+            @update:model-value="toggleRow(slotRow.row)"
+          />
           </div>
         </template>
       </q-td>
@@ -1986,11 +1988,19 @@ function filteredItems(row, field) {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
+  /* same spacing between checkbox and buttons in the header and on every row */
+  gap: 1px;
 }
 
 .auto-table-side--right {
   flex-direction: row-reverse;
   justify-content: flex-start;
+}
+
+/* right row: dynamic buttons, then the dropdown, then the checkbox at the outer edge */
+.auto-table-side--end {
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
 /* the checkboxes of the actions column (header and rows) share one fixed slot, so they line up */
