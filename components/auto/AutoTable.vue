@@ -1214,7 +1214,7 @@ function filteredItems(row, field) {
                   clickable
                   v-show="
                     canAction(a) &&
-                    ['m', 'M'].includes(a.position) &&
+                    (['m', 'M'].includes(a.position) || (compactBar && ['l', 'L', 'r', 'R', 'b', 'B'].includes(a.position))) &&
                     !isDeleted(slotRow.row)
                   "
                   @click="runAction(a, slotRow.row)"
@@ -1259,7 +1259,7 @@ function filteredItems(row, field) {
             :key="a.action || a.endpoint || a.url"
             v-show="
               canAction(a) &&
-              ['l', 'L', 'b', 'B'].includes(a.position) &&
+              ['l', 'L', 'b', 'B'].includes(a.position) && !compactBar &&
               !isDeleted(slotRow.row)
             "
             dense
@@ -1292,7 +1292,7 @@ function filteredItems(row, field) {
             :key="a.action || a.endpoint || a.url"
             v-show="
               canAction(a) &&
-              ['r', 'R','b', 'B'].includes(a.position) &&
+              ['r', 'R','b', 'B'].includes(a.position) && !compactBar &&
               !isDeleted(slotRow.row) &&
               slotRow.col.field == '__ractions'
             "
@@ -1527,7 +1527,7 @@ function filteredItems(row, field) {
                   clickable
                   v-show="
                     canAction(a) &&
-                    ['m', 'M'].includes(a.position) &&
+                    (['m', 'M'].includes(a.position) || (compactBar && ['l', 'L', 'r', 'R', 'b', 'B'].includes(a.position))) &&
                     !isDeleted(slotRow.row)
                   "
                   @click="runAction(a, slotRow.row)"
