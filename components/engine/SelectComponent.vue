@@ -27,7 +27,7 @@
     @virtual-scroll="onScroll"
   >
     <template v-if="canAdd || canEdit || canView" #after>
-      <s-btn flat round dense size="sm" color="primary" icon="more_vert" @click.stop>
+      <s-btn flat round dense size="sm" color="primary" icon="more_vert" class="select-actions-btn" @click.stop>
         <s-tooltip>{{ tdc('Actions') }}</s-tooltip>
 
         <q-menu auto-close>
@@ -814,3 +814,12 @@ export default defineComponent({
 
 })
 </script>
+
+<style scoped>
+/* the actions button beside the select takes the select's height */
+.select-actions-btn {
+  align-self: stretch;
+  height: auto;
+  min-height: 0;
+}
+</style>
