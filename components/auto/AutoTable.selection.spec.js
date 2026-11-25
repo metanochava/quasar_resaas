@@ -13,6 +13,7 @@ import AutoTable from './AutoTable.vue'
 
 const COLUMNS = [
   { name: '__actions', label: 'Actions', field: '__lactions', align: 'left' },
+  { name: '__actions', label: 'Actions', field: '__ractions', align: 'right' },
   { name: 'name', label: 'Name', field: 'name', align: 'left' },
 ]
 const ROWS = [{ id: 1, name: 'A' }, { id: 2, name: 'B' }, { id: 3, name: 'C', deleted_at: '2026-11-20' }]
@@ -59,12 +60,13 @@ describe('AutoTable: select rows, then delete or restore them', () => {
     expect(restored.rows.map(r => r.id)).toEqual([3])
   })
 
-  it('no permission to delete or restore: no checkboxes', async () => {
+  it('no permission to delete or restore: the checkboxes and the bulk button stay, disabled', async () => {
     perms.set = new Set(['list_product'])
     const w = mountTable()
     await flushPromises()
-    expect(w.find('[data-test="auto-table-select-row"]').exists()).toBe(false)
-    expect(w.find('[data-test="auto-table-select-all"]').exists()).toBe(false)
+    expect(w.find('[data-test="auto-table-select-row"]').attributes('aria-disabled')).toBe('true')
+    expect(w.find('[data-test="auto-table-select-all"]').attributes('aria-disabled')).toBe('true')
+    expect(w.find('[data-test="auto-table-bulk"]').attributes('disabled')).toBeDefined()
   })
 
   it('the top bar: one New (the add page), the rest in the "more" menu', async () => {

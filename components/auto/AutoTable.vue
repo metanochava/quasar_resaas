@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import { tdc } from '../../services/translation'
 import { groupLabel } from '../../utils/groupLabel'
 import { useRouter } from 'vue-router'
@@ -284,7 +285,7 @@ const canPdfList = computed(() => Boolean(
   schemaPdf.value.enabled && schemaPdf.value.list && schemaUi.value.show_pdf_list && can(schemaPdf.value.list_permission)
 ))
 const hasTopMenu = computed(() =>
-  Boolean((canCreate.value && props.config?.routes?.add) || canPdfList.value || schemaUi.value.show_columns || topActions.value.length)
+  Boolean((canCreate.value && props.config?.routes?.add) || canPdfList.value || schemaUi.value.show_columns || topActions.value.length || objectsInMenu.value || refreshInMenu.value)
 )
 
 const topActions = computed(() =>
@@ -304,19 +305,36 @@ const objectsOptions = [
   {
     label: '',
     value: 'alive',
+    slot: 'alive',
     icon: 'check_circle'
   },
   {
     label: '',
     value: 'deleted',
+    slot: 'deleted',
     icon: 'delete'
   },
   {
     label: '',
     value: 'all',
+    slot: 'all',
     icon: 'list'
   }
 ]
+
+const $q = useQuasar()
+
+// phones: the active/deleted/all toggle and the reload button move into the
+// "more" menu, so the top bar stays on one line
+const compactBar = computed(() => $q.screen.lt.sm)
+const showObjectsToggle = computed(() => can(permissions.value.restore))
+const objectsInMenu = computed(() => compactBar.value && showObjectsToggle.value)
+const refreshInMenu = computed(() => compactBar.value && Boolean(schemaUi.value.show_refresh))
+
+function setObjects(value) {
+  objects.value = value
+  emit('objects', value)
+}
 
 // ---------------- COMPUTED ----------------
 const filteredColumns = computed(() =>
@@ -707,6 +725,7 @@ function filteredItems(row, field) {
 
 
   <q-table
+    class="auto-table-root"
     square
     bordered
     :rows="rows"
@@ -734,40 +753,37 @@ function filteredItems(row, field) {
 
     <template #top>
 
-      <!-- one aligned row: the title, then search, active/deleted/all,
-           reload, the "more" menu (add in a dialog, PDF list, visible
-           columns, the model's top actions) and New -->
+      <!-- the title on its own row (centred on phones); then, on one line: the
+           search, the "more" menu, active/deleted/all (only with the restore
+           permission on this model) and reload, and New on the right -->
       <div class="auto-table-top row items-center full-width q-col-gutter-sm" data-test="auto-table-top">
 
-        <div class="col-12 col-md text-h5 text-primary ellipsis">
+        <div class="col-12 text-h5 text-weight-bold text-primary ellipsis" :class="{ 'text-center': compactBar }">
           {{ tdc(schemaUi.title) }}
         </div>
 
-        <div class="col-12 col-md-auto row items-center no-wrap justify-end q-gutter-x-xs">
+        <div class="col-12 row items-center no-wrap q-gutter-x-xs">
 
-          <!-- SEARCH (the filters button inside) -->
-          <s-input
-            v-if="schemaUi.show_search"
-            v-model="search"
-            dense outlined hide-bottom-space
-            class="auto-table-search"
-            :label="tdc('Search')"
-            data-test="auto-table-search"
-            @keyup.enter="emit('search', search)"
+          <!-- NEW: the add page when the model has one, else the dialog -->
+          <s-btn
+            v-if="canCreate"
+            color="primary" unelevated icon="add"
+            :label="tdc('New')"
+            data-test="auto-table-add"
+            v-bind="props.config?.routes?.add ? { to: { name: props.config.routes.add } } : {}"
+            @click="!props.config?.routes?.add && emit('create')"
           >
-            <template #prepend>
-              <s-btn v-if="schemaUi.show_filters" dense flat round icon="filter_list" @click="emit('filter')">
-                <s-tooltip>{{ tdc('Show filters') }}</s-tooltip>
-              </s-btn>
-            </template>
-            <template #append>
-              <q-icon name="search" class="cursor-pointer" @click="emit('search', search)" />
-            </template>
-          </s-input>
+            <s-tooltip>{{ tdc('Add a new record') }}</s-tooltip>
+          </s-btn>
 
-          <!-- ACTIVE / DELETED / ALL -->
+          <q-space />
+
+
+
+
+          <!-- ACTIVE / DELETED / ALL (wide screens; phones: in "more") -->
           <q-btn-toggle
-            v-if="can(permissions.restore) || can(permissions.hard_delete)"
+            v-if="!compactBar && showObjectsToggle"
             v-model="objects"
             dense no-caps unelevated
             toggle-color="primary"
@@ -782,12 +798,11 @@ function filteredItems(row, field) {
             <template #all><s-tooltip>{{ tdc('Show all') }}</s-tooltip></template>
           </q-btn-toggle>
 
-          <!-- RELOAD -->
-          <s-btn v-if="schemaUi.show_refresh" dense flat round icon="refresh" data-test="auto-table-refresh" @click="emit('refresh')">
+          <!-- RELOAD (wide screens; phones: in "more") -->
+          <s-btn v-if="!compactBar && schemaUi.show_refresh" dense flat round icon="refresh" data-test="auto-table-refresh" @click="emit('refresh')">
             <s-tooltip>{{ tdc('Reload data') }}</s-tooltip>
           </s-btn>
 
-          <!-- MORE -->
           <s-btn v-if="hasTopMenu" dense flat round icon="more_vert" data-test="auto-table-more">
             <s-tooltip>{{ tdc('More actions') }}</s-tooltip>
             <q-menu>
@@ -813,7 +828,8 @@ function filteredItems(row, field) {
                   <q-item-section avatar><q-icon name="view_column" color="grey-8" /></q-item-section>
                   <q-item-section>{{ tdc('Visible columns') }}</q-item-section>
                   <q-item-section side><q-icon name="chevron_right" /></q-item-section>
-                  <q-menu anchor="top end" self="top start">
+                  <!-- opens below the item; it may overlap the content when there is no room -->
+                  <q-menu anchor="bottom start" self="top start">
                     <q-list dense style="min-width: 200px">
                       <q-item clickable @click="toggleAllColumns">
                         <q-item-section avatar>
@@ -831,6 +847,26 @@ function filteredItems(row, field) {
                     </q-list>
                   </q-menu>
                 </q-item>
+
+                <!-- phones: the toggle and the reload, which are beside the button on wide screens -->
+                <template v-if="objectsInMenu || refreshInMenu">
+                  <q-separator />
+                  <q-item
+                    v-for="option in objectsInMenu ? objectsOptions : []"
+                    :key="option.value"
+                    v-close-popup clickable
+                    :active="objects === option.value"
+                    data-test="auto-table-objects-menu"
+                    @click="setObjects(option.value)"
+                  >
+                    <q-item-section avatar><q-icon :name="option.icon" /></q-item-section>
+                    <q-item-section>{{ tdc(option.value === 'alive' ? 'Show active' : option.value === 'deleted' ? 'Show deleted' : 'Show all') }}</q-item-section>
+                  </q-item>
+                  <q-item v-if="refreshInMenu" v-close-popup clickable data-test="auto-table-refresh-menu" @click="emit('refresh')">
+                    <q-item-section avatar><q-icon name="refresh" /></q-item-section>
+                    <q-item-section>{{ tdc('Reload data') }}</q-item-section>
+                  </q-item>
+                </template>
 
                 <template v-if="topActions.length">
                   <q-separator />
@@ -852,18 +888,25 @@ function filteredItems(row, field) {
             </q-menu>
           </s-btn>
 
-          <!-- NEW: the add page when the model has one, else the dialog -->
-          <s-btn
-            v-if="canCreate"
-            color="primary" unelevated icon="add"
-            :label="tdc('New')"
-            data-test="auto-table-add"
-            v-bind="props.config?.routes?.add ? { to: { name: props.config.routes.add } } : {}"
-            @click="!props.config?.routes?.add && emit('create')"
+          <!-- SEARCH (the filters button inside) -->
+          <s-input
+            v-if="schemaUi.show_search"
+            v-model="search"
+            dense outlined hide-bottom-space
+            class="auto-table-search"
+            :label="tdc('Search')"
+            data-test="auto-table-search"
+            @keyup.enter="emit('search', search)"
           >
-            <s-tooltip>{{ tdc('Add a new record') }}</s-tooltip>
-          </s-btn>
-
+            <template #prepend>
+              <s-btn v-if="schemaUi.show_filters" dense flat round icon="filter_list" @click="emit('filter')">
+                <s-tooltip>{{ tdc('Show filters') }}</s-tooltip>
+              </s-btn>
+            </template>
+            <template #append>
+              <q-icon name="search" class="cursor-pointer" @click="emit('search', search)" />
+            </template>
+          </s-input>
         </div>
       </div>
 
@@ -886,46 +929,47 @@ function filteredItems(row, field) {
             props.col.field === '__ractions'
         }"
       >
-        <!-- select all + the actions on the selected rows, beside the rows' menus -->
-        <div
-          v-if="props.col.field === '__lactions' && bulkEnabled"
-          class="row inline items-center no-wrap auto-table-bulk"
+        <!-- left header: select all on this page; its checkbox lines up with the rows' checkboxes -->
+        <q-checkbox
+          v-if="props.col.field === '__lactions'"
+          dense
+          class="auto-table-slot"
+          :disable="!bulkEnabled"
+          :model-value="pageSelection"
+          data-test="auto-table-select-all"
+          @update:model-value="toggleAll"
         >
-          <q-checkbox
-            dense
-            :model-value="pageSelection"
-            data-test="auto-table-select-all"
-            @update:model-value="toggleAll"
-          >
-            <s-tooltip>{{ tdc('Select all on this page') }}</s-tooltip>
-          </q-checkbox>
-          <s-btn
-            dense outline icon="checklist" color="secondary"
-            class="q-ml-xs"
-            :disable="!selectedRows.length"
-            data-test="auto-table-bulk"
-          >
-            <q-badge v-if="selectedRows.length" floating color="primary" data-test="auto-table-bulk-count">{{ selectedRows.length }}</q-badge>
-            <s-tooltip>{{ tdc('Actions on the selected records') }}</s-tooltip>
-            <q-menu auto-close>
-              <q-list dense style="min-width: 200px">
-                <q-item v-if="bulkDeletable.length" clickable data-test="auto-table-bulk-delete" @click="bulk('delete')">
-                  <q-item-section avatar><q-icon name="delete" color="negative" /></q-item-section>
-                  <q-item-section>{{ tdc('Delete selected') }} ({{ bulkDeletable.length }})</q-item-section>
-                </q-item>
-                <q-item v-if="bulkRestorable.length" clickable data-test="auto-table-bulk-restore" @click="bulk('restore')">
-                  <q-item-section avatar><q-icon name="restore" color="positive" /></q-item-section>
-                  <q-item-section>{{ tdc('Restore selected') }} ({{ bulkRestorable.length }})</q-item-section>
-                </q-item>
-                <q-separator v-if="bulkDeletable.length || bulkRestorable.length" />
-                <q-item clickable data-test="auto-table-bulk-clear" @click="selectedIds = []">
-                  <q-item-section avatar><q-icon name="deselect" color="grey-7" /></q-item-section>
-                  <q-item-section>{{ tdc('Clear the selection') }}</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </s-btn>
-        </div>
+          <s-tooltip>{{ tdc('Select all on this page') }}</s-tooltip>
+        </q-checkbox>
+
+        <!-- right header: the actions on the selected records, in line with the rows' buttons on the right -->
+        <s-btn
+          v-else-if="props.col.field === '__ractions'"
+          dense outline icon="checklist" color="secondary"
+          class="auto-table-bulk"
+          :disable="!bulkEnabled || !selectedRows.length"
+          data-test="auto-table-bulk"
+        >
+          <q-badge v-if="selectedRows.length" floating color="primary" data-test="auto-table-bulk-count">{{ selectedRows.length }}</q-badge>
+          <s-tooltip>{{ tdc('Actions on the selected records') }}</s-tooltip>
+          <q-menu auto-close>
+            <q-list dense style="min-width: 200px">
+              <q-item v-if="bulkDeletable.length" clickable data-test="auto-table-bulk-delete" @click="bulk('delete')">
+                <q-item-section avatar><q-icon name="delete" color="negative" /></q-item-section>
+                <q-item-section>{{ tdc('Delete selected') }} ({{ bulkDeletable.length }})</q-item-section>
+              </q-item>
+              <q-item v-if="bulkRestorable.length" clickable data-test="auto-table-bulk-restore" @click="bulk('restore')">
+                <q-item-section avatar><q-icon name="restore" color="positive" /></q-item-section>
+                <q-item-section>{{ tdc('Restore selected') }} ({{ bulkRestorable.length }})</q-item-section>
+              </q-item>
+              <q-separator v-if="bulkDeletable.length || bulkRestorable.length" />
+              <q-item clickable data-test="auto-table-bulk-clear" @click="selectedIds = []">
+                <q-item-section avatar><q-icon name="deselect" color="grey-7" /></q-item-section>
+                <q-item-section>{{ tdc('Clear the selection') }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </s-btn>
         <template v-else>{{ tdc(props.col.label) }}</template>
       </q-th>
 
@@ -941,9 +985,9 @@ function filteredItems(row, field) {
       <q-td :props="slotRow">
         <template v-if="slotRow.col.field === '__lactions'">
           <q-checkbox
-            v-if="bulkEnabled"
             dense
-            class="q-mr-xs"
+            class="auto-table-slot"
+            :disable="!bulkEnabled"
             :model-value="isSelected(slotRow.row)"
             data-test="auto-table-select-row"
             @update:model-value="toggleRow(slotRow.row)"
@@ -1898,6 +1942,28 @@ function filteredItems(row, field) {
 .row-odd:hover {
   background-color: var(--q-primary);
   opacity: 0.1;
+}
+
+/* phones: the pagination of the table sits centred under the rows */
+@media (max-width: 599.98px) {
+  .auto-table-root .q-table__bottom {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 4px;
+  }
+}
+
+/* the checkboxes of the actions column (header and rows) share one fixed slot, so they line up */
+.auto-table-slot {
+  flex: 0 0 40px;
+  width: 40px;
+  justify-content: center;
+}
+
+/* the search sits at the right of the top bar with a fixed width, so it lines up */
+.auto-table-search {
+  width: 260px;
+  max-width: 100%;
 }
 
 </style>
