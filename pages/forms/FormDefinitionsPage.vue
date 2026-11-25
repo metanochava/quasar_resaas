@@ -92,9 +92,12 @@
             <div v-if="saveError" class="text-negative q-mt-sm" data-test="fd-error">{{ saveError }}</div>
           </q-card-section>
           <q-separator />
+          <div v-if="branchHidden" class="text-negative text-caption q-px-md q-pt-sm" data-test="fd-branch-hidden">
+            {{ tdc('Only an Entity admin can save a branch-level form') }}
+          </div>
           <q-card-actions align="right">
             <s-btn v-if="canSave" color="primary" icon="save" no-caps :loading="saving"
-                   :label="tdc(isNew ? 'Save' : 'Save as a new version')" :disable="!!jsonError" data-test="fd-save" @click="save">
+                   :label="tdc(isNew ? 'Save' : 'Save as a new version')" :disable="!!jsonError || branchHidden" data-test="fd-save" @click="save">
               <s-tooltip>{{ tdc('A published version never changes: saving makes a new draft version') }}</s-tooltip>
             </s-btn>
             <s-btn v-if="canPublish" color="positive" icon="publish" no-caps :label="tdc('Publish')"
@@ -141,6 +144,12 @@ const isNew = computed(() => !editing.value?.id)
 const published = computed(() => editing.value?.status === 'published')
 const readonlyEditor = computed(() => !can('add_formdefinition'))
 const canSave = computed(() => can('add_formdefinition'))
+
+// an existing branch-level form only carries its branch to an Entity admin (field read rule);
+// saving it without the branch would fail on the backend, so the save is held here
+const branchHidden = computed(() =>
+  !isNew.value && editing.value?.level === 'branch' && !('branch' in (editing.value || {}))
+)
 const canPublish = computed(() => !isNew.value && !published.value && can('publish_formdefinition'))
 
 const parsed = computed(() => {
