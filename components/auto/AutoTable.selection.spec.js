@@ -69,6 +69,20 @@ describe('AutoTable: select rows, then delete or restore them', () => {
     expect(w.find('[data-test="auto-table-bulk"]').attributes('disabled')).toBeDefined()
   })
 
+  it('both sides have a checkbox and the bulk button, in the header and on every row', async () => {
+    const w = mountTable()
+    await flushPromises()
+    expect(w.find('[data-test="auto-table-select-all"]').exists()).toBe(true)
+    expect(w.find('[data-test="auto-table-select-all-right"]').exists()).toBe(true)
+    expect(w.find('[data-test="auto-table-bulk"]').exists()).toBe(true)
+    expect(w.find('[data-test="auto-table-bulk-right"]').exists()).toBe(true)
+    expect(w.findAll('[data-test="auto-table-select-row"]')).toHaveLength(3)
+    expect(w.findAll('[data-test="auto-table-select-row-right"]')).toHaveLength(3)
+
+    await w.findAll('[data-test="auto-table-select-row-right"]')[0].trigger('click')
+    expect(w.find('[data-test="auto-table-bulk-count"]').text()).toBe('1')
+  })
+
   it('the top bar: one New (the add page), the rest in the "more" menu', async () => {
     const w = mountTable()
     await flushPromises()

@@ -929,26 +929,27 @@ function filteredItems(row, field) {
             props.col.field === '__ractions'
         }"
       >
-        <!-- left header: select all on this page; its checkbox lines up with the rows' checkboxes -->
+        <!-- both sides: select all on this page (its checkbox lines up with the rows') and the actions on the selected records; the right side mirrors the left -->
+        <div
+          v-if="props.col.field === '__lactions' || props.col.field === '__ractions'"
+          class="auto-table-side"
+          :class="{ 'auto-table-side--right': props.col.field === '__ractions' }"
+        >
         <q-checkbox
-          v-if="props.col.field === '__lactions'"
           dense
           class="auto-table-slot"
           :disable="!bulkEnabled"
           :model-value="pageSelection"
-          data-test="auto-table-select-all"
+          :data-test="props.col.field === '__lactions' ? 'auto-table-select-all' : 'auto-table-select-all-right'"
           @update:model-value="toggleAll"
         >
           <s-tooltip>{{ tdc('Select all on this page') }}</s-tooltip>
         </q-checkbox>
-
-        <!-- right header: the actions on the selected records, in line with the rows' buttons on the right -->
         <s-btn
-          v-else-if="props.col.field === '__ractions'"
           dense outline icon="checklist" color="secondary"
           class="auto-table-bulk"
           :disable="!bulkEnabled || !selectedRows.length"
-          data-test="auto-table-bulk"
+          :data-test="props.col.field === '__lactions' ? 'auto-table-bulk' : 'auto-table-bulk-right'"
         >
           <q-badge v-if="selectedRows.length" floating color="primary" data-test="auto-table-bulk-count">{{ selectedRows.length }}</q-badge>
           <s-tooltip>{{ tdc('Actions on the selected records') }}</s-tooltip>
@@ -970,6 +971,7 @@ function filteredItems(row, field) {
             </q-list>
           </q-menu>
         </s-btn>
+        </div>
         <template v-else>{{ tdc(props.col.label) }}</template>
       </q-th>
 
@@ -1274,6 +1276,15 @@ function filteredItems(row, field) {
 
 
         <template v-if="slotRow.col.field === '__ractions'">
+          <div class="auto-table-side auto-table-side--right">
+          <q-checkbox
+            dense
+            class="auto-table-slot"
+            :disable="!bulkEnabled"
+            :model-value="isSelected(slotRow.row)"
+            data-test="auto-table-select-row-right"
+            @update:model-value="toggleRow(slotRow.row)"
+          />
           <s-btn
             dense
             flat
@@ -1554,6 +1565,7 @@ function filteredItems(row, field) {
             </s-tooltip>
 
           </s-btn>
+          </div>
         </template>
       </q-td>
 
@@ -1944,6 +1956,12 @@ function filteredItems(row, field) {
   opacity: 0.1;
 }
 
+/* the "Records per page" label takes the dynamic primary colour, like its select */
+.auto-table-root .q-table__bottom .q-table__control > .q-table__bottom-item:first-child {
+  color: var(--q-primary);
+  font-weight: 700;
+}
+
 /* phones: the pagination of the table sits centred under the rows */
 @media (max-width: 599.98px) {
   .auto-table-root .q-table__bottom {
@@ -1951,6 +1969,28 @@ function filteredItems(row, field) {
     justify-content: center;
     row-gap: 4px;
   }
+
+  /* the flexible spacer would push the rows-per-page control to the left when the bar wraps */
+  .auto-table-root .q-table__bottom .q-table__separator {
+    display: none;
+  }
+
+  .auto-table-root .q-table__bottom .q-table__control {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* both action columns: checkbox and buttons in one row; the right side is reversed so its checkbox sits at the outer edge, like the left */
+.auto-table-side {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.auto-table-side--right {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
 }
 
 /* the checkboxes of the actions column (header and rows) share one fixed slot, so they line up */
